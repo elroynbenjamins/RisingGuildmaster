@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Guildmaster",
+    "slug": "guildmaster",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": ["**/*"],
+    "android": { "package": "com.guildmaster.game" },
+    "ios": { "bundleIdentifier": "com.guildmaster.game" }
+  }
+}

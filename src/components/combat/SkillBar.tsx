@@ -1,0 +1,5 @@
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+export interface SkillBarItem { id: string; name: string; detail: string; enabled: boolean }
+export function SkillBar({ items, selectedId, onSelect }: { items: readonly SkillBarItem[]; selectedId?: string; onSelect(id: string): void }) { return <View style={styles.wrap}>{items.map((item) => <Pressable key={item.id} disabled={!item.enabled} onPress={() => onSelect(item.id)} style={[styles.button, selectedId === item.id && styles.selected, !item.enabled && styles.disabled]}><Text style={styles.name}>{item.name}</Text><Text style={styles.detail}>{item.detail}</Text></Pressable>)}</View>; }
+const styles = StyleSheet.create({ wrap: { gap: 7 }, button: { padding: 10, borderWidth: 1, borderColor: "#445069", borderRadius: 9, backgroundColor: "#202a3d" }, selected: { borderColor: "#f2cb68", borderWidth: 2 }, disabled: { opacity: .4 }, name: { color: "#f3f4f7", fontWeight: "800" }, detail: { color: "#9ca7b9", fontSize: 12, marginTop: 2 } });

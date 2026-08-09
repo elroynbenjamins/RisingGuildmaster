@@ -1,0 +1,3 @@
+import { SUBCLASSES } from "../../../data/subclasses/subclasses";
+import type { Hero } from "../../heroes/types";
+export function validateSubclassSelection(hero: Hero, subclassId: string): string[] { const definition = SUBCLASSES[subclassId]; const errors: string[] = []; if (!definition) return ["Unknown subclass"]; if (hero.subclassId) errors.push("Hero already has a permanent subclass"); if (hero.level < definition.levelRequirement) errors.push(`Subclass unlocks at level ${definition.levelRequirement}`); if (hero.classId !== definition.baseClassId) errors.push("Subclass does not match hero base class"); return errors; }

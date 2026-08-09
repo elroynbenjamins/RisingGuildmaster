@@ -1,0 +1,11 @@
+import React from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { QUESTS } from "../data/quests/quests";
+import { QUEST_ENCOUNTERS } from "../data/encounters/questEncounters";
+import { getEnemyDefinition } from "../data/enemies";
+import { ActionButton, BackButton, Panel, colors } from "../components/ui";
+export function QuestSelectionScreen({ onBack, selectQuest, questIds }: { onBack(): void; selectQuest(id: string): void; questIds?: string[] }) {
+  const quests = Object.values(QUESTS).filter((quest) => questIds ? questIds.includes(quest.id) : quest.questType === "contract");
+  return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={styles.title}>Quest Board</Text><Text style={styles.intro}>Choose a contract, then assemble up to four available heroes.</Text>{quests.map((quest) => { const factions = [...new Set(quest.encounterIds.flatMap((id) => QUEST_ENCOUNTERS[id]?.enemies ?? []).map((entry) => getEnemyDefinition(entry.enemyDefinitionId).factionId))]; return <Panel key={quest.id} style={styles.card}><View style={styles.row}><View style={styles.flex}><Text style={styles.name}>{quest.name}</Text><Text style={styles.difficulty}>{quest.questType.toUpperCase()} · Difficulty {quest.difficulty}</Text></View><ActionButton label="Choose" onPress={() => selectQuest(quest.id)} /></View><Text style={styles.detail}>Party {quest.minPartySize}–{quest.maxPartySize} · {quest.encounterIds.length} encounter{quest.encounterIds.length > 1 ? "s" : ""}</Text><Text style={styles.detail}>Factions: {factions.join(", ")}</Text><Text style={styles.detail}>{quest.goldRewardMin}–{quest.goldRewardMax} gold · {quest.xpRewardPerHero} XP per hero</Text></Panel>; })}</ScrollView>;
+}
+const styles = StyleSheet.create({ content: { padding: 20, paddingBottom: 50 }, title: { color: colors.text, fontSize: 32, fontWeight: "900", marginTop: 12 }, intro: { color: colors.muted, lineHeight: 21, marginVertical: 10, marginBottom: 20 }, card: { marginBottom: 12 }, row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, flex: { flex: 1 }, name: { color: colors.text, fontSize: 20, fontWeight: "800" }, difficulty: { color: colors.gold, marginTop: 3 }, detail: { color: colors.muted, marginTop: 9 } });

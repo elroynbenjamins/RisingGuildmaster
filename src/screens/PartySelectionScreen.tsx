@@ -1,0 +1,17 @@
+import React, { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { CLASSES } from "../data/classes/classes";
+import { QUESTS } from "../data/quests/quests";
+import { RACES } from "../data/races/races";
+import { ActionButton, BackButton, Panel, colors } from "../components/ui";
+import { calculateHero } from "../game/heroes/heroCalculator";
+import type { Party } from "../game/party/partyTypes";
+import { validateParty } from "../game/party/partyValidator";
+import { useGuild } from "../state/GuildContext";
+export function PartySelectionScreen({ questId, onBack, start }: { questId: string; onBack(): void; start(party: Party): void }) {
+  const { guild } = useGuild(); const quest = QUESTS[questId]!; const [ids, setIds] = useState<string[]>([]);
+  const party = { id: `party-${questId}`, heroIds: ids }; const validation = validateParty(party, guild.heroes); const questSizeValid = ids.length >= quest.minPartySize && ids.length <= quest.maxPartySize;
+  const toggle = (id: string) => setIds((current) => current.includes(id) ? current.filter((item) => item !== id) : current.length < quest.maxPartySize ? [...current, id] : current);
+  return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={styles.title}>Assemble Party</Text><Text style={styles.quest}>{quest.name} · select {quest.minPartySize}–{quest.maxPartySize}</Text>{guild.heroes.map((hero) => { const selected = ids.includes(hero.id); const stats = calculateHero(hero); const disabled = !hero.isAvailable || hero.currentHP <= 0; return <Pressable key={hero.id} disabled={disabled} onPress={() => toggle(hero.id)}><Panel style={[styles.hero, selected && styles.selected, disabled && styles.disabled]}><View style={styles.row}><View style={styles.flex}><Text style={styles.name}>{hero.name} · Lv {hero.level}</Text><Text style={styles.meta}>{RACES[hero.raceId].name} • {CLASSES[hero.classId].name}</Text><Text style={styles.meta}>HP {Math.round(hero.currentHP)} / {Math.round(stats.stats.maxHP)} · Potential {hero.potentialEstimateMin}–{hero.potentialEstimateMax}</Text><Text style={styles.meta}>{hero.conditions.length ? hero.conditions.map((condition) => condition.conditionId).join(", ") : "No conditions"}</Text></View><Text style={styles.check}>{selected ? "✓" : disabled ? "Unavailable" : "○"}</Text></View></Panel></Pressable>; })}{!guild.heroes.length && <Text style={styles.error}>Recruit at least one hero before starting a quest.</Text>}{(!validation.valid || !questSizeValid) && ids.length > 0 && <Text style={styles.error}>{!questSizeValid ? `This quest requires ${quest.minPartySize}–${quest.maxPartySize} heroes.` : validation.errors.join(" · ")}</Text>}<ActionButton label="Start Quest" disabled={!validation.valid || !questSizeValid} onPress={() => start(party)} /></ScrollView>;
+}
+const styles = StyleSheet.create({ content: { padding: 20, paddingBottom: 50 }, title: { color: colors.text, fontSize: 30, fontWeight: "900", marginTop: 12 }, quest: { color: colors.gold, marginTop: 5, marginBottom: 18 }, hero: { marginBottom: 10 }, selected: { borderColor: colors.gold, backgroundColor: colors.panel2 }, disabled: { opacity: .45 }, row: { flexDirection: "row", alignItems: "center" }, flex: { flex: 1 }, name: { color: colors.text, fontSize: 17, fontWeight: "800" }, meta: { color: colors.muted, marginTop: 4 }, check: { color: colors.gold, fontWeight: "800" }, error: { color: colors.danger, marginBottom: 12 } });

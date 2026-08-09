@@ -1,0 +1,5 @@
+import type { EnemyDefinition } from "../../game/enemies/enemyTypes";
+export const BANDIT_ENEMIES = {
+  bandit: { id: "bandit", name: "Bandit", factionId: "bandits", role: "frontline", hpModifier: 0, physicalDamageModifier: 0.05, physicalDefenseModifier: 0, magicDamageModifier: 0, magicDefenseModifier: 0, speedModifier: 0.05, xpReward: 30, goldRewardMin: 10, goldRewardMax: 25, abilityIds: ["steal_gold"], skillIds: ["bandit_slash", "dirty_strike"], behaviorId: "bandit_behavior", conditionImmunities: [], resistanceModifiers: {}, lootTableId: "bandit_loot" },
+  bandit_captain: { id: "bandit_captain", name: "Bandit Captain", factionId: "bandits", role: "elite", hpModifier: 0.30, physicalDamageModifier: 0.20, physicalDefenseModifier: 0.15, magicDamageModifier: 0, magicDefenseModifier: 0.05, speedModifier: 0, xpReward: 70, goldRewardMin: 30, goldRewardMax: 60, abilityIds: ["commanding_presence"], skillIds: ["captain_sword_strike", "bandit_rally", "commanding_presence"], behaviorId: "bandit_captain_behavior", conditionImmunities: [], resistanceModifiers: {}, lootTableId: "bandit_captain_loot" },
+} satisfies Record<string, EnemyDefinition>;

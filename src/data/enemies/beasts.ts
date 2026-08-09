@@ -1,0 +1,5 @@
+import type { EnemyDefinition } from "../../game/enemies/enemyTypes";
+export const BEAST_ENEMIES = {
+  dire_wolf: { id: "dire_wolf", name: "Dire Wolf", factionId: "beasts", role: "skirmisher", hpModifier: -0.05, physicalDamageModifier: 0.10, physicalDefenseModifier: -0.10, magicDamageModifier: 0, magicDefenseModifier: -0.10, speedModifier: 0.30, xpReward: 30, goldRewardMin: 0, goldRewardMax: 4, abilityIds: ["predator_instinct"], skillIds: ["wolf_bite", "wolf_pounce", "predator_instinct"], behaviorId: "dire_wolf_behavior", conditionImmunities: [], resistanceModifiers: {}, lootTableId: "wolf_loot" },
+  giant_spider: { id: "giant_spider", name: "Giant Spider", factionId: "beasts", role: "debuffer", hpModifier: -0.10, physicalDamageModifier: -0.05, physicalDefenseModifier: 0, magicDamageModifier: 0, magicDefenseModifier: 0, speedModifier: 0.15, xpReward: 35, goldRewardMin: 4, goldRewardMax: 12, abilityIds: ["venom_bite"], skillIds: ["spider_bite", "venom_bite"], behaviorId: "giant_spider_behavior", conditionImmunities: [], resistanceModifiers: { poison: 0.50 }, lootTableId: "giant_spider_loot" },
+} satisfies Record<string, EnemyDefinition>;

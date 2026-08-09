@@ -1,0 +1,5 @@
+import type { EnemyDefinition } from "../../game/enemies/enemyTypes";
+export const ORC_ENEMIES = {
+  orc_raider: { id: "orc_raider", name: "Orc Raider", factionId: "orcs", role: "heavy_attacker", hpModifier: 0.20, physicalDamageModifier: 0.25, physicalDefenseModifier: 0.05, magicDamageModifier: 0, magicDefenseModifier: -0.10, speedModifier: -0.10, xpReward: 50, goldRewardMin: 10, goldRewardMax: 22, abilityIds: ["orc_blood_fury"], skillIds: ["orc_cleave", "reckless_charge", "orc_blood_fury"], behaviorId: "orc_raider_behavior", conditionImmunities: [], resistanceModifiers: {}, lootTableId: "orc_loot" },
+  troll: { id: "troll", name: "Troll", factionId: "orcs", role: "mini_boss", hpModifier: 0.80, physicalDamageModifier: 0.20, physicalDefenseModifier: 0.20, magicDamageModifier: 0, magicDefenseModifier: 0.05, speedModifier: -0.30, xpReward: 150, goldRewardMin: 40, goldRewardMax: 80, abilityIds: ["troll_regeneration"], skillIds: ["troll_smash", "ground_slam", "troll_regeneration"], behaviorId: "troll_behavior", conditionImmunities: [], resistanceModifiers: { poison: 0.25 }, lootTableId: "troll_loot" },
+} satisfies Record<string, EnemyDefinition>;

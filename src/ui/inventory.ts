@@ -1,0 +1,3 @@
+import { resolveEquipmentDefinition, type ResolvedEquipmentDefinition } from "../game/equipment/equipmentResolver";
+export type InventoryTab = "All" | "Weapons" | "Armor" | "Accessories" | "Materials";
+export function filterInventory(itemIds: string[], tab: InventoryTab): ResolvedEquipmentDefinition[] { return itemIds.map(resolveEquipmentDefinition).filter((item): item is ResolvedEquipmentDefinition => Boolean(item)).filter((item) => tab === "All" || (tab === "Weapons" ? item.slot === "weapon" : tab === "Armor" ? ["armor", "helmet", "boots"].includes(item.slot) : tab === "Accessories" ? item.slot.startsWith("accessory") : false)); }

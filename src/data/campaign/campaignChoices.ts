@@ -1,9 +1,25 @@
 import type { CampaignChoiceDefinition } from "../../game/campaign/campaignTypes";
 const chieftainFlags = ["chieftain_spared", "chieftain_killed", "chieftain_imprisoned"];
+const foundingVowFlags = ["founding_vow_protection", "founding_vow_justice", "founding_vow_ambition"];
+const evidenceFlags = ["evidence_shared_with_stonegate", "evidence_concealed_by_guild", "iron_laurel_challenged_publicly"];
+const ghorakFlags = ["ghorak_allied", "ghorak_imprisoned", "ghorak_banished"];
+const heartstoneFlags = ["heartstone_restored", "heartstone_entrusted", "heartstone_retained"];
 export const CAMPAIGN_CHOICES: Record<string, CampaignChoiceDefinition> = {
+  vow_protect_heroes: { id: "vow_protect_heroes", text: "No hero will be treated as disposable", description: "Build a guild where recruits are developed, protected, and remembered—not spent for someone else's reputation.", setWorldFlags: { founding_vow_protection: true }, mutuallyExclusiveFlagIds: foundingVowFlags },
+  vow_expose_laurel: { id: "vow_expose_laurel", text: "The truth of Blackbridge will be known", description: "Grow strong enough to challenge Cassian Vane and reveal what the Iron Laurel did to its abandoned recruits.", setWorldFlags: { founding_vow_justice: true }, mutuallyExclusiveFlagIds: foundingVowFlags },
+  vow_surpass_all: { id: "vow_surpass_all", text: "We will become Eldoria's greatest guild", description: "Surpass the Iron Laurel in victories, heroes, and reputation until no great contract can ignore your banner.", setWorldFlags: { founding_vow_ambition: true }, mutuallyExclusiveFlagIds: foundingVowFlags },
   track_carefully: { id: "track_carefully", text: "Follow the tracks carefully", setWorldFlags: { tracks_followed_carefully: true } },
   track_quickly: { id: "track_quickly", text: "Press ahead before the trail cools", setWorldFlags: { tracks_followed_quickly: true } },
   spare_chieftain: { id: "spare_chieftain", text: "Spare the Chieftain", setWorldFlags: { chieftain_spared: true }, mutuallyExclusiveFlagIds: chieftainFlags },
   execute_chieftain: { id: "execute_chieftain", text: "Execute the Chieftain", setWorldFlags: { chieftain_killed: true }, mutuallyExclusiveFlagIds: chieftainFlags },
   imprison_chieftain: { id: "imprison_chieftain", text: "Imprison the Chieftain", setWorldFlags: { chieftain_imprisoned: true }, mutuallyExclusiveFlagIds: chieftainFlags },
+  share_stonegate_evidence: { id: "share_stonegate_evidence", text: "Share everything with Stonegate", description: "Earn the keepers' trust, even if the evidence reaches the Iron Laurel before you are ready.", setWorldFlags: { evidence_shared_with_stonegate: true, stonegate_reputation_gained: true }, mutuallyExclusiveFlagIds: evidenceFlags },
+  conceal_wardstone_evidence: { id: "conceal_wardstone_evidence", text: "Keep the manifests inside the guild", description: "Protect the investigation from interference, but make Stonegate wonder what you are hiding.", setWorldFlags: { evidence_concealed_by_guild: true }, mutuallyExclusiveFlagIds: evidenceFlags },
+  challenge_iron_laurel_claim: { id: "challenge_iron_laurel_claim", text: "Challenge the Iron Laurel publicly", description: "Force Cassian's expedition to answer the accusation and deepen the rivalry between your banners.", setWorldFlags: { iron_laurel_challenged_publicly: true, iron_laurel_rivalry_escalated: true }, mutuallyExclusiveFlagIds: evidenceFlags },
+  free_ghoraks_clan: { id: "free_ghoraks_clan", text: "Break the chains and accept Ghorak's oath", description: "Treat the uprising as a rescue and gain an orc guide for the descent.", setWorldFlags: { ghorak_allied: true, orc_clans_respected: true }, mutuallyExclusiveFlagIds: ghorakFlags },
+  bind_ghorak_to_trial: { id: "bind_ghorak_to_trial", text: "Take Ghorak to Stonegate for trial", description: "Let the keepers judge the damage done during the uprising.", setWorldFlags: { ghorak_imprisoned: true }, mutuallyExclusiveFlagIds: ghorakFlags },
+  banish_ghorak: { id: "banish_ghorak", text: "Banish Ghorak from the Iron Hills", description: "Spare his life but deny his clan any claim on the deep roads.", setWorldFlags: { ghorak_banished: true }, mutuallyExclusiveFlagIds: ghorakFlags },
+  restore_iron_wardstone: { id: "restore_iron_wardstone", text: "Return the heartstone to the Ward", description: "Stabilize the Iron Hills immediately and surrender the fragment's power.", setWorldFlags: { heartstone_restored: true }, mutuallyExclusiveFlagIds: heartstoneFlags },
+  entrust_stonegate_keepers: { id: "entrust_stonegate_keepers", text: "Entrust it to Stonegate's keepers", description: "Let dwarven ward-smiths study the heartstone before restoring it.", setWorldFlags: { heartstone_entrusted: true }, mutuallyExclusiveFlagIds: heartstoneFlags },
+  retain_heartstone_fragment: { id: "retain_heartstone_fragment", text: "Retain one fragment under guild seal", description: "Keep evidence capable of proving the Iron Laurel's operation, accepting the risk it carries.", setWorldFlags: { heartstone_retained: true }, mutuallyExclusiveFlagIds: heartstoneFlags },
 };

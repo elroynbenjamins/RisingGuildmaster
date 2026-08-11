@@ -10,8 +10,10 @@ import { resolveSkill, type ResolveSkillResult } from "./skillResolver";
 import { getTargetsInSkillRange, getValidTargets, selectSkillTargets } from "./targetSelector";
 import type { CombatUnit } from "./combatTypes";
 import type { CombatBoardState } from "./grid/gridTypes";
+import type { Hero } from "../heroes/types";
+import { getHeroEquipmentConditionResistance } from "../equipment/equipmentSpecialEffectService";
 
-export interface EnemyTurnInput { instance: EnemyInstance; actor: CombatUnit; heroes: CombatUnit[]; allies: CombatUnit[]; enemyInstances: EnemyInstance[]; board?: CombatBoardState }
+export interface EnemyTurnInput { instance: EnemyInstance; actor: CombatUnit; heroes: CombatUnit[]; allies: CombatUnit[]; enemyInstances: EnemyInstance[]; heroDefinitionsById?: Readonly<Record<string, Hero>>; board?: CombatBoardState }
 export interface EnemyTurnResult extends EnemyTurnInput { skipped: boolean; skillResult?: ResolveSkillResult }
 
 /** Executes the generic enemy turn pipeline; encounter state integration can consume the returned immutable values. */
@@ -41,7 +43,7 @@ export function resolveEnemyTurn(input: EnemyTurnInput, random: RandomSource): E
   }
   const firstTarget = targets[0];
   const passiveModifiers = [...getConditionalPassiveModifiers(definition, actor, firstTarget), ...getAuraModifiersForEnemy(input.enemyInstances, input.instance)];
-  const skillResult = resolveSkill(actor, targets, skill, random, { actorModifiers: passiveModifiers });
+  const skillResult = resolveSkill(actor, targets, skill, random, { actorModifiers: passiveModifiers, conditionChance: (target, conditionId, baseChance) => { const hero = input.heroDefinitionsById?.[target.combatantId]; return hero ? baseChance * (1 - getHeroEquipmentConditionResistance(hero, conditionId as import("../heroes/types").ConditionId)) : baseChance; } });
   actor = { ...skillResult.actor, activeConditions: advanceCombatConditions(skillResult.actor.activeConditions) };
   const activeCooldowns = advanceCooldowns(setSkillCooldown(input.instance.activeCooldowns, skill.id, skill.cooldownTurns ?? 0), skill.id);
   return { ...input, actor, instance: { ...input.instance, currentHP: actor.currentHP, isAlive: actor.isAlive, activeCooldowns }, skipped: false, skillResult };

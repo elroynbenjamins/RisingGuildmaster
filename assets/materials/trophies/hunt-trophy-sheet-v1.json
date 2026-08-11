@@ -1,0 +1,23 @@
+{
+  "image": "hunt-trophy-sheet-v1.png",
+  "width": 1448,
+  "height": 1086,
+  "cellWidth": 362,
+  "cellHeight": 362,
+  "columns": 4,
+  "rows": 3,
+  "cells": [
+    { "id": "serpent_scale", "column": 0, "row": 0 },
+    { "id": "venom_gland", "column": 1, "row": 0 },
+    { "id": "serpent_fang", "column": 2, "row": 0 },
+    { "id": "serpent_recipe_fragment", "column": 3, "row": 0 },
+    { "id": "armored_scute", "column": 0, "row": 1 },
+    { "id": "ancient_hide", "column": 1, "row": 1 },
+    { "id": "crocodile_tooth", "column": 2, "row": 1 },
+    { "id": "crocodile_recipe_fragment", "column": 3, "row": 1 },
+    { "id": "white_maw_pelt", "column": 0, "row": 2 },
+    { "id": "yeti_fang", "column": 1, "row": 2 },
+    { "id": "frost_crystal", "column": 2, "row": 2 },
+    { "id": "yeti_recipe_fragment", "column": 3, "row": 2 }
+  ]
+}

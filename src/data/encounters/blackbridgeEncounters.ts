@@ -1,0 +1,13 @@
+import type { EncounterDefinition } from "../../game/quests/questTypes";
+
+const grandHeroes = [{ x: 0, y: 3 }, { x: 0, y: 4 }, { x: 0, y: 5 }, { x: 1, y: 4 }];
+const warfrontHeroes = [{ x: 0, y: 4 }, { x: 0, y: 5 }, { x: 0, y: 6 }, { x: 1, y: 5 }];
+
+export const BLACKBRIDGE_ENCOUNTERS: Record<string, EncounterDefinition> = {
+  blackbridge_ruins_encounter: { id: "blackbridge_ruins_encounter", battlefieldId: "blackbridge_ruins", heroSpawnPositions: grandHeroes, enemies: [{ enemyDefinitionId: "carrion_crow_swarm", count: 2, level: 3, spawnPositions: [{ x: 7, y: 2 }, { x: 7, y: 6 }] }, { enemyDefinitionId: "goblin_scout", count: 2, level: 3, spawnPositions: [{ x: 9, y: 3 }, { x: 9, y: 5 }] }] },
+  blackbridge_bell_tower_encounter: { id: "blackbridge_bell_tower_encounter", battlefieldId: "blackbridge_ruins", heroSpawnPositions: grandHeroes, enemies: [{ enemyDefinitionId: "goblin_sapper", count: 2, level: 4, spawnPositions: [{ x: 8, y: 2 }, { x: 8, y: 6 }] }, { enemyDefinitionId: "blackbridge_wraith", count: 1, level: 4, difficultyMultiplier: 1.08, spawnPositions: [{ x: 9, y: 4 }] }] },
+  laurel_storehouse_approach: { id: "laurel_storehouse_approach", battlefieldId: "laurel_storehouse", heroSpawnPositions: grandHeroes, enemies: [{ enemyDefinitionId: "iron_laurel_enforcer", count: 1, level: 6, spawnPositions: [{ x: 9, y: 4 }] }, { enemyDefinitionId: "bandit", count: 3, level: 6, spawnPositions: [{ x: 8, y: 2 }, { x: 8, y: 4 }, { x: 8, y: 6 }] }] },
+  laurel_manifest_vault: { id: "laurel_manifest_vault", battlefieldId: "laurel_storehouse", heroSpawnPositions: grandHeroes, enemies: [{ enemyDefinitionId: "iron_laurel_enforcer", count: 2, level: 7, difficultyMultiplier: 1.05, spawnPositions: [{ x: 8, y: 3 }, { x: 8, y: 5 }] }, { enemyDefinitionId: "wardstone_wisp", count: 2, level: 7, spawnPositions: [{ x: 9, y: 2 }, { x: 9, y: 6 }] }] },
+  blackbridge_undercroft_guard: { id: "blackbridge_undercroft_guard", battlefieldId: "blackbridge_undercroft", heroSpawnPositions: warfrontHeroes, enemies: [{ enemyDefinitionId: "blackbridge_wraith", count: 2, level: 8, spawnPositions: [{ x: 11, y: 3 }, { x: 11, y: 7 }] }, { enemyDefinitionId: "wardstone_wisp", count: 2, level: 8, spawnPositions: [{ x: 13, y: 2 }, { x: 13, y: 8 }] }] },
+  heartstone_revenant_encounter: { id: "heartstone_revenant_encounter", battlefieldId: "blackbridge_undercroft", heroSpawnPositions: warfrontHeroes, enemies: [{ enemyDefinitionId: "heartstone_revenant", count: 1, level: 9, difficultyMultiplier: 1.18, spawnPositions: [{ x: 13, y: 5 }] }, { enemyDefinitionId: "blackbridge_wraith", count: 2, level: 8, spawnPositions: [{ x: 11, y: 3 }, { x: 11, y: 7 }] }, { enemyDefinitionId: "wardstone_wisp", count: 1, level: 8, spawnPositions: [{ x: 12, y: 5 }] }] },
+};

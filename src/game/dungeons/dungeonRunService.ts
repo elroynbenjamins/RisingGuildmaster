@@ -1,0 +1,93 @@
+import { DUNGEONS, DUNGEON_NODES, DUNGEON_RUN_MODIFIERS } from "../../data/dungeons/dungeons";
+import type { RandomSource } from "../../utils/random";
+import type { HeroCombatInstance, QuestCombatSetup } from "../combat/combatTypes";
+import { createHeroCombatInstance } from "../combat/heroCombatFactory";
+import type { GuildState } from "../guild/types";
+import { grantHeroXp } from "../progression/levelSystem";
+import { finishRogueliteRun, resolveRogueliteRecipeDrop, startRogueliteRun } from "../roguelite/recipeRewardService";
+import { resolveAbilityCheck, type AbilityCheckResult } from "../world/worldEventResolver";
+import { markDungeonNodeResolved, startDungeonRun } from "./dungeonService";
+import { DUNGEON_UNLOCK_HERO_COUNT } from "./dungeonDraftService";
+
+export type DungeonMerchantChoice = "buy_supplies" | "leave";
+export interface DungeonNodeResolution { guild: GuildState; check: AbilityCheckResult | null; text: string; goldDelta: number; recipeId: string | null }
+
+function activeRun(guild: GuildState) { const run = guild.activeDungeonRun; if (!run || run.status !== "active") throw new Error("No active dungeon run"); return run; }
+function rewardMultiplier(guild: GuildState): number { const run = activeRun(guild); return 1 + run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.rewardGoldModifier ?? 0), 0); }
+function healingMultiplier(guild: GuildState): number { const run = activeRun(guild); const themeHealing = DUNGEONS[run.dungeonId]?.combatModifiers.heroHealingPowerModifier ?? 0; return Math.max(0, 1 + themeHealing + run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.healingPowerModifier ?? 0), 0)); }
+function scaledGold(guild: GuildState, amount: number): number { return Math.max(0, Math.round(amount * rewardMultiplier(guild))); }
+function updateRun(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>): GuildState { return { ...guild, activeDungeonRun: run }; }
+function recoverInstances(instances: readonly HeroCombatInstance[], hpRatio: number, manaRatio: number, staminaRatio: number): HeroCombatInstance[] {
+  return instances.map((instance) => instance.isAlive ? { ...instance, currentHP: Math.min(instance.maxHP, instance.currentHP + Math.round(instance.maxHP * hpRatio)), currentMana: Math.min(instance.maxMana, instance.currentMana + Math.round(instance.maxMana * manaRatio)), currentStamina: Math.min(instance.maxStamina, instance.currentStamina + Math.round(instance.maxStamina * staminaRatio)) } : instance);
+}
+function syncHeroes(guild: GuildState, instances: readonly HeroCombatInstance[], xp = 0): GuildState {
+  const byId = new Map(instances.map((instance) => [instance.heroId, instance]));
+  return { ...guild, heroes: guild.heroes.map((hero) => { const instance = byId.get(hero.id); if (!instance) return hero; const synced = { ...hero, currentHP: Math.round(instance.currentHP), isAvailable: instance.isAlive }; return instance.isAlive ? grantHeroXp(synced, xp) : synced; }) };
+}
+
+export function beginDungeonExpedition(guild: GuildState, dungeonId: string, partyHeroIds: string[], modifierIds: string[] = [], random?: RandomSource): GuildState {
+  if (guild.activeDungeonRun || guild.activeRogueliteRun) throw new Error("Another dungeon run is already active");
+  if (guild.heroes.length < DUNGEON_UNLOCK_HERO_COUNT) throw new Error(`Roguelite Expeditions unlock at ${DUNGEON_UNLOCK_HERO_COUNT} owned heroes`);
+  const party = guild.heroes.filter((hero) => partyHeroIds.includes(hero.id));
+  if (party.length !== 4 || party.length !== new Set(partyHeroIds).size) throw new Error("A roguelite dungeon party requires exactly four unique drafted heroes");
+  if (party.some((hero) => !hero.isAvailable || hero.currentHP <= 0)) throw new Error("Every dungeon hero must be available and alive");
+  const run = startDungeonRun(dungeonId, modifierIds, partyHeroIds, party.map(createHeroCombatInstance), random);
+  const withRoguelite = startRogueliteRun(guild, run.id);
+  return { ...withRoguelite, recentPartyHeroIds: partyHeroIds, activeDungeonRun: run };
+}
+
+export function getDungeonCombatSetup(guild: GuildState): QuestCombatSetup {
+  const run = activeRun(guild); const node = DUNGEON_NODES[run.currentNodeId]; const dungeon = DUNGEONS[run.dungeonId]; const encounterId = node ? run.selectedEncounterIds?.[node.id] ?? node.encounterId ?? node.encounterPoolIds?.[0] : undefined;
+  if (!node || !dungeon || !encounterId || !["combat", "elite", "boss"].includes(node.type)) throw new Error("Current dungeon node is not a combat encounter");
+  let enemyPhysicalDamageModifier = 0; let enemyDamageModifier = 0;
+  for (const id of run.selectedModifierIds) for (const modifier of DUNGEON_RUN_MODIFIERS[id]?.enemyModifiers ?? []) {
+    if (modifier.target === "physicalDamage") enemyPhysicalDamageModifier += modifier.value;
+    if (modifier.target === "damage") enemyDamageModifier += modifier.value;
+  }
+  const theme = dungeon.combatModifiers; enemyPhysicalDamageModifier += theme.enemyPhysicalDamageModifier ?? 0; enemyDamageModifier += theme.enemyDamageModifier ?? 0;
+  const heroHealingPowerModifier = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.healingPowerModifier ?? 0), 0) + (theme.heroHealingPowerModifier ?? 0);
+  return { encounterIds: [encounterId], label: node.title, heroInitiativeModifier: theme.heroInitiativeModifier ?? 0, enemyInitiativeModifier: theme.enemyInitiativeModifier ?? 0, heroArmorClassModifier: 0, heroOpeningAttackRollModifier: 0, enemyOpeningAttackRollModifier: 0, enemyPhysicalDamageModifier, enemyDamageModifier, heroHealingPowerModifier, heroMovementRangeModifier: theme.heroMovementRangeModifier ?? 0, enemyMovementRangeModifier: theme.enemyMovementRangeModifier ?? 0 };
+}
+
+export function resolveDungeonUtilityNode(guild: GuildState, random: RandomSource, merchantChoice?: DungeonMerchantChoice): DungeonNodeResolution {
+  const run = activeRun(guild); const node = DUNGEON_NODES[run.currentNodeId]; if (!node) throw new Error("Unknown dungeon node");
+  if (run.resolvedNodeIds.includes(node.id)) throw new Error("Dungeon node has already been resolved");
+  if (["combat", "elite", "boss"].includes(node.type)) throw new Error("Combat nodes must be won in tactical combat");
+  let nextGuild = guild; let instances = run.heroInstances; let check: AbilityCheckResult | null = null; let goldDelta = 0; let text = "";
+  if (node.type === "event") {
+    if (!node.abilityCheck) throw new Error("Dungeon event has no ability check");
+    const heroes = guild.heroes.filter((hero) => run.partyHeroIds.includes(hero.id)); check = resolveAbilityCheck(node.abilityCheck, heroes, random);
+    goldDelta = check.success ? scaledGold(guild, node.successGoldReward ?? 0) : 0;
+    text = check.success ? `The seal yields. D20 ${check.diceRoll} + ${check.modifier} = ${check.total}; the party recovers ${goldDelta} gold from the antechamber.` : `The runes resist. D20 ${check.diceRoll} + ${check.modifier} = ${check.total} against DC ${check.difficultyClass}.`;
+  } else if (node.type === "treasure") { goldDelta = scaledGold(guild, node.goldReward ?? 0); text = `The cache contains ${goldDelta} gold.`;
+  } else if (node.type === "rest") { const power = healingMultiplier(guild); instances = recoverInstances(instances, (node.healMaxHpModifier ?? 0) * power, node.manaRecoveryModifier ?? 0, node.staminaRecoveryModifier ?? 0); text = "The party binds its wounds and recovers mana and stamina.";
+  } else {
+    if (!merchantChoice) throw new Error("Choose whether to buy supplies or leave");
+    if (merchantChoice === "buy_supplies") { const cost = node.merchantCost ?? 0; if (guild.gold < cost) throw new Error("Not enough gold for the peddler's supplies"); nextGuild = { ...nextGuild, gold: nextGuild.gold - cost }; instances = recoverInstances(instances, (node.healMaxHpModifier ?? 0) * healingMultiplier(guild), node.manaRecoveryModifier ?? 0, node.staminaRecoveryModifier ?? 0); goldDelta = -cost; text = `The party buys supplies for ${cost} gold and recovers.`; }
+    else text = "The party leaves the Lantern Peddler's wares untouched.";
+  }
+  const resolved = markDungeonNodeResolved({ ...run, heroInstances: instances }, text);
+  nextGuild = updateRun({ ...nextGuild, gold: nextGuild.gold + Math.max(0, goldDelta) }, { ...resolved, goldEarned: resolved.goldEarned + goldDelta });
+  nextGuild = syncHeroes(nextGuild, instances);
+  return { guild: nextGuild, check, text, goldDelta, recipeId: null };
+}
+
+export function resolveDungeonCombat(guild: GuildState, status: "victory" | "defeat", instances: HeroCombatInstance[], random: RandomSource): DungeonNodeResolution {
+  const run = activeRun(guild); const node = DUNGEON_NODES[run.currentNodeId]; if (!node || !["combat", "elite", "boss"].includes(node.type)) throw new Error("Current dungeon node is not combat");
+  if (run.resolvedNodeIds.includes(node.id)) throw new Error("Dungeon node has already been resolved");
+  if (status === "defeat") { const defeatedRun = { ...run, heroInstances: instances, status: "defeat" as const, lastResolutionText: "The expedition was defeated in the depths." }; const next = syncHeroes(updateRun(guild, defeatedRun), instances); return { guild: next, check: null, text: defeatedRun.lastResolutionText, goldDelta: 0, recipeId: null }; }
+  const goldDelta = scaledGold(guild, node.goldReward ?? 0); const xp = node.xpRewardPerHero ?? 0; const text = `${node.title} cleared. ${goldDelta} gold and ${xp} XP per surviving hero.`;
+  let resolvedRun = markDungeonNodeResolved({ ...run, heroInstances: instances }, text);
+  resolvedRun = { ...resolvedRun, goldEarned: resolvedRun.goldEarned + goldDelta, xpEarnedPerHero: resolvedRun.xpEarnedPerHero + xp };
+  let next = syncHeroes(updateRun({ ...guild, gold: guild.gold + goldDelta }, resolvedRun), instances, xp);
+  let recipeId: string | null = null;
+  if (node.type === "elite" || node.type === "boss") { const drop = resolveRogueliteRecipeDrop(next, node.type, random); next = drop.guild; recipeId = drop.result.droppedRecipeId; if (recipeId && next.activeDungeonRun) next = updateRun(next, { ...next.activeDungeonRun, recipeIdsUnlocked: [...next.activeDungeonRun.recipeIdsUnlocked, recipeId] }); }
+  return { guild: next, check: null, text, goldDelta, recipeId };
+}
+
+export function closeDungeonExpedition(guild: GuildState, abandon = false): GuildState {
+  if (!guild.activeDungeonRun) throw new Error("No dungeon run to close");
+  const run = guild.activeDungeonRun; const heroIds = new Set(run.partyHeroIds); let next: GuildState = { ...guild, heroes: guild.heroes.map((hero) => heroIds.has(hero.id) && hero.currentHP > 0 ? { ...hero, isAvailable: true } : hero), activeDungeonRun: null };
+  if (next.activeRogueliteRun) next = finishRogueliteRun(next);
+  return next;
+}

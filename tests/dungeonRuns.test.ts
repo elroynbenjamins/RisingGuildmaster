@@ -1,0 +1,8 @@
+import { describe, expect, it } from "vitest";
+import { DUNGEON_NODES, DUNGEON_RUN_MODIFIERS } from "../src/data/dungeons/dungeons";
+import { availableDungeonNodeIds, chooseDungeonNode, markDungeonNodeResolved, startDungeonRun } from "../src/game/dungeons/dungeonService";
+describe("branching dungeon runs", () => {
+  it("requires node resolution before offering routes and rejects disconnected jumps", () => { let run = startDungeonRun("wardstone_depths", ["brutal_host"]); expect(availableDungeonNodeIds(run)).toEqual([]); run = markDungeonNodeResolved(run, "Seal opened"); expect(availableDungeonNodeIds(run)).toEqual(["depths_combat", "depths_elite"]); expect(() => chooseDungeonNode(run, "depths_boss")).toThrow("not connected"); run = chooseDungeonNode(run, "depths_elite"); expect(run.currentNodeId).toBe("depths_elite"); expect(run.status).toBe("active"); });
+  it("defines all seven node types and explicit rest values", () => { expect(new Set(Object.values(DUNGEON_NODES).map((node) => node.type))).toEqual(new Set(["combat", "elite", "event", "treasure", "rest", "merchant", "boss"])); expect(DUNGEON_NODES.depths_rest).toMatchObject({ healMaxHpModifier: .25, manaRecoveryModifier: .40, staminaRecoveryModifier: .40 }); });
+  it("uses decimal risk and reward run modifiers", () => { expect(DUNGEON_RUN_MODIFIERS.brutal_host).toMatchObject({ rewardGoldModifier: .30 }); expect(DUNGEON_RUN_MODIFIERS.withered_grace).toMatchObject({ healingPowerModifier: -.25, rareLootModifier: .20 }); });
+});

@@ -1,0 +1,11 @@
+import type { BossPhaseDefinition } from "../../game/bosses/bossMechanicTypes";
+const permanent = (stat: string, value: number) => ({ stat, operation: "percentage" as const, value, durationTurns: -1 });
+export const BOSS_PHASES: Record<string, BossPhaseDefinition> = {
+  queen_brood_stirs: { id: "queen_brood_stirs", bossEnemyDefinitionId: "spider_queen", hpRatioAtMost: .75, summonGroups: [{ enemyDefinitionId: "spiderling_swarm", count: 2 }], selfModifiers: [], announcement: "The brood sacs rupture—spiderlings flood the sanctum." },
+  queen_webguard: { id: "queen_webguard", bossEnemyDefinitionId: "spider_queen", hpRatioAtMost: .50, summonGroups: [{ enemyDefinitionId: "webspinner", count: 1 }], selfModifiers: [], announcement: "A Webspinner descends to shield its wounded queen." },
+  queen_last_brood: { id: "queen_last_brood", bossEnemyDefinitionId: "spider_queen", hpRatioAtMost: .25, summonGroups: [], selfModifiers: [permanent("physicalDamage", .25)], announcement: "The Spider Queen abandons the brood and attacks with desperate fury." },
+  ghorak_breaks_chain: { id: "ghorak_breaks_chain", bossEnemyDefinitionId: "ghorak_chainbreaker", hpRatioAtMost: .50, summonGroups: [], selfModifiers: [permanent("physicalDamage", .20), permanent("speed", .10)], announcement: "Ghorak tears away his last binding chain and surges forward." },
+  warden_calls_sentries: { id: "warden_calls_sentries", bossEnemyDefinitionId: "hollow_warden", hpRatioAtMost: .75, summonGroups: [{ enemyDefinitionId: "ironbound_sentry", count: 2 }], selfModifiers: [], announcement: "The forge answers the Warden: two iron sentries rise from their alcoves." },
+  warden_releases_wisps: { id: "warden_releases_wisps", bossEnemyDefinitionId: "hollow_warden", hpRatioAtMost: .50, summonGroups: [{ enemyDefinitionId: "wardstone_wisp", count: 2 }], selfModifiers: [permanent("magicDamage", .15)], announcement: "Cracks spread across the ward-shell and living shards spill into the chamber." },
+  warden_final_judgment: { id: "warden_final_judgment", bossEnemyDefinitionId: "hollow_warden", hpRatioAtMost: .25, summonGroups: [], selfModifiers: [permanent("physicalDamage", .25), permanent("magicDamage", .25), permanent("speed", .15)], announcement: "The Hollow Warden abandons restraint and declares every living soul condemned." },
+};

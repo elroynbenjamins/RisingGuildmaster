@@ -7,8 +7,12 @@ import { rollEnemyRewards } from "../src/game/enemies/enemyService";
 import { createSeededRandom } from "../src/utils/random";
 
 describe("enemy data integrity and rewards", () => {
-  it("retains the initial 12 enemies plus the Chapter 1 boss", () => { expect(Object.keys(ENEMIES)).toHaveLength(13); expect(ENEMIES.goblin_chieftain).toBeDefined(); });
-  it("contains the five initial factions", () => expect(Object.keys(ENEMY_FACTIONS)).toEqual(["goblins", "undead", "beasts", "bandits", "orcs"]));
+  it("retains the foundation roster and adds the campaign enemies", () => {
+    expect(Object.keys(ENEMIES)).toHaveLength(31);
+    expect(ENEMIES.goblin_chieftain).toBeDefined();
+    expect(ENEMIES).toMatchObject({ goblin_wardbreaker: { role: "debuffer" }, spiderling_swarm: { factionId: "beasts" }, webspinner: { factionId: "beasts" }, spider_broodguard: { factionId: "beasts" }, spider_queen: { role: "mini_boss" } });
+  });
+  it("retains the five initial factions and adds Ward Constructs", () => expect(Object.keys(ENEMY_FACTIONS)).toEqual(["goblins", "undead", "beasts", "bandits", "orcs", "constructs"]));
   it("resolves every ability and loot reference", () => {
     for (const enemy of Object.values(ENEMIES)) {
       expect(enemy.goldRewardMin).toBeLessThanOrEqual(enemy.goldRewardMax);

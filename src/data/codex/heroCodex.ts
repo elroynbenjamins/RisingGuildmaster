@@ -1,0 +1,32 @@
+import type { ClassId, RaceId } from "../../game/heroes/types";
+
+export interface RaceCodexEntry {
+  raceId: RaceId;
+  epithet: string;
+  homeland: string;
+  overview: string;
+  playstyle: string;
+}
+
+export interface ClassCodexEntry {
+  classId: ClassId;
+  role: string;
+  overview: string;
+  playstyle: string;
+}
+
+export const RACE_CODEX: Record<RaceId, RaceCodexEntry> = {
+  human: { raceId: "human", epithet: "Roadborn Adaptors", homeland: "Greenveil's towns, Guildhaven, and settlements across Eldoria", overview: "Humans rebuilt the roads between the five regions and founded many of Eldoria's youngest guilds. Their short generations foster ambition, experimentation, and a talent for learning from anyone.", playstyle: "Flexible recruits who develop efficiently and fit any class without a severe weakness." },
+  elf: { raceId: "elf", epithet: "Children of the Silver Bough", homeland: "The Silverbough enclaves and old woodland paths of Greenveil", overview: "Elven enclaves preserve songs and magical techniques from before the Wardstones. Their scouts move lightly through old forests, while their scholars study the strange currents now leaking from damaged wards.", playstyle: "Fast, precise heroes suited to ranged weapons and magic, but less durable in a prolonged frontline fight." },
+  dwarf: { raceId: "dwarf", epithet: "Keepers of the Deep Roads", homeland: "Kharum-Deep and the fortress settlements of the Iron Hills", overview: "Dwarven holds guard the mountain roads and the oldest surviving Wardstone records. Their armorers value work that endures, and their shield lines are notoriously difficult to break.", playstyle: "Slow, resilient heroes with excellent Constitution, armor, and crafting advantages." },
+  orc: { raceId: "orc", epithet: "Clans of the Red Roads", homeland: "The Iron Hills clanroads and the western reaches of the Ashlands", overview: "Eldoria's orc clans are bound by oaths of kinship, challenge, and hospitality. Many travel beyond their ancestral roads as raiders, wardens, mercenaries, or adventurers seeking a deed worthy of remembrance.", playstyle: "Powerful physical combatants who become especially dangerous after suffering heavy wounds." },
+};
+
+export const CLASS_CODEX: Record<ClassId, ClassCodexEntry> = {
+  warrior: { classId: "warrior", role: "Frontline / Control", overview: "Disciplined weapon specialists who hold dangerous ground and disrupt enemy plans.", playstyle: "Reliable armor and close-range pressure make Warriors forgiving anchors for a new party." },
+  ranger: { classId: "ranger", role: "Ranged / Mobility", overview: "Hunters, pathfinders, and precision archers trained to exploit terrain and distance.", playstyle: "Rangers move farther and attack from greater range, rewarding careful positioning." },
+  mage: { classId: "mage", role: "Arcane Damage / Control", overview: "Students of unstable arcane currents who shape elemental and raw magical power.", playstyle: "High ranged magic damage and area attacks offset a fragile defensive profile." },
+  cleric: { classId: "cleric", role: "Healing / Support", overview: "Battlefield ministers who channel faith into restoration, protection, and sacred force.", playstyle: "Clerics sustain a party through difficult encounters while contributing dependable magic attacks." },
+  paladin: { classId: "paladin", role: "Defense / Hybrid", overview: "Oath-bound champions who combine martial discipline with protective divine magic.", playstyle: "Excellent defenses and ally protection come at the cost of battlefield mobility." },
+  berserker: { classId: "berserker", role: "Physical Damage / Bruiser", overview: "Fearless shock fighters who turn pain and momentum into overwhelming attacks.", playstyle: "Berserkers hit hard and move quickly, but demand careful health and armor management." },
+};

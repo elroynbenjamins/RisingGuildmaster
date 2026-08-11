@@ -1,8 +1,8 @@
-import { EQUIPMENT } from "../../data/equipment/equipment";
 import type { Hero } from "../heroes/types";
+import { resolveEquipmentDefinition } from "./equipmentResolver";
 
 export function equipItem(hero: Hero, equipmentId: string): Hero {
-  const item = EQUIPMENT[equipmentId];
+  const item = resolveEquipmentDefinition(equipmentId);
   if (!item) throw new Error(`Unknown equipment: ${equipmentId}`);
   if (hero.level < item.levelRequirement) throw new Error("Hero does not meet the level requirement");
   if (item.classRestrictions.length && !item.classRestrictions.includes(hero.classId)) throw new Error("Hero class cannot equip this item");

@@ -5,7 +5,7 @@ import { testHero } from "./testHero";
 import { createSeededRandom } from "../src/utils/random";
 describe("tactical action economy", () => {
   it("allows Skill then Move without ending the hero turn", () => {
-    const hero = { ...testHero(), classId: "ranger" as const };
+    const hero = { ...testHero(), classId: "ranger" as const, learnedSkillIds: ["ranger_precise_shot"] };
     let state = createCombatState("goblin_patrol", 0, [hero], createSeededRandom(77));
     state = { ...state, awaitingHeroId: hero.id, turnOrderIds: [hero.id], actions: { movementUsed: false, combatActionUsed: false } };
     const enemyId = state.enemies[1]!.instance.instanceId;

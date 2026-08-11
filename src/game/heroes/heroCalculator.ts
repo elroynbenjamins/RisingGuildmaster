@@ -1,6 +1,5 @@
 import { CLASSES } from "../../data/classes/classes";
 import { CONDITIONS } from "../../data/conditions/conditions";
-import { EQUIPMENT } from "../../data/equipment/equipment";
 import { RACES } from "../../data/races/races";
 import { TRAITS } from "../../data/traits/traits";
 import { calculateDerivedStats } from "../attributes/derivedStats";
@@ -8,17 +7,22 @@ import { applyAttributeModifiers, applyDerivedModifiers } from "../modifiers/mod
 import type { Modifier } from "../modifiers/types";
 import type { CalculatedHero, Hero } from "./types";
 import { SUBCLASSES } from "../../data/subclasses/subclasses";
+import { resolveEquipmentDefinition } from "../equipment/equipmentResolver";
+import { BACKGROUNDS } from "../../data/backgrounds/backgrounds";
+import { getHeroEquipmentSpecialModifiers } from "../equipment/equipmentSpecialEffectService";
 
 export function collectHeroModifiers(hero: Hero): Modifier[] {
-  const equipment = Object.values(hero.equipment).flatMap((id) => id ? (EQUIPMENT[id]?.modifiers ?? []) : []);
+  const equipment = Object.values(hero.equipment).flatMap((id) => id ? (resolveEquipmentDefinition(id)?.modifiers ?? []) : []);
   const conditions = hero.conditions.flatMap((instance) => CONDITIONS[instance.conditionId].modifiers);
   return [
     ...RACES[hero.raceId].modifiers,
     ...CLASSES[hero.classId].modifiers,
+    ...(hero.backgroundId ? BACKGROUNDS[hero.backgroundId].modifiers : []),
     ...(hero.subclassId ? SUBCLASSES[hero.subclassId]?.modifiers ?? [] : []),
     ...hero.traitIds.flatMap((id) => TRAITS[id].modifiers),
     ...conditions,
     ...equipment,
+    ...getHeroEquipmentSpecialModifiers(hero),
   ];
 }
 

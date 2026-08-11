@@ -1,25 +1,169 @@
 import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ActionButton, BackButton, Panel, SectionTitle, colors } from "../../components/ui";
 import { REGIONS } from "../../data/world/regions";
 import { SETTLEMENTS } from "../../data/world/settlements";
+import { WORLD_ART } from "../../data/world/worldArt";
+import { RACE_HOMELANDS } from "../../data/recruitment/raceHomelands";
+import { RACES } from "../../data/races/races";
 import type { GuildState } from "../../game/guild/types";
 import { isBossAvailable, isRegionCompleted } from "../../game/world/regionService";
 import { discoverRegionSettlements } from "../../game/world/worldService";
-import { travelToRegion } from "../../game/world/travelService";
+import { canTravel, travelToRegion } from "../../game/world/travelService";
 import type { WorldEventDefinition } from "../../game/world/worldTypes";
 import { WORLD_NAME } from "../../game/world/worldState";
+import { mapChromeStyles } from "../../ui/worldMap";
 import type { RandomSource } from "../../utils/random";
+import { GameIcon } from "../../components/icons/GameIcon";
 
-export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, openCampaign, openEvent }: { guild: GuildState; random: RandomSource; onBack(): void; updateGuild(guild: GuildState): void; openQuest(id: string): void; openCampaign(): void; openEvent(event: WorldEventDefinition): void }) {
-  const [selectedId, setSelectedId] = useState(guild.world.currentRegionId); const [message, setMessage] = useState<string>(); const selected = REGIONS[selectedId]!;
-  const unlocked = guild.world.unlockedRegionIds.includes(selectedId); const current = guild.world.currentRegionId === selectedId; const averageLevel = guild.heroes.length ? guild.heroes.reduce((sum, hero) => sum + hero.level, 0) / guild.heroes.length : 0;
-  const travel = () => { try { const result = travelToRegion(guild.world, selectedId, random); const world = discoverRegionSettlements(result.state, selectedId); updateGuild({ ...guild, world }); setMessage(`Arrived in ${selected.name}.`); if (result.event) openEvent(result.event); } catch (error) { setMessage(error instanceof Error ? error.message : "Travel failed"); } };
-  return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={styles.title}>{WORLD_NAME}</Text><Text style={styles.subtitle}>Campaign Chapter {guild.world.campaignChapter} · Current: {REGIONS[guild.world.currentRegionId]!.name}</Text>
-    <View style={styles.map}><View style={[styles.road, styles.roadGreenIron]} /><View style={[styles.road, styles.roadIronAsh]} /><View style={[styles.road, styles.roadIronFrost]} /><View style={[styles.road, styles.roadGreenShadow]} />{Object.values(REGIONS).map((region) => { const isUnlocked = guild.world.unlockedRegionIds.includes(region.id); const isCurrent = guild.world.currentRegionId === region.id; const completed = isRegionCompleted(region.id, guild.world); const boss = isBossAvailable(region.id, guild.world); const status = !isUnlocked ? "🔒 LOCKED" : isCurrent ? "◆ CURRENT" : completed ? "✓ COMPLETE" : boss ? "⚔ BOSS" : "○ OPEN"; return <Pressable key={region.id} onPress={() => setSelectedId(region.id)} style={[styles.node, { left: `${region.mapPosition.x * 82}%`, top: `${region.mapPosition.y * 76}%` }, isCurrent && styles.currentNode, selectedId === region.id && styles.selectedNode]}><Text style={styles.nodeIcon}>{region.id === "frostmarch" ? "❄" : region.id === "ashlands" ? "🔥" : region.id === "shadowfen" ? "☠" : "◆"}</Text><Text style={styles.nodeName}>{region.name}</Text><Text style={styles.nodeState}>{status}</Text></Pressable>; })}</View>
-    <Panel><View style={styles.panelHeader}><View><Text style={styles.regionName}>{selected.name}</Text><Text style={styles.level}>Recommended level {selected.recommendedLevelMin}–{selected.recommendedLevelMax}</Text></View><Text style={styles.state}>{!unlocked ? "🔒 Locked" : current ? "◆ Current" : "○ Unlocked"}</Text></View><Text style={styles.description}>{selected.description}</Text>{unlocked && averageLevel > 0 && averageLevel < selected.recommendedLevelMin && <Text style={styles.danger}>⚠ DANGER: Party level below recommended range.</Text>}<Text style={styles.detail}>Enemy factions: {selected.enemyFactionIds.join(", ") || "Unknown"}</Text><Text style={styles.detail}>Settlements: {selected.settlementIds.map((id) => SETTLEMENTS[id]!.name).join(", ")}</Text><Text style={styles.detail}>Contracts: {selected.questPoolIds.length}</Text>{selected.bossQuestId && <Text style={styles.boss}>⚔ Regional boss: {guild.world.completedQuestIds.includes(selected.bossQuestId) ? "Defeated" : "Available through campaign"}</Text>}
-      <View style={styles.buttons}>{!current && unlocked && <ActionButton label="Travel" onPress={travel} />}{unlocked && selected.questPoolIds[0] && <ActionButton label="View Contract" onPress={() => openQuest(selected.questPoolIds[0]!)} />}<ActionButton label="Campaign" onPress={openCampaign} /></View>{message && <Text style={styles.message}>{message}</Text>}</Panel>
-    <SectionTitle>DISCOVERED SETTLEMENTS</SectionTitle><Text style={styles.description}>{guild.world.discoveredSettlementIds.map((id) => `⌂ ${SETTLEMENTS[id]?.name ?? id}`).join("  ·  ")}</Text>
-  </ScrollView>;
+interface WorldMapProps {
+  guild: GuildState;
+  random: RandomSource;
+  onBack?: () => void;
+  updateGuild(guild: GuildState): void;
+  openQuest(id: string): void;
+  openRegion(id: string): void;
+  openCampaign(): void;
+  openEvent(event: WorldEventDefinition): void;
 }
-const styles = StyleSheet.create({ content: { padding: 16, paddingBottom: 50 }, title: { color: colors.text, fontSize: 30, fontWeight: "900", marginTop: 8 }, subtitle: { color: colors.gold, marginTop: 3 }, map: { height: 350, backgroundColor: "#172a2b", borderColor: "#526b63", borderWidth: 2, borderRadius: 16, marginVertical: 16, overflow: "hidden" }, road: { position: "absolute", backgroundColor: "#817253", height: 4 }, roadGreenIron: { left: "25%", top: "51%", width: "27%" }, roadIronAsh: { left: "54%", top: "51%", width: "28%" }, roadIronFrost: { left: "51%", top: "20%", width: 4, height: "31%" }, roadGreenShadow: { left: "18%", top: "55%", width: 4, height: "25%" }, node: { position: "absolute", width: 94, minHeight: 68, backgroundColor: "#273a3d", borderColor: "#71817b", borderWidth: 2, borderRadius: 12, padding: 6, alignItems: "center" }, currentNode: { borderColor: colors.green, borderWidth: 3 }, selectedNode: { backgroundColor: "#4a4028", borderColor: colors.gold }, nodeIcon: { fontSize: 16 }, nodeName: { color: colors.text, fontWeight: "900", fontSize: 11, textAlign: "center" }, nodeState: { color: colors.muted, fontSize: 8, marginTop: 3 }, panelHeader: { flexDirection: "row", justifyContent: "space-between", gap: 8 }, regionName: { color: colors.text, fontSize: 23, fontWeight: "900" }, level: { color: colors.gold, marginTop: 2 }, state: { color: colors.text, fontWeight: "800" }, description: { color: colors.muted, lineHeight: 20, marginVertical: 9 }, detail: { color: colors.text, marginTop: 6 }, danger: { color: colors.danger, fontWeight: "800", marginTop: 8 }, boss: { color: colors.gold, marginTop: 8, fontWeight: "700" }, buttons: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 13 }, message: { color: colors.green, marginTop: 9 } });
+
+export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, openRegion, openCampaign, openEvent }: WorldMapProps) {
+  const [selectedId, setSelectedId] = useState(guild.world.currentRegionId);
+  const [message, setMessage] = useState<string>();
+  const selected = REGIONS[selectedId]!;
+  const unlocked = guild.world.unlockedRegionIds.includes(selectedId);
+  const current = guild.world.currentRegionId === selectedId;
+  const travelAllowed = canTravel(guild.world, selectedId);
+  const homelandContacts = Object.values(RACE_HOMELANDS).filter((homeland) => homeland.regionId === selectedId);
+  const averageLevel = guild.heroes.length ? guild.heroes.reduce((sum, hero) => sum + hero.level, 0) / guild.heroes.length : 0;
+
+  const travel = () => {
+    try {
+      const result = travelToRegion(guild.world, selectedId, random);
+      const world = discoverRegionSettlements(result.state, selectedId);
+      updateGuild({ ...guild, world });
+      setMessage(`Arrived in ${selected.name}.`);
+      if (result.event) openEvent(result.event);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Travel failed");
+    }
+  };
+
+  return (
+    <ScrollView contentContainerStyle={styles.content}>
+      {onBack && <BackButton onPress={onBack} />}
+      <Text style={styles.title}>{WORLD_NAME}</Text>
+      <Text style={styles.subtitle}>Campaign Chapter {guild.world.campaignChapter} · Current: {REGIONS[guild.world.currentRegionId]!.name}</Text>
+
+      <View style={mapChromeStyles.frame}>
+        <ImageBackground source={WORLD_ART.eldoria} resizeMode="cover" style={mapChromeStyles.canvas} imageStyle={mapChromeStyles.image}>
+          <View pointerEvents="none" style={styles.mapShade} />
+          <View pointerEvents="none" style={[styles.road, styles.roadGreenIron]} />
+          <View pointerEvents="none" style={[styles.road, styles.roadIronAsh]} />
+          <View pointerEvents="none" style={[styles.road, styles.roadIronFrost]} />
+          <View pointerEvents="none" style={[styles.road, styles.roadGreenShadow]} />
+
+          {Object.values(REGIONS).map((region) => {
+            const isUnlocked = guild.world.unlockedRegionIds.includes(region.id);
+            const isCurrent = guild.world.currentRegionId === region.id;
+            const completed = isRegionCompleted(region.id, guild.world);
+            const boss = isBossAvailable(region.id, guild.world);
+            const selectedRegion = selectedId === region.id;
+            const status = !isUnlocked ? "LOCKED" : isCurrent ? "CURRENT" : completed ? "COMPLETE" : boss ? "BOSS" : "OPEN";
+            const markerIcon = !isUnlocked ? "locked" : isCurrent ? "current" : completed ? "complete" : boss ? "boss" : "region_open";
+            const settlementDiscovered = region.settlementIds.some((id) => guild.world.discoveredSettlementIds.includes(id));
+
+            return (
+              <Pressable
+                accessibilityLabel={`${region.name}, ${status.toLowerCase()}`}
+                accessibilityRole="button"
+                accessibilityState={{ selected: selectedRegion }}
+                key={region.id}
+                onPress={() => setSelectedId(region.id)}
+                style={({ pressed }) => [
+                  styles.node,
+                  { left: `${region.mapPosition.x * 100}%`, top: `${region.mapPosition.y * 100}%` },
+                  !isUnlocked && styles.lockedNode,
+                  isCurrent && styles.currentNode,
+                  selectedRegion && styles.selectedNode,
+                  pressed && styles.pressedNode,
+                ]}
+              >
+                <View style={[styles.marker, isCurrent && styles.currentMarker, boss && styles.bossMarker]}><GameIcon id={markerIcon} size={28} framed={false} /></View>
+                <Text numberOfLines={1} style={styles.nodeName}>{region.name}</Text>
+                <Text style={styles.nodeState}>{status}</Text>
+                {settlementDiscovered && <View style={styles.settlementRow}><GameIcon id="settlement" size={13} framed={false} /><Text style={styles.settlement}>{SETTLEMENTS[region.settlementIds[0]!]?.name}</Text></View>}
+              </Pressable>
+            );
+          })}
+        </ImageBackground>
+        <View style={mapChromeStyles.legend}>
+          <Text style={styles.legendText}>CURRENT</Text><Text style={styles.legendText}>BOSS</Text><Text style={styles.legendText}>LOCKED</Text>
+        </View>
+      </View>
+
+      <Panel>
+        <View style={styles.panelHeader}>
+          <View style={styles.flex}><Text style={styles.regionName}>{selected.name}</Text><Text style={styles.level}>Recommended level {selected.recommendedLevelMin}–{selected.recommendedLevelMax}</Text></View>
+          <Text style={styles.state}>{!unlocked ? "Locked" : current ? "Current" : "Unlocked"}</Text>
+        </View>
+        <Text style={styles.description}>{selected.description}</Text>
+        {unlocked && averageLevel > 0 && averageLevel < selected.recommendedLevelMin && <Text style={styles.danger}>⚠ DANGER: Party level below recommended range.</Text>}
+        <Text style={styles.detail}>Enemy factions: {selected.enemyFactionIds.join(", ") || "Unknown"}</Text>
+        <Text style={styles.detail}>Settlement: {selected.settlementIds.map((id) => SETTLEMENTS[id]!.name).join(", ")}</Text>
+        {homelandContacts.length > 0 && <Text style={styles.detail}>Recruitment homeland: {homelandContacts.map((homeland) => `${RACES[homeland.raceId].name} · ${homeland.locationName}`).join(", ")}</Text>}
+        <Text style={styles.detail}>Available contracts: {selected.questPoolIds.length}</Text>
+        {selected.bossQuestId && <Text style={styles.boss}>! Regional boss: {guild.world.completedQuestIds.includes(selected.bossQuestId) ? "Defeated" : "Available through campaign"}</Text>}
+        {!current && unlocked && !travelAllowed && <Text style={styles.routeWarning}>No direct road from your current region. Travel through a connected region first.</Text>}
+        <View style={styles.buttons}>
+          <ActionButton label="Open Region Map" onPress={() => openRegion(selectedId)} />
+          {!current && unlocked && <ActionButton label="Travel" disabled={!travelAllowed} onPress={travel} />}
+          {unlocked && selected.questPoolIds[0] && <ActionButton label="View Contract" onPress={() => openQuest(selected.questPoolIds[0]!)} />}
+          <ActionButton label="Campaign" onPress={openCampaign} />
+        </View>
+        {message && <Text style={styles.message}>{message}</Text>}
+      </Panel>
+
+      <SectionTitle>DISCOVERED SETTLEMENTS</SectionTitle>
+      <Text style={styles.description}>{guild.world.discoveredSettlementIds.map((id) => SETTLEMENTS[id]?.name ?? id).join("  ·  ")}</Text>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  content: { padding: 16, paddingBottom: 50 },
+  title: { color: colors.text, fontSize: 30, fontWeight: "900", marginTop: 8 },
+  subtitle: { color: colors.gold, marginTop: 3 },
+  mapShade: { backgroundColor: "rgba(4, 11, 17, 0.10)", bottom: 0, left: 0, position: "absolute", right: 0, top: 0 },
+  road: { backgroundColor: "rgba(238, 196, 101, 0.78)", borderColor: "rgba(48, 30, 17, 0.9)", borderWidth: 1, height: 5, position: "absolute" },
+  roadGreenIron: { left: "27%", top: "51.5%", width: "23%" },
+  roadIronAsh: { left: "50%", top: "51.5%", width: "23%" },
+  roadIronFrost: { height: "28%", left: "49.5%", top: "23%", width: 5 },
+  roadGreenShadow: { height: "21%", left: "17.5%", top: "57%", width: 5 },
+  node: { alignItems: "center", backgroundColor: "rgba(25, 34, 36, 0.92)", borderColor: "#9b9278", borderRadius: 4, borderWidth: 2, marginLeft: -50, marginTop: -34, minHeight: 67, padding: 5, position: "absolute", width: 100 },
+  lockedNode: { backgroundColor: "rgba(25, 29, 31, 0.88)", borderColor: "#666b69", opacity: 0.82 },
+  currentNode: { borderColor: colors.green, borderWidth: 3 },
+  selectedNode: { backgroundColor: "rgba(72, 57, 29, 0.96)", borderColor: colors.gold, borderWidth: 3 },
+  pressedNode: { opacity: 0.72, transform: [{ scale: 0.96 }] },
+  marker: { alignItems: "center", backgroundColor: "#374449", borderColor: "#d4c59d", borderRadius: 2, borderWidth: 1, height: 18, justifyContent: "center", marginTop: -14, width: 18 },
+  currentMarker: { backgroundColor: "#27633e", borderColor: colors.green },
+  bossMarker: { backgroundColor: "#762f29", borderColor: colors.danger },
+  markerText: { color: colors.text, fontSize: 11, fontWeight: "900", lineHeight: 14 },
+  nodeName: { color: colors.text, fontSize: 11, fontWeight: "900", marginTop: 3, textAlign: "center" },
+  nodeState: { color: colors.gold, fontSize: 8, fontWeight: "900", letterSpacing: 0.7, marginTop: 2 },
+  settlementRow: { alignItems: "center", flexDirection: "row", gap: 2, marginTop: 2 },
+  settlement: { color: colors.muted, fontSize: 7 },
+  legendText: { color: colors.muted, fontSize: 8, fontWeight: "900", letterSpacing: 0.5 },
+  panelHeader: { flexDirection: "row", gap: 8, justifyContent: "space-between" },
+  flex: { flex: 1 },
+  regionName: { color: colors.text, fontSize: 23, fontWeight: "900" },
+  level: { color: colors.gold, marginTop: 2 },
+  state: { color: colors.text, fontWeight: "800" },
+  description: { color: colors.muted, lineHeight: 20, marginVertical: 9 },
+  detail: { color: colors.text, marginTop: 6 },
+  danger: { color: colors.danger, fontWeight: "800", marginTop: 8 },
+  boss: { color: colors.gold, fontWeight: "700", marginTop: 8 },
+  routeWarning: { color: colors.danger, fontSize: 12, lineHeight: 17, marginTop: 9 },
+  buttons: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 13 },
+  message: { color: colors.green, marginTop: 9 },
+});

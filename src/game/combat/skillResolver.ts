@@ -19,7 +19,7 @@ function effectiveStats(unit: CombatUnit, external: readonly SkillModifier[] = [
   return {
     physicalDamage: getModifiedCombatStat(unit, "physicalDamage", physicalModifiers), physicalDefense: getModifiedCombatStat(unit, "physicalDefense", external),
     magicDamage: getModifiedCombatStat(unit, "magicDamage", external), magicDefense: getModifiedCombatStat(unit, "magicDefense", external),
-    speed: getModifiedCombatStat(unit, "speed", external), evasion: getModifiedCombatStat(unit, "evasion", external),
+    speed: getModifiedCombatStat(unit, "speed", external), initiativeBonus: unit.stats.initiativeBonus, evasion: getModifiedCombatStat(unit, "evasion", external),
     criticalChance: getModifiedCombatStat(unit, "criticalChance", external), accuracy: getModifiedCombatStat(unit, "accuracy", external),
     healingPower: unit.stats.healingPower + [...unit.activeModifiers, ...external].filter((modifier) => modifier.stat === "healingPower").reduce((sum, modifier) => sum + modifier.value, 0),
     physicalAttackBonus: getModifiedCombatStat(unit, "physicalAttackBonus", external), magicAttackBonus: getModifiedCombatStat(unit, "magicAttackBonus", external),

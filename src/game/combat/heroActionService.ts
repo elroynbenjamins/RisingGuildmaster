@@ -12,6 +12,7 @@ import type { CombatBoardState } from "./grid/gridTypes";
 import { getTargetsInSkillRange } from "./targetSelector";
 import { RACES } from "../../data/races/races";
 import { getHeroSkillIds, getHeroSkillRange } from "../progression/subclasses/subclassService";
+import { getHeroEquipmentSpecialEffects } from "../equipment/equipmentSpecialEffectService";
 
 export interface SkillAvailability { skill: CombatSkillDefinition; enabled: boolean; reasons: string[] }
 export function getHeroSkillAvailability(hero: Hero, instance: HeroCombatInstance, actor: CombatUnit, skillId: string, heroes: readonly CombatUnit[], enemies: readonly CombatUnit[], board?: CombatBoardState): SkillAvailability {
@@ -32,7 +33,9 @@ export function resolveHeroAction(hero: Hero, instance: HeroCombatInstance, acto
   paid = { ...paid, activeCooldowns: setSkillCooldown(paid.activeCooldowns, skill.id, skill.cooldownTurns ?? 0) };
   const modifiers = getHeroConditionalPassiveModifiers(hero, actor);
   if ((skill.range ?? 1) <= 1 && skill.damageType === "physical" && RACES[hero.raceId].tactical.meleeDamageModifier) modifiers.push({ stat: "physicalDamage", operation: "percentage", value: RACES[hero.raceId].tactical.meleeDamageModifier, durationTurns: -1 });
-  const skillResult = resolveSkill(actor, targets, skill, random, { actorModifiers: modifiers });
+  const equipmentApplications = getHeroEquipmentSpecialEffects(hero).filter((effect) => effect.conditionApplication && ((effect.trigger === "on_physical_hit" && skill.damageType === "physical") || (effect.trigger === "on_magic_hit" && skill.damageType === "magic"))).map((effect) => effect.conditionApplication!);
+  const resolvedSkill = equipmentApplications.length ? { ...skill, conditionApplications: [...(skill.conditionApplications ?? []), ...equipmentApplications] } : skill;
+  const skillResult = resolveSkill(actor, targets, resolvedSkill, random, { actorModifiers: modifiers });
   paid = { ...paid, currentHP: skillResult.actor.currentHP, isAlive: skillResult.actor.isAlive, activeConditions: skillResult.actor.activeConditions };
   return { instance: paid, actor: skillResult.actor, targets: skillResult.targets, skillResult };
 }

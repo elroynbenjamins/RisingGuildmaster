@@ -9,7 +9,7 @@ export type EnemyRole =
   | "heavy_attacker"
   | "mini_boss";
 
-export type EnemyFactionId = "goblins" | "undead" | "beasts" | "bandits" | "orcs";
+export type EnemyFactionId = "goblins" | "undead" | "beasts" | "bandits" | "orcs" | "constructs";
 import type { GridPosition } from "../combat/grid/gridTypes";
 
 export interface EnemyDefinition {
@@ -67,6 +67,7 @@ export interface EnemyInstance {
   isAlive: boolean;
   position: GridPosition;
   movementRange: number;
+  triggeredPhaseIds?: string[];
 }
 
 export interface EncounterEntry { enemyDefinitionId: string; count: number }

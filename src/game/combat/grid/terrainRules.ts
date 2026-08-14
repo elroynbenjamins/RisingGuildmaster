@@ -16,4 +16,5 @@ export const TERRAIN_RULES: Record<TerrainType, TerrainRule> = {
   caravan: { movementCost: 0, blocksMovement: true, blocksLineOfSight: true },
   escort_npc: { movementCost: 0, blocksMovement: true, blocksLineOfSight: false },
   obstacle: { movementCost: 0, blocksMovement: true, blocksLineOfSight: true },
+  trap: { movementCost: 2, blocksMovement: false, blocksLineOfSight: false },
 };

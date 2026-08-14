@@ -7,6 +7,7 @@ import { manhattanDistance } from "./grid/distanceCalculator";
 import { getReachablePositions } from "./grid/pathfinding";
 import type { CombatBoardState, GridPosition } from "./grid/gridTypes";
 import type { TacticalBehavior } from "./tacticalAiTypes";
+import { getEffectiveMovementRange } from "./conditionResolver";
 
 export function getEnemyTacticalBehavior(instance: EnemyInstance): TacticalBehavior {
   const definition = getEnemyDefinition(instance.enemyDefinitionId);
@@ -26,7 +27,7 @@ export function selectTacticalTarget(actor: CombatUnit, heroes: readonly CombatU
 
 export function chooseEnemyDestination(board: CombatBoardState, actor: CombatUnit, target: CombatUnit, behavior: TacticalBehavior): GridPosition {
   const currentDistance = manhattanDistance(actor.position, target.position);
-  const candidates = [actor.position, ...getReachablePositions(board, actor.position, actor.movementRange)];
+  const candidates = [actor.position, ...getReachablePositions(board, actor.position, getEffectiveMovementRange(actor))];
   const retreating = behavior.retreatRange !== undefined && currentDistance < behavior.retreatRange;
   return candidates.sort((a, b) => {
     const distanceA = manhattanDistance(a, target.position);

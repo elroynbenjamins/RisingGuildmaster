@@ -10,8 +10,10 @@ import { generateWeightedPotential } from "../progression/potentialGenerator";
 import { applyLevelAttributeGrowth } from "../progression/attributeGrowth";
 import { BACKGROUNDS } from "../../data/backgrounds/backgrounds";
 import type { BackgroundId } from "./types";
+import { generateHeroName } from "../../data/heroes/heroNames";
+import type { HeroGender } from "../../data/heroes/heroPortraits";
+import { createHeroHistory } from "./heroHistoryService";
 
-const NAMES = ["Aldric", "Brynn", "Caelan", "Dara", "Elowen", "Fenric", "Gwen", "Hale", "Ilyra", "Jorin", "Kael", "Lyra", "Mara", "Nym", "Orin", "Pyria"] as const;
 const RACE_IDS = Object.keys(RACES) as RaceId[];
 const CLASS_IDS = Object.keys(CLASSES) as ClassId[];
 const TRAIT_IDS = Object.keys(TRAITS) as TraitId[];
@@ -23,20 +25,22 @@ function startingEquipment(classId: ClassId): EquipmentSlots {
   return { weapon, armor: "padded-armor", helmet: null, boots: null, accessory1: null, accessory2: null };
 }
 
-export interface HeroGenerationOptions { raceId?: RaceId; classId?: ClassId; backgroundId?: BackgroundId; age?: number; level?: number; potential?: number; traitCount?: number }
+export interface HeroGenerationOptions { raceId?: RaceId; classId?: ClassId; gender?: HeroGender; backgroundId?: BackgroundId; age?: number; level?: number; potential?: number; traitCount?: number }
 
 export function generateHero(random: RandomSource, options: HeroGenerationOptions = {}): Hero {
   const raceId = options.raceId ?? random.pick(RACE_IDS);
   const classId = options.classId ?? random.pick(CLASS_IDS);
   const potential = options.potential ?? generateWeightedPotential(random);
   const estimateVariance = random.int(8, 20);
-  const gender = random.pick(["female", "male", "nonbinary"] as const);
+  const gender = options.gender ?? random.pick(["female", "male"] as const);
+  const portraitVariant = random.int(0, 2) as 0 | 1 | 2;
   const traitCount = options.traitCount ?? random.int(1, 2);
   const traits = [...TRAIT_IDS].sort(() => random.next() - 0.5).slice(0, traitCount);
   const hero: Hero = {
     id: `hero-${random.int(100000, 999999)}-${random.int(100000, 999999)}`,
-    name: random.pick(NAMES), age: options.age ?? random.int(18, 48), gender,
-    portraitKey: `${raceId}-${classId}-${gender}`,
+    name: generateHeroName(random, raceId, gender), age: options.age ?? random.int(18, 48), gender,
+    portraitVariant,
+    portraitKey: `${raceId}-${classId}-${gender}-v${portraitVariant}`,
     raceId, classId, subclassId: null, learnedSkillIds: [], backgroundId: options.backgroundId ?? weightedBackground(random),
     baseAttributes: {
       strength: random.int(1, 20), dexterity: random.int(1, 20), constitution: random.int(1, 20),
@@ -46,9 +50,10 @@ export function generateHero(random: RandomSource, options: HeroGenerationOption
     potentialEstimateMin: Math.max(GAME_CONFIG.potentialMin, potential - estimateVariance),
     potentialEstimateMax: Math.min(100, potential + estimateVariance),
     traitIds: traits, conditions: [], equipment: startingEquipment(classId), currentHP: 9999,
-    history: { questsCompleted: 0, enemiesDefeated: 0, achievements: [], importantEvents: [] },
+    history: createHeroHistory(),
     recruitmentCost: random.int(300, 750), salary: random.int(30, 85),
     isAvailable: true,
+    adventureStamina: GAME_CONFIG.maxAdventureStamina,
     attributeGrowthProgress: { strength: 0, dexterity: 0, constitution: 0, intelligence: 0, wisdom: 0, charisma: 0 },
   };
   let progressed = hero; const targetLevel = options.level ?? 1;

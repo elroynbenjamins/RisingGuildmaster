@@ -9,4 +9,10 @@ export const GAME_CONFIG = {
   potentialMin: 50,
   potentialMax: 100,
   baseHeroCapacity: 8,
+  rewardedAdGems: 5,
+  goldPerGem: 250,
+  maxAdventureStamina: 100,
+  adventureStaminaRecoveryPerDay: 25,
+  standardQuestStaminaCost: 50,
+  dailyTavernIncome: 50,
 } as const;

@@ -30,6 +30,12 @@ describe("interactive regional maps", () => {
     for (const region of Object.values(REGIONS)) for (const settlementId of region.settlementIds) expect(SETTLEMENTS[settlementId]).toMatchObject({ regionId: region.id });
   });
 
+  it("keeps settlement data and illustrated regional markers on the same calibrated coordinates", () => {
+    for (const entry of Object.values(REGION_LOCATIONS)) {
+      if (entry.settlementId) expect(entry.mapPosition, entry.name).toEqual(SETTLEMENTS[entry.settlementId]?.mapPosition);
+    }
+  });
+
   it("discovers all public settlements when a region is visited", () => {
     const discovered = discoverRegionSettlements(createWorldState(), "iron_hills");
     expect(discovered.discoveredSettlementIds).toEqual(expect.arrayContaining(["stonegate", "kharum_deep", "flintwatch"]));

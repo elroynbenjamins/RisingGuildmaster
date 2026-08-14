@@ -1,6 +1,11 @@
 import type { EnemyBehaviorDefinition } from "../../game/combat/enemyBehaviorTypes";
+import { STONEGATE_ASSASSIN_BEHAVIORS } from "./stonegateAssassinBehaviors";
 
 export const ENEMY_BEHAVIORS: Record<string, EnemyBehaviorDefinition> = {
+  ...STONEGATE_ASSASSIN_BEHAVIORS,
+  ashscale_vermin_behavior: { id: "ashscale_vermin_behavior", basicAttackSkillId: "ember_bite", rules: [{ skillId: "cinder_scuttle", priority: 15 }] },
+  cinder_touched_bandit_behavior: { id: "cinder_touched_bandit_behavior", basicAttackSkillId: "cinder_blade", rules: [{ skillId: "ash_bomb", priority: 20, conditions: { minTargetsInRange: 2, targetRange: 3 } }] },
+  wardstone_scale_guardian_behavior: { id: "wardstone_scale_guardian_behavior", basicAttackSkillId: "scale_hammer", rules: [{ skillId: "wardfire_pulse", priority: 30, conditions: { minTargetsInRange: 2, targetRange: 4 } }] },
   carrion_crow_swarm_behavior: { id: "carrion_crow_swarm_behavior", basicAttackSkillId: "raking_beaks", rules: [{ skillId: "blinding_wings", priority: 20, conditions: { minTargetsInRange: 2, targetRange: 2 } }] },
   goblin_sapper_behavior: { id: "goblin_sapper_behavior", basicAttackSkillId: "sapper_knife", rules: [{ skillId: "blasting_charge", priority: 25, conditions: { minTargetsInRange: 2, targetRange: 3 } }, { skillId: "smoke_pot", priority: 15 }] },
   blackbridge_wraith_behavior: { id: "blackbridge_wraith_behavior", basicAttackSkillId: "spectral_brand", rules: [{ skillId: "accusing_whisper", priority: 25, conditions: { minTargetsInRange: 2, targetRange: 3 } }] },

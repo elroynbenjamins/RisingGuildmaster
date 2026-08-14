@@ -1,10 +1,14 @@
 import type { CombatBoardSizeId, TerrainPlacement, TerrainType } from "../../game/combat/grid/gridTypes";
 import { BLACKBRIDGE_BATTLEFIELDS } from "./blackbridgeBattlefields";
+import { ASH_BENEATH_GREENVEIL_BATTLEFIELDS } from "./ashBeneathGreenveilBattlefields";
+import { STONEGATE_ASSASSIN_BATTLEFIELDS } from "./stonegateAssassinBattlefields";
 export interface BattlefieldCombatModifiers { heroInitiativeModifier?: number; heroMovementRangeModifier?: number; enemyInitiativeModifier?: number; enemyMovementRangeModifier?: number }
 export interface BattlefieldDefinition { id: string; name: string; boardSizeId: CombatBoardSizeId; terrainPlacements: TerrainPlacement[]; legend: Partial<Record<TerrainType, string>>; combatModifiers?: BattlefieldCombatModifiers }
 const placements = (terrainType: TerrainType, positions: [number, number][]): TerrainPlacement[] => positions.map(([x, y]) => ({ position: { x, y }, terrainType }));
 export const BATTLEFIELDS: Record<string, BattlefieldDefinition> = {
   ...BLACKBRIDGE_BATTLEFIELDS,
+  ...ASH_BENEATH_GREENVEIL_BATTLEFIELDS,
+  ...STONEGATE_ASSASSIN_BATTLEFIELDS,
   greenveil_forest: { id: "greenveil_forest", name: "Greenveil Forest", boardSizeId: "skirmish", terrainPlacements: placements("forest", [[2, 0], [3, 1], [3, 3], [4, 4]]), legend: { forest: "Forest · cost 2 · blocks sight" } },
   deep_forest: { id: "deep_forest", name: "Deep Forest", boardSizeId: "battlefield", terrainPlacements: placements("forest", [[3, 0], [3, 1], [4, 3], [3, 5], [6, 1], [6, 5]]), legend: { forest: "Forest · cost 2 · blocks sight" } },
   shadowfen_waters: { id: "shadowfen_waters", name: "Shadowfen Waters", boardSizeId: "battlefield", terrainPlacements: [...placements("shallow_water", [[3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [4, 5]]), ...placements("forest", [[5, 1], [5, 5]])], legend: { shallow_water: "Shallow water · cost 2", forest: "Marsh trees · cost 2 · blocks sight" } },

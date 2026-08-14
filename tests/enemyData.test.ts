@@ -8,9 +8,9 @@ import { createSeededRandom } from "../src/utils/random";
 
 describe("enemy data integrity and rewards", () => {
   it("retains the foundation roster and adds the campaign enemies", () => {
-    expect(Object.keys(ENEMIES)).toHaveLength(31);
+    expect(Object.keys(ENEMIES)).toHaveLength(37);
     expect(ENEMIES.goblin_chieftain).toBeDefined();
-    expect(ENEMIES).toMatchObject({ goblin_wardbreaker: { role: "debuffer" }, spiderling_swarm: { factionId: "beasts" }, webspinner: { factionId: "beasts" }, spider_broodguard: { factionId: "beasts" }, spider_queen: { role: "mini_boss" } });
+    expect(ENEMIES).toMatchObject({ goblin_wardbreaker: { role: "debuffer" }, spiderling_swarm: { factionId: "beasts" }, webspinner: { factionId: "beasts" }, spider_broodguard: { factionId: "beasts" }, spider_queen: { role: "mini_boss" }, ashscale_vermin: { factionId: "beasts" }, cinder_touched_bandit: { role: "debuffer" }, wardstone_scale_guardian: { role: "mini_boss" } });
   });
   it("retains the five initial factions and adds Ward Constructs", () => expect(Object.keys(ENEMY_FACTIONS)).toEqual(["goblins", "undead", "beasts", "bandits", "orcs", "constructs"]));
   it("resolves every ability and loot reference", () => {

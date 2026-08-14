@@ -6,7 +6,7 @@ export type SystemModifierTarget =
   | "salary" | "trainingXp" | "recoveryDuration" | "intelligenceGrowth"
   | "injuryChance" | "damage" | "healingReceived" | "armorClass" | "magicDefenseScore"
   | "movementRange" | "maxHP" | "fireDamage" | "frostDamage" | "burnChance" | "attackRoll"
-  | "healingPower" | "rangedSkillRange" | "rangedAttackRoll" | "recruitmentFee";
+  | "healingPower" | "rangedSkillRange" | "rangedAttackRoll" | "recruitmentFee" | "initiative";
 export type ModifierTarget = AttributeKey | DerivedStatKey | SystemModifierTarget;
 export type ModifierOperation = "flat" | "percentage";
 export type ModifierSource = "race" | "class" | "subclass" | "background" | "trait" | "condition" | "equipment" | "skill" | "guild" | "quest" | "event";

@@ -26,6 +26,30 @@ export function advanceCombatConditions(current: readonly ActiveCombatCondition[
 export function getConditionStatPercentage(unit: CombatUnit, stat: string): number {
   return unit.activeConditions.reduce((sum, active) => {
     const definition = COMBAT_CONDITIONS[active.conditionId];
-    return sum + (stat === "physicalDamage" ? definition?.physicalDamageModifier ?? 0 : 0);
+    if (!definition) return sum;
+    if (stat === "physicalDamage") return sum + (definition.physicalDamageModifier ?? 0);
+    if (stat === "magicDamage") return sum + (definition.magicDamageModifier ?? 0);
+    if (stat === "speed") return sum + (definition.speedModifier ?? 0);
+    return sum;
   }, 0);
 }
+
+export function getConditionFlatModifier(unit: CombatUnit, stat: string): number {
+  return unit.activeConditions.reduce((sum, active) => {
+    const definition = COMBAT_CONDITIONS[active.conditionId];
+    if (!definition) return sum;
+    if (stat === "attackRollModifier") return sum + (definition.attackRollModifier ?? 0);
+    if (stat === "armorClass") return sum + (definition.armorClassModifier ?? 0);
+    if (stat === "magicDefenseScore") return sum + (definition.magicDefenseScoreModifier ?? 0);
+    return sum;
+  }, 0);
+}
+
+export function getEffectiveMovementRange(unit: CombatUnit): number {
+  const definitions = unit.activeConditions.map((active) => COMBAT_CONDITIONS[active.conditionId]).filter(Boolean);
+  const overrides = definitions.map((definition) => definition.movementRangeOverride).filter((value): value is number => value !== undefined);
+  if (overrides.length) return Math.max(0, Math.min(...overrides));
+  return Math.max(0, unit.movementRange + definitions.reduce((sum, definition) => sum + (definition.movementRangeModifier ?? 0), 0));
+}
+
+export function blocksMagicSkills(unit: CombatUnit): boolean { return unit.activeConditions.some((active) => COMBAT_CONDITIONS[active.conditionId]?.blocksMagicSkills); }

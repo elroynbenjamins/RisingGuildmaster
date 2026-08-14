@@ -9,6 +9,8 @@ import { purgeExpiredCandidates } from "../recruitment/recruitmentService";
 import { advanceRegionalThreats } from "../world/regionalThreatService";
 import type { GuildDayEvent, GuildDayPreview, GuildDayResolution, GuildTimeAdvanceResult } from "./economyTypes";
 import { resolveTrainingGroundDay } from "../training/trainingService";
+import { recoverAdventureStamina } from "../heroes/adventureStaminaService";
+import { GAME_CONFIG } from "../../config/gameConfig";
 
 const dueOnDay = (startDay: number, endDay: number, day: number): boolean => day > startDay && day <= endDay && (day - startDay) % 7 === 0;
 export const totalSalaryArrears = (guild: GuildState): number => Object.values(guild.finance.salaryArrearsByHeroId).reduce((sum, value) => sum + value, 0);
@@ -31,7 +33,7 @@ function processPayroll(guild: GuildState, day: number): { guild: GuildState; du
       events.push({ type: "salary_arrears", text: `${heroName} is owed ${unpaid} gold.`, amount: unpaid });
     }
   }
-  return { guild: { ...guild, gold, finance: { salaryArrearsByHeroId: arrears, totalSalaryPaid: guild.finance.totalSalaryPaid + paidTotal, transactions } }, due: dueContracts.reduce((sum, contract) => sum + contract.weeklySalary, 0), paid: paidTotal, arrearsAdded, events };
+  return { guild: { ...guild, gold, finance: { ...guild.finance, salaryArrearsByHeroId: arrears, totalSalaryPaid: guild.finance.totalSalaryPaid + paidTotal, transactions } }, due: dueContracts.reduce((sum, contract) => sum + contract.weeklySalary, 0), paid: paidTotal, arrearsAdded, events };
 }
 
 function resolveSingleDay(guild: GuildState): { guild: GuildState; resolution: GuildDayResolution } {
@@ -46,6 +48,10 @@ function resolveSingleDay(guild: GuildState): { guild: GuildState; resolution: G
     heroes: guild.heroes.map((hero) => ({ ...hero, conditions: advanceConditions(hero.conditions, 1) })),
     heroContracts: guild.heroContracts.map((contract) => ({ ...contract, status: getContractStatus(contract, day) })),
   };
+  const tavernIncome = GAME_CONFIG.dailyTavernIncome * Math.max(1, guild.finance.tavernLevel);
+  updated = { ...recoverAdventureStamina(updated), gold: updated.gold + tavernIncome, finance: { ...updated.finance, totalTavernIncome: updated.finance.totalTavernIncome + tavernIncome, transactions: [...updated.finance.transactions, { id: `tavern-${day}`, type: "tavern_income", day, amount: tavernIncome, note: "Guildhaven tavern daily proceeds" }] } };
+  events.push({ type: "tavern_income", text: `The guild tavern earned ${tavernIncome} gold.`, amount: tavernIncome });
+  if (guild.heroes.some((hero) => hero.adventureStamina < GAME_CONFIG.maxAdventureStamina)) events.push({ type: "stamina_recovered", text: `Resting heroes recovered ${GAME_CONFIG.adventureStaminaRecoveryPerDay} readiness stamina.` });
   updated = completeArtisanConstructions(updated);
   const training = resolveTrainingGroundDay(updated); updated = training.guild;
   training.completedHeroNames.forEach((name) => events.push({ type: "training_complete", text: `${name} completed training and is available again.` }));
@@ -102,5 +108,5 @@ export function paySalaryArrears(guild: GuildState, heroId?: string): GuildState
     transactions.push({ id: `arrears-${guild.currentDay}-${id}-${transactions.length}`, type: "salary_arrears", day: guild.currentDay, amount: -paid, heroId: id, note: `Salary arrears paid to ${name}` });
   }
   if (totalPaid === 0 && totalSalaryArrears(guild) > 0) throw new Error("Not enough gold to pay salary arrears");
-  return { ...guild, gold, finance: { salaryArrearsByHeroId: arrears, totalSalaryPaid: guild.finance.totalSalaryPaid + totalPaid, transactions } };
+  return { ...guild, gold, finance: { ...guild.finance, salaryArrearsByHeroId: arrears, totalSalaryPaid: guild.finance.totalSalaryPaid + totalPaid, transactions } };
 }

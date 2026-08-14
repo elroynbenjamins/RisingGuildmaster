@@ -24,9 +24,19 @@ const enemyCoordinates = [
 ] as const;
 export const ENEMY_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(enemyCoordinates.map((id, index) => [id, { column: index % 6, row: Math.floor(index / 6) }])) as Record<string, SkillIconCoordinate>;
 
-export function getSkillIconArt(skillId: string): SkillIconCoordinate & { atlas: "hero" | "enemy" } {
+const ashStoryCoordinates = [
+  "ember_bite", "cinder_scuttle", "ember_fed",
+  "cinder_blade", "ash_bomb", "scale_hammer",
+  "wardfire_pulse", "ancient_scale_shell", "sleeping_ember",
+] as const;
+export const ASH_STORY_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(ashStoryCoordinates.map((id, index) => [id, { column: index % 3, row: Math.floor(index / 3) }])) as Record<string, SkillIconCoordinate>;
+
+export type SkillIconAtlasId = "hero" | "enemy" | "ashStory";
+
+export function getSkillIconArt(skillId: string): SkillIconCoordinate & { atlas: SkillIconAtlasId } {
   const authored = HERO_SKILL_ICON_COORDINATES[skillId]; if (authored) return { ...authored, atlas: "hero" };
   const enemy = ENEMY_SKILL_ICON_COORDINATES[skillId]; if (enemy) return { ...enemy, atlas: "enemy" };
+  const ashStory = ASH_STORY_SKILL_ICON_COORDINATES[skillId]; if (ashStory) return { ...ashStory, atlas: "ashStory" };
   let hash = 0;
   for (let index = 0; index < skillId.length; index += 1) hash = (hash * 31 + skillId.charCodeAt(index)) >>> 0;
   const cell = hash % 36;

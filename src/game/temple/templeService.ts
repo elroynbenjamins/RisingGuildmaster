@@ -1,5 +1,5 @@
 import { TEMPLE_CONFIG } from "../../config/templeConfig";
-import { addCondition } from "../conditions/conditionService";
+import { addCondition, hasInjury } from "../conditions/conditionService";
 import type { GuildState } from "../guild/types";
 import { calculateHero } from "../heroes/heroCalculator";
 import type { ConditionId, Hero } from "../heroes/types";
@@ -66,7 +66,7 @@ export function reviveHero(guild: GuildState, heroId: string): GuildState {
   const hero = findHero(guild, heroId);
   if (hero.currentHP > 0) throw new Error("This hero is not fallen");
   if (guild.gems < TEMPLE_CONFIG.revivalGemCost) throw new Error("Not enough gems");
-  const revived = { ...hero, currentHP: Math.max(1, Math.round(calculateHero(hero).stats.maxHP * TEMPLE_CONFIG.revivedHpRatio)), conditions: addCondition(hero.conditions, "injured"), isAvailable: true };
+  const revived = { ...hero, currentHP: Math.max(1, Math.round(calculateHero(hero).stats.maxHP * TEMPLE_CONFIG.revivedHpRatio)), conditions: hasInjury(hero.conditions) ? hero.conditions : addCondition(hero.conditions, "injured"), isAvailable: true };
   const transaction: GemTransaction = { id: `revival-${hero.id}-${guild.currentDay}-${guild.gemTransactions.length}`, type: "revival", amount: -TEMPLE_CONFIG.revivalGemCost, day: guild.currentDay, note: `Revived ${hero.name}` };
   return replaceHero({ ...guild, gems: guild.gems - TEMPLE_CONFIG.revivalGemCost, gemTransactions: [...guild.gemTransactions, transaction] }, revived);
 }

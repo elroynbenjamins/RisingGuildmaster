@@ -1,5 +1,19 @@
 import type { RegionLocationDefinition } from "../../game/world/worldTypes";
 
+/** Marker centers calibrated against the v2 regional artwork. */
+const ART_MARKER_POSITIONS: Record<string, { x: number; y: number }> = {
+  guildhaven_location: { x: .25, y: .42 }, highcourt: { x: .64, y: .18 }, brambleford: { x: .45, y: .52 },
+  mosswatch_ruins: { x: .20, y: .13 }, blackbridge: { x: .40, y: .75 }, greenveil_wardstone: { x: .65, y: .48 }, thornroot_hideout: { x: .18, y: .76 },
+  stonegate_location: { x: .11, y: .47 }, kharum_deep: { x: .49, y: .37 }, flintwatch: { x: .49, y: .07 },
+  orcroad_pass: { x: .80, y: .43 }, deepforge_ruins: { x: .34, y: .69 }, iron_ward_vault: { x: .82, y: .79 },
+  northwatch_location: { x: .50, y: .71 }, silverbough: { x: .75, y: .48 }, aurora_pines: { x: .20, y: .20 },
+  whitefang_pass: { x: .49, y: .25 }, frozen_wardstone: { x: .20, y: .47 }, glimmerlake: { x: .75, y: .14 },
+  emberfall_location: { x: .20, y: .19 }, red_mesa: { x: .78, y: .18 }, cinderwell: { x: .40, y: .47 },
+  obsidian_spire: { x: .61, y: .48 }, ashen_crucible: { x: .45, y: .72 }, ashlands_wardstone: { x: .79, y: .69 },
+  blackwater_location: { x: .29, y: .56 }, drowned_abbey: { x: .72, y: .44 }, broodmother_hollow: { x: .24, y: .33 },
+  sunken_wardstone: { x: .50, y: .67 }, wispgrave: { x: .77, y: .82 }, mirewatch: { x: .50, y: .23 },
+};
+
 const location = (
   id: string,
   name: string,
@@ -9,7 +23,7 @@ const location = (
   y: number,
   description: string,
   extras: Pick<RegionLocationDefinition, "settlementId" | "questId" | "recommendedLevel"> = {},
-): RegionLocationDefinition => ({ id, name, regionId, type, mapPosition: { x, y }, description, ...extras });
+): RegionLocationDefinition => ({ id, name, regionId, type, mapPosition: ART_MARKER_POSITIONS[id] ?? { x, y }, description, ...extras });
 
 export const REGION_LOCATIONS: Record<string, RegionLocationDefinition> = {
   guildhaven_location: location("guildhaven_location", "Guildhaven", "greenveil", "city", .28, .45, "The guild's riverbound home city. Competing companies, merchants, temples, and adventurers crowd its fortified districts.", { settlementId: "guildhaven" }),

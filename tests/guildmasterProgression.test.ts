@@ -14,12 +14,13 @@ describe("Guildmaster progression", () => {
   });
 
   it("enforces level, prerequisite, point cost, and permanent unlocks", () => {
-    expect(() => unlockGuildmasterSkill(createGuildmasterProfile(), "regional_network")).toThrow("Level 2");
-    let profile = grantGuildmasterXp(createGuildmasterProfile(), 100);
+    expect(() => unlockGuildmasterSkill(createGuildmasterProfile(), "regional_network")).toThrow("Level 3");
+    let profile = grantGuildmasterXp(createGuildmasterProfile(), 250);
+    profile = unlockGuildmasterSkill(profile, "scouting_basics");
     profile = unlockGuildmasterSkill(profile, "regional_network");
-    expect(profile.unlockedSkillIds).toEqual(["regional_network"]);
+    expect(profile.unlockedSkillIds).toEqual(["scouting_basics", "regional_network"]);
     expect(profile.skillPoints).toBe(0);
-    expect(() => unlockGuildmasterSkill(profile, "specialist_headhunting")).toThrow("Level 3");
+    expect(() => unlockGuildmasterSkill(profile, "specialist_headhunting")).toThrow("Level 4");
     expect(() => unlockGuildmasterSkill(profile, "regional_network")).toThrow("already unlocked");
   });
 

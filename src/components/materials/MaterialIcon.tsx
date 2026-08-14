@@ -6,15 +6,8 @@ import type { MaterialId } from "../../game/crafting/craftingTypes";
 import { colors } from "../ui";
 
 export function MaterialIcon({ materialId, size = 44 }: { materialId: MaterialId; size?: number }) {
-  return (
-    <Image
-      accessibilityLabel={`${MATERIALS[materialId].name} material`}
-      fadeDuration={0}
-      resizeMode="cover"
-      source={MATERIAL_ART[materialId]}
-      style={[styles.icon, { width: size, height: size, borderRadius: Math.max(6, size * 0.18) }]}
-    />
-  );
+  const art = MATERIAL_ART[materialId];
+  return <View accessibilityLabel={`${MATERIALS[materialId].name} material`} style={[styles.icon, { width: size, height: size, borderRadius: Math.max(6, size * .18) }]}><Image fadeDuration={0} resizeMode="stretch" source={art.source} style={{ position: "absolute", width: size * art.columns, height: size * art.rows, left: -art.column * size, top: -art.row * size }} /></View>;
 }
 
 export function MaterialCostList({

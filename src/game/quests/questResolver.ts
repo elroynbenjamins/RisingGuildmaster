@@ -1,7 +1,8 @@
 import { COMBAT_CONDITIONS } from "../../data/conditions/combatConditions";
 import { QUEST_LOOT_TABLES } from "../../data/loot/questLootTables";
 import type { RandomSource } from "../../utils/random";
-import { addCondition } from "../conditions/conditionService";
+import { addCondition, isInjuryCondition } from "../conditions/conditionService";
+import { applyOutcomeInjury } from "../conditions/injuryService";
 import type { HeroCombatInstance } from "../combat/combatTypes";
 import { recoverBetweenEncounters } from "../combat/resourceService";
 import type { GuildState } from "../guild/types";
@@ -14,6 +15,7 @@ import { getTraitPercentage } from "../traits/traitService";
 import type { MaterialId } from "../crafting/craftingTypes";
 import { grantGuildmasterXp } from "../guildmaster/guildmasterProgression";
 import type { HuntRewardProgress } from "../guild/types";
+import { recordQuestHistory } from "../heroes/heroHistoryService";
 
 export function isCombatVictory(enemies: readonly { isAlive: boolean }[]): boolean { return enemies.every((enemy) => !enemy.isAlive); }
 export function isCombatDefeat(heroes: readonly { isAlive: boolean }[]): boolean { return heroes.every((hero) => !hero.isAlive); }
@@ -44,17 +46,24 @@ function persistHeroOutcome(hero: Hero, instance: HeroCombatInstance, xp: number
   const defeated = !instance.isAlive || instance.currentHP <= 0;
   let conditions = [...hero.conditions];
   for (const active of instance.activeConditions) {
-    if (COMBAT_CONDITIONS[active.conditionId]?.persistsAfterCombat && active.conditionId === "infected") conditions = addCondition(conditions, "infected");
+    const definition = COMBAT_CONDITIONS[active.conditionId];
+    if (definition?.persistsAfterCombat && definition.persistentConditionId) conditions = addCondition(conditions, definition.persistentConditionId);
   }
   const injuryChance = Math.max(0, Math.min(1, .15 * (1 + getTraitPercentage(hero, "injuryChance"))));
-  if (defeated || (instance.currentHP / instance.maxHP <= .20 && random.next() < injuryChance)) conditions = addCondition(conditions, "injured");
+  if (defeated) conditions = applyOutcomeInjury(conditions, hero.id, "major");
+  else if (instance.currentHP / instance.maxHP <= .20 && random.next() < injuryChance) conditions = applyOutcomeInjury(conditions, hero.id, "minor");
   return grantHeroXp({ ...hero, currentHP: defeated ? 0 : instance.currentHP, conditions, isAvailable: !defeated }, defeated ? Math.round(xp * .5) : xp);
 }
 
 export function resolveQuestVictory(activeQuest: ActiveQuest, party: Party, guild: GuildState, instances: readonly HeroCombatInstance[], random: RandomSource): { activeQuest: ActiveQuest; guild: GuildState } {
   const quest = getQuestDefinition(activeQuest.questDefinitionId); const partyHeroes = guild.heroes.filter((hero) => party.heroIds.includes(hero.id)); const goldModifier = partyHeroes.reduce((sum, hero) => sum + getTraitPercentage(hero, "questGold"), 0); const gold = Math.max(0, Math.round(rollQuestGold(quest, random) * (1 + goldModifier)));
   const byId = new Map(instances.map((instance) => [instance.heroId, instance]));
-  const heroes = guild.heroes.map((hero) => party.heroIds.includes(hero.id) && byId.has(hero.id) ? persistHeroOutcome(hero, byId.get(hero.id)!, getQuestXpForHero(hero, quest), random) : hero);
+  const heroes = guild.heroes.map((hero) => {
+    if (!party.heroIds.includes(hero.id) || !byId.has(hero.id)) return hero;
+    const instance = byId.get(hero.id)!; const xp = getQuestXpForHero(hero, quest);
+    const persisted = persistHeroOutcome(hero, instance, xp, random); const newInjury = persisted.conditions.find((condition) => isInjuryCondition(condition.conditionId) && !hero.conditions.some((old) => old.conditionId === condition.conditionId)); const newlyInjured = Boolean(newInjury);
+    return recordQuestHistory(persisted, { day: guild.currentDay, questId: quest.id, questName: quest.name, victory: true, xpEarned: instance.isAlive && instance.currentHP > 0 ? xp : Math.round(xp * .5), fellInBattle: !instance.isAlive || instance.currentHP <= 0, newlyInjured, injuryConditionId: newInjury?.conditionId, previousLevel: hero.level });
+  });
   const lootTable = QUEST_LOOT_TABLES[quest.lootTableId]; const lootId = lootTable?.itemIds.length ? random.pick(lootTable.itemIds) : null; const collectedMaterials: Partial<Record<MaterialId, number>> = {};
   for (const drop of lootTable?.materialDrops ?? []) { const amount = random.int(drop.quantityMin, drop.quantityMax); if (amount > 0) collectedMaterials[drop.materialId] = amount; }
   const huntRewardProgress = { ...guild.huntRewardProgress };
@@ -65,11 +74,17 @@ export function resolveQuestVictory(activeQuest: ActiveQuest, party: Party, guil
     if (rolled.amount > 0) collectedMaterials[quest.huntReward.recipeFragmentMaterialId] = (collectedMaterials[quest.huntReward.recipeFragmentMaterialId] ?? 0) + rolled.amount;
   }
   const materials = { ...guild.materials }; for (const [id, amount] of Object.entries(collectedMaterials) as [MaterialId, number][]) materials[id] = (materials[id] ?? 0) + amount;
-  return { activeQuest: { ...activeQuest, status: "victory", goldEarned: gold, xpEarnedPerHero: quest.xpRewardPerHero, collectedLootIds: lootId ? [lootId] : [], collectedMaterials }, guild: { ...guild, guildmaster: grantGuildmasterXp(guild.guildmaster, quest.difficulty * 35), gold: guild.gold + gold, heroes, materials, huntRewardProgress, inventory: lootId ? [...guild.inventory, lootId] : guild.inventory } };
+  const unlockedRecipeIds = [...new Set([...(guild.unlockedRecipeIds ?? []), ...(quest.recipeUnlockIdsOnVictory ?? [])])];
+  return { activeQuest: { ...activeQuest, status: "victory", goldEarned: gold, xpEarnedPerHero: quest.xpRewardPerHero, collectedLootIds: lootId ? [lootId] : [], collectedMaterials }, guild: { ...guild, guildmaster: grantGuildmasterXp(guild.guildmaster, quest.difficulty * 35), gold: guild.gold + gold, heroes, materials, huntRewardProgress, unlockedRecipeIds, inventory: lootId ? [...guild.inventory, lootId] : guild.inventory } };
 }
 
 export function resolveQuestDefeat(activeQuest: ActiveQuest, party: Party, guild: GuildState, instances: readonly HeroCombatInstance[], random: RandomSource): { activeQuest: ActiveQuest; guild: GuildState } {
+  const quest = getQuestDefinition(activeQuest.questDefinitionId);
   const byId = new Map(instances.map((instance) => [instance.heroId, instance]));
-  const heroes = guild.heroes.map((hero) => party.heroIds.includes(hero.id) && byId.has(hero.id) ? persistHeroOutcome(hero, { ...byId.get(hero.id)!, currentHP: 0, isAlive: false }, 0, random) : hero);
+  const heroes = guild.heroes.map((hero) => {
+    if (!party.heroIds.includes(hero.id) || !byId.has(hero.id)) return hero;
+    const persisted = persistHeroOutcome(hero, { ...byId.get(hero.id)!, currentHP: 0, isAlive: false }, 0, random); const newInjury = persisted.conditions.find((condition) => isInjuryCondition(condition.conditionId) && !hero.conditions.some((old) => old.conditionId === condition.conditionId));
+    return recordQuestHistory(persisted, { day: guild.currentDay, questId: quest.id, questName: quest.name, victory: false, xpEarned: 0, fellInBattle: true, newlyInjured: Boolean(newInjury), injuryConditionId: newInjury?.conditionId, previousLevel: hero.level });
+  });
   return { activeQuest: { ...activeQuest, status: "defeat" }, guild: { ...guild, heroes } };
 }

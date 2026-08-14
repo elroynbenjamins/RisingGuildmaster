@@ -30,9 +30,14 @@ const EQUIPMENT_DROPS: Record<string, string[]> = {
   blackbridge_wraith_loot: ["silver-ward-ring", "runespun-cowl"],
   iron_laurel_loot: ["iron-longsword", "wardplate", "steel-greathelm"],
   heartstone_revenant_loot: ["wardstone-scepter", "ironheart-amulet", "sapphire-focus-charm"],
+  ashscale_vermin_loot: ["trail-boots", "copper-luck-ring"],
+  cinder_salvager_loot: ["ash-wand", "scout-cloak", "topaz-precision-ring"],
+  wardstone_scale_guardian_loot: ["wardstone-scepter", "silver-ward-ring", "runespun-cowl"],
+  gloam_knives_loot: ["iron-longsword", "scout-cloak", "topaz-precision-ring"],
+  gloam_master_loot: ["steel-greatsword", "shadowweave-mantle", "silver-ward-ring"],
 };
 
 export const ENEMY_LOOT_TABLES: Record<string, LootTableDefinition> = Object.fromEntries([
   "goblin_basic_loot", "goblin_brute_loot", "goblin_wardbreaker_loot", "skeleton_loot", "zombie_loot", "wolf_loot",
-  "giant_spider_loot", "spiderling_loot", "webspinner_loot", "broodguard_loot", "spider_queen_loot", "bandit_loot", "bandit_captain_loot", "orc_loot", "troll_loot", "goblin_chieftain_loot", "chainbreaker_loot", "ward_construct_loot", "hollow_warden_loot", "forest_serpent_loot", "sewer_crocodile_loot", "frost_wisp_loot", "frostmarch_yeti_loot", "blackbridge_scavenger_loot", "blackbridge_sapper_loot", "blackbridge_wraith_loot", "iron_laurel_loot", "heartstone_revenant_loot",
+  "giant_spider_loot", "spiderling_loot", "webspinner_loot", "broodguard_loot", "spider_queen_loot", "bandit_loot", "bandit_captain_loot", "orc_loot", "troll_loot", "goblin_chieftain_loot", "chainbreaker_loot", "ward_construct_loot", "hollow_warden_loot", "forest_serpent_loot", "sewer_crocodile_loot", "frost_wisp_loot", "frostmarch_yeti_loot", "blackbridge_scavenger_loot", "blackbridge_sapper_loot", "blackbridge_wraith_loot", "iron_laurel_loot", "heartstone_revenant_loot", "ashscale_vermin_loot", "cinder_salvager_loot", "wardstone_scale_guardian_loot", "gloam_knives_loot", "gloam_master_loot",
 ].map((id) => [id, { id, itemIds: EQUIPMENT_DROPS[id] ?? [] }]));

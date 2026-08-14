@@ -6,6 +6,8 @@ import { ORC_ENEMIES } from "./orcs";
 import { UNDEAD_ENEMIES } from "./undead";
 import { CONSTRUCT_ENEMIES } from "./constructs";
 import { BLACKBRIDGE_ENEMIES } from "./blackbridge";
+import { ASH_BENEATH_GREENVEIL_ENEMIES } from "./ashBeneathGreenveil";
+import { STONEGATE_ASSASSIN_ENEMIES } from "./stonegateAssassins";
 
 export const ENEMIES: Record<string, EnemyDefinition> = {
   ...GOBLIN_ENEMIES,
@@ -15,6 +17,8 @@ export const ENEMIES: Record<string, EnemyDefinition> = {
   ...ORC_ENEMIES,
   ...CONSTRUCT_ENEMIES,
   ...BLACKBRIDGE_ENEMIES,
+  ...ASH_BENEATH_GREENVEIL_ENEMIES,
+  ...STONEGATE_ASSASSIN_ENEMIES,
 };
 
 export function getEnemyDefinition(id: string): EnemyDefinition {

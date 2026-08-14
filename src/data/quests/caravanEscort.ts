@@ -1,10 +1,10 @@
 import type { QuestDecisionChoiceDefinition, QuestDecisionStageDefinition } from "../../game/quests/questDecisionTypes";
 
-export interface EscortNpcDefinition { id: string; name: string; role: string; description: string; mapIcon: string }
+export interface EscortNpcDefinition { id: string; name: string; role: string; description: string; portraitId: string }
 
 export const CARAVAN_ESCORT_NPCS: EscortNpcDefinition[] = [
-  { id: "aldren_vale", name: "Aldren Vale", role: "Merchant", description: "The caravan owner. Aldren knows the Brambleway's trade posts, but hides how nervous the recent disappearances have made him.", mapIcon: "AV" },
-  { id: "mira_thorn", name: "Mira Thorn", role: "Caravan Guard", description: "A veteran outrider hired to keep Aldren alive. Mira watches the tree line while the guild protects the wagons.", mapIcon: "MT" },
+  { id: "aldren_vale", name: "Aldren Vale", role: "Merchant", description: "The caravan owner. Aldren knows the Brambleway's trade posts, but hides how nervous the recent disappearances have made him.", portraitId: "aldren_vale" },
+  { id: "mira_thorn", name: "Mira Thorn", role: "Caravan Guard", description: "A veteran outrider hired to keep Aldren alive. Mira watches the tree line while the guild protects the wagons.", portraitId: "mira_thorn" },
 ];
 
 export const CARAVAN_DECISION_STAGES: Record<string, QuestDecisionStageDefinition> = {

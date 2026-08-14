@@ -8,6 +8,7 @@ import { finishRogueliteRun, resolveRogueliteRecipeDrop, startRogueliteRun } fro
 import { resolveAbilityCheck, type AbilityCheckResult } from "../world/worldEventResolver";
 import { markDungeonNodeResolved, startDungeonRun } from "./dungeonService";
 import { DUNGEON_UNLOCK_HERO_COUNT } from "./dungeonDraftService";
+import { isChapterOneComplete } from "./rogueliteRotationService";
 
 export type DungeonMerchantChoice = "buy_supplies" | "leave";
 export interface DungeonNodeResolution { guild: GuildState; check: AbilityCheckResult | null; text: string; goldDelta: number; recipeId: string | null }
@@ -27,13 +28,16 @@ function syncHeroes(guild: GuildState, instances: readonly HeroCombatInstance[],
 
 export function beginDungeonExpedition(guild: GuildState, dungeonId: string, partyHeroIds: string[], modifierIds: string[] = [], random?: RandomSource): GuildState {
   if (guild.activeDungeonRun || guild.activeRogueliteRun) throw new Error("Another dungeon run is already active");
+  if (!isChapterOneComplete(guild)) throw new Error("Complete Chapter 1 to unlock Roguelite Expeditions");
+  if (guild.currentDay < guild.rogueliteRotation.cooldownUntilDay) throw new Error(`Roguelite Expeditions recover on Day ${guild.rogueliteRotation.cooldownUntilDay}`);
+  if (!guild.rogueliteRotation.offeredDungeonIds.includes(dungeonId)) throw new Error("Choose one of the three current expedition themes");
   if (guild.heroes.length < DUNGEON_UNLOCK_HERO_COUNT) throw new Error(`Roguelite Expeditions unlock at ${DUNGEON_UNLOCK_HERO_COUNT} owned heroes`);
   const party = guild.heroes.filter((hero) => partyHeroIds.includes(hero.id));
   if (party.length !== 4 || party.length !== new Set(partyHeroIds).size) throw new Error("A roguelite dungeon party requires exactly four unique drafted heroes");
   if (party.some((hero) => !hero.isAvailable || hero.currentHP <= 0)) throw new Error("Every dungeon hero must be available and alive");
   const run = startDungeonRun(dungeonId, modifierIds, partyHeroIds, party.map(createHeroCombatInstance), random);
   const withRoguelite = startRogueliteRun(guild, run.id);
-  return { ...withRoguelite, recentPartyHeroIds: partyHeroIds, activeDungeonRun: run };
+  return { ...withRoguelite, recentPartyHeroIds: partyHeroIds, rogueliteRotation: { ...guild.rogueliteRotation, selectedDungeonId: dungeonId }, activeDungeonRun: run };
 }
 
 export function getDungeonCombatSetup(guild: GuildState): QuestCombatSetup {
@@ -87,7 +91,7 @@ export function resolveDungeonCombat(guild: GuildState, status: "victory" | "def
 
 export function closeDungeonExpedition(guild: GuildState, abandon = false): GuildState {
   if (!guild.activeDungeonRun) throw new Error("No dungeon run to close");
-  const run = guild.activeDungeonRun; const heroIds = new Set(run.partyHeroIds); let next: GuildState = { ...guild, heroes: guild.heroes.map((hero) => heroIds.has(hero.id) && hero.currentHP > 0 ? { ...hero, isAvailable: true } : hero), activeDungeonRun: null };
+  const run = guild.activeDungeonRun; const heroIds = new Set(run.partyHeroIds); const won = run.status === "victory" && !abandon; let next: GuildState = { ...guild, heroes: guild.heroes.map((hero) => heroIds.has(hero.id) && hero.currentHP > 0 ? { ...hero, isAvailable: true } : hero), rogueliteRotation: won ? { offeredDungeonIds: [], selectedDungeonId: null, cooldownUntilDay: guild.currentDay + 7 } : { ...guild.rogueliteRotation, selectedDungeonId: null }, activeDungeonRun: null };
   if (next.activeRogueliteRun) next = finishRogueliteRun(next);
   return next;
 }

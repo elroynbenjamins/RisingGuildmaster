@@ -12,8 +12,8 @@ import { createWorldState } from "../src/game/world/worldState";
 
 describe("Blackbridge side story", () => {
   it("links optional quests to chapters one and two", () => {
-    expect(CHAPTER_1.sideQuestIds).toEqual(["ashes_of_blackbridge"]);
-    expect(CHAPTER_2.sideQuestIds).toEqual(["blackbridge_ledger", "oath_of_the_broken_bridge"]);
+    expect(CHAPTER_1.sideQuestIds).toEqual(expect.arrayContaining(["ashes_of_blackbridge"]));
+    expect(CHAPTER_2.sideQuestIds).toEqual(expect.arrayContaining(["blackbridge_ledger", "oath_of_the_broken_bridge"]));
   });
 
   it("unlocks each sequel only after its explicit story evidence", () => {

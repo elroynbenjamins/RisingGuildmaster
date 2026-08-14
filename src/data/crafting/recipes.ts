@@ -1,6 +1,8 @@
 import type { CraftingRecipeDefinition } from "../../game/crafting/craftingTypes";
+import { BASIC_RECIPE_EXPANSION } from "./basicRecipeExpansion";
 
 export const CRAFTING_RECIPES: Record<string, CraftingRecipeDefinition> = {
+  ...BASIC_RECIPE_EXPANSION,
   forge_iron_longsword: { id: "forge_iron_longsword", artisanType: "blacksmith", artisanLevel: 1, outputEquipmentId: "iron-longsword", goldCost: 80, materials: { iron_ore: 5, coal: 2, oak_timber: 1 }, description: "A dependable martial blade similar to the standard longsword of tabletop adventurers." },
   forge_chainmail: { id: "forge_chainmail", artisanType: "blacksmith", artisanLevel: 1, outputEquipmentId: "iron-chainmail", goldCost: 100, materials: { iron_ore: 7, coal: 3 }, description: "Interlocking iron rings offering sturdy frontline defense." },
   forge_guard_helm: { id: "forge_guard_helm", artisanType: "blacksmith", artisanLevel: 1, outputEquipmentId: "iron-guard-helm", goldCost: 60, materials: { iron_ore: 4, coal: 1 }, description: "A practical helm for heroes expected to hold a formation." },

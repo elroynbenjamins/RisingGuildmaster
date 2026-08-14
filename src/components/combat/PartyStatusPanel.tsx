@@ -4,6 +4,7 @@ import { CLASSES } from "../../data/classes/classes";
 import type { HeroCombatant } from "../../game/combat/combatEngine";
 import { colors } from "../ui";
 import { getRaceNameColor } from "../../ui/raceColors";
+import { COMBAT_CONDITIONS } from "../../data/conditions/combatConditions";
 
 function ratio(value: number, maximum: number) {
   return maximum > 0 ? Math.max(0, Math.min(1, value / maximum)) : 0;
@@ -29,6 +30,7 @@ export function PartyStatusPanel({ heroes, activeHeroId }: { heroes: readonly He
         <ResourceBar label="HP" value={instance.currentHP} maximum={instance.maxHP} color={colors.green} />
         {instance.maxMana > 0 && <ResourceBar label="MP" value={instance.currentMana} maximum={instance.maxMana} color={colors.blue} />}
         {instance.maxStamina > 0 && <ResourceBar label="SP" value={instance.currentStamina} maximum={instance.maxStamina} color={colors.gold} />}
+        {instance.activeConditions.length > 0 && <Text style={styles.conditions}>{instance.activeConditions.map((condition) => `${COMBAT_CONDITIONS[condition.conditionId]?.name ?? condition.conditionId} ${condition.remainingTurns}t`).join(" • ")}</Text>}
       </View>;
     })}
   </View>;
@@ -48,4 +50,5 @@ const styles = StyleSheet.create({
   track: { flex: 1, height: 7, backgroundColor: "#3d3038", borderRadius: 4, overflow: "hidden" },
   fill: { height: "100%", borderRadius: 4 },
   resourceValue: { color: colors.text, fontSize: 10, fontVariant: ["tabular-nums"], textAlign: "right", minWidth: 57 },
+  conditions: { color: "#f0b76d", fontSize: 10, fontWeight: "800", marginTop: 4 },
 });

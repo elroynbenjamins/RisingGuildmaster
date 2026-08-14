@@ -23,7 +23,9 @@ export type EventRequirement = { type: "party_attribute_at_least"; attribute: At
 export type EventOutcome = { type: "gold"; value: number } | { type: "faction_reputation"; factionId: string; value: number } | { type: "world_flag"; flag: string; value: boolean } | { type: "none" };
 export interface EventChoice { id: string; text: string; requirements?: EventRequirement[]; abilityCheck?: AbilityCheck; successOutcomes: EventOutcome[]; failureOutcomes?: EventOutcome[] }
 export interface WorldEventDefinition { id: string; title: string; description: string; weight: number; regionIds: string[]; choices: EventChoice[] }
-export interface LoreEntryDefinition { id: string; title: string; category: "region" | "history" | "faction" | "character" | "creature" | "artifact"; text: string; unlockFlag: string }
+export type LorePerspectiveKind = "eyewitness" | "oral_tradition" | "official_claim" | "scholarly_record" | "field_note";
+export interface LorePerspective { speaker: string; role?: string; text: string; kind: LorePerspectiveKind }
+export interface LoreEntryDefinition { id: string; title: string; category: "region" | "history" | "faction" | "character" | "creature" | "artifact"; text: string; unlockFlag: string; perspectives?: LorePerspective[] }
 export interface RegionLoreDefinition {
   regionId: string;
   epithet: string;

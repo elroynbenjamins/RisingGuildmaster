@@ -1,4 +1,5 @@
 export type GuildmasterSkillId =
+  | "scouting_basics"
   | "regional_network"
   | "specialist_headhunting"
   | "express_dispatches"

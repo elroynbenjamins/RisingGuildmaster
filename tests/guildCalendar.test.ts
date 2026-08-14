@@ -13,16 +13,16 @@ describe("central guild calendar and economy", () => {
     let guild = createGuild(); guild.heroes = [hero]; guild.heroContracts = [createHeroContract(hero, 100, 12, guild.currentDay)];
     expect(payrollDueOnDay(guild, 7)).toBe(0); expect(payrollDueOnDay(guild, 8)).toBe(100);
     const result = advanceGuildTime(guild, 7);
-    expect(result.guild.currentDay).toBe(8); expect(result.guild.gold).toBe(4900); expect(result.guild.finance.totalSalaryPaid).toBe(100);
+    expect(result.guild.currentDay).toBe(8); expect(result.guild.gold).toBe(5250); expect(result.guild.finance.totalSalaryPaid).toBe(100); expect(result.guild.finance.totalTavernIncome).toBe(350);
     expect(result.days[6]).toMatchObject({ day: 8, payrollDue: 100, payrollPaid: 100, arrearsAdded: 0 });
   });
 
   it("never makes gold negative and records unpaid salary per hero", () => {
     const hero = { ...testHero(), id: "arrears-hero", name: "Brakka" };
-    let guild = createGuild(); guild.gold = 40; guild.heroes = [hero]; guild.heroContracts = [createHeroContract(hero, 100, 12, 1)];
+    let guild = createGuild(); guild.gold = 40; guild.heroes = [hero]; guild.heroContracts = [createHeroContract(hero, 500, 12, 1)];
     const result = advanceGuildTime(guild, 7);
-    expect(result.guild.gold).toBe(0); expect(result.guild.finance.salaryArrearsByHeroId[hero.id]).toBe(60); expect(totalSalaryArrears(result.guild)).toBe(60);
-    expect(result.days[6]).toMatchObject({ payrollDue: 100, payrollPaid: 40, arrearsAdded: 60 });
+    expect(result.guild.gold).toBe(0); expect(result.guild.finance.salaryArrearsByHeroId[hero.id]).toBe(110); expect(totalSalaryArrears(result.guild)).toBe(110);
+    expect(result.days[6]).toMatchObject({ payrollDue: 500, payrollPaid: 390, arrearsAdded: 110 });
   });
 
   it("allows arrears to be paid later from available treasury gold", () => {
@@ -45,12 +45,12 @@ describe("central guild calendar and economy", () => {
     expect(preview).toMatchObject({ targetDay: 2, workshopNames: ["Blacksmith"], gatheringMissionIds: ["gather-ready"], scoutReturns: true, recoveringHeroNames: ["Ysra"], expiringCandidateCount: 1, threatIncreaseRegionIds: ["shadowfen"] });
     const result = advanceGuildTime(guild);
     expect(result.guild.artisans.blacksmith).toMatchObject({ recruited: true, level: 1, construction: null }); expect(result.guild.heroes[0]?.conditions).toHaveLength(0); expect(result.guild.recruitment.candidates).toHaveLength(0); expect(result.guild.world.regionThreat?.shadowfen).toBe(1);
-    expect(new Set(result.days[0]?.events.map((event) => event.type))).toEqual(new Set(["workshop_complete", "gathering_ready", "scout_ready", "condition_recovered", "candidate_expired", "regional_threat"]));
+    expect(new Set(result.days[0]?.events.map((event) => event.type))).toEqual(new Set(["tavern_income", "workshop_complete", "gathering_ready", "scout_ready", "condition_recovered", "candidate_expired", "regional_threat"]));
   });
 
   it("migrates legacy saves without finance state", () => {
     const legacy = JSON.parse(serializeGuild(createGuild())) as Record<string, unknown>; delete legacy.finance;
     const loaded = deserializeGuild(JSON.stringify(legacy));
-    expect(loaded.finance).toEqual({ salaryArrearsByHeroId: {}, totalSalaryPaid: 0, transactions: [] });
+    expect(loaded.finance).toEqual({ salaryArrearsByHeroId: {}, totalSalaryPaid: 0, transactions: [], tavernLevel: 1, totalTavernIncome: 0 });
   });
 });

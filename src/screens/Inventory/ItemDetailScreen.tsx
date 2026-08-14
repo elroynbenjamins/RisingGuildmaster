@@ -1,12 +1,16 @@
 import React, { useMemo, useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { ActionButton, BackButton, EmptyState, Panel, SectionTitle, colors } from "../../components/ui";
+import { ActionButton, BackButton, EmptyState, Panel, SecondaryButton, SectionTitle, colors } from "../../components/ui";
+import { MaterialIcon } from "../../components/materials/MaterialIcon";
+import { MATERIALS } from "../../data/crafting/materials";
 import { describeEquipmentSpecialEffect } from "../../game/equipment/equipmentSpecialEffectService";
 import { resolveEquipmentDefinition } from "../../game/equipment/equipmentResolver";
 import { equipItem } from "../../game/equipment/equipmentService";
 import { useGuild } from "../../state/GuildContext";
 import { compareEquipment } from "../../ui/equipmentComparison";
 import { getRaceNameColor } from "../../ui/raceColors";
+import { previewEquipmentDisposition, salvageInventoryEquipment, sellInventoryEquipment } from "../../game/equipment/equipmentDispositionService";
+import type { MaterialId } from "../../game/crafting/craftingTypes";
 
 export function ItemDetailScreen({ itemId, onBack }: { itemId: string; onBack(): void }) {
   const { guild, updateGuild } = useGuild(); const item = resolveEquipmentDefinition(itemId);
@@ -14,6 +18,9 @@ export function ItemDetailScreen({ itemId, onBack }: { itemId: string; onBack():
   const [selectedId, setSelectedId] = useState(compatible[0]?.id); const hero = compatible.find((entry) => entry.id === selectedId);
   const comparison = useMemo(() => hero && item ? compareEquipment(hero, item.inventoryKey) : [], [hero, item]);
   if (!item) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><EmptyState title="Item unavailable" message="This item definition could not be found." /></ScrollView>;
+  const disposition = previewEquipmentDisposition(item.inventoryKey);
+  const salvageMaterials = Object.entries(disposition.salvageMaterials) as [MaterialId, number][];
+  const salvageWorkshop = guild.artisans[disposition.salvageArtisan];
   const specialEffects = item.specialEffectIds.map(describeEquipmentSpecialEffect).filter((effect): effect is NonNullable<typeof effect> => Boolean(effect));
   const equip = () => { if (!hero) return; try { const oldId = hero.equipment[item.slot]; const updated = equipItem(hero, item.inventoryKey); const inventory = [...guild.inventory]; const index = inventory.indexOf(item.inventoryKey); if (index >= 0) inventory.splice(index, 1); if (oldId) inventory.push(oldId); updateGuild({ ...guild, inventory, heroes: guild.heroes.map((entry) => entry.id === hero.id ? updated : entry) }); Alert.alert("Equipped", `${item.name} equipped by ${hero.name}.`); onBack(); } catch (error) { Alert.alert("Cannot equip", error instanceof Error ? error.message : "Equipment failed"); } };
   return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={styles.title}>{item.name}</Text><Text style={styles.rarity}>{item.rarity.toUpperCase()} • {item.slot.toUpperCase()} • Level {item.level}</Text>
@@ -22,7 +29,18 @@ export function ItemDetailScreen({ itemId, onBack }: { itemId: string; onBack():
     <SectionTitle>EQUIP TO HERO</SectionTitle>{compatible.map((entry) => <Pressable key={entry.id} onPress={() => setSelectedId(entry.id)}><Panel style={[styles.hero, selectedId === entry.id && styles.selected]}><Text style={[styles.heroName, { color: getRaceNameColor(entry.raceId) }]}>{entry.name}</Text><Text style={styles.meta}>Lv {entry.level} • {entry.classId}</Text></Panel></Pressable>)}
     {!compatible.length && <Text style={styles.error}>No guild hero meets this item's requirements.</Text>}
     {hero && <><SectionTitle>CALCULATED COMPARISON</SectionTitle><Panel>{comparison.length ? comparison.map((row) => <View key={row.label} style={styles.row}><Text style={styles.meta}>{row.label}</Text><Text style={[styles.diff, row.difference < 0 && styles.negative]}>{format(row.before, row.label)} → {format(row.after, row.label)} ({row.difference > 0 ? "+" : ""}{format(row.difference, row.label)})</Text></View>) : <Text style={styles.meta}>No calculated stat changes.</Text>}</Panel><View style={styles.action}><ActionButton label={`Equip to ${hero.name}`} onPress={equip} /></View></>}
+    <SectionTitle>QUARTERMASTER</SectionTitle>
+    <Panel style={styles.disposition}>
+      <Text style={styles.dispositionTitle}>Sell or salvage this inventory copy</Text>
+      <Text style={styles.meta}>Selling returns 40% of its current value, including attached enchantments. Salvaging destroys it and recovers part of the original recipe materials.</Text>
+      <View style={styles.salvageRow}>{salvageMaterials.map(([materialId, amount]) => <View key={materialId} style={styles.salvageMaterial}><MaterialIcon materialId={materialId} size={32}/><Text style={styles.salvageText}>{MATERIALS[materialId].name} x{amount}</Text></View>)}</View>
+      <Text style={salvageWorkshop.recruited ? styles.workshopReady : styles.error}>{salvageWorkshop.recruited ? `${disposition.salvageArtisan} workshop ready` : `Requires an operational ${disposition.salvageArtisan} workshop`}</Text>
+      <View style={styles.dispositionActions}>
+        <View style={styles.flex}><SecondaryButton label={`Sell for ${disposition.saleGold} gold`} onPress={() => Alert.alert("Sell equipment?", `${item.name} will be permanently sold for ${disposition.saleGold} gold.`, [{ text: "Cancel", style: "cancel" }, { text: "Sell", style: "destructive", onPress: () => { updateGuild(sellInventoryEquipment(guild, item.inventoryKey)); onBack(); } }])}/></View>
+        <View style={styles.flex}><SecondaryButton label="Salvage materials" disabled={!salvageWorkshop.recruited || !salvageMaterials.length} onPress={() => Alert.alert("Salvage equipment?", `${item.name} will be permanently dismantled.`, [{ text: "Cancel", style: "cancel" }, { text: "Salvage", style: "destructive", onPress: () => { try { updateGuild(salvageInventoryEquipment(guild, item.inventoryKey)); onBack(); } catch (error) { Alert.alert("Cannot salvage", error instanceof Error ? error.message : "Salvage failed"); } } }])}/></View>
+      </View>
+    </Panel>
   </ScrollView>;
 }
 function format(value: number, label: string) { return label === "Critical Chance" ? `${(value * 100).toFixed(1)}%` : Number.isInteger(value) ? String(value) : value.toFixed(1); }
-const styles = StyleSheet.create({ content: { padding: 20, paddingBottom: 45 }, title: { color: colors.text, fontSize: 30, fontWeight: "900", marginTop: 10 }, rarity: { color: colors.gold, fontWeight: "800", marginVertical: 8 }, line: { color: colors.text, marginVertical: 5 }, effect: { color: colors.green, fontWeight: "800", marginTop: 8 }, special: { borderColor: "#8c6ac7", marginBottom: 8 }, specialName: { color: "#d2b8ff", fontSize: 16, fontWeight: "900" }, specialDescription: { color: colors.text, lineHeight: 19, marginTop: 5 }, hero: { marginBottom: 8 }, selected: { borderColor: colors.gold, backgroundColor: colors.panel2 }, heroName: { color: colors.text, fontWeight: "900" }, meta: { color: colors.muted, marginTop: 3 }, error: { color: colors.danger }, row: { flexDirection: "row", justifyContent: "space-between", gap: 10, paddingVertical: 6 }, diff: { color: colors.green, fontWeight: "700" }, negative: { color: colors.danger }, action: { marginTop: 16 } });
+const styles = StyleSheet.create({ content: { padding: 20, paddingBottom: 45 }, title: { color: colors.text, fontSize: 30, fontWeight: "900", marginTop: 10 }, rarity: { color: colors.gold, fontWeight: "800", marginVertical: 8 }, line: { color: colors.text, marginVertical: 5 }, effect: { color: colors.green, fontWeight: "800", marginTop: 8 }, special: { borderColor: "#8c6ac7", marginBottom: 8 }, specialName: { color: "#d2b8ff", fontSize: 16, fontWeight: "900" }, specialDescription: { color: colors.text, lineHeight: 19, marginTop: 5 }, hero: { marginBottom: 8 }, selected: { borderColor: colors.gold, backgroundColor: colors.panel2 }, heroName: { color: colors.text, fontWeight: "900" }, meta: { color: colors.muted, marginTop: 3 }, error: { color: colors.danger, marginTop: 8 }, row: { flexDirection: "row", justifyContent: "space-between", gap: 10, paddingVertical: 6 }, diff: { color: colors.green, fontWeight: "700" }, negative: { color: colors.danger }, action: { marginTop: 16 }, disposition: { gap: 10 }, dispositionTitle: { color: colors.text, fontSize: 16, fontWeight: "900" }, salvageRow: { flexDirection: "row", flexWrap: "wrap", gap: 7 }, salvageMaterial: { alignItems: "center", backgroundColor: colors.panel2, borderRadius: 8, flexDirection: "row", gap: 6, padding: 5 }, salvageText: { color: colors.text, fontSize: 10, fontWeight: "800" }, workshopReady: { color: colors.green, fontSize: 11, fontWeight: "800", textTransform: "capitalize" }, dispositionActions: { flexDirection: "row", gap: 8 }, flex: { flex: 1 } });

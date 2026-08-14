@@ -7,9 +7,9 @@ import { QUEST_LOOT_TABLES } from "../src/data/loot/questLootTables";
 import type { ClassId, EquipmentSlot } from "../src/game/heroes/types";
 
 describe("expanded equipment data", () => {
-  it("provides 60 items across every slot and progression tier", () => {
+  it("provides 80 items across every slot and progression tier", () => {
     const items = Object.values(EQUIPMENT);
-    expect(items).toHaveLength(60);
+    expect(items).toHaveLength(80);
     for (const slot of ["weapon", "armor", "helmet", "boots", "accessory1", "accessory2"] satisfies EquipmentSlot[]) {
       expect(items.some((item) => item.slot === slot)).toBe(true);
     }

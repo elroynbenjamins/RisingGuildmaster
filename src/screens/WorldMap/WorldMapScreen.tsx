@@ -58,10 +58,6 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
       <View style={mapChromeStyles.frame}>
         <ImageBackground source={WORLD_ART.eldoria} resizeMode="cover" style={mapChromeStyles.canvas} imageStyle={mapChromeStyles.image}>
           <View pointerEvents="none" style={styles.mapShade} />
-          <View pointerEvents="none" style={[styles.road, styles.roadGreenIron]} />
-          <View pointerEvents="none" style={[styles.road, styles.roadIronAsh]} />
-          <View pointerEvents="none" style={[styles.road, styles.roadIronFrost]} />
-          <View pointerEvents="none" style={[styles.road, styles.roadGreenShadow]} />
 
           {Object.values(REGIONS).map((region) => {
             const isUnlocked = guild.world.unlockedRegionIds.includes(region.id);
@@ -135,11 +131,6 @@ const styles = StyleSheet.create({
   title: { color: colors.text, fontSize: 30, fontWeight: "900", marginTop: 8 },
   subtitle: { color: colors.gold, marginTop: 3 },
   mapShade: { backgroundColor: "rgba(4, 11, 17, 0.10)", bottom: 0, left: 0, position: "absolute", right: 0, top: 0 },
-  road: { backgroundColor: "rgba(238, 196, 101, 0.78)", borderColor: "rgba(48, 30, 17, 0.9)", borderWidth: 1, height: 5, position: "absolute" },
-  roadGreenIron: { left: "27%", top: "51.5%", width: "23%" },
-  roadIronAsh: { left: "50%", top: "51.5%", width: "23%" },
-  roadIronFrost: { height: "28%", left: "49.5%", top: "23%", width: 5 },
-  roadGreenShadow: { height: "21%", left: "17.5%", top: "57%", width: 5 },
   node: { alignItems: "center", backgroundColor: "rgba(25, 34, 36, 0.92)", borderColor: "#9b9278", borderRadius: 4, borderWidth: 2, marginLeft: -50, marginTop: -34, minHeight: 67, padding: 5, position: "absolute", width: 100 },
   lockedNode: { backgroundColor: "rgba(25, 29, 31, 0.88)", borderColor: "#666b69", opacity: 0.82 },
   currentNode: { borderColor: colors.green, borderWidth: 3 },

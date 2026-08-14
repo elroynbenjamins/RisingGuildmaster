@@ -7,7 +7,7 @@ export const COMBAT_BOARD_SIZES = {
 export type CombatBoardSizeId = keyof typeof COMBAT_BOARD_SIZES;
 export const COMBAT_BOARD = COMBAT_BOARD_SIZES.skirmish;
 export interface GridPosition { x: number; y: number }
-export type TerrainType = "normal" | "forest" | "mountain" | "shallow_water" | "snow" | "cracked_ice" | "sand" | "ash" | "cave_wall" | "barricade" | "web" | "egg_sac" | "caravan" | "escort_npc" | "obstacle";
+export type TerrainType = "normal" | "forest" | "mountain" | "shallow_water" | "snow" | "cracked_ice" | "sand" | "ash" | "cave_wall" | "barricade" | "web" | "egg_sac" | "caravan" | "escort_npc" | "obstacle" | "trap";
 export interface TerrainPlacement { position: GridPosition; terrainType: TerrainType }
 export interface CombatTile { position: GridPosition; terrainType: TerrainType; occupantId: string | null; movementCost: number; blocksMovement: boolean; blocksLineOfSight: boolean }
 export interface CombatBoardState { sizeId: CombatBoardSizeId; environmentId: string; width: number; height: number; tiles: CombatTile[] }

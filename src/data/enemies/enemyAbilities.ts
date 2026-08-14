@@ -1,6 +1,15 @@
 import type { EnemyAbilityDefinition } from "../../game/enemies/enemyAbilityTypes";
 
 export const ENEMY_ABILITIES: Record<string, EnemyAbilityDefinition> = {
+  death_from_shadow: { id: "death_from_shadow", name: "Death from Shadow", type: "passive", criticalChanceModifier: .05 },
+  prepared_killbox: { id: "prepared_killbox", name: "Prepared Killbox", type: "passive", armorClassModifier: 1 },
+  silent_coordination: { id: "silent_coordination", name: "Silent Coordination", type: "aura", targetFactionId: "bandits", physicalDamageModifier: .10 },
+  no_witnesses: { id: "no_witnesses", name: "No Witnesses", type: "passive", trigger: { selfHpRatioMax: .40 }, physicalDamageModifier: .20 },
+  ember_fed: { id: "ember_fed", name: "Ember-Fed", type: "passive", trigger: { selfHpRatioMax: .50 }, damageModifier: .15 },
+  ash_bomb: { id: "ash_bomb", name: "Ash Bomb", type: "active", damageMultiplier: .55 },
+  wardfire_pulse: { id: "wardfire_pulse", name: "Wardfire Pulse", type: "active", damageMultiplier: .75, magicDefenseScoreModifier: -1 },
+  ancient_scale_shell: { id: "ancient_scale_shell", name: "Ancient Scale Shell", type: "passive", armorClassModifier: 2, magicDefenseScoreModifier: 1 },
+  sleeping_ember: { id: "sleeping_ember", name: "The Sleeping Ember", type: "passive", trigger: { selfHpRatioMax: .40 }, magicDamageModifier: .25 },
   feast_on_the_fallen: { id: "feast_on_the_fallen", name: "Feast on the Fallen", type: "passive", trigger: { targetHpRatioMax: .50 }, damageModifier: .15 },
   blasting_charge: { id: "blasting_charge", name: "Blasting Charge", type: "active", damageMultiplier: .70, physicalDefenseModifier: -.15 },
   accusing_whisper: { id: "accusing_whisper", name: "Accusing Whisper", type: "active", damageMultiplier: .65 },

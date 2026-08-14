@@ -8,7 +8,7 @@ import { useGuild } from "../../state/GuildContext";
 import { GameIcon } from "../../components/icons/GameIcon";
 import type { GameIconId } from "../../data/ui/gameIcons";
 
-const SKILL_ICONS: Record<GuildmasterSkillId, GameIconId> = { regional_network: "scouting", specialist_headhunting: "recruitment", express_dispatches: "calendar", workshop_planning: "management", forge_charter: "blacksmith", loom_charter: "tailor", lapidary_charter: "jeweler", advanced_workshops: "materials", masterwork_district: "victory" };
+const SKILL_ICONS: Record<GuildmasterSkillId, GameIconId> = { scouting_basics: "scouting", regional_network: "world", specialist_headhunting: "recruitment", express_dispatches: "calendar", workshop_planning: "management", forge_charter: "blacksmith", loom_charter: "tailor", lapidary_charter: "jeweler", advanced_workshops: "materials", masterwork_district: "victory" };
 
 function SkillNode({ skillId, profile, compact = false, learn }: { skillId: GuildmasterSkillId; profile: GuildmasterProfile; compact?: boolean; learn(id: GuildmasterSkillId): void }) {
   const skill = GUILDMASTER_SKILLS[skillId];
@@ -42,7 +42,7 @@ export function GuildmasterSkillTreeScreen({ onBack }: { onBack(): void }) {
     {message && <Text style={message.endsWith("unlocked.") ? styles.success : styles.error}>{message}</Text>}
 
     <View style={styles.branchSection}><Text style={styles.branchTitle}>SCOUTING NETWORK</Text><Text style={styles.branchHint}>Recruitment reach and expedition control</Text>
-      <SkillNode skillId="regional_network" profile={profile} learn={learn} />
+      <SkillNode skillId="scouting_basics" profile={profile} learn={learn} /><Connector /><SkillNode skillId="regional_network" profile={profile} learn={learn} />
       <Fork><SkillNode compact skillId="specialist_headhunting" profile={profile} learn={learn} /><SkillNode compact skillId="express_dispatches" profile={profile} learn={learn} /></Fork>
     </View>
 

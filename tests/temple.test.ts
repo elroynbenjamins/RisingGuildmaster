@@ -47,6 +47,12 @@ describe("Temple services", () => {
     const fallen = { ...testHero(), currentHP: 0, isAvailable: false };
     expect(() => reviveHero({ ...createGuild(), gems: 2, heroes: [fallen] }, fallen.id)).toThrow("Not enough gems");
   });
+
+  it("preserves a named battle injury on revival instead of adding a duplicate general injury", () => {
+    const fallen = { ...testHero(), currentHP: 0, isAvailable: false, conditions: [{ conditionId: "broken_arm" as const, remainingDuration: 8 }] };
+    const result = reviveHero({ ...createGuild(), heroes: [fallen] }, fallen.id);
+    expect(result.heroes[0]?.conditions).toEqual([{ conditionId: "broken_arm", remainingDuration: 8 }]);
+  });
 });
 
 describe("verified gem credits", () => {

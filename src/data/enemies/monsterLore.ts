@@ -1,4 +1,10 @@
 export const MONSTER_LORE: Record<string, string> = {
+  gloam_knife_assassin: "A professional killer trained to turn darkness, crowds and elevation into weapons. Gloam Knives strike wounded targets first and leave blackglass coins as proof of contract.",
+  nightglass_trapper: "A pursuit specialist carrying hand crossbows, tripwire, smoke glass and poisoned caltrops. Their traps make the route itself part of the assassination.",
+  seressa_vane: "Master of Stonegate's Gloam Knife cell. Seressa Vane coordinates every blade without speaking and becomes most dangerous when an operation begins to collapse.",
+  ashscale_vermin: "Small subterranean scavengers transformed by feeding on warm scale fragments. They are evidence of draconic magic, not young dragons.",
+  cinder_touched_bandit: "A relic salvager altered by handling improperly contained scales. Fine ash leaks from their armor whenever they breathe.",
+  wardstone_scale_guardian: "An observatory guardian plated with scales freely given by an ancient dragon to Eldoria's first Wardstone masons.",
   carrion_crow_swarm: "Black-feathered scavengers drawn to Wardstone residue. Their wings carry glittering ash that blinds anyone who looks upward.",
   goblin_sapper: "A quick-handed demolitions expert carrying stolen quarry charges. Sappers break formations before the heavier warband arrives.",
   blackbridge_wraith: "The oath-bound shade of a guard abandoned during Blackbridge's burning. It repeats accusations that the official Laurel report omitted.",

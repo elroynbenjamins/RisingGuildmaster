@@ -1,12 +1,16 @@
 import type { EncounterDefinition } from "../../game/quests/questTypes";
 import { ROGUELITE_ENCOUNTERS } from "../dungeons/rogueliteEncounters";
 import { BLACKBRIDGE_ENCOUNTERS } from "./blackbridgeEncounters";
+import { ASH_BENEATH_GREENVEIL_ENCOUNTERS } from "./ashBeneathGreenveilEncounters";
+import { STONEGATE_ASSASSIN_ENCOUNTERS } from "./stonegateAssassinEncounters";
 const smallHeroes = [{ x: 0, y: 1 }, { x: 0, y: 2 }, { x: 0, y: 3 }, { x: 1, y: 2 }];
 const largeHeroes = [{ x: 0, y: 2 }, { x: 0, y: 3 }, { x: 0, y: 4 }, { x: 1, y: 3 }];
 const grandHeroes = [{ x: 0, y: 3 }, { x: 0, y: 4 }, { x: 0, y: 5 }, { x: 1, y: 4 }];
 const warfrontHeroes = [{ x: 0, y: 4 }, { x: 0, y: 5 }, { x: 0, y: 6 }, { x: 1, y: 5 }];
 export const QUEST_ENCOUNTERS: Record<string, EncounterDefinition> = {
   ...BLACKBRIDGE_ENCOUNTERS,
+  ...ASH_BENEATH_GREENVEIL_ENCOUNTERS,
+  ...STONEGATE_ASSASSIN_ENCOUNTERS,
   goblin_patrol_encounter: { id: "goblin_patrol_encounter", battlefieldId: "greenveil_forest", heroSpawnPositions: smallHeroes, enemies: [{ enemyDefinitionId: "goblin_scout", count: 2, level: 1, spawnPositions: [{ x: 5, y: 1 }, { x: 5, y: 3 }] }, { enemyDefinitionId: "goblin_archer", count: 1, level: 1, spawnPositions: [{ x: 6, y: 2 }] }] },
   spider_nest_encounter_1: { id: "spider_nest_encounter_1", battlefieldId: "deep_forest", heroSpawnPositions: largeHeroes, enemies: [{ enemyDefinitionId: "giant_spider", count: 2, level: 2, spawnPositions: [{ x: 7, y: 2 }, { x: 7, y: 4 }] }] },
   spider_nest_encounter_2: { id: "spider_nest_encounter_2", battlefieldId: "shadowfen_waters", heroSpawnPositions: largeHeroes, enemies: [{ enemyDefinitionId: "giant_spider", count: 1, level: 2, spawnPositions: [{ x: 7, y: 3 }] }, { enemyDefinitionId: "dire_wolf", count: 1, level: 2, spawnPositions: [{ x: 8, y: 4 }] }] },

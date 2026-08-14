@@ -1,9 +1,13 @@
 import type { CombatSkillDefinition, SkillModifier } from "../../game/combat/skillTypes";
 import { BLACKBRIDGE_ENEMY_SKILLS } from "./blackbridgeEnemySkills";
+import { ASH_BENEATH_GREENVEIL_ENEMY_SKILLS } from "./ashBeneathGreenveilEnemySkills";
+import { STONEGATE_ASSASSIN_SKILLS } from "./stonegateAssassinSkills";
 
 const permanent = (stat: string, operation: SkillModifier["operation"], value: number): SkillModifier => ({ stat, operation, value, durationTurns: -1 });
 export const ENEMY_SKILLS: Record<string, CombatSkillDefinition> = {
   ...BLACKBRIDGE_ENEMY_SKILLS,
+  ...ASH_BENEATH_GREENVEIL_ENEMY_SKILLS,
+  ...STONEGATE_ASSASSIN_SKILLS,
   goblin_stab: { id: "goblin_stab", name: "Stab", type: "basic_attack", damageType: "physical", damageMultiplier: 1, accuracyModifier: 0, criticalChanceModifier: 0, targetType: "single_enemy", cooldownTurns: 0, range: 1 },
   quick_strike: { id: "quick_strike", name: "Quick Strike", type: "active", damageType: "physical", damageMultiplier: 0.75, accuracyModifier: 0.10, attackRollModifier: 1, criticalChanceModifier: 0, targetType: "single_enemy", cooldownTurns: 2, range: 1 },
   goblin_dodge: { id: "goblin_dodge", name: "Goblin Dodge", type: "passive", selfModifiers: [permanent("evasion", "percentage", 0.10)] },

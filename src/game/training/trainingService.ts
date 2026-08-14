@@ -10,6 +10,7 @@ import { potentialMultiplier } from "../progression/potential";
 import { grantHeroXp } from "../progression/levelSystem";
 import { xpRequiredForNextLevel } from "../progression/xpSystem";
 import type { TrainingProgramId, TrainingSession } from "./trainingTypes";
+import { appendHeroHistoryEvent } from "../heroes/heroHistoryService";
 
 export function trainingCapacity(guild: GuildState): number { return TRAINING_GROUND_CONFIG.capacityByLevel[guild.trainingGround.level] ?? 1; }
 
@@ -80,7 +81,7 @@ function applyGrowth(hero: Hero, session: TrainingSession): Hero {
 
 export function resolveTrainingGroundDay(guild: GuildState): { guild: GuildState; completedHeroNames: string[]; upgraded: boolean } {
   const ready = guild.trainingGround.sessions.filter((session) => session.completionDay <= guild.currentDay); const names: string[] = [];
-  let heroes = guild.heroes.map((hero) => { const session = ready.find((item) => item.heroId === hero.id); if (!session) return hero; names.push(hero.name); const progressed = session.levelCap === undefined ? grantHeroXp(hero, session.xpReward) : grantTrainingXp(hero, session.xpReward, session.levelCap); return { ...applyGrowth(progressed, session), isAvailable: true, history: { ...hero.history, importantEvents: [...hero.history.importantEvents, `Completed ${TRAINING_PROGRAMS[session.programId].name} on Day ${guild.currentDay}.`] } }; });
+  let heroes = guild.heroes.map((hero) => { const session = ready.find((item) => item.heroId === hero.id); if (!session) return hero; names.push(hero.name); const program = TRAINING_PROGRAMS[session.programId]; const progressed = session.levelCap === undefined ? grantHeroXp(hero, session.xpReward) : grantTrainingXp(hero, session.xpReward, session.levelCap); const trained = { ...applyGrowth(progressed, session), isAvailable: true, history: { ...hero.history, importantEvents: [...hero.history.importantEvents, `Completed ${program.name} on Day ${guild.currentDay}.`] } }; return appendHeroHistoryEvent(trained, { day: guild.currentDay, type: "training", outcome: "positive", title: `Completed ${program.name}`, description: `${hero.name} completed training and earned ${session.xpReward} XP.`, tags: session.focusedAttribute ? [session.focusedAttribute] : undefined }); });
   const upgradeReady = Boolean(guild.trainingGround.upgrade && guild.trainingGround.upgrade.completionDay <= guild.currentDay);
   return { guild: { ...guild, heroes, trainingGround: { ...guild.trainingGround, level: upgradeReady ? guild.trainingGround.upgrade!.targetLevel : guild.trainingGround.level, upgrade: upgradeReady ? null : guild.trainingGround.upgrade, sessions: guild.trainingGround.sessions.filter((session) => session.completionDay > guild.currentDay), completedTrainingCount: guild.trainingGround.completedTrainingCount + ready.length } }, completedHeroNames: names, upgraded: upgradeReady };
 }

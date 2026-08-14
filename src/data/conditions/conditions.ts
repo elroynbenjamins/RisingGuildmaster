@@ -1,11 +1,20 @@
 import type { ConditionId } from "../../game/heroes/types";
 import type { Modifier } from "../../game/modifiers/types";
-export interface ConditionDefinition { id: ConditionId; name: string; durationDays: number; stackable: boolean; modifiers: Modifier[] }
+export type PersistentConditionCategory = "injury" | "ailment" | "boon";
+export interface ConditionDefinition { id: ConditionId; name: string; category: PersistentConditionCategory; description: string; durationDays: number; stackable: boolean; modifiers: Modifier[] }
 const pct = (sourceId: ConditionId, target: Modifier["target"], value: number): Modifier => ({ source: "condition", sourceId, target, operation: "percentage", value });
+const flat = (sourceId: ConditionId, target: Modifier["target"], value: number): Modifier => ({ source: "condition", sourceId, target, operation: "flat", value });
 export const CONDITIONS: Record<ConditionId, ConditionDefinition> = {
-  injured: { id: "injured", name: "Injured", durationDays: 5, stackable: false, modifiers: [pct("injured", "physicalDamage", -0.2), pct("injured", "physicalDefense", -0.1)] },
-  exhausted: { id: "exhausted", name: "Exhausted", durationDays: 2, stackable: false, modifiers: [pct("exhausted", "damage", -0.1), pct("exhausted", "speed", -0.15)] },
-  inspired: { id: "inspired", name: "Inspired", durationDays: 3, stackable: false, modifiers: [pct("inspired", "damage", 0.1), pct("inspired", "trainingXp", 0.15)] },
-  poisoned: { id: "poisoned", name: "Poisoned", durationDays: 3, stackable: false, modifiers: [pct("poisoned", "maxHP", -0.1), pct("poisoned", "healingReceived", -0.25)] },
-  infected: { id: "infected", name: "Infected", durationDays: 3, stackable: false, modifiers: [pct("infected", "physicalDamage", -0.10)] },
+  injured: { id: "injured", name: "General Injury", category: "injury", description: "A collection of bruises and strained muscles that reduces physical effectiveness.", durationDays: 5, stackable: false, modifiers: [pct("injured", "physicalDamage", -.20), pct("injured", "physicalDefense", -.10)] },
+  sprained_ankle: { id: "sprained_ankle", name: "Sprained Ankle", category: "injury", description: "Damaged footing makes rapid movement and evasive positioning painful.", durationDays: 4, stackable: false, modifiers: [pct("sprained_ankle", "speed", -.15), flat("sprained_ankle", "movementRange", -1)] },
+  broken_arm: { id: "broken_arm", name: "Broken Arm", category: "injury", description: "A serious fracture compromises weapon use and raw physical power.", durationDays: 8, stackable: false, modifiers: [pct("broken_arm", "strength", -.20), pct("broken_arm", "physicalDamage", -.25)] },
+  cracked_ribs: { id: "cracked_ribs", name: "Cracked Ribs", category: "injury", description: "Breathing and bracing against impacts are difficult until the ribs mend.", durationDays: 7, stackable: false, modifiers: [pct("cracked_ribs", "maxHP", -.15), pct("cracked_ribs", "physicalDefense", -.10)] },
+  concussion: { id: "concussion", name: "Concussion", category: "injury", description: "Disorientation impairs perception, spell control, and defensive reactions.", durationDays: 5, stackable: false, modifiers: [pct("concussion", "intelligence", -.10), pct("concussion", "wisdom", -.10), flat("concussion", "attackRoll", -1)] },
+  deep_wound: { id: "deep_wound", name: "Deep Wound", category: "injury", description: "A severe wound limits vitality and responds poorly to ordinary healing.", durationDays: 6, stackable: false, modifiers: [pct("deep_wound", "maxHP", -.12), pct("deep_wound", "healingReceived", -.25)] },
+  exhausted: { id: "exhausted", name: "Exhausted", category: "ailment", description: "Overexertion lowers damage output and speed until the hero rests.", durationDays: 2, stackable: false, modifiers: [pct("exhausted", "damage", -.10), pct("exhausted", "speed", -.15)] },
+  inspired: { id: "inspired", name: "Inspired", category: "boon", description: "Renewed purpose improves combat performance and training results.", durationDays: 3, stackable: false, modifiers: [pct("inspired", "damage", .10), pct("inspired", "trainingXp", .15)] },
+  poisoned: { id: "poisoned", name: "Poisoned", category: "ailment", description: "Lingering venom reduces vitality and the effectiveness of healing.", durationDays: 3, stackable: false, modifiers: [pct("poisoned", "maxHP", -.10), pct("poisoned", "healingReceived", -.25)] },
+  infected: { id: "infected", name: "Infected", category: "ailment", description: "A festering wound weakens physical effort and requires treatment or time.", durationDays: 4, stackable: false, modifiers: [pct("infected", "physicalDamage", -.10), pct("infected", "recoveryDuration", .20)] },
+  diseased: { id: "diseased", name: "Diseased", category: "ailment", description: "Illness drains endurance and substantially slows natural recovery.", durationDays: 6, stackable: false, modifiers: [pct("diseased", "constitution", -.15), pct("diseased", "maxHP", -.10), pct("diseased", "recoveryDuration", .30)] },
+  cursed: { id: "cursed", name: "Cursed", category: "ailment", description: "Hostile magic twists fortune and weakens resistance to supernatural attacks.", durationDays: 5, stackable: false, modifiers: [flat("cursed", "attackRoll", -1), flat("cursed", "magicDefenseScore", -1)] },
 };

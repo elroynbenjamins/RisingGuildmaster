@@ -8,7 +8,7 @@ import type { RandomSource } from "../../utils/random";
 import type { EnemyInstance } from "../enemies/enemyTypes";
 import type { Hero } from "../heroes/types";
 import { createQuestEncounter } from "../quests/encounterFactory";
-import { advanceCombatConditions, resolveStartOfTurnConditions } from "./conditionResolver";
+import { advanceCombatConditions, getEffectiveMovementRange, resolveStartOfTurnConditions } from "./conditionResolver";
 import { advanceCooldowns } from "./cooldownService";
 import type { CombatLogEntry, CombatUnit, HeroCombatInstance, InitiativeRoll, QuestCombatSetup, SkillHitResult } from "./combatTypes";
 import { createHeroCombatInstance, createHeroCombatUnit } from "./heroCombatFactory";
@@ -28,6 +28,8 @@ import { chooseEnemyDestination, getEnemyTacticalBehavior, selectTacticalTarget 
 import { getHeroSkillRange } from "../progression/subclasses/subclassService";
 import { BATTLEFIELDS } from "../../data/combat/battlefields";
 import { advanceSkillModifiers } from "./modifierService";
+import type { HeroRelationship } from "../relationships/relationshipTypes";
+import { healingReceivedFromHeroModifier, relationshipCombatBonuses } from "../relationships/relationshipService";
 
 export interface HeroCombatant { hero: Hero; instance: HeroCombatInstance; unit: CombatUnit }
 export interface EnemyCombatant { instance: EnemyInstance; unit: CombatUnit }
@@ -39,9 +41,10 @@ export interface CombatState {
   heroes: HeroCombatant[]; enemies: EnemyCombatant[]; board: CombatBoardState;
   initiativeRolls: InitiativeRoll[]; combatStarted: boolean; turnOrderIds: string[]; turnCursor: number; awaitingHeroId: string | null;
   actions: CombatTurnActions; status: CombatStatus; log: CombatLogEntry[]; lastRoll: SkillHitResult | null;
+  relationships: HeroRelationship[];
 }
 
-export function createCombatState(questId: string, encounterIndex: number, heroes: readonly Hero[], random: RandomSource, carried?: readonly HeroCombatInstance[], setup?: QuestCombatSetup): CombatState {
+export function createCombatState(questId: string, encounterIndex: number, heroes: readonly Hero[], random: RandomSource, carried?: readonly HeroCombatInstance[], setup?: QuestCombatSetup, relationships: readonly HeroRelationship[] = []): CombatState {
   const quest = QUESTS[questId]; if (!quest) throw new Error(`Unknown quest: ${questId}`);
   const encounterIds = setup?.encounterIds ?? quest.encounterIds;
   const encounterId = encounterIds[encounterIndex]; const encounter = encounterId ? QUEST_ENCOUNTERS[encounterId] : undefined;
@@ -68,7 +71,7 @@ export function createCombatState(questId: string, encounterIndex: number, heroe
   board = spawnOccupants(board, [...heroCombatants.map((item) => ({ occupantId: item.unit.combatantId, position: item.unit.position })), ...enemies.map((item) => ({ occupantId: item.unit.combatantId, position: item.unit.position }))]);
   const units = [...heroCombatants.map((item) => item.unit), ...enemies.map((item) => item.unit)];
   const initiative = rollInitiative(units, random);
-  return { questId, encounterIndex, encounterIds, ...(setup?.label ? { setupLabel: setup.label } : {}), round: 1, turn: 1, heroes: heroCombatants, enemies, board, initiativeRolls: initiative.map(({ combatantId, d20, modifier, total }) => ({ combatantId, d20, modifier, total })), combatStarted: false, turnOrderIds: initiative.map((entry) => entry.combatantId), turnCursor: 0, awaitingHeroId: null, actions: { movementUsed: false, combatActionUsed: false }, status: "active", log: [], lastRoll: null };
+  return { questId, encounterIndex, encounterIds, ...(setup?.label ? { setupLabel: setup.label } : {}), round: 1, turn: 1, heroes: heroCombatants, enemies, board, initiativeRolls: initiative.map(({ combatantId, d20, modifier, total }) => ({ combatantId, d20, modifier, total })), combatStarted: false, turnOrderIds: initiative.map((entry) => entry.combatantId), turnCursor: 0, awaitingHeroId: null, actions: { movementUsed: false, combatActionUsed: false }, status: "active", log: [], lastRoll: null, relationships: [...relationships] };
 }
 
 export function beginCombat(state: CombatState, random: RandomSource): CombatState {
@@ -134,7 +137,7 @@ export function advanceCombat(state: CombatState, random: RandomSource): CombatS
     if (target) {
       const destination = chooseEnemyDestination(board, enemy.unit, target, behavior);
       if (positionKey(destination) !== positionKey(enemy.unit.position)) {
-        const moved = moveOccupant(board, actorId, enemy.unit.position, destination, enemy.unit.movementRange); board = moved.board;
+        const moved = moveOccupant(board, actorId, enemy.unit.position, destination, getEffectiveMovementRange(enemy.unit)); board = moved.board;
         enemy = { instance: { ...enemy.instance, position: destination }, unit: { ...enemy.unit, position: destination } };
       }
     }
@@ -157,7 +160,7 @@ export function moveCurrentHero(state: CombatState, destination: GridPosition): 
   if (!state.awaitingHeroId) throw new Error("No hero is awaiting input");
   if (state.actions.movementUsed) throw new Error("Movement action already used");
   const index = state.heroes.findIndex((item) => item.unit.combatantId === state.awaitingHeroId); const combatant = state.heroes[index]!;
-  const moved = moveOccupant(state.board, combatant.unit.combatantId, combatant.unit.position, destination, combatant.unit.movementRange, combatant.unit.ignoredTerrainMovementCosts);
+  const moved = moveOccupant(state.board, combatant.unit.combatantId, combatant.unit.position, destination, getEffectiveMovementRange(combatant.unit), combatant.unit.ignoredTerrainMovementCosts);
   const heroes = [...state.heroes]; heroes[index] = { ...combatant, instance: { ...combatant.instance, position: destination }, unit: { ...combatant.unit, position: destination } };
   return { ...state, board: moved.board, heroes, actions: { ...state.actions, movementUsed: true }, log: [...state.log, { turn: state.turn, actorId: combatant.hero.id, actionId: "move", targetIds: [], message: `${combatant.hero.name} moved ${moved.path.length - 1} tiles.` }] };
 }
@@ -185,7 +188,8 @@ export function performHeroTurn(state: CombatState, skillId: string, random: Ran
     targets = explicit ? [explicit] : inRange.length ? [random.pick(inRange)] : [];
   }
   if (!targets.length) throw new Error("No valid target in range");
-  const action = resolveHeroAction(combatant.hero, combatant.instance, combatant.unit, targets, skillId, random);
+  const relationshipBonuses = relationshipCombatBonuses(combatant.hero.id, state.heroes.map((item) => item.unit), state.relationships);
+  const action = resolveHeroAction(combatant.hero, combatant.instance, combatant.unit, targets, skillId, random, { ...relationshipBonuses, healingReceivedModifier: (target) => healingReceivedFromHeroModifier(combatant.hero.id, target.combatantId, state.relationships) });
   const heroes = [...state.heroes]; heroes[heroIndex] = { ...combatant, instance: action.instance, unit: action.actor };
   const enemyTargets = action.targets.filter((unit) => unit.side === "enemies"); const heroTargets = action.targets.filter((unit) => unit.side === "heroes");
   const enemies = replaceUnits(state.enemies, enemyTargets).map((item) => ({ ...item, instance: { ...item.instance, currentHP: item.unit.currentHP, isAlive: item.unit.isAlive, activeConditions: item.unit.activeConditions, activeConditionIds: item.unit.activeConditions.map((condition) => condition.conditionId) } }));

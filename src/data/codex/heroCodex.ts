@@ -1,25 +1,13 @@
 import type { ClassId, RaceId } from "../../game/heroes/types";
 
-export interface RaceCodexEntry {
-  raceId: RaceId;
-  epithet: string;
-  homeland: string;
-  overview: string;
-  playstyle: string;
-}
-
-export interface ClassCodexEntry {
-  classId: ClassId;
-  role: string;
-  overview: string;
-  playstyle: string;
-}
+export interface RaceCodexEntry { raceId: RaceId; epithet: string; homeland: string; overview: string; playstyle: string; recommendedClassIds: ClassId[] }
+export interface ClassCodexEntry { classId: ClassId; role: string; overview: string; playstyle: string }
 
 export const RACE_CODEX: Record<RaceId, RaceCodexEntry> = {
-  human: { raceId: "human", epithet: "Roadborn Adaptors", homeland: "Greenveil's towns, Guildhaven, and settlements across Eldoria", overview: "Humans rebuilt the roads between the five regions and founded many of Eldoria's youngest guilds. Their short generations foster ambition, experimentation, and a talent for learning from anyone.", playstyle: "Flexible recruits who develop efficiently and fit any class without a severe weakness." },
-  elf: { raceId: "elf", epithet: "Children of the Silver Bough", homeland: "The Silverbough enclaves and old woodland paths of Greenveil", overview: "Elven enclaves preserve songs and magical techniques from before the Wardstones. Their scouts move lightly through old forests, while their scholars study the strange currents now leaking from damaged wards.", playstyle: "Fast, precise heroes suited to ranged weapons and magic, but less durable in a prolonged frontline fight." },
-  dwarf: { raceId: "dwarf", epithet: "Keepers of the Deep Roads", homeland: "Kharum-Deep and the fortress settlements of the Iron Hills", overview: "Dwarven holds guard the mountain roads and the oldest surviving Wardstone records. Their armorers value work that endures, and their shield lines are notoriously difficult to break.", playstyle: "Slow, resilient heroes with excellent Constitution, armor, and crafting advantages." },
-  orc: { raceId: "orc", epithet: "Clans of the Red Roads", homeland: "The Iron Hills clanroads and the western reaches of the Ashlands", overview: "Eldoria's orc clans are bound by oaths of kinship, challenge, and hospitality. Many travel beyond their ancestral roads as raiders, wardens, mercenaries, or adventurers seeking a deed worthy of remembrance.", playstyle: "Powerful physical combatants who become especially dangerous after suffering heavy wounds." },
+  human: { raceId: "human", epithet: "Roadborn Adaptors", homeland: "Greenveil's towns, Guildhaven, and settlements across Eldoria", overview: "Humans rebuilt the roads between the five regions and founded many of Eldoria's youngest guilds. Their short generations foster ambition, experimentation, and a talent for learning from anyone.", playstyle: "Flexible recruits who develop efficiently and fit any class without a severe weakness.", recommendedClassIds: ["warrior", "paladin", "ranger", "cleric", "mage", "berserker"] },
+  elf: { raceId: "elf", epithet: "Children of the Silver Bough", homeland: "The Silverbough enclaves and old woodland paths of Greenveil", overview: "Elven enclaves preserve songs and magical techniques from before the Wardstones. Their scouts move lightly through old forests, while their scholars study the strange currents now leaking from damaged wards.", playstyle: "Fast, precise heroes suited to ranged weapons and magic, but less durable in a prolonged frontline fight.", recommendedClassIds: ["ranger", "mage", "cleric"] },
+  dwarf: { raceId: "dwarf", epithet: "Keepers of the Deep Roads", homeland: "Kharum-Deep and the fortress settlements of the Iron Hills", overview: "Dwarven holds guard the mountain roads and the oldest surviving Wardstone records. Their armorers value work that endures, and their shield lines are notoriously difficult to break.", playstyle: "Slow, resilient heroes with excellent Constitution, armor, and crafting advantages.", recommendedClassIds: ["warrior", "paladin", "cleric"] },
+  orc: { raceId: "orc", epithet: "Clans of the Red Roads", homeland: "The Iron Hills clanroads and the western reaches of the Ashlands", overview: "Eldoria's orc clans are bound by oaths of kinship, challenge, and hospitality. Many travel beyond their ancestral roads as raiders, wardens, mercenaries, or adventurers seeking a deed worthy of remembrance.", playstyle: "Powerful physical combatants who become especially dangerous after suffering heavy wounds.", recommendedClassIds: ["warrior", "berserker", "ranger"] },
 };
 
 export const CLASS_CODEX: Record<ClassId, ClassCodexEntry> = {

@@ -1,0 +1,17 @@
+import React, { useState } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActionButton, BackButton, Panel, colors } from "../../components/ui";
+import { POTIONS } from "../../data/alchemy/potions";
+import { craftPotion } from "../../game/alchemy/potionService";
+import type { PotionId } from "../../game/alchemy/potionTypes";
+import { useGuild } from "../../state/GuildContext";
+import { PotionIcon } from "../../components/alchemy/PotionIcon";
+import { MaterialCostList } from "../../components/materials/MaterialIcon";
+
+export function AlchemyScreen({ onBack }: { onBack(): void }) {
+  const { guild, updateGuild } = useGuild(); const [message, setMessage] = useState<string>();
+  const craft = (id: PotionId) => { try { updateGuild(craftPotion(guild, id)); setMessage(`${POTIONS[id].name} crafted and stored.`); } catch (error) { setMessage(error instanceof Error ? error.message : "Crafting failed"); } };
+  return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={styles.eyebrow}>GUILD ALCHEMY</Text><Text style={styles.title}>Potion Workshop</Text><Text style={styles.intro}>Turn gathered materials into combat supplies. Drinking a potion consumes the active hero's combat action.</Text><Panel style={styles.stock}><Text style={styles.stockTitle}>STORED POTIONS</Text>{Object.values(POTIONS).map((potion) => <View key={potion.id} style={styles.stockRow}><PotionIcon potionId={potion.id} size={38}/><Text style={[styles.stockName, styles.flex]}>{potion.name}</Text><Text style={styles.quantity}>{guild.potions[potion.id]}</Text></View>)}</Panel>{message && <Text style={styles.message}>{message}</Text>}{Object.values(POTIONS).map((potion) => { const requirements = Object.entries(potion.materials); const canCraft = guild.gold >= potion.goldCost && requirements.every(([id, amount]) => guild.materials[id as keyof typeof guild.materials] >= amount); return <Panel key={potion.id} style={styles.recipe}><View style={styles.recipeHead}><PotionIcon potionId={potion.id} size={58}/><View style={styles.flex}><Text style={styles.name}>{potion.name}</Text><Text style={styles.description}>{potion.description}</Text></View></View><Text style={styles.cost}>Cost: {potion.goldCost} gold</Text><MaterialCostList costs={potion.materials} inventory={guild.materials}/><ActionButton label="Craft Potion" disabled={!canCraft} onPress={() => craft(potion.id)} /></Panel>; })}</ScrollView>;
+}
+
+const styles = StyleSheet.create({ content: { padding: 18, paddingBottom: 45 }, eyebrow: { color: colors.gold, fontSize: 10, fontWeight: "900", letterSpacing: 1.5, marginTop: 8 }, title: { color: colors.text, fontSize: 29, fontWeight: "900", marginTop: 3 }, intro: { color: colors.muted, lineHeight: 19, marginBottom: 14, marginTop: 7 }, stock: { borderColor: colors.gold, marginBottom: 12 }, stockTitle: { color: colors.gold, fontSize: 10, fontWeight: "900", letterSpacing: 1 }, stockRow: { alignItems: "center", borderTopColor: colors.border, borderTopWidth: 1, flexDirection: "row", gap: 9, paddingVertical: 8 }, stockName: { color: colors.text }, quantity: { color: colors.gold, fontSize: 18, fontWeight: "900" }, message: { color: colors.green, fontWeight: "800", marginBottom: 10 }, recipe: { gap: 9, marginBottom: 10 }, recipeHead: { alignItems: "center", flexDirection: "row", gap: 11 }, flex: { flex: 1 }, name: { color: colors.text, fontSize: 18, fontWeight: "900" }, description: { color: colors.muted, lineHeight: 18 }, cost: { color: colors.gold, fontWeight: "800" } });

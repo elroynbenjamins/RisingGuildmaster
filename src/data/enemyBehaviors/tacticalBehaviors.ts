@@ -33,6 +33,9 @@ export const TACTICAL_BEHAVIORS: Record<string, TacticalBehavior> = {
   sewer_crocodile: { preferredRange: 1, targetPriority: "lowest_hp" },
   frost_wisp: { preferredRange: 4, retreatRange: 2, targetPriority: "highest_damage" },
   frostmarch_yeti: { preferredRange: 1, targetPriority: "highest_damage" },
+  gloam_knife_assassin: { preferredRange: 1, targetPriority: "lowest_hp" },
+  nightglass_trapper: { preferredRange: 5, retreatRange: 2, targetPriority: "lowest_hp" },
+  seressa_vane: { preferredRange: 1, targetPriority: "highest_damage" },
 };
 
 export function defaultTacticalBehavior(role: EnemyRole): TacticalBehavior {

@@ -1,4 +1,4 @@
-export type EnemyPortraitAtlasId = "goblins" | "undead" | "beastsA" | "beastsB" | "bandits" | "orcs" | "constructs";
+export type EnemyPortraitAtlasId = "goblins" | "undead" | "beastsA" | "beastsB" | "bandits" | "orcs" | "constructs" | "ashStory" | "stonegateAssassins";
 export interface EnemyPortraitCrop { atlasId: EnemyPortraitAtlasId; column: 0 | 1 | 2; row: 0 | 1 }
 
 export const ENEMY_PORTRAITS: Record<string, EnemyPortraitCrop> = {
@@ -9,4 +9,6 @@ export const ENEMY_PORTRAITS: Record<string, EnemyPortraitCrop> = {
   bandit: { atlasId: "bandits", column: 0, row: 0 }, bandit_captain: { atlasId: "bandits", column: 1, row: 0 }, iron_laurel_enforcer: { atlasId: "bandits", column: 2, row: 0 },
   orc_raider: { atlasId: "orcs", column: 0, row: 0 }, troll: { atlasId: "orcs", column: 1, row: 0 }, ghorak_chainbreaker: { atlasId: "orcs", column: 2, row: 0 },
   ironbound_sentry: { atlasId: "constructs", column: 0, row: 0 }, wardstone_wisp: { atlasId: "constructs", column: 1, row: 0 }, hollow_warden: { atlasId: "constructs", column: 2, row: 0 },
+  ashscale_vermin: { atlasId: "ashStory", column: 0, row: 0 }, cinder_touched_bandit: { atlasId: "ashStory", column: 1, row: 0 }, wardstone_scale_guardian: { atlasId: "ashStory", column: 2, row: 0 },
+  gloam_knife_assassin: { atlasId: "stonegateAssassins", column: 0, row: 0 }, nightglass_trapper: { atlasId: "stonegateAssassins", column: 1, row: 0 }, seressa_vane: { atlasId: "stonegateAssassins", column: 2, row: 0 },
 };

@@ -36,7 +36,7 @@ export function MaterialCostList({
 }
 
 const styles = StyleSheet.create({
-  icon: { backgroundColor: "#151b20", borderColor: colors.border, borderWidth: 1 },
+  icon: { backgroundColor: "#151b20", borderColor: colors.border, borderWidth: 1, overflow: "hidden", position: "relative" },
   costs: { flexDirection: "row", flexWrap: "wrap", gap: 7 },
   costChip: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, borderRadius: 9, borderWidth: 1, flexDirection: "row", gap: 7, minWidth: 128, padding: 5 },
   missing: { borderColor: colors.danger },

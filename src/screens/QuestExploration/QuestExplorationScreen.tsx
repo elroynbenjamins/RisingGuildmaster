@@ -20,7 +20,20 @@ export function QuestExplorationScreen({ questId, party, onBack, onComplete }: {
   const roll = () => { if (!stage || result) return; const resolved = resolveQuestExplorationStage(stage, partyHeroes, createSeededRandom(randomSeed())); setResult(resolved); if (resolved.appliedConditionId) updateGuild({ ...guild, heroes: guild.heroes.map((hero) => hero.id === resolved.check.heroId ? { ...hero, conditions: addCondition(hero.conditions, resolved.appliedConditionId!) } : hero) }); };
   const proceed = () => {
     const effect = result?.combatEffect;
-    const next = effect ? { ...combatSetup, label: [combatSetup.label, effect.label].filter(Boolean).join(" · "), heroInitiativeModifier: combatSetup.heroInitiativeModifier + (effect.heroInitiativeModifier ?? 0), enemyInitiativeModifier: combatSetup.enemyInitiativeModifier + (effect.enemyInitiativeModifier ?? 0), heroArmorClassModifier: combatSetup.heroArmorClassModifier + (effect.heroArmorClassModifier ?? 0), heroOpeningAttackRollModifier: combatSetup.heroOpeningAttackRollModifier + (effect.heroOpeningAttackRollModifier ?? 0), enemyOpeningAttackRollModifier: combatSetup.enemyOpeningAttackRollModifier + (effect.enemyOpeningAttackRollModifier ?? 0) } : combatSetup;
+    const next = effect ? {
+      ...combatSetup,
+      label: [combatSetup.label, effect.label].filter(Boolean).join(" · "),
+      heroInitiativeModifier: combatSetup.heroInitiativeModifier + (effect.heroInitiativeModifier ?? 0),
+      enemyInitiativeModifier: combatSetup.enemyInitiativeModifier + (effect.enemyInitiativeModifier ?? 0),
+      heroArmorClassModifier: combatSetup.heroArmorClassModifier + (effect.heroArmorClassModifier ?? 0),
+      heroOpeningAttackRollModifier: combatSetup.heroOpeningAttackRollModifier + (effect.heroOpeningAttackRollModifier ?? 0),
+      enemyOpeningAttackRollModifier: combatSetup.enemyOpeningAttackRollModifier + (effect.enemyOpeningAttackRollModifier ?? 0),
+      enemyPhysicalDamageModifier: (combatSetup.enemyPhysicalDamageModifier ?? 0) + (effect.enemyPhysicalDamageModifier ?? 0),
+      enemyDamageModifier: (combatSetup.enemyDamageModifier ?? 0) + (effect.enemyDamageModifier ?? 0),
+      heroHealingPowerModifier: (combatSetup.heroHealingPowerModifier ?? 0) + (effect.heroHealingPowerModifier ?? 0),
+      heroMovementRangeModifier: (combatSetup.heroMovementRangeModifier ?? 0) + (effect.heroMovementRangeModifier ?? 0),
+      enemyMovementRangeModifier: (combatSetup.enemyMovementRangeModifier ?? 0) + (effect.enemyMovementRangeModifier ?? 0),
+    } : combatSetup;
     if (stageIndex >= stages.length - 1) onComplete(next); else { setCombatSetup(next); setStageIndex((value) => value + 1); setResult(undefined); }
   };
   if (!stage) { onComplete(); return null; }

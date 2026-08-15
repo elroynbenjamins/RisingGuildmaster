@@ -13,6 +13,8 @@ import { GameIcon } from "../../components/icons/GameIcon";
 import { HeroPortrait } from "../../components/heroes/HeroPortrait";
 import type { QuestChronicleEntry, QuestHeroOutcomeRecord } from "../../game/quests/questChronicleTypes";
 import { CRAFTING_RECIPES } from "../../data/crafting/recipes";
+import { QuestDialogueSequence } from "../../components/quests/QuestDialogueSequence";
+import { getQuestDialogue } from "../../data/quests/questDialogue";
 
 export type QuestHeroOutcome = QuestHeroOutcomeRecord;
 
@@ -30,11 +32,12 @@ export interface QuestResultSummary {
 }
 
 export function QuestResultScreen({ summary, choiceIds = [], onChoice, onContinue }: { summary: QuestResultSummary; choiceIds?: string[]; onChoice?(choiceId: string): void; onContinue(): void }) {
-  const quest = QUESTS[summary.questId]!; const victory = summary.status === "victory"; const pendingChoice = victory && choiceIds.length > 0 && !summary.selectedChoiceId;
+  const quest = QUESTS[summary.questId]!; const victory = summary.status === "victory"; const pendingChoice = victory && choiceIds.length > 0 && !summary.selectedChoiceId; const debrief = getQuestDialogue(summary.questId)[victory ? "victory" : "defeat"];
   return <ScrollView contentContainerStyle={styles.content}>
     <View style={[styles.banner, victory ? styles.victoryBanner : styles.defeatBanner]}>
       <GameIcon id={victory ? "victory" : "defeat"} size={58} /><Text style={styles.result}>{victory ? "QUEST VICTORY" : "PARTY DEFEATED"}</Text><Text style={styles.quest}>{quest.name}</Text>
     </View>
+    <SectionTitle>{victory ? "VOICES AFTER THE BATTLE" : "VOICES OF THE WITHDRAWAL"}</SectionTitle><QuestDialogueSequence lines={debrief} label={victory ? "QUEST DEBRIEF" : "AFTER ACTION REPORT"} />
     <Panel style={styles.story}><Text style={styles.storyLabel}>AFTERMATH • DAY {summary.chronicle.day}</Text><Text style={styles.storyText}>{summary.chronicle.aftermath}</Text><Text style={styles.recorded}>RECORDED IN THE GUILD CHRONICLE</Text></Panel>
     {summary.selectedChoiceId && <Panel style={styles.choiceOutcome}><Text style={styles.storyLabel}>YOUR DECISION</Text><Text style={styles.storyText}>{CAMPAIGN_CHOICE_OUTCOMES[summary.selectedChoiceId]}</Text></Panel>}
     <SectionTitle>CONSEQUENCES</SectionTitle>

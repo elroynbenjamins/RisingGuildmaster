@@ -48,6 +48,10 @@ export interface EnemyCalculatedStats extends EnemyBaseStats {}
 export interface EnemyStatScaling {
   levelMultiplier?: number;
   difficultyMultiplier?: number;
+  hpMultiplier?: number;
+  damageMultiplier?: number;
+  defenseMultiplier?: number;
+  speedMultiplier?: number;
 }
 
 export interface ActiveEnemyCondition {

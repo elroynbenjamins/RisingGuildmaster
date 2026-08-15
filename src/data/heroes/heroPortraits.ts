@@ -8,6 +8,23 @@ export interface HeroPortraitCrop {
   row: number;
 }
 
+export interface HeroPortraitAtlasLayout {
+  columns: 4;
+  rows: 3 | 4;
+  /** Display height of one source cell relative to its width. */
+  cellHeightRatio: number;
+}
+
+export const HERO_BASE_PORTRAIT_LAYOUT: HeroPortraitAtlasLayout = { columns: 4, rows: 3, cellHeightRatio: 1 };
+export const HERO_VARIANT_PORTRAIT_LAYOUTS: Record<ClassId, HeroPortraitAtlasLayout> = {
+  warrior: { columns: 4, rows: 4, cellHeightRatio: 1 },
+  ranger: { columns: 4, rows: 4, cellHeightRatio: 1 },
+  mage: { columns: 4, rows: 4, cellHeightRatio: .75 },
+  cleric: { columns: 4, rows: 4, cellHeightRatio: 1 },
+  paladin: { columns: 4, rows: 4, cellHeightRatio: 1 },
+  berserker: { columns: 4, rows: 4, cellHeightRatio: 1 },
+};
+
 const RACE_COLUMNS: Record<RaceId, number> = { human: 0, elf: 1, dwarf: 2, orc: 3 };
 const GENDER_ROWS: Record<HeroGender, number> = { female: 0, male: 1 };
 

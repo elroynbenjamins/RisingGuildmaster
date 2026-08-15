@@ -13,6 +13,7 @@ import type { BackgroundId } from "./types";
 import { generateHeroName } from "../../data/heroes/heroNames";
 import type { HeroGender } from "../../data/heroes/heroPortraits";
 import { createHeroHistory } from "./heroHistoryService";
+import { generateDndAttributes } from "../attributes/dndAttributes";
 
 const RACE_IDS = Object.keys(RACES) as RaceId[];
 const CLASS_IDS = Object.keys(CLASSES) as ClassId[];
@@ -42,10 +43,7 @@ export function generateHero(random: RandomSource, options: HeroGenerationOption
     portraitVariant,
     portraitKey: `${raceId}-${classId}-${gender}-v${portraitVariant}`,
     raceId, classId, subclassId: null, learnedSkillIds: [], backgroundId: options.backgroundId ?? weightedBackground(random),
-    baseAttributes: {
-      strength: random.int(1, 20), dexterity: random.int(1, 20), constitution: random.int(1, 20),
-      intelligence: random.int(1, 20), wisdom: random.int(1, 20), charisma: random.int(1, 20),
-    },
+    baseAttributes: generateDndAttributes(random, CLASSES[classId].attributePriorities),
     level: 1, xp: 0, potential,
     potentialEstimateMin: Math.max(GAME_CONFIG.potentialMin, potential - estimateVariance),
     potentialEstimateMax: Math.min(100, potential + estimateVariance),

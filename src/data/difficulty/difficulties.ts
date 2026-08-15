@@ -1,0 +1,9 @@
+import type { DifficultyDefinition, GameDifficultyId } from "../../game/difficulty/difficultyTypes";
+
+export const DIFFICULTIES: Record<GameDifficultyId, DifficultyDefinition> = {
+  standard: { id: "standard", name: "Standard", tagline: "Intended balance", description: "The recommended first campaign. Enemies use trained tactics and the guild economy follows its normal pace.", enemyAiLevel: "trained", enemyHpMultiplier: 1, enemyDamageMultiplier: 1, enemyDefenseMultiplier: 1, enemySpeedMultiplier: 1, enemyAttackRollModifier: 0, enemyDefenseScoreModifier: 0, questGoldMultiplier: 1, tavernIncomeMultiplier: 1, allowsPaidRecruitmentRefresh: true },
+  veteran: { id: "veteran", name: "Veteran", tagline: "Stronger foes · tighter economy", description: "Enemies coordinate wounded-target pressure and avoid wasteful actions. Rewards and tavern income are reduced.", enemyAiLevel: "tactical", enemyHpMultiplier: 1.12, enemyDamageMultiplier: 1.10, enemyDefenseMultiplier: 1.06, enemySpeedMultiplier: 1.03, enemyAttackRollModifier: 1, enemyDefenseScoreModifier: 1, questGoldMultiplier: .90, tavernIncomeMultiplier: .85, allowsPaidRecruitmentRefresh: true },
+  iron_guild: { id: "iron_guild", name: "Iron Guild", tagline: "For experienced Guildmasters", description: "Ruthless enemies focus vulnerable heroes, combat scaling is severe, income is scarce, and tavern candidates cannot be refreshed with gold.", enemyAiLevel: "ruthless", enemyHpMultiplier: 1.28, enemyDamageMultiplier: 1.22, enemyDefenseMultiplier: 1.12, enemySpeedMultiplier: 1.06, enemyAttackRollModifier: 2, enemyDefenseScoreModifier: 2, questGoldMultiplier: .75, tavernIncomeMultiplier: .70, allowsPaidRecruitmentRefresh: false },
+};
+
+export function getDifficulty(id: GameDifficultyId | undefined): DifficultyDefinition { return DIFFICULTIES[id ?? "standard"]; }

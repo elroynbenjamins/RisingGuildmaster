@@ -13,4 +13,5 @@ export const QUEST_OUTCOME_CONSEQUENCES: Record<string, QuestOutcomeConsequences
   ashes_of_blackbridge: { victory: ["Keeper Sella and half of the Blackbridge ledger are recovered."], defeat: ["Blackbridge's hidden witness and evidence are lost beneath the river."] },
   blackbridge_ledger: { victory: ["The Iron Laurel's sealed order is recovered as evidence."], defeat: ["The storehouse records are destroyed before they can identify who gave the order."] },
   oath_of_the_broken_bridge: { victory: ["Blackbridge's dead deliver testimony that clears the Guildmaster and implicates the Iron Laurel."], defeat: ["The final testimony remains sealed in the drowned undercroft."] },
+  the_aurora_that_fell: { victory: ["The fallen aurora withdraws from Northwatch's southern road and the regional threat is cleared.", "Frostmarch confirms that the damaged Wardstones are transmitting a summons toward the Ashlands."], defeat: ["The false aurora consumes another signal tower and Frostmarch's regional threat continues to rise."] },
 };

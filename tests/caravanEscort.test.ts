@@ -17,7 +17,7 @@ describe("The Brambleway Run", () => {
   });
 
   it("uses D20 checks and party attributes to detect the ambush", () => {
-    const hero = testHero();
+    const hero = { ...testHero(), baseAttributes: { ...testHero().baseAttributes, wisdom: 14 } };
     const first = resolveQuestDecision(CARAVAN_DECISION_CHOICES.scout_ahead!, [hero], sequenceRandom([.50]));
     expect(first).toMatchObject({ awarenessDelta: 1, check: { diceRoll: 11, modifier: 2, total: 13, difficultyClass: 12, success: true } });
     const progress = advanceQuestDecision(EMPTY_QUEST_DECISION_PROGRESS, first);

@@ -6,7 +6,7 @@ export const SETTLEMENTS: Record<string, SettlementDefinition> = {
   stonegate: { id: "stonegate", name: "Stonegate", regionId: "iron_hills", serviceIds: ["temple", "equipment_shop", "quest_board"], questIds: ["troll_hunt", "knives_of_stonegate"], mapPosition: { x: .11, y: .47 } },
   kharum_deep: { id: "kharum_deep", name: "Kharum-Deep", regionId: "iron_hills", serviceIds: ["blacksmith", "training_grounds", "quest_board"], questIds: [], mapPosition: { x: .49, y: .37 } },
   flintwatch: { id: "flintwatch", name: "Flintwatch", regionId: "iron_hills", serviceIds: ["mine_exchange", "inn", "quest_board"], questIds: ["last_lift_of_flintwatch"], mapPosition: { x: .49, y: .07 } },
-  northwatch: { id: "northwatch", name: "Northwatch", regionId: "frostmarch", serviceIds: ["temple", "quest_board"], questIds: [], mapPosition: { x: .50, y: .71 } },
+  northwatch: { id: "northwatch", name: "Northwatch", regionId: "frostmarch", serviceIds: ["temple", "quest_board"], questIds: ["the_aurora_that_fell"], mapPosition: { x: .50, y: .71 } },
   silverbough_enclaves: { id: "silverbough_enclaves", name: "Silverbough Enclaves", regionId: "frostmarch", serviceIds: ["scout_lodge", "enchanter", "quest_board"], questIds: [], mapPosition: { x: .75, y: .48 } },
   emberfall: { id: "emberfall", name: "Emberfall", regionId: "ashlands", serviceIds: ["equipment_shop", "quest_board"], questIds: [], mapPosition: { x: .20, y: .19 } },
   red_mesa_clanroads: { id: "red_mesa_clanroads", name: "Red Mesa Clanroads", regionId: "ashlands", serviceIds: ["clan_moot", "blacksmith", "quest_board"], questIds: [], mapPosition: { x: .78, y: .18 } },

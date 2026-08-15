@@ -1,18 +1,18 @@
 import type { EnemyCalculatedStats, EnemyBaseStats, EnemyDefinition, EnemyStatScaling } from "./enemyTypes";
 
-function scaled(base: number, modifier: number, scaling: EnemyStatScaling): number {
-  return base * (1 + modifier) * (scaling.levelMultiplier ?? 1) * (scaling.difficultyMultiplier ?? 1);
+function scaled(base: number, modifier: number, scaling: EnemyStatScaling, categoryMultiplier = 1): number {
+  return base * (1 + modifier) * (scaling.levelMultiplier ?? 1) * (scaling.difficultyMultiplier ?? 1) * categoryMultiplier;
 }
 
 /** Applies definition percentages to shared base stats; level/difficulty scaling remains caller-configurable. */
 export function calculateEnemyStats(base: EnemyBaseStats, enemy: EnemyDefinition, scaling: EnemyStatScaling = {}): EnemyCalculatedStats {
   return {
-    hp: scaled(base.hp, enemy.hpModifier, scaling),
-    physicalDamage: scaled(base.physicalDamage, enemy.physicalDamageModifier, scaling),
-    physicalDefense: scaled(base.physicalDefense, enemy.physicalDefenseModifier, scaling),
-    magicDamage: scaled(base.magicDamage, enemy.magicDamageModifier, scaling),
-    magicDefense: scaled(base.magicDefense, enemy.magicDefenseModifier, scaling),
-    speed: scaled(base.speed, enemy.speedModifier, scaling),
+    hp: scaled(base.hp, enemy.hpModifier, scaling, scaling.hpMultiplier),
+    physicalDamage: scaled(base.physicalDamage, enemy.physicalDamageModifier, scaling, scaling.damageMultiplier),
+    physicalDefense: scaled(base.physicalDefense, enemy.physicalDefenseModifier, scaling, scaling.defenseMultiplier),
+    magicDamage: scaled(base.magicDamage, enemy.magicDamageModifier, scaling, scaling.damageMultiplier),
+    magicDefense: scaled(base.magicDefense, enemy.magicDefenseModifier, scaling, scaling.defenseMultiplier),
+    speed: scaled(base.speed, enemy.speedModifier, scaling, scaling.speedMultiplier),
   };
 }
 

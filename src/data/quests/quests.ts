@@ -2,10 +2,12 @@ import type { QuestDefinition } from "../../game/quests/questTypes";
 import { BLACKBRIDGE_QUESTS } from "./blackbridgeQuests";
 import { ASH_BENEATH_GREENVEIL_QUESTS } from "./ashBeneathGreenveilQuests";
 import { STONEGATE_ASSASSIN_QUESTS } from "./stonegateAssassinQuest";
+import { FROSTMARCH_CRISIS_QUESTS } from "./frostmarchCrisisQuest";
 const RAW_QUESTS: Record<string, QuestDefinition> = {
   ...BLACKBRIDGE_QUESTS,
   ...ASH_BENEATH_GREENVEIL_QUESTS,
   ...STONEGATE_ASSASSIN_QUESTS,
+  ...FROSTMARCH_CRISIS_QUESTS,
   goblin_patrol: { id: "goblin_patrol", name: "Goblin Patrol", questType: "contract", regionId: "greenveil", repeatable: true, difficulty: 1, recommendedLevelMin: 1, recommendedLevelMax: 2, minPartySize: 1, maxPartySize: 4, encounterIds: ["goblin_patrol_encounter"], goldRewardMin: 80, goldRewardMax: 120, xpRewardPerHero: 50, lootTableId: "goblin_quest_loot" },
   spider_nest: { id: "spider_nest", name: "Spider Nest", questType: "contract", regionId: "greenveil", repeatable: true, difficulty: 2, recommendedLevelMin: 2, recommendedLevelMax: 3, minPartySize: 2, maxPartySize: 4, encounterIds: ["spider_nest_encounter_1", "spider_nest_encounter_2"], goldRewardMin: 140, goldRewardMax: 190, xpRewardPerHero: 90, lootTableId: "spider_quest_loot" },
   troll_hunt: { id: "troll_hunt", name: "Troll Hunt", questType: "contract", regionId: "iron_hills", repeatable: true, difficulty: 3, minPartySize: 3, maxPartySize: 4, encounterIds: ["troll_hunt_encounter_1", "troll_hunt_encounter_2"], goldRewardMin: 300, goldRewardMax: 450, xpRewardPerHero: 180, lootTableId: "troll_quest_loot" },

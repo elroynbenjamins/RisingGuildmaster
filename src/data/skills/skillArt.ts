@@ -12,6 +12,15 @@ const heroCoordinates = [
 export const HERO_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(heroCoordinates.map((id, index) => [id, { column: index % 6, row: Math.floor(index / 6) }])) as Record<string, SkillIconCoordinate>;
 HERO_SKILL_ICON_COORDINATES.hexbreaker_weakened_oath = { column: 4, row: 5 };
 HERO_SKILL_ICON_COORDINATES.bloodreaver_blood_strike = { column: 3, row: 3 };
+const heroSkillVisualAliases: Record<string, string> = {
+  warrior_guarded_stance: "warrior_shield_bash", warrior_cleaving_sweep: "berserker_whirlwind", warrior_second_wind: "cleric_heal", warrior_intercept: "guardian_taunt", warrior_relentless_assault: "warrior_power_strike", warrior_unbreakable: "warrior_battle_hardened",
+  ranger_hunters_mark: "ranger_hunters_focus", ranger_ensnaring_arrow: "ranger_precise_shot", ranger_evasive_step: "ranger_hunters_focus", ranger_piercing_shot: "sharpshooter_deadeye", ranger_volley: "ranger_multi_shot", ranger_ambush_mastery: "ranger_hunters_focus",
+  mage_arcane_shield: "paladin_holy_armor", mage_lightning_line: "mage_arcane_bolt", mage_mist_step: "mage_frost_bolt", mage_counterspell: "hexbreaker_null_seal", mage_chain_lightning: "mage_fireball", mage_mana_font: "mage_arcane_knowledge",
+  cleric_blessing: "oracle_foresight_blessing", cleric_sacred_ward: "paladin_guardians_oath", cleric_purifying_light: "cleric_divine_light", cleric_turn_undead: "cleric_holy_strike", cleric_mass_restoration: "life_priest_greater_heal", cleric_divine_intervention: "cleric_faith",
+  paladin_lay_on_hands: "cleric_heal", paladin_compelled_challenge: "guardian_taunt", paladin_cleansing_smite: "paladin_smite", paladin_aura_of_courage: "templar_defensive_aura", paladin_judgment: "paladin_holy_slash", paladin_unyielding_faith: "paladin_holy_armor",
+  berserker_reckless_attack: "berserker_frenzied_strike", berserker_war_cry: "commander_arcane_rally", berserker_blood_rush: "berserker_rage", berserker_groundbreaker: "berserker_whirlwind", berserker_brutal_critical: "berserker_rage", berserker_refuse_death: "warrior_battle_hardened",
+};
+for (const [skillId, visualId] of Object.entries(heroSkillVisualAliases)) HERO_SKILL_ICON_COORDINATES[skillId] = HERO_SKILL_ICON_COORDINATES[visualId]!;
 
 /** Enemy abilities reuse this visual vocabulary deterministically pending a dedicated bestiary atlas. */
 const enemyCoordinates = [
@@ -31,12 +40,32 @@ const ashStoryCoordinates = [
 ] as const;
 export const ASH_STORY_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(ashStoryCoordinates.map((id, index) => [id, { column: index % 3, row: Math.floor(index / 3) }])) as Record<string, SkillIconCoordinate>;
 
-export type SkillIconAtlasId = "hero" | "enemy" | "ashStory";
+const enemyExpansionACoordinates = [
+  "raking_beaks", "blinding_wings", "feast_on_the_fallen", "sapper_knife", "blasting_charge", "smoke_pot",
+  "spectral_brand", "accusing_whisper", "unfinished_oath", "laurel_blade", "shield_rebuke", "laurel_discipline",
+  "revenant_glaive", "heartstone_pulse", "oathbound_shell", "final_testimony", "gloam_stiletto", "shadowstep_strike",
+  "death_from_shadow", "nightglass_bolt", "caltrop_burst", "prepared_killbox", "blackglass_blade", "vanishing_cut",
+  "silent_coordination", "no_witnesses", "quick_strike", "aimed_shot", "heavy_swing", "splinter_bolt",
+  "piercing_shot", "bone_precision", "spiderling_bites", "skittering_strike", "web_bolt", "brood_crush",
+] as const;
+export const ENEMY_SKILL_EXPANSION_A_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(enemyExpansionACoordinates.map((id, index) => [id, { column: index % 6, row: Math.floor(index / 6) }])) as Record<string, SkillIconCoordinate>;
+
+const enemyExpansionBCoordinates = [
+  "queen_fangs", "queen_frenzy", "brood_matriarch", "bandit_slash", "captain_sword_strike", "chieftain_cleave",
+  "chieftain_presence", "chain_cleaver", "unbound_fury", "warden_hammer", "warden_pulse", "hollow_ward_shell",
+  "warden_judgment_protocol", "serpent_fangs", "venom_spit", "coiled_fury", "crocodile_bite", "death_roll",
+  "blood_in_water", "ice_shard", "freezing_gust", "yeti_maul", "thick_winter_fur", "whiteout_fury",
+] as const;
+export const ENEMY_SKILL_EXPANSION_B_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(enemyExpansionBCoordinates.map((id, index) => [id, { column: index % 6, row: Math.floor(index / 6) }])) as Record<string, SkillIconCoordinate>;
+
+export type SkillIconAtlasId = "hero" | "enemy" | "ashStory" | "enemyExpansionA" | "enemyExpansionB";
 
 export function getSkillIconArt(skillId: string): SkillIconCoordinate & { atlas: SkillIconAtlasId } {
   const authored = HERO_SKILL_ICON_COORDINATES[skillId]; if (authored) return { ...authored, atlas: "hero" };
   const enemy = ENEMY_SKILL_ICON_COORDINATES[skillId]; if (enemy) return { ...enemy, atlas: "enemy" };
   const ashStory = ASH_STORY_SKILL_ICON_COORDINATES[skillId]; if (ashStory) return { ...ashStory, atlas: "ashStory" };
+  const enemyExpansionA = ENEMY_SKILL_EXPANSION_A_COORDINATES[skillId]; if (enemyExpansionA) return { ...enemyExpansionA, atlas: "enemyExpansionA" };
+  const enemyExpansionB = ENEMY_SKILL_EXPANSION_B_COORDINATES[skillId]; if (enemyExpansionB) return { ...enemyExpansionB, atlas: "enemyExpansionB" };
   let hash = 0;
   for (let index = 0; index < skillId.length; index += 1) hash = (hash * 31 + skillId.charCodeAt(index)) >>> 0;
   const cell = hash % 36;

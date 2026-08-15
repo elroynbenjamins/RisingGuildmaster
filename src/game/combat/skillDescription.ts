@@ -15,6 +15,7 @@ export function getSkillDescriptionLines(skill: CombatSkillDefinition): string[]
   if ((skill.resourceCost ?? 0) > 0) lines.push(`Costs ${skill.resourceCost} ${skill.resourceType}.`);
   if ((skill.cooldownTurns ?? 0) > 0) lines.push(`Cooldown: ${skill.cooldownTurns} turns.`);
   if (skill.attackRollModifier) lines.push(`Attack roll modifier: ${signed(skill.attackRollModifier)}.`);
+  if (skill.attackRollMode && skill.attackRollMode !== "normal") lines.push(`Makes its attack roll with ${skill.attackRollMode}.`);
   if (skill.accuracyModifier) lines.push(`Accuracy modifier: ${pct(skill.accuracyModifier)}.`);
   if (skill.criticalChanceModifier) lines.push(`Critical chance modifier: ${pct(skill.criticalChanceModifier)}.`);
   for (const condition of skill.conditionApplications ?? []) lines.push(`${Math.round(condition.chance * 100)}% chance to apply ${words(condition.conditionId)} for ${condition.durationTurns} turn${condition.durationTurns === 1 ? "" : "s"}.`);

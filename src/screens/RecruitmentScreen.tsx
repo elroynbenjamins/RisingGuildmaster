@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useGameDialog } from "../components/dialogs/GameDialog";
 import { ActionButton, BackButton, Panel, Portrait, SecondaryButton, colors } from "../components/ui";
 import { CLASSES } from "../data/classes/classes";
 import { RACES } from "../data/races/races";
@@ -11,19 +12,23 @@ import type { RecruitmentCandidate } from "../game/recruitment/recruitmentTypes"
 import { useGuild } from "../state/GuildContext";
 import { getRaceNameColor } from "../ui/raceColors";
 import { RegionalScoutPanel } from "./Recruitment/RegionalScoutPanel";
+import { formatAbilityModifier } from "../game/attributes/dndAttributes";
+import { getDifficulty } from "../data/difficulty/difficulties";
 
 const range = (min: number, max: number) => min === max ? `${min}` : `${min}-${max}`;
 
 export function RecruitmentScreen({ onBack, inspect, openCalendar }: { onBack(): void; inspect(candidate: RecruitmentCandidate): void; openCalendar(): void }) {
+  const { showDialog } = useGameDialog();
   const { candidates, guild, refreshCandidates, recruitCandidate, rejectCandidate, updateGuild } = useGuild();
   const [message, setMessage] = useState<string>();
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const freeReady = guild.currentDay >= guild.recruitment.nextFreeRefreshDay;
+  const paidRefreshAllowed = getDifficulty(guild.difficultyId).allowsPaidRecruitmentRefresh;
   const tutorial = guild.tutorial.active ? guild.tutorial.step : null;
   const tutorialRefresh = tutorial === "refresh_board";
   const tutorialCopy = tutorial === "recruit_first" ? "Inspect the candidates and recruit your first hero." : tutorialRefresh ? "Refresh the board now. This guided refresh is free." : tutorial === "recruit_second" ? "Choose a candidate from the refreshed board and recruit your second hero." : null;
   const act = (action: () => string | null, success: string) => { const error = action(); setMessage(error ?? success); };
-  const confirmRecruit = (candidate: RecruitmentCandidate) => Alert.alert(`Recruit ${candidate.heroPreview.name}?`, `Estimated fee: ${range(candidate.recruitmentFeeEstimateMin, candidate.recruitmentFeeEstimateMax)}\nEstimated salary demand: ${range(candidate.weeklySalaryEstimateMin, candidate.weeklySalaryEstimateMax)}/week\nContract: ${candidate.contractLengthWeeks} weeks`, [{ text: "Cancel", style: "cancel" }, { text: "Recruit", onPress: () => act(() => recruitCandidate(candidate.candidateId), `${candidate.heroPreview.name} joined the guild.`) }]);
+  const confirmRecruit = (candidate: RecruitmentCandidate) => showDialog({ title: `Recruit ${candidate.heroPreview.name}?`, message: `Estimated fee: ${range(candidate.recruitmentFeeEstimateMin, candidate.recruitmentFeeEstimateMax)} gold\nSalary demand: ${range(candidate.weeklySalaryEstimateMin, candidate.weeklySalaryEstimateMax)} gold/week\nContract: ${candidate.contractLengthWeeks} weeks`, eyebrow: "GUILD CONTRACT", actions: [{ label: "Cancel", tone: "secondary" }, { label: "Recruit", tone: "primary", onPress: () => act(() => recruitCandidate(candidate.candidateId), `${candidate.heroPreview.name} joined the guild.`) }] });
   const toggleCompare = (id: string) => setCompareIds((current) => current.includes(id) ? current.filter((item) => item !== id) : current.length < 3 ? [...current, id] : current);
   const compared = candidates.filter((item) => compareIds.includes(item.candidateId));
 
@@ -31,7 +36,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar }: { onBack():
     <BackButton onPress={onBack} />
     <Text style={styles.title}>Recruitment</Text><Text style={styles.sub}>Roster {guild.heroes.length}/{RECRUITMENT_CONFIG.heroCapacity} | Gold {guild.gold.toLocaleString()}</Text>
     {tutorialCopy && <Panel style={styles.tutorial}><Text style={styles.tutorialStep}>FIRST GUILD PARTY | {guild.heroes.length}/2 HEROES</Text><Text style={styles.tutorialTitle}>{tutorial === "recruit_first" ? "Recruit Your First Hero" : tutorialRefresh ? "Refresh the Candidate Board" : "Recruit Your Second Hero"}</Text><Text style={styles.tutorialText}>{tutorialCopy}</Text><SecondaryButton label="Skip Tutorial" onPress={() => updateGuild(skipTutorial(guild))} /></Panel>}
-    <Panel style={[styles.refresh, tutorialRefresh && styles.tutorialTarget]}><View style={styles.flex}><Text style={styles.name}>Candidate Search</Text><Text style={styles.meta}>{tutorialRefresh ? "Tutorial refresh: FREE" : `Next free refresh: ${freeReady ? "Ready" : `${guild.recruitment.nextFreeRefreshDay - guild.currentDay} days`}`}</Text><Text style={styles.meta}>{tutorialRefresh ? "Required before recruiting hero 2" : `Manual refresh: ${guild.recruitment.manualRefreshCost} gold`}</Text></View><View style={styles.refreshButtons}><SecondaryButton label={tutorialRefresh ? "Free Tutorial Refresh" : freeReady ? "Free Refresh" : "Refresh"} disabled={!tutorialRefresh && !freeReady && guild.gold < guild.recruitment.manualRefreshCost} onPress={() => act(() => refreshCandidates(freeReady), "Candidate pool refreshed.")} /></View></Panel>
+    <Panel style={[styles.refresh, tutorialRefresh && styles.tutorialTarget]}><View style={styles.flex}><Text style={styles.name}>Candidate Search</Text><Text style={styles.meta}>{tutorialRefresh ? "Tutorial refresh: FREE" : `Next free refresh: ${freeReady ? "Ready" : `${guild.recruitment.nextFreeRefreshDay - guild.currentDay} days`}`}</Text><Text style={styles.meta}>{tutorialRefresh ? "Required before recruiting hero 2" : paidRefreshAllowed ? `Manual refresh: ${guild.recruitment.manualRefreshCost} gold` : "Iron Guild: gold refreshes disabled"}</Text></View><View style={styles.refreshButtons}><SecondaryButton label={tutorialRefresh ? "Free Tutorial Refresh" : freeReady ? "Free Refresh" : paidRefreshAllowed ? "Refresh" : "Wait for Free Refresh"} disabled={!tutorialRefresh && !freeReady && (!paidRefreshAllowed || guild.gold < guild.recruitment.manualRefreshCost)} onPress={() => act(() => refreshCandidates(freeReady), "Candidate pool refreshed.")} /></View></Panel>
     <RegionalScoutPanel openCalendar={openCalendar} />
     {message && <Text style={styles.message}>{message}</Text>}
     {candidates.map((candidate) => { const hero = candidate.heroPreview; const reserved = guild.recruitment.reservedCandidateId === candidate.candidateId; return <Panel key={candidate.candidateId} style={styles.card}>
@@ -40,7 +45,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar }: { onBack():
       <View style={styles.actions}><View style={styles.flex}><SecondaryButton label="Inspect / Scout" onPress={() => inspect(candidate)} /></View><View style={styles.flex}><ActionButton label={guild.gold < candidate.recruitmentFeeEstimateMin ? "Insufficient Gold" : "Recruit"} disabled={tutorialRefresh || guild.gold < candidate.recruitmentFeeEstimateMin || guild.heroes.length >= RECRUITMENT_CONFIG.heroCapacity} onPress={() => confirmRecruit(candidate)} /></View></View>
       <Pressable disabled={Boolean(tutorial)} onPress={() => act(() => rejectCandidate(candidate.candidateId), `${hero.name} rejected.`)}><Text style={[styles.reject, tutorial && styles.disabled]}>Reject candidate</Text></Pressable>
     </Panel>; })}
-    {compared.length >= 2 && <Panel><Text style={styles.name}>Candidate Comparison</Text><View style={styles.compareGrid}>{compared.map((candidate) => <View key={candidate.candidateId} style={styles.compareColumn}><Text numberOfLines={1} style={[styles.columnName, { color: getRaceNameColor(candidate.heroPreview.raceId) }]}>{candidate.heroPreview.name}</Text><Text style={styles.meta}>{candidate.heroPreview.raceId}</Text><Text style={styles.meta}>{candidate.heroPreview.classId}</Text><Text style={styles.meta}>Lv {candidate.heroPreview.level} | Age {candidate.heroPreview.age}</Text><Text style={styles.potential}>POT {candidate.potentialEstimateMin}-{candidate.potentialEstimateMax}</Text><Text style={styles.meta}>Fee {range(candidate.recruitmentFeeEstimateMin, candidate.recruitmentFeeEstimateMax)}</Text><Text style={styles.meta}>Demand {range(candidate.weeklySalaryEstimateMin, candidate.weeklySalaryEstimateMax)}/wk</Text>{Object.entries(candidate.heroPreview.baseAttributes).map(([key, value]) => <Text key={key} style={styles.meta}>{key.slice(0, 3).toUpperCase()} {value}</Text>)}</View>)}</View></Panel>}
+    {compared.length >= 2 && <Panel><Text style={styles.name}>Candidate Comparison</Text><View style={styles.compareGrid}>{compared.map((candidate) => <View key={candidate.candidateId} style={styles.compareColumn}><Text numberOfLines={1} style={[styles.columnName, { color: getRaceNameColor(candidate.heroPreview.raceId) }]}>{candidate.heroPreview.name}</Text><Text style={styles.meta}>{candidate.heroPreview.raceId}</Text><Text style={styles.meta}>{candidate.heroPreview.classId}</Text><Text style={styles.meta}>Lv {candidate.heroPreview.level} | Age {candidate.heroPreview.age}</Text><Text style={styles.potential}>POT {candidate.potentialEstimateMin}-{candidate.potentialEstimateMax}</Text><Text style={styles.meta}>Fee {range(candidate.recruitmentFeeEstimateMin, candidate.recruitmentFeeEstimateMax)}</Text><Text style={styles.meta}>Demand {range(candidate.weeklySalaryEstimateMin, candidate.weeklySalaryEstimateMax)}/wk</Text>{Object.entries(candidate.heroPreview.baseAttributes).map(([key, value]) => <Text key={key} style={styles.meta}>{key.slice(0, 3).toUpperCase()} {value} ({formatAbilityModifier(value)})</Text>)}</View>)}</View></Panel>}
   </ScrollView>;
 }
 

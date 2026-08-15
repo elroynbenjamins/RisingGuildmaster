@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { ActionButton, BackButton, EmptyState, Panel, SecondaryButton, SectionTitle, colors } from "../../components/ui";
 import { MaterialIcon } from "../../components/materials/MaterialIcon";
 import { MATERIALS } from "../../data/crafting/materials";
@@ -11,20 +12,25 @@ import { compareEquipment } from "../../ui/equipmentComparison";
 import { getRaceNameColor } from "../../ui/raceColors";
 import { previewEquipmentDisposition, salvageInventoryEquipment, sellInventoryEquipment } from "../../game/equipment/equipmentDispositionService";
 import type { MaterialId } from "../../game/crafting/craftingTypes";
+import { getEquipmentRarityColor } from "../../ui/equipmentRarity";
+import { getModifierTargetLabel } from "../../ui/modifierLabels";
 
 export function ItemDetailScreen({ itemId, onBack }: { itemId: string; onBack(): void }) {
+  const { showDialog } = useGameDialog();
   const { guild, updateGuild } = useGuild(); const item = resolveEquipmentDefinition(itemId);
   const compatible = item ? guild.heroes.filter((hero) => hero.level >= item.levelRequirement && (!item.classRestrictions.length || item.classRestrictions.includes(hero.classId))) : [];
-  const [selectedId, setSelectedId] = useState(compatible[0]?.id); const hero = compatible.find((entry) => entry.id === selectedId);
+  const [selectedId, setSelectedId] = useState(compatible[0]?.id); const [equipNotice, setEquipNotice] = useState<{ title: string; message: string; error?: boolean }>(); const hero = compatible.find((entry) => entry.id === selectedId);
   const comparison = useMemo(() => hero && item ? compareEquipment(hero, item.inventoryKey) : [], [hero, item]);
   if (!item) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><EmptyState title="Item unavailable" message="This item definition could not be found." /></ScrollView>;
   const disposition = previewEquipmentDisposition(item.inventoryKey);
   const salvageMaterials = Object.entries(disposition.salvageMaterials) as [MaterialId, number][];
   const salvageWorkshop = guild.artisans[disposition.salvageArtisan];
   const specialEffects = item.specialEffectIds.map(describeEquipmentSpecialEffect).filter((effect): effect is NonNullable<typeof effect> => Boolean(effect));
-  const equip = () => { if (!hero) return; try { const oldId = hero.equipment[item.slot]; const updated = equipItem(hero, item.inventoryKey); const inventory = [...guild.inventory]; const index = inventory.indexOf(item.inventoryKey); if (index >= 0) inventory.splice(index, 1); if (oldId) inventory.push(oldId); updateGuild({ ...guild, inventory, heroes: guild.heroes.map((entry) => entry.id === hero.id ? updated : entry) }); Alert.alert("Equipped", `${item.name} equipped by ${hero.name}.`); onBack(); } catch (error) { Alert.alert("Cannot equip", error instanceof Error ? error.message : "Equipment failed"); } };
-  return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={styles.title}>{item.name}</Text><Text style={styles.rarity}>{item.rarity.toUpperCase()} • {item.slot.toUpperCase()} • Level {item.level}</Text>
-    <Panel><Text style={styles.line}>Value: {item.value} gold</Text><Text style={styles.line}>Requirement: Level {item.levelRequirement}</Text><Text style={styles.line}>Classes: {item.classRestrictions.length ? item.classRestrictions.join(", ") : "Any"}</Text>{item.modifiers.map((modifier, index) => <Text key={index} style={styles.effect}>{modifier.value >= 0 ? "+" : ""}{modifier.operation === "percentage" ? `${modifier.value * 100}%` : modifier.value} {modifier.target}</Text>)}</Panel>
+  const equip = () => { if (!hero) return; try { const oldId = hero.equipment[item.slot]; const updated = equipItem(hero, item.inventoryKey); const inventory = [...guild.inventory]; const index = inventory.indexOf(item.inventoryKey); if (index >= 0) inventory.splice(index, 1); if (oldId) inventory.push(oldId); updateGuild({ ...guild, inventory, heroes: guild.heroes.map((entry) => entry.id === hero.id ? updated : entry) }); setEquipNotice({ title: "Equipment Ready", message: `${item.name} is now equipped by ${hero.name}.` }); } catch (error) { setEquipNotice({ title: "Cannot Equip", message: error instanceof Error ? error.message : "Equipment failed", error: true }); } };
+  if (equipNotice) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack}/><Panel style={{ borderColor: equipNotice.error ? colors.danger : colors.green, gap: 14, marginTop: 28 }}><Text style={{ color: equipNotice.error ? colors.danger : colors.green, fontSize: 24, fontWeight: "900" }}>{equipNotice.title}</Text><Text style={{ color: colors.text, fontSize: 15, lineHeight: 21 }}>{equipNotice.message}</Text><ActionButton label="Return to Inventory" onPress={onBack}/></Panel></ScrollView>;
+  const rarityColor = getEquipmentRarityColor(item.rarity);
+  return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={[styles.title, { color: rarityColor }]}>{item.name}</Text><Text style={[styles.rarity, { color: rarityColor }]}>{item.rarity.toUpperCase()} • {item.slot.toUpperCase()} • Level {item.level}</Text>
+    <Panel style={{ borderColor: rarityColor }}><Text style={styles.line}>Value: {item.value} gold</Text><Text style={styles.line}>Requirement: Level {item.levelRequirement}</Text><Text style={styles.line}>Classes: {item.classRestrictions.length ? item.classRestrictions.join(", ") : "Any"}</Text>{item.modifiers.map((modifier, index) => <Text key={index} style={styles.effect}>{modifier.value >= 0 ? "+" : ""}{modifier.operation === "percentage" ? `${modifier.value * 100}%` : modifier.value} {getModifierTargetLabel(modifier.target)}</Text>)}</Panel>
     {specialEffects.length ? <><SectionTitle>SPECIAL EFFECTS</SectionTitle>{specialEffects.map((effect) => <Panel key={effect.name} style={styles.special}><Text style={styles.specialName}>{effect.name}</Text><Text style={styles.specialDescription}>{effect.description}</Text></Panel>)}</> : null}
     <SectionTitle>EQUIP TO HERO</SectionTitle>{compatible.map((entry) => <Pressable key={entry.id} onPress={() => setSelectedId(entry.id)}><Panel style={[styles.hero, selectedId === entry.id && styles.selected]}><Text style={[styles.heroName, { color: getRaceNameColor(entry.raceId) }]}>{entry.name}</Text><Text style={styles.meta}>Lv {entry.level} • {entry.classId}</Text></Panel></Pressable>)}
     {!compatible.length && <Text style={styles.error}>No guild hero meets this item's requirements.</Text>}
@@ -36,8 +42,8 @@ export function ItemDetailScreen({ itemId, onBack }: { itemId: string; onBack():
       <View style={styles.salvageRow}>{salvageMaterials.map(([materialId, amount]) => <View key={materialId} style={styles.salvageMaterial}><MaterialIcon materialId={materialId} size={32}/><Text style={styles.salvageText}>{MATERIALS[materialId].name} x{amount}</Text></View>)}</View>
       <Text style={salvageWorkshop.recruited ? styles.workshopReady : styles.error}>{salvageWorkshop.recruited ? `${disposition.salvageArtisan} workshop ready` : `Requires an operational ${disposition.salvageArtisan} workshop`}</Text>
       <View style={styles.dispositionActions}>
-        <View style={styles.flex}><SecondaryButton label={`Sell for ${disposition.saleGold} gold`} onPress={() => Alert.alert("Sell equipment?", `${item.name} will be permanently sold for ${disposition.saleGold} gold.`, [{ text: "Cancel", style: "cancel" }, { text: "Sell", style: "destructive", onPress: () => { updateGuild(sellInventoryEquipment(guild, item.inventoryKey)); onBack(); } }])}/></View>
-        <View style={styles.flex}><SecondaryButton label="Salvage materials" disabled={!salvageWorkshop.recruited || !salvageMaterials.length} onPress={() => Alert.alert("Salvage equipment?", `${item.name} will be permanently dismantled.`, [{ text: "Cancel", style: "cancel" }, { text: "Salvage", style: "destructive", onPress: () => { try { updateGuild(salvageInventoryEquipment(guild, item.inventoryKey)); onBack(); } catch (error) { Alert.alert("Cannot salvage", error instanceof Error ? error.message : "Salvage failed"); } } }])}/></View>
+        <View style={styles.flex}><SecondaryButton label={`Sell for ${disposition.saleGold} gold`} onPress={() => showDialog({ title: "Sell equipment?", message: `${item.name} will be permanently sold for ${disposition.saleGold} gold.`, eyebrow: "QUARTERMASTER ORDER", tone: "danger", actions: [{ label: "Cancel", tone: "secondary" }, { label: "Sell", tone: "danger", onPress: () => { updateGuild(sellInventoryEquipment(guild, item.inventoryKey)); onBack(); } }] })}/></View>
+        <View style={styles.flex}><SecondaryButton label="Salvage materials" disabled={!salvageWorkshop.recruited || !salvageMaterials.length} onPress={() => showDialog({ title: "Salvage equipment?", message: `${item.name} will be permanently dismantled.`, eyebrow: "WORKSHOP ORDER", tone: "danger", actions: [{ label: "Cancel", tone: "secondary" }, { label: "Salvage", tone: "danger", onPress: () => { try { updateGuild(salvageInventoryEquipment(guild, item.inventoryKey)); onBack(); } catch (error) { showDialog({ title: "Cannot salvage", message: error instanceof Error ? error.message : "Salvage failed", tone: "danger" }); } } }] })}/></View>
       </View>
     </Panel>
   </ScrollView>;

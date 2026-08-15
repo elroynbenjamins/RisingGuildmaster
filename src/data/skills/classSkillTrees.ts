@@ -1,33 +1,17 @@
 import type { ClassId } from "../../game/heroes/types";
 
-export interface ClassSkillNodeDefinition {
-  skillId: string;
-  requiredLevel: number;
-  tier: number;
-  prerequisiteSkillIds?: string[];
-}
-
-export interface ClassSkillTreeDefinition {
-  classId: ClassId;
-  basicSkillId: string;
-  nodes: ClassSkillNodeDefinition[];
-}
-
-const tree = (classId: ClassId, basicSkillId: string, firstChoice: string, secondChoice: string, advancedPassive: string): ClassSkillTreeDefinition => ({
-  classId,
-  basicSkillId,
-  nodes: [
-    { skillId: firstChoice, requiredLevel: 2, tier: 1 },
-    { skillId: secondChoice, requiredLevel: 2, tier: 1 },
-    { skillId: advancedPassive, requiredLevel: 4, tier: 2 },
-  ],
-});
+export interface ClassSkillNodeDefinition { skillId: string; requiredLevel: number; tier: number; prerequisiteSkillIds?: string[] }
+export interface RecommendedSkillPathDefinition { id: string; name: string; description: string; skillIds: readonly string[] }
+export interface ClassSkillTreeDefinition { classId: ClassId; basicSkillId: string; nodes: ClassSkillNodeDefinition[]; recommendedPaths: readonly RecommendedSkillPathDefinition[] }
+const node = (skillId: string, requiredLevel: number, tier: number): ClassSkillNodeDefinition => ({ skillId, requiredLevel, tier });
+const path = (id: string, name: string, description: string, skillIds: readonly [string, string, string, string]): RecommendedSkillPathDefinition => ({ id, name, description, skillIds });
+const tree = (classId: ClassId, basicSkillId: string, levels: readonly [readonly string[], readonly string[], readonly string[], readonly string[]], recommendedPaths: readonly [RecommendedSkillPathDefinition, RecommendedSkillPathDefinition]): ClassSkillTreeDefinition => ({ classId, basicSkillId, nodes: levels.flatMap((ids, index) => ids.map((id) => node(id, [2, 4, 6, 8][index]!, index + 1))), recommendedPaths });
 
 export const CLASS_SKILL_TREES: Record<ClassId, ClassSkillTreeDefinition> = {
-  warrior: tree("warrior", "warrior_sword_strike", "warrior_shield_bash", "warrior_power_strike", "warrior_battle_hardened"),
-  ranger: tree("ranger", "ranger_bow_shot", "ranger_precise_shot", "ranger_multi_shot", "ranger_hunters_focus"),
-  mage: tree("mage", "mage_arcane_bolt", "mage_fireball", "mage_frost_bolt", "mage_arcane_knowledge"),
-  cleric: tree("cleric", "cleric_holy_strike", "cleric_heal", "cleric_divine_light", "cleric_faith"),
-  paladin: tree("paladin", "paladin_holy_slash", "paladin_smite", "paladin_guardians_oath", "paladin_holy_armor"),
-  berserker: tree("berserker", "berserker_wild_swing", "berserker_frenzied_strike", "berserker_whirlwind", "berserker_rage"),
+  warrior: tree("warrior", "warrior_sword_strike", [["warrior_shield_bash", "warrior_power_strike"], ["warrior_battle_hardened", "warrior_guarded_stance", "warrior_cleaving_sweep"], ["warrior_second_wind", "warrior_intercept"], ["warrior_relentless_assault", "warrior_unbreakable"]], [path("warrior_vanguard", "Vanguard", "Area pressure and decisive frontline attacks.", ["warrior_power_strike", "warrior_cleaving_sweep", "warrior_second_wind", "warrior_relentless_assault"]), path("warrior_bulwark", "Bulwark", "Protect allies and become increasingly difficult to break.", ["warrior_shield_bash", "warrior_guarded_stance", "warrior_intercept", "warrior_unbreakable"])]),
+  ranger: tree("ranger", "ranger_bow_shot", [["ranger_precise_shot", "ranger_multi_shot"], ["ranger_hunters_focus", "ranger_hunters_mark", "ranger_ensnaring_arrow"], ["ranger_evasive_step", "ranger_piercing_shot"], ["ranger_volley", "ranger_ambush_mastery"]], [path("ranger_marksman", "Marksman", "Accuracy, armor penetration, and lethal opening attacks.", ["ranger_precise_shot", "ranger_hunters_mark", "ranger_piercing_shot", "ranger_ambush_mastery"]), path("ranger_warden", "Warden", "Control groups at range while remaining mobile.", ["ranger_multi_shot", "ranger_ensnaring_arrow", "ranger_evasive_step", "ranger_volley"])]),
+  mage: tree("mage", "mage_arcane_bolt", [["mage_fireball", "mage_frost_bolt"], ["mage_arcane_knowledge", "mage_arcane_shield", "mage_lightning_line"], ["mage_mist_step", "mage_counterspell"], ["mage_chain_lightning", "mage_mana_font"]], [path("mage_elementalist", "Elementalist", "Escalating area magic for clustered enemies.", ["mage_fireball", "mage_lightning_line", "mage_counterspell", "mage_chain_lightning"]), path("mage_arcanist", "Arcanist", "Control and survival through dependable spellcraft.", ["mage_frost_bolt", "mage_arcane_shield", "mage_mist_step", "mage_mana_font"])]),
+  cleric: tree("cleric", "cleric_holy_strike", [["cleric_heal", "cleric_divine_light"], ["cleric_faith", "cleric_blessing", "cleric_sacred_ward"], ["cleric_purifying_light", "cleric_turn_undead"], ["cleric_mass_restoration", "cleric_divine_intervention"]], [path("cleric_lifebringer", "Lifebringer", "Wards, cleansing, and powerful group recovery.", ["cleric_heal", "cleric_sacred_ward", "cleric_purifying_light", "cleric_mass_restoration"]), path("cleric_exorcist", "Exorcist", "Bolster allies and control supernatural foes.", ["cleric_divine_light", "cleric_blessing", "cleric_turn_undead", "cleric_divine_intervention"])]),
+  paladin: tree("paladin", "paladin_holy_slash", [["paladin_smite", "paladin_guardians_oath"], ["paladin_holy_armor", "paladin_lay_on_hands", "paladin_compelled_challenge"], ["paladin_cleansing_smite", "paladin_aura_of_courage"], ["paladin_judgment", "paladin_unyielding_faith"]], [path("paladin_avenger", "Avenger", "Divine punishment against corrupted and undead foes.", ["paladin_smite", "paladin_lay_on_hands", "paladin_cleansing_smite", "paladin_judgment"]), path("paladin_protector", "Protector", "Draw attention and reinforce nearby allies.", ["paladin_guardians_oath", "paladin_compelled_challenge", "paladin_aura_of_courage", "paladin_unyielding_faith"])]),
+  berserker: tree("berserker", "berserker_wild_swing", [["berserker_frenzied_strike", "berserker_whirlwind"], ["berserker_rage", "berserker_reckless_attack", "berserker_war_cry"], ["berserker_blood_rush", "berserker_groundbreaker"], ["berserker_brutal_critical", "berserker_refuse_death"]], [path("berserker_reaver", "Reaver", "Momentum, critical hits, and single-target damage.", ["berserker_frenzied_strike", "berserker_reckless_attack", "berserker_blood_rush", "berserker_brutal_critical"]), path("berserker_destroyer", "Destroyer", "Disrupt groups and survive their retaliation.", ["berserker_whirlwind", "berserker_war_cry", "berserker_groundbreaker", "berserker_refuse_death"])]),
 };

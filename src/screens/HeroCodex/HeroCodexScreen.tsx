@@ -11,11 +11,11 @@ import { getSkillDescriptionLines } from "../../game/combat/skillDescription";
 import type { Modifier } from "../../game/modifiers/types";
 import type { ClassId, RaceId } from "../../game/heroes/types";
 import { getRaceNameColor } from "../../ui/raceColors";
+import { getModifierTargetLabel } from "../../ui/modifierLabels";
 
 type CodexTab = "Races" | "Classes";
 const ATTRIBUTE_LABELS: Record<AttributeKey, string> = { strength: "STR", dexterity: "DEX", constitution: "CON", intelligence: "INT", wisdom: "WIS", charisma: "CHA" };
-const words = (value: string) => value.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").replace(/^./, (letter) => letter.toUpperCase());
-const modifierText = (modifier: Modifier) => `${words(modifier.target)} ${modifier.value >= 0 ? "+" : ""}${modifier.operation === "percentage" ? `${Math.round(modifier.value * 100)}%` : modifier.value}`;
+const modifierText = (modifier: Modifier) => `${getModifierTargetLabel(modifier.target)} ${modifier.value >= 0 ? "+" : ""}${modifier.operation === "percentage" ? `${Math.round(modifier.value * 100)}%` : modifier.value}`;
 function Label({ children }: React.PropsWithChildren) { return <Text style={styles.label}>{children}</Text>; }
 
 function Header({ portrait, title, subtitle, color, expanded }: { portrait: React.ReactNode; title: string; subtitle: string; color?: string; expanded: boolean }) {

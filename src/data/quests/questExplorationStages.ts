@@ -5,6 +5,7 @@ import { HUNT_EXPLORATION } from "./huntExploration";
 import { BLACKBRIDGE_EXPLORATION } from "./blackbridgeExploration";
 import { ASH_BENEATH_GREENVEIL_EXPLORATION } from "./ashBeneathGreenveilExploration";
 import { STONEGATE_ASSASSIN_EXPLORATION } from "./stonegateAssassinExploration";
+import { FROSTMARCH_CRISIS_EXPLORATION } from "./frostmarchCrisisExploration";
 
 export const QUEST_EXPLORATION_STAGES = {
   ...SPIDER_QUEEN_EXPLORATION,
@@ -14,4 +15,5 @@ export const QUEST_EXPLORATION_STAGES = {
   ...BLACKBRIDGE_EXPLORATION,
   ...ASH_BENEATH_GREENVEIL_EXPLORATION,
   ...STONEGATE_ASSASSIN_EXPLORATION,
+  ...FROSTMARCH_CRISIS_EXPLORATION,
 };

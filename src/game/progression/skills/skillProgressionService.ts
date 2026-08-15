@@ -2,7 +2,7 @@ import { CLASS_SKILL_TREES, type ClassSkillNodeDefinition } from "../../../data/
 import type { Hero } from "../../heroes/types";
 
 /** Heroes earn one permanent class-skill choice at each milestone. */
-export const CLASS_SKILL_POINT_LEVELS = [2, 4, 6] as const;
+export const CLASS_SKILL_POINT_LEVELS = [2, 4, 6, 8] as const;
 
 export type SkillNodeState = "learned" | "available" | "locked_level" | "locked_prerequisite" | "no_points";
 export interface HeroSkillNode extends ClassSkillNodeDefinition { state: SkillNodeState }
@@ -18,6 +18,10 @@ export function getLearnedClassSkillIds(hero: Hero): string[] {
 
 export function getAvailableClassSkillPoints(hero: Hero): number {
   return Math.max(0, getEarnedClassSkillPoints(hero.level) - getLearnedClassSkillIds(hero).length);
+}
+
+export function getNextClassSkillPointLevel(level: number): number | null {
+  return CLASS_SKILL_POINT_LEVELS.find((requiredLevel) => requiredLevel > level) ?? null;
 }
 
 function nodeState(hero: Hero, node: ClassSkillNodeDefinition): SkillNodeState {

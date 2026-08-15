@@ -30,6 +30,13 @@ describe("roguelite recipe rewards", () => {
     expect(first.guild.unlockedRecipeIds).toContain(first.result.droppedRecipeId);
   });
 
+  it("applies a dungeon rare-loot modifier to the recipe drop chance", () => {
+    const normal = resolveRogueliteRecipeDrop(startRogueliteRun(createGuild(), "normal-chance"), "elite", sequenceRandom([.60]));
+    expect(normal.result.droppedRecipeId).toBeNull();
+    const improved = resolveRogueliteRecipeDrop(startRogueliteRun(createGuild(), "improved-chance"), "elite", sequenceRandom([.60, 0]), .20);
+    expect(improved.result.droppedRecipeId).toBe(Object.values(ELITE_RING_RECIPE_IDS)[0]);
+  });
+
   it("allows at most one Elite recipe and one Boss recipe per run", () => {
     let guild = startRogueliteRun(createGuild(), "cap-test");
     const elite = resolveRogueliteRecipeDrop(guild, "elite", sequenceRandom([0, .99])); guild = elite.guild;

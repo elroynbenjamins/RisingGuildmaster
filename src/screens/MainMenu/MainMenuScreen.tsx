@@ -1,9 +1,11 @@
 import React from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { ActionButton, Panel, SecondaryButton, colors } from "../../components/ui";
 
 export function MainMenuScreen({ hasSave, onContinue, onNewGame }: { hasSave: boolean; onContinue(): void; onNewGame(): void }) {
-  const start = () => hasSave ? Alert.alert("Start a new guild?", "This replaces the current local save when the new game begins.", [{ text: "Cancel", style: "cancel" }, { text: "New Game", style: "destructive", onPress: onNewGame }]) : onNewGame();
+  const { showDialog } = useGameDialog();
+  const start = () => hasSave ? showDialog({ title: "Start a new guild?", message: "This replaces the current local save when the new game begins.", eyebrow: "IRREVERSIBLE ORDER", tone: "danger", actions: [{ label: "Keep Save", tone: "secondary" }, { label: "New Game", tone: "danger", onPress: onNewGame }] }) : onNewGame();
   return <View style={styles.screen}><Text style={styles.eyebrow}>A GUILD MANAGEMENT ROGUELITE</Text><Text style={styles.title}>GUILDMASTER</Text><Text style={styles.subtitle}>Raise a banner. Build a company. Restore the Wardstones.</Text><Panel style={styles.menu}>{hasSave ? <ActionButton label="Continue Guild" onPress={onContinue} /> : null}<SecondaryButton label="New Game" onPress={start} /><Text style={styles.save}>{hasSave ? "Local save found · progress autosaves" : "No local save found"}</Text></Panel></View>;
 }
 

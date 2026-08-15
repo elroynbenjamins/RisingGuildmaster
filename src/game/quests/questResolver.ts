@@ -16,6 +16,7 @@ import type { MaterialId } from "../crafting/craftingTypes";
 import { grantGuildmasterXp } from "../guildmaster/guildmasterProgression";
 import type { HuntRewardProgress } from "../guild/types";
 import { recordQuestHistory } from "../heroes/heroHistoryService";
+import { getDifficulty } from "../../data/difficulty/difficulties";
 
 export function isCombatVictory(enemies: readonly { isAlive: boolean }[]): boolean { return enemies.every((enemy) => !enemy.isAlive); }
 export function isCombatDefeat(heroes: readonly { isAlive: boolean }[]): boolean { return heroes.every((hero) => !hero.isAlive); }
@@ -56,7 +57,7 @@ function persistHeroOutcome(hero: Hero, instance: HeroCombatInstance, xp: number
 }
 
 export function resolveQuestVictory(activeQuest: ActiveQuest, party: Party, guild: GuildState, instances: readonly HeroCombatInstance[], random: RandomSource): { activeQuest: ActiveQuest; guild: GuildState } {
-  const quest = getQuestDefinition(activeQuest.questDefinitionId); const partyHeroes = guild.heroes.filter((hero) => party.heroIds.includes(hero.id)); const goldModifier = partyHeroes.reduce((sum, hero) => sum + getTraitPercentage(hero, "questGold"), 0); const gold = Math.max(0, Math.round(rollQuestGold(quest, random) * (1 + goldModifier)));
+  const quest = getQuestDefinition(activeQuest.questDefinitionId); const partyHeroes = guild.heroes.filter((hero) => party.heroIds.includes(hero.id)); const goldModifier = partyHeroes.reduce((sum, hero) => sum + getTraitPercentage(hero, "questGold"), 0); const gold = Math.max(0, Math.round(rollQuestGold(quest, random) * (1 + goldModifier) * getDifficulty(guild.difficultyId).questGoldMultiplier));
   const byId = new Map(instances.map((instance) => [instance.heroId, instance]));
   const heroes = guild.heroes.map((hero) => {
     if (!party.heroIds.includes(hero.id) || !byId.has(hero.id)) return hero;

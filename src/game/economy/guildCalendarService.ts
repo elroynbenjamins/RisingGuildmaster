@@ -11,10 +11,12 @@ import type { GuildDayEvent, GuildDayPreview, GuildDayResolution, GuildTimeAdvan
 import { resolveTrainingGroundDay } from "../training/trainingService";
 import { recoverAdventureStamina } from "../heroes/adventureStaminaService";
 import { GAME_CONFIG } from "../../config/gameConfig";
+import { getDifficulty } from "../../data/difficulty/difficulties";
 
 const dueOnDay = (startDay: number, endDay: number, day: number): boolean => day > startDay && day <= endDay && (day - startDay) % 7 === 0;
 export const totalSalaryArrears = (guild: GuildState): number => Object.values(guild.finance.salaryArrearsByHeroId).reduce((sum, value) => sum + value, 0);
 export const payrollDueOnDay = (guild: GuildState, day: number): number => guild.heroContracts.filter((contract) => dueOnDay(contract.startDay, contract.endDay, day)).reduce((sum, contract) => sum + contract.weeklySalary, 0);
+export const dailyTavernIncome = (guild: GuildState): number => Math.round(GAME_CONFIG.dailyTavernIncome * Math.max(1, guild.finance.tavernLevel) * getDifficulty(guild.difficultyId).tavernIncomeMultiplier);
 
 function processPayroll(guild: GuildState, day: number): { guild: GuildState; due: number; paid: number; arrearsAdded: number; events: GuildDayEvent[] } {
   const dueContracts = guild.heroContracts.filter((contract) => dueOnDay(contract.startDay, contract.endDay, day));
@@ -48,7 +50,7 @@ function resolveSingleDay(guild: GuildState): { guild: GuildState; resolution: G
     heroes: guild.heroes.map((hero) => ({ ...hero, conditions: advanceConditions(hero.conditions, 1) })),
     heroContracts: guild.heroContracts.map((contract) => ({ ...contract, status: getContractStatus(contract, day) })),
   };
-  const tavernIncome = GAME_CONFIG.dailyTavernIncome * Math.max(1, guild.finance.tavernLevel);
+  const tavernIncome = dailyTavernIncome(guild);
   updated = { ...recoverAdventureStamina(updated), gold: updated.gold + tavernIncome, finance: { ...updated.finance, totalTavernIncome: updated.finance.totalTavernIncome + tavernIncome, transactions: [...updated.finance.transactions, { id: `tavern-${day}`, type: "tavern_income", day, amount: tavernIncome, note: "Guildhaven tavern daily proceeds" }] } };
   events.push({ type: "tavern_income", text: `The guild tavern earned ${tavernIncome} gold.`, amount: tavernIncome });
   if (guild.heroes.some((hero) => hero.adventureStamina < GAME_CONFIG.maxAdventureStamina)) events.push({ type: "stamina_recovered", text: `Resting heroes recovered ${GAME_CONFIG.adventureStaminaRecoveryPerDay} readiness stamina.` });

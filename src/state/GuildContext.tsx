@@ -8,8 +8,9 @@ import { loadGuild, saveGuild } from "../game/save/saveService";
 import { collectRegionalScoutReport as collectScout, dispatchRegionalScout as dispatchScout, focusRegionalScoutClass as focusScout, speedUpRegionalScout as speedUpScout } from "../game/recruitment/regionalScoutingService";
 import type { ClassId, RaceId } from "../game/heroes/types";
 import { recordTutorialRecruit, recordTutorialRefresh } from "../game/onboarding/tutorialService";
+import type { GameDifficultyId } from "../game/difficulty/difficultyTypes";
 
-interface GuildContextValue { guild: GuildState; candidates: RecruitmentCandidate[]; isHydrated: boolean; hasSave: boolean; gameStarted: boolean; startNewGame(): void; continueGame(): void; refreshCandidates(free?: boolean): string | null; dispatchRegionalScout(raceId: RaceId, classId?: ClassId | null): string | null; focusRegionalScoutClass(classId: ClassId): string | null; speedUpRegionalScout(): string | null; collectRegionalScoutReport(): string | null; recruitCandidate(candidateId: string): string | null; scoutCandidate(candidateId: string): string | null; reserveCandidate(candidateId: string): string | null; rejectCandidate(candidateId: string): string | null; updateGuild(guild: GuildState): void }
+interface GuildContextValue { guild: GuildState; candidates: RecruitmentCandidate[]; isHydrated: boolean; hasSave: boolean; gameStarted: boolean; startNewGame(difficultyId?: GameDifficultyId): void; continueGame(): void; refreshCandidates(free?: boolean): string | null; dispatchRegionalScout(raceId: RaceId, classId?: ClassId | null): string | null; focusRegionalScoutClass(classId: ClassId): string | null; speedUpRegionalScout(): string | null; collectRegionalScoutReport(): string | null; recruitCandidate(candidateId: string): string | null; scoutCandidate(candidateId: string): string | null; reserveCandidate(candidateId: string): string | null; rejectCandidate(candidateId: string): string | null; updateGuild(guild: GuildState): void }
 const GuildContext = createContext<GuildContextValue | null>(null);
 const resultOf = (action: () => GuildState, setGuild: React.Dispatch<React.SetStateAction<GuildState>>): string | null => { try { setGuild(action()); return null; } catch (error) { return error instanceof Error ? error.message : "Action failed"; } };
 
@@ -19,7 +20,7 @@ export function GuildProvider({ children }: React.PropsWithChildren) {
   useEffect(() => { if (hydrated && gameStarted) { setHasSave(true); void saveGuild(guild); } }, [guild, hydrated, gameStarted]);
   const value = useMemo<GuildContextValue>(() => ({
     guild, candidates: guild.recruitment.candidates, isHydrated: hydrated, hasSave, gameStarted,
-    startNewGame: () => { setGuild(initializeRecruitment(createGuild(), createSeededRandom(randomSeed()))); setGameStarted(true); setHasSave(true); },
+    startNewGame: (difficultyId = "standard") => { setGuild(initializeRecruitment(createGuild("The Wayfarers", difficultyId), createSeededRandom(randomSeed()))); setGameStarted(true); setHasSave(true); },
     continueGame: () => setGameStarted(true),
     refreshCandidates: (free = false) => resultOf(() => guild.tutorial.active && guild.tutorial.step === "refresh_board" ? recordTutorialRefresh(tutorialRefreshRecruitment(guild, createSeededRandom(randomSeed()))) : free ? freeRefreshRecruitment(guild, createSeededRandom(randomSeed())) : manualRefreshRecruitment(guild, createSeededRandom(randomSeed())), setGuild),
     dispatchRegionalScout: (raceId, classId = null) => resultOf(() => dispatchScout(guild, raceId, createSeededRandom(randomSeed()), classId), setGuild),

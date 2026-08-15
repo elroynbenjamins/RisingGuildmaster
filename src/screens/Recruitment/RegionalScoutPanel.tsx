@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { ActionButton, Panel, SecondaryButton, colors } from "../../components/ui";
 import { CLASSES } from "../../data/classes/classes";
 import { RACES } from "../../data/races/races";
@@ -16,6 +17,7 @@ const RACE_IDS = ["human", "elf", "dwarf", "orc"] as const;
 const CLASS_IDS = ["warrior", "ranger", "mage", "cleric", "paladin", "berserker"] as const;
 
 export function RegionalScoutPanel({ openCalendar }: { openCalendar(): void }) {
+  const { showDialog } = useGameDialog();
   const { guild, dispatchRegionalScout, focusRegionalScoutClass, speedUpRegionalScout, collectRegionalScoutReport } = useGuild();
   const [expanded, setExpanded] = useState(false);
   const [selectedRaceId, setSelectedRaceId] = useState<RaceId>("human");
@@ -69,17 +71,18 @@ export function RegionalScoutPanel({ openCalendar }: { openCalendar(): void }) {
   const classCost = selectedClassId ? RECRUITMENT_CONFIG.regionalScoutClassFocusGemCost : 0;
   const totalCost = baseCost + classCost;
 
-  const confirmDispatch = () => Alert.alert(
-    `Dispatch to ${selected.locationName}?`,
-    `The scout will return on Guild Day ${guild.currentDay + RECRUITMENT_CONFIG.regionalScoutDurationDays} with five ${selectedClassId ? CLASSES[selectedClassId].name : "mixed-class"} ${RACES[selectedRaceId].name} candidates.\n\nDispatch: ${baseCost} gems${selectedClassId ? `\nClass focus: ${classCost} gems` : ""}\nTotal: ${totalCost} gems\n\nNo candidates appear until the report is complete and collected.`,
-    [
-      { text: "Cancel", style: "cancel" },
-      { text: `Spend ${totalCost} gems`, onPress: () => {
+  const confirmDispatch = () => showDialog({
+    title: `Dispatch to ${selected.locationName}?`,
+    message: `The scout will return on Guild Day ${guild.currentDay + RECRUITMENT_CONFIG.regionalScoutDurationDays} with five ${selectedClassId ? CLASSES[selectedClassId].name : "mixed-class"} ${RACES[selectedRaceId].name} candidates.\n\nDispatch: ${baseCost} gems${selectedClassId ? `\nClass focus: ${classCost} gems` : ""}\nTotal: ${totalCost} gems\n\nNo candidates appear until the report is complete and collected.`,
+    eyebrow: "SCOUTING ORDER",
+    actions: [
+      { label: "Cancel", tone: "secondary" },
+      { label: `Spend ${totalCost} gems`, tone: "primary", onPress: () => {
         const error = dispatchRegionalScout(selectedRaceId, selectedClassId);
         setMessage(error ?? `Scout dispatched. Expected return: Guild Day ${guild.currentDay + RECRUITMENT_CONFIG.regionalScoutDurationDays}.`);
       } },
     ],
-  );
+  });
 
   return <Panel style={styles.panel}>
     <View style={styles.header}><View style={styles.flex}><Text style={styles.eyebrow}>REGIONAL HEADHUNTING</Text><Text style={styles.title}>Dispatch a Guild Scout</Text><Text style={styles.summary}>Send a scout to a people's homeland. The journey takes {RECRUITMENT_CONFIG.regionalScoutDurationDays} in-game days and returns five narrowed reports.</Text></View><View style={styles.toggle}><SecondaryButton label={expanded ? "Close" : "Choose"} onPress={() => setExpanded((value) => !value)} /></View></View>

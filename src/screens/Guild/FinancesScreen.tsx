@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { REGIONS } from "../../data/world/regions";
 import { ActionButton, BackButton, EmptyState, Panel, SectionTitle, colors } from "../../components/ui";
 import { advanceGuildTime, paySalaryArrears, previewNextGuildDay, totalSalaryArrears } from "../../game/economy/guildCalendarService";
@@ -8,6 +9,7 @@ import { useGuild } from "../../state/GuildContext";
 import { getRaceNameColor } from "../../ui/raceColors";
 
 export function FinancesScreen({ onBack }: { onBack(): void }) {
+  const { showDialog } = useGameDialog();
   const { guild, updateGuild } = useGuild();
   const preview = useMemo(() => previewNextGuildDay(guild), [guild]);
   const [lastDay, setLastDay] = useState<GuildDayResolution | null>(null);
@@ -24,8 +26,8 @@ export function FinancesScreen({ onBack }: { onBack(): void }) {
     ...(preview.contractChanges ? [preview.contractChanges + " contract status update" + (preview.contractChanges === 1 ? "" : "s")] : []),
     ...preview.threatIncreaseRegionIds.map((id) => (REGIONS[id]?.name ?? id) + " threat increases"),
   ];
-  const advance = () => Alert.alert("End Guild Day?", "Advance from Day " + guild.currentDay + " to Day " + preview.targetDay + "?\n\n" + previewLines.join("\n"), [{ text: "Cancel", style: "cancel" }, { text: "End Day", onPress: () => { const result = advanceGuildTime(guild); updateGuild(result.guild); setLastDay(result.days[0] ?? null); } }]);
-  const settle = () => { try { updateGuild(paySalaryArrears(guild)); } catch (error) { Alert.alert("Payroll", error instanceof Error ? error.message : "Payment failed"); } };
+  const advance = () => showDialog({ title: "End Guild Day?", message: "Advance from Day " + guild.currentDay + " to Day " + preview.targetDay + "?\n\n" + previewLines.join("\n"), eyebrow: "ADVANCE CALENDAR", actions: [{ label: "Cancel", tone: "secondary" }, { label: "End Day", tone: "primary", onPress: () => { const result = advanceGuildTime(guild); updateGuild(result.guild); setLastDay(result.days[0] ?? null); } }] });
+  const settle = () => { try { updateGuild(paySalaryArrears(guild)); } catch (error) { showDialog({ title: "Payroll order failed", message: error instanceof Error ? error.message : "Payment failed", tone: "danger" }); } };
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} />
     <View style={styles.heading}><View><Text style={styles.eyebrow}>GUILD OPERATIONS</Text><Text style={styles.title}>Calendar & Finances</Text></View><Text style={styles.day}>DAY {guild.currentDay}</Text></View>

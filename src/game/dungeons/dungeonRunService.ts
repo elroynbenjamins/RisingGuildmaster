@@ -9,6 +9,9 @@ import { resolveAbilityCheck, type AbilityCheckResult } from "../world/worldEven
 import { markDungeonNodeResolved, startDungeonRun } from "./dungeonService";
 import { DUNGEON_UNLOCK_HERO_COUNT } from "./dungeonDraftService";
 import { isChapterOneComplete } from "./rogueliteRotationService";
+import { getDifficulty } from "../../data/difficulty/difficulties";
+import { calculateDungeonRunScore } from "./dungeonIntelService";
+import { createRogueliteDungeonRecord } from "./rogueliteRotationTypes";
 
 export type DungeonMerchantChoice = "buy_supplies" | "leave";
 export interface DungeonNodeResolution { guild: GuildState; check: AbilityCheckResult | null; text: string; goldDelta: number; recipeId: string | null }
@@ -16,7 +19,7 @@ export interface DungeonNodeResolution { guild: GuildState; check: AbilityCheckR
 function activeRun(guild: GuildState) { const run = guild.activeDungeonRun; if (!run || run.status !== "active") throw new Error("No active dungeon run"); return run; }
 function rewardMultiplier(guild: GuildState): number { const run = activeRun(guild); return 1 + run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.rewardGoldModifier ?? 0), 0); }
 function healingMultiplier(guild: GuildState): number { const run = activeRun(guild); const themeHealing = DUNGEONS[run.dungeonId]?.combatModifiers.heroHealingPowerModifier ?? 0; return Math.max(0, 1 + themeHealing + run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.healingPowerModifier ?? 0), 0)); }
-function scaledGold(guild: GuildState, amount: number): number { return Math.max(0, Math.round(amount * rewardMultiplier(guild))); }
+function scaledGold(guild: GuildState, amount: number): number { return Math.max(0, Math.round(amount * rewardMultiplier(guild) * getDifficulty(guild.difficultyId).questGoldMultiplier)); }
 function updateRun(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>): GuildState { return { ...guild, activeDungeonRun: run }; }
 function recoverInstances(instances: readonly HeroCombatInstance[], hpRatio: number, manaRatio: number, staminaRatio: number): HeroCombatInstance[] {
   return instances.map((instance) => instance.isAlive ? { ...instance, currentHP: Math.min(instance.maxHP, instance.currentHP + Math.round(instance.maxHP * hpRatio)), currentMana: Math.min(instance.maxMana, instance.currentMana + Math.round(instance.maxMana * manaRatio)), currentStamina: Math.min(instance.maxStamina, instance.currentStamina + Math.round(instance.maxStamina * staminaRatio)) } : instance);
@@ -37,7 +40,8 @@ export function beginDungeonExpedition(guild: GuildState, dungeonId: string, par
   if (party.some((hero) => !hero.isAvailable || hero.currentHP <= 0)) throw new Error("Every dungeon hero must be available and alive");
   const run = startDungeonRun(dungeonId, modifierIds, partyHeroIds, party.map(createHeroCombatInstance), random);
   const withRoguelite = startRogueliteRun(guild, run.id);
-  return { ...withRoguelite, recentPartyHeroIds: partyHeroIds, rogueliteRotation: { ...guild.rogueliteRotation, selectedDungeonId: dungeonId }, activeDungeonRun: run };
+  const record = guild.rogueliteRotation.records[dungeonId] ?? createRogueliteDungeonRecord();
+  return { ...withRoguelite, recentPartyHeroIds: partyHeroIds, rogueliteRotation: { ...guild.rogueliteRotation, selectedDungeonId: dungeonId, records: { ...guild.rogueliteRotation.records, [dungeonId]: { ...record, attempts: record.attempts + 1 } } }, activeDungeonRun: run };
 }
 
 export function getDungeonCombatSetup(guild: GuildState): QuestCombatSetup {
@@ -49,8 +53,10 @@ export function getDungeonCombatSetup(guild: GuildState): QuestCombatSetup {
     if (modifier.target === "damage") enemyDamageModifier += modifier.value;
   }
   const theme = dungeon.combatModifiers; enemyPhysicalDamageModifier += theme.enemyPhysicalDamageModifier ?? 0; enemyDamageModifier += theme.enemyDamageModifier ?? 0;
+  const oathEnemyInitiative = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.enemyInitiativeModifier ?? 0), 0);
+  const oathEnemyMovement = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.enemyMovementRangeModifier ?? 0), 0);
   const heroHealingPowerModifier = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.healingPowerModifier ?? 0), 0) + (theme.heroHealingPowerModifier ?? 0);
-  return { encounterIds: [encounterId], label: node.title, heroInitiativeModifier: theme.heroInitiativeModifier ?? 0, enemyInitiativeModifier: theme.enemyInitiativeModifier ?? 0, heroArmorClassModifier: 0, heroOpeningAttackRollModifier: 0, enemyOpeningAttackRollModifier: 0, enemyPhysicalDamageModifier, enemyDamageModifier, heroHealingPowerModifier, heroMovementRangeModifier: theme.heroMovementRangeModifier ?? 0, enemyMovementRangeModifier: theme.enemyMovementRangeModifier ?? 0 };
+  return { encounterIds: [encounterId], label: node.title, heroInitiativeModifier: theme.heroInitiativeModifier ?? 0, enemyInitiativeModifier: (theme.enemyInitiativeModifier ?? 0) + oathEnemyInitiative, heroArmorClassModifier: 0, heroOpeningAttackRollModifier: 0, enemyOpeningAttackRollModifier: 0, enemyPhysicalDamageModifier, enemyDamageModifier, heroHealingPowerModifier, heroMovementRangeModifier: theme.heroMovementRangeModifier ?? 0, enemyMovementRangeModifier: (theme.enemyMovementRangeModifier ?? 0) + oathEnemyMovement };
 }
 
 export function resolveDungeonUtilityNode(guild: GuildState, random: RandomSource, merchantChoice?: DungeonMerchantChoice): DungeonNodeResolution {
@@ -62,7 +68,8 @@ export function resolveDungeonUtilityNode(guild: GuildState, random: RandomSourc
     if (!node.abilityCheck) throw new Error("Dungeon event has no ability check");
     const heroes = guild.heroes.filter((hero) => run.partyHeroIds.includes(hero.id)); check = resolveAbilityCheck(node.abilityCheck, heroes, random);
     goldDelta = check.success ? scaledGold(guild, node.successGoldReward ?? 0) : 0;
-    text = check.success ? `The seal yields. D20 ${check.diceRoll} + ${check.modifier} = ${check.total}; the party recovers ${goldDelta} gold from the antechamber.` : `The runes resist. D20 ${check.diceRoll} + ${check.modifier} = ${check.total} against DC ${check.difficultyClass}.`;
+    if (!check.success && (node.failureDamageMaxHpModifier ?? 0) > 0) instances = instances.map((instance) => instance.isAlive ? { ...instance, currentHP: Math.max(1, instance.currentHP - Math.round(instance.maxHP * node.failureDamageMaxHpModifier!)) } : instance);
+    text = check.success ? `The seal yields. D20 ${check.diceRoll} + ${check.modifier} = ${check.total}; the party recovers ${goldDelta} gold from the antechamber.` : `The route turns against them. D20 ${check.diceRoll} + ${check.modifier} = ${check.total} against DC ${check.difficultyClass}; each living hero loses ${Math.round((node.failureDamageMaxHpModifier ?? 0) * 100)}% max HP.`;
   } else if (node.type === "treasure") { goldDelta = scaledGold(guild, node.goldReward ?? 0); text = `The cache contains ${goldDelta} gold.`;
   } else if (node.type === "rest") { const power = healingMultiplier(guild); instances = recoverInstances(instances, (node.healMaxHpModifier ?? 0) * power, node.manaRecoveryModifier ?? 0, node.staminaRecoveryModifier ?? 0); text = "The party binds its wounds and recovers mana and stamina.";
   } else {
@@ -85,13 +92,17 @@ export function resolveDungeonCombat(guild: GuildState, status: "victory" | "def
   resolvedRun = { ...resolvedRun, goldEarned: resolvedRun.goldEarned + goldDelta, xpEarnedPerHero: resolvedRun.xpEarnedPerHero + xp };
   let next = syncHeroes(updateRun({ ...guild, gold: guild.gold + goldDelta }, resolvedRun), instances, xp);
   let recipeId: string | null = null;
-  if (node.type === "elite" || node.type === "boss") { const drop = resolveRogueliteRecipeDrop(next, node.type, random); next = drop.guild; recipeId = drop.result.droppedRecipeId; if (recipeId && next.activeDungeonRun) next = updateRun(next, { ...next.activeDungeonRun, recipeIdsUnlocked: [...next.activeDungeonRun.recipeIdsUnlocked, recipeId] }); }
+  if (node.type === "elite" || node.type === "boss") { const rareLootModifier = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.rareLootModifier ?? 0), 0); const drop = resolveRogueliteRecipeDrop(next, node.type, random, rareLootModifier); next = drop.guild; recipeId = drop.result.droppedRecipeId; if (recipeId && next.activeDungeonRun) next = updateRun(next, { ...next.activeDungeonRun, recipeIdsUnlocked: [...next.activeDungeonRun.recipeIdsUnlocked, recipeId] }); }
+  if (next.activeDungeonRun?.status === "victory") {
+    const score = calculateDungeonRunScore(next.activeDungeonRun); const record = next.rogueliteRotation.records[run.dungeonId] ?? createRogueliteDungeonRecord();
+    next = { ...next, rogueliteRotation: { ...next.rogueliteRotation, records: { ...next.rogueliteRotation.records, [run.dungeonId]: { ...record, victories: record.victories + 1, bestScore: Math.max(record.bestScore, score.total), bestGrade: score.total >= record.bestScore ? score.grade : record.bestGrade, lastVictoryDay: next.currentDay } } } };
+  }
   return { guild: next, check: null, text, goldDelta, recipeId };
 }
 
 export function closeDungeonExpedition(guild: GuildState, abandon = false): GuildState {
   if (!guild.activeDungeonRun) throw new Error("No dungeon run to close");
-  const run = guild.activeDungeonRun; const heroIds = new Set(run.partyHeroIds); const won = run.status === "victory" && !abandon; let next: GuildState = { ...guild, heroes: guild.heroes.map((hero) => heroIds.has(hero.id) && hero.currentHP > 0 ? { ...hero, isAvailable: true } : hero), rogueliteRotation: won ? { offeredDungeonIds: [], selectedDungeonId: null, cooldownUntilDay: guild.currentDay + 7 } : { ...guild.rogueliteRotation, selectedDungeonId: null }, activeDungeonRun: null };
+  const run = guild.activeDungeonRun; const heroIds = new Set(run.partyHeroIds); const won = run.status === "victory" && !abandon; let next: GuildState = { ...guild, heroes: guild.heroes.map((hero) => heroIds.has(hero.id) && hero.currentHP > 0 ? { ...hero, isAvailable: true } : hero), rogueliteRotation: won ? { ...guild.rogueliteRotation, offeredDungeonIds: [], selectedDungeonId: null, cooldownUntilDay: guild.currentDay + 7 } : { ...guild.rogueliteRotation, selectedDungeonId: null }, activeDungeonRun: null };
   if (next.activeRogueliteRun) next = finishRogueliteRun(next);
   return next;
 }

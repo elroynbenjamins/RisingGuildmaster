@@ -1,17 +1,19 @@
 import type { RandomSource } from "../../utils/random";
 import { applyCombatCondition } from "./conditionResolver";
-import { getConditionFlatModifier, getConditionStatPercentage } from "./conditionResolver";
+import { getConditionAttackRollMode, getConditionAttacksAgainstRollMode, getConditionFlatModifier, getConditionStatPercentage } from "./conditionResolver";
 import { calculateSkillDamage } from "./damageCalculator";
 import { rollAttack } from "./dice/attackRoll";
 import { applySkillModifiers, getModifiedCombatStat } from "./modifierService";
 import type { CombatStats, CombatUnit, SkillHitResult, SkillResolution } from "./combatTypes";
 import type { CombatSkillDefinition, SkillModifier } from "./skillTypes";
+import { combineD20RollModes, type D20RollMode } from "./dice/d20RollMode";
 
 export interface ResolveSkillOptions {
   actorModifiers?: SkillModifier[];
   healingReceivedModifier?: (target: CombatUnit) => number;
   conditionChance?: (target: CombatUnit, conditionId: string, baseChance: number, resistanceKey?: string) => number;
   reactiveDefenseModifiers?: (target: CombatUnit, incomingDamageType: NonNullable<CombatSkillDefinition["damageType"]>) => SkillModifier[];
+  attackRollMode?: D20RollMode;
 }
 export interface ResolveSkillResult { actor: CombatUnit; targets: CombatUnit[]; resolution: SkillResolution }
 
@@ -48,7 +50,8 @@ export function resolveSkill(actor: CombatUnit, targets: readonly CombatUnit[], 
     const rangedBonus = (skill.range ?? 1) > 1 ? attackerStats.rangedAttackRollModifier : 0;
     const attackBonus = (skill.damageType === "magic" ? attackerStats.magicAttackBonus : attackerStats.physicalAttackBonus) + attackerStats.attackRollModifier + rangedBonus;
     const targetValue = skill.damageType === "magic" ? defenderStats.magicDefenseScore : defenderStats.armorClass;
-    const attackRoll = causesDamage ? rollAttack(random, attackBonus, skill.attackRollModifier ?? 0, targetValue) : undefined;
+    const rollMode = combineD20RollModes(skill.attackRollMode, options.attackRollMode, getConditionAttackRollMode(actor), getConditionAttacksAgainstRollMode(originalTarget));
+    const attackRoll = causesDamage ? rollAttack(random, attackBonus, skill.attackRollModifier ?? 0, targetValue, rollMode) : undefined;
     const hit = attackRoll?.hit ?? true;
     const critical = attackRoll?.critical ?? false;
     const factionDamageBonus = originalTarget.factionId ? skill.factionDamageModifiers?.[originalTarget.factionId] ?? 0 : 0;
@@ -77,7 +80,7 @@ export function resolveSkill(actor: CombatUnit, targets: readonly CombatUnit[], 
       }
     }
     updatedTargets.push(target);
-    hits.push({ targetId: target.combatantId, hit, critical, damage, appliedConditionIds, ...(attackRoll ? { diceRoll: attackRoll.diceRoll, attackBonus: attackRoll.attackBonus, skillAttackModifier: attackRoll.skillModifier, attackTotal: attackRoll.total, targetValue: attackRoll.targetValue, rollResult: attackRoll.result } : {}) });
+    hits.push({ targetId: target.combatantId, hit, critical, damage, appliedConditionIds, ...(attackRoll ? { diceRoll: attackRoll.diceRoll, diceRolls: attackRoll.diceRolls, rollMode: attackRoll.rollMode, attackBonus: attackRoll.attackBonus, skillAttackModifier: attackRoll.skillModifier, attackTotal: attackRoll.total, targetValue: attackRoll.targetValue, rollResult: attackRoll.result } : {}) });
   }
   const selfModifiers = skill.selfModifiers ?? [];
   const withModifiers = selfModifiers.length ? { ...actor, activeModifiers: [...actor.activeModifiers, ...selfModifiers.map((modifier) => ({ ...modifier, sourceSkillId: skill.id }))] } : actor;

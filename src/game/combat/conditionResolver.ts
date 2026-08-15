@@ -1,5 +1,6 @@
 import { COMBAT_CONDITIONS } from "../../data/conditions/combatConditions";
 import type { ActiveCombatCondition, CombatUnit } from "./combatTypes";
+import { combineD20RollModes, type D20RollMode } from "./dice/d20RollMode";
 
 export function applyCombatCondition(current: readonly ActiveCombatCondition[], conditionId: string, durationTurns: number): ActiveCombatCondition[] {
   const definition = COMBAT_CONDITIONS[conditionId];
@@ -53,3 +54,11 @@ export function getEffectiveMovementRange(unit: CombatUnit): number {
 }
 
 export function blocksMagicSkills(unit: CombatUnit): boolean { return unit.activeConditions.some((active) => COMBAT_CONDITIONS[active.conditionId]?.blocksMagicSkills); }
+
+export function getConditionAttackRollMode(unit: CombatUnit): D20RollMode {
+  return combineD20RollModes(...unit.activeConditions.map((active) => COMBAT_CONDITIONS[active.conditionId]?.attackRollMode));
+}
+
+export function getConditionAttacksAgainstRollMode(unit: CombatUnit): D20RollMode {
+  return combineD20RollModes(...unit.activeConditions.map((active) => COMBAT_CONDITIONS[active.conditionId]?.attacksAgainstRollMode));
+}

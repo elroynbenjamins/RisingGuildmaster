@@ -2,6 +2,7 @@ import type { EnemyFactionId } from "../enemies/enemyTypes";
 import type { SkillModifier } from "./skillTypes";
 import type { GridPosition } from "./grid/gridTypes";
 import type { TerrainType } from "./grid/gridTypes";
+import type { D20RollMode } from "./dice/d20RollMode";
 
 export interface CombatStats { physicalDamage: number; physicalDefense: number; magicDamage: number; magicDefense: number; speed: number; initiativeBonus: number; evasion: number; criticalChance: number; accuracy: number; healingPower: number; physicalAttackBonus: number; magicAttackBonus: number; armorClass: number; magicDefenseScore: number; attackRollModifier: number; rangedAttackRollModifier: number }
 export interface ActiveCombatCondition { conditionId: string; remainingTurns: number }
@@ -57,5 +58,5 @@ export interface QuestCombatSetup {
   enemyMovementRangeModifier?: number;
 }
 
-export interface SkillHitResult { targetId: string; hit: boolean; critical: boolean; damage: number; appliedConditionIds: string[]; diceRoll?: number; attackBonus?: number; skillAttackModifier?: number; attackTotal?: number; targetValue?: number; rollResult?: "critical" | "hit" | "miss" | "critical_miss" }
+export interface SkillHitResult { targetId: string; hit: boolean; critical: boolean; damage: number; appliedConditionIds: string[]; diceRoll?: number; diceRolls?: number[]; rollMode?: D20RollMode; attackBonus?: number; skillAttackModifier?: number; attackTotal?: number; targetValue?: number; rollResult?: "critical" | "hit" | "miss" | "critical_miss" }
 export interface SkillResolution { skillId: string; actorId: string; hits: SkillHitResult[]; targetIds: string[] }

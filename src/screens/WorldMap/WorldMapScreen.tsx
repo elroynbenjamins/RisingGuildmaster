@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ActionButton, BackButton, Panel, SectionTitle, colors } from "../../components/ui";
 import { REGIONS } from "../../data/world/regions";
@@ -15,6 +15,7 @@ import { WORLD_NAME } from "../../game/world/worldState";
 import { mapChromeStyles } from "../../ui/worldMap";
 import type { RandomSource } from "../../utils/random";
 import { GameIcon } from "../../components/icons/GameIcon";
+import { isMatchingDoubleTap, type TapRecord } from "../../utils/doubleTap";
 
 interface WorldMapProps {
   guild: GuildState;
@@ -30,12 +31,24 @@ interface WorldMapProps {
 export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, openRegion, openCampaign, openEvent }: WorldMapProps) {
   const [selectedId, setSelectedId] = useState(guild.world.currentRegionId);
   const [message, setMessage] = useState<string>();
+  const lastRegionTap = useRef<TapRecord | null>(null);
   const selected = REGIONS[selectedId]!;
   const unlocked = guild.world.unlockedRegionIds.includes(selectedId);
   const current = guild.world.currentRegionId === selectedId;
   const travelAllowed = canTravel(guild.world, selectedId);
   const homelandContacts = Object.values(RACE_HOMELANDS).filter((homeland) => homeland.regionId === selectedId);
   const averageLevel = guild.heroes.length ? guild.heroes.reduce((sum, hero) => sum + hero.level, 0) / guild.heroes.length : 0;
+  const completedRegionQuests = selected.questPoolIds.filter((id) => guild.world.completedQuestIds.includes(id)).length;
+  const selectedThreat = guild.world.regionThreat?.[selectedId] ?? 0;
+
+  const selectRegion = (regionId: string) => {
+    const timestamp = Date.now();
+    const doubleTapped = isMatchingDoubleTap(lastRegionTap.current, regionId, timestamp);
+    lastRegionTap.current = doubleTapped ? null : { targetKey: regionId, timestamp };
+    setSelectedId(regionId);
+    setMessage(undefined);
+    if (doubleTapped) openRegion(regionId);
+  };
 
   const travel = () => {
     try {
@@ -55,6 +68,12 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
       <Text style={styles.title}>{WORLD_NAME}</Text>
       <Text style={styles.subtitle}>Campaign Chapter {guild.world.campaignChapter} · Current: {REGIONS[guild.world.currentRegionId]!.name}</Text>
 
+      <View style={styles.overview}>
+        <View style={styles.overviewStat}><Text style={styles.overviewValue}>{guild.world.unlockedRegionIds.length}/{Object.keys(REGIONS).length}</Text><Text style={styles.overviewLabel}>REGIONS OPEN</Text></View>
+        <View style={styles.overviewStat}><Text style={styles.overviewValue}>{guild.world.discoveredSettlementIds.length}/{Object.keys(SETTLEMENTS).length}</Text><Text style={styles.overviewLabel}>SETTLEMENTS</Text></View>
+        <View style={styles.overviewStat}><Text style={styles.overviewValue}>{guild.world.completedQuestIds.length}</Text><Text style={styles.overviewLabel}>QUESTS WON</Text></View>
+      </View>
+
       <View style={mapChromeStyles.frame}>
         <ImageBackground source={WORLD_ART.eldoria} resizeMode="cover" style={mapChromeStyles.canvas} imageStyle={mapChromeStyles.image}>
           <View pointerEvents="none" style={styles.mapShade} />
@@ -71,11 +90,12 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
 
             return (
               <Pressable
+                accessibilityHint="Tap once to inspect. Tap twice quickly to open the regional map."
                 accessibilityLabel={`${region.name}, ${status.toLowerCase()}`}
                 accessibilityRole="button"
                 accessibilityState={{ selected: selectedRegion }}
                 key={region.id}
-                onPress={() => setSelectedId(region.id)}
+                onPress={() => selectRegion(region.id)}
                 style={({ pressed }) => [
                   styles.node,
                   { left: `${region.mapPosition.x * 100}%`, top: `${region.mapPosition.y * 100}%` },
@@ -88,15 +108,21 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
                 <View style={[styles.marker, isCurrent && styles.currentMarker, boss && styles.bossMarker]}><GameIcon id={markerIcon} size={28} framed={false} /></View>
                 <Text numberOfLines={1} style={styles.nodeName}>{region.name}</Text>
                 <Text style={styles.nodeState}>{status}</Text>
+                {selectedRegion && <Text style={styles.nodeHint}>DOUBLE TAP · OPEN</Text>}
+                {(guild.world.regionThreat?.[region.id] ?? 0) > 0 && <Text style={styles.threatBadge}>THREAT {guild.world.regionThreat?.[region.id]}</Text>}
                 {settlementDiscovered && <View style={styles.settlementRow}><GameIcon id="settlement" size={13} framed={false} /><Text style={styles.settlement}>{SETTLEMENTS[region.settlementIds[0]!]?.name}</Text></View>}
               </Pressable>
             );
           })}
         </ImageBackground>
         <View style={mapChromeStyles.legend}>
-          <Text style={styles.legendText}>CURRENT</Text><Text style={styles.legendText}>BOSS</Text><Text style={styles.legendText}>LOCKED</Text>
+          <View style={styles.legendItem}><GameIcon id="current" size={14} framed={false}/><Text style={styles.legendText}>CURRENT</Text></View>
+          <View style={styles.legendItem}><GameIcon id="boss" size={14} framed={false}/><Text style={styles.legendText}>BOSS</Text></View>
+          <View style={styles.legendItem}><GameIcon id="locked" size={14} framed={false}/><Text style={styles.legendText}>LOCKED</Text></View>
         </View>
       </View>
+
+      <Text style={styles.gestureHint}>Tap a flag to inspect · Double tap the same flag to open its regional map</Text>
 
       <Panel>
         <View style={styles.panelHeader}>
@@ -109,8 +135,12 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
         <Text style={styles.detail}>Settlement: {selected.settlementIds.map((id) => SETTLEMENTS[id]!.name).join(", ")}</Text>
         {homelandContacts.length > 0 && <Text style={styles.detail}>Recruitment homeland: {homelandContacts.map((homeland) => `${RACES[homeland.raceId].name} · ${homeland.locationName}`).join(", ")}</Text>}
         <Text style={styles.detail}>Available contracts: {selected.questPoolIds.length}</Text>
+        <Text style={styles.detail}>Regional progress: {completedRegionQuests}/{selected.questPoolIds.length} listed quests complete</Text>
+        {selectedThreat > 0 && <Text style={styles.threat}>Regional threat {selectedThreat}/4 · Delaying unresolved dangers can strengthen enemies and disrupt settlements.</Text>}
         {selected.bossQuestId && <Text style={styles.boss}>! Regional boss: {guild.world.completedQuestIds.includes(selected.bossQuestId) ? "Defeated" : "Available through campaign"}</Text>}
         {!current && unlocked && !travelAllowed && <Text style={styles.routeWarning}>No direct road from your current region. Travel through a connected region first.</Text>}
+        <Text style={styles.roadTitle}>DIRECT ROADS</Text>
+        <View style={styles.roads}>{selected.connectedRegionIds.map((regionId) => { const destination = REGIONS[regionId]!; const destinationUnlocked = guild.world.unlockedRegionIds.includes(regionId); return <Pressable accessibilityRole="button" key={regionId} onPress={() => setSelectedId(regionId)} style={[styles.road, !destinationUnlocked && styles.roadLocked]}><GameIcon id={destinationUnlocked ? "region_open" : "locked"} size={18} framed={false}/><Text style={destinationUnlocked ? styles.roadName : styles.roadNameLocked}>{destination.name}</Text></Pressable>; })}</View>
         <View style={styles.buttons}>
           <ActionButton label="Open Region Map" onPress={() => openRegion(selectedId)} />
           {!current && unlocked && <ActionButton label="Travel" disabled={!travelAllowed} onPress={travel} />}
@@ -130,6 +160,10 @@ const styles = StyleSheet.create({
   content: { padding: 16, paddingBottom: 50 },
   title: { color: colors.text, fontSize: 30, fontWeight: "900", marginTop: 8 },
   subtitle: { color: colors.gold, marginTop: 3 },
+  overview: { flexDirection: "row", gap: 7, marginTop: 13 },
+  overviewStat: { alignItems: "center", backgroundColor: colors.panel, borderColor: colors.border, borderRadius: 8, borderWidth: 1, flex: 1, paddingHorizontal: 4, paddingVertical: 9 },
+  overviewValue: { color: colors.text, fontSize: 18, fontWeight: "900" },
+  overviewLabel: { color: colors.gold, fontSize: 7, fontWeight: "900", letterSpacing: .6, marginTop: 2, textAlign: "center" },
   mapShade: { backgroundColor: "rgba(4, 11, 17, 0.10)", bottom: 0, left: 0, position: "absolute", right: 0, top: 0 },
   node: { alignItems: "center", backgroundColor: "rgba(25, 34, 36, 0.92)", borderColor: "#9b9278", borderRadius: 4, borderWidth: 2, marginLeft: -50, marginTop: -34, minHeight: 67, padding: 5, position: "absolute", width: 100 },
   lockedNode: { backgroundColor: "rgba(25, 29, 31, 0.88)", borderColor: "#666b69", opacity: 0.82 },
@@ -142,9 +176,13 @@ const styles = StyleSheet.create({
   markerText: { color: colors.text, fontSize: 11, fontWeight: "900", lineHeight: 14 },
   nodeName: { color: colors.text, fontSize: 11, fontWeight: "900", marginTop: 3, textAlign: "center" },
   nodeState: { color: colors.gold, fontSize: 8, fontWeight: "900", letterSpacing: 0.7, marginTop: 2 },
+  nodeHint: { color: colors.green, fontSize: 6, fontWeight: "900", letterSpacing: .4, marginTop: 2 },
+  threatBadge: { backgroundColor: "rgba(113, 38, 34, .95)", borderRadius: 3, color: "#ffb0a8", fontSize: 6, fontWeight: "900", marginTop: 2, overflow: "hidden", paddingHorizontal: 3, paddingVertical: 1 },
   settlementRow: { alignItems: "center", flexDirection: "row", gap: 2, marginTop: 2 },
   settlement: { color: colors.muted, fontSize: 7 },
+  legendItem: { alignItems: "center", flexDirection: "row", gap: 3 },
   legendText: { color: colors.muted, fontSize: 8, fontWeight: "900", letterSpacing: 0.5 },
+  gestureHint: { color: colors.gold, fontSize: 9, fontWeight: "800", marginBottom: 12, marginTop: -7, textAlign: "center" },
   panelHeader: { flexDirection: "row", gap: 8, justifyContent: "space-between" },
   flex: { flex: 1 },
   regionName: { color: colors.text, fontSize: 23, fontWeight: "900" },
@@ -152,9 +190,16 @@ const styles = StyleSheet.create({
   state: { color: colors.text, fontWeight: "800" },
   description: { color: colors.muted, lineHeight: 20, marginVertical: 9 },
   detail: { color: colors.text, marginTop: 6 },
+  threat: { backgroundColor: "rgba(78, 30, 29, .72)", borderColor: colors.danger, borderRadius: 7, borderWidth: 1, color: "#ffc0b8", fontSize: 11, lineHeight: 16, marginTop: 9, padding: 8 },
   danger: { color: colors.danger, fontWeight: "800", marginTop: 8 },
   boss: { color: colors.gold, fontWeight: "700", marginTop: 8 },
   routeWarning: { color: colors.danger, fontSize: 12, lineHeight: 17, marginTop: 9 },
+  roadTitle: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: 1, marginTop: 13 },
+  roads: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 6 },
+  road: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, borderRadius: 7, borderWidth: 1, flexDirection: "row", gap: 5, paddingHorizontal: 8, paddingVertical: 6 },
+  roadLocked: { opacity: .56 },
+  roadName: { color: colors.text, fontSize: 10, fontWeight: "800" },
+  roadNameLocked: { color: colors.muted, fontSize: 10, fontWeight: "800" },
   buttons: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 13 },
   message: { color: colors.green, marginTop: 9 },
 });

@@ -1,0 +1,40 @@
+import type { QuestExplorationStageDefinition } from "../../game/quests/explorationTypes";
+
+export const FROSTMARCH_CRISIS_EXPLORATION: Record<string, QuestExplorationStageDefinition> = {
+  fallen_aurora_read_resonance: {
+    id: "fallen_aurora_read_resonance",
+    questId: "the_aurora_that_fell",
+    title: "Five Notes in the Snow",
+    description: "The fallen aurora repeats the Hollow Forge's five-note oath out of sequence. Reconstruct the northern Wardstone tone before the light notices the party.",
+    attribute: "intelligence",
+    difficultyClass: 14,
+    successText: "The false fifth note is isolated, revealing a safe rhythm through the living light.",
+    failureText: "The aurora answers the mistaken sequence and wakes the guardians ahead.",
+    successCombatEffect: { label: "True resonance found: enemies -1 initiative", enemyInitiativeModifier: -1 },
+    failureCombatEffect: { label: "Guardians awakened: enemies +1 initiative", enemyInitiativeModifier: 1 },
+  },
+  fallen_aurora_hold_hearthline: {
+    id: "fallen_aurora_hold_hearthline",
+    questId: "the_aurora_that_fell",
+    title: "Guest-Right in a Killing Wind",
+    description: "Stranded travelers from rival lodges will not leave their failing shelters together. Invoke Frostmarch guest-right and organize one protected column to Northwatch.",
+    attribute: "charisma",
+    difficultyClass: 15,
+    successText: "Old custom overcomes old grudges. The travelers raise linked shields around the party's advance.",
+    failureText: "The column splinters in the glasswind, forcing the heroes to shield every retreat separately.",
+    successCombatEffect: { label: "Hearth-line shields: heroes +1 Armor Class", heroArmorClassModifier: 1 },
+    failureCombatEffect: { label: "Scattered column: heroes -1 initiative", heroInitiativeModifier: -1 },
+  },
+  fallen_aurora_cross_glasswind: {
+    id: "fallen_aurora_cross_glasswind",
+    questId: "the_aurora_that_fell",
+    title: "The Glasswind Causeway",
+    description: "Aurora-frost has turned the final causeway into brittle glass. Endure the cutting wind long enough to relight all three signal pylons.",
+    attribute: "constitution",
+    difficultyClass: 16,
+    successText: "The party reaches the Signal Crown with breath and strength intact.",
+    failureText: "The glasswind drains the lead hero before the final pylon is reached.",
+    failureConditionId: "exhausted",
+    successCombatEffect: { label: "Pylons relit: heroes +1 movement", heroMovementRangeModifier: 1 },
+  },
+};

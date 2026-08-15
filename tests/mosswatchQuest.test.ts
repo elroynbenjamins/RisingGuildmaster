@@ -19,9 +19,10 @@ describe("Echoes of Mosswatch", () => {
 
   it("uses explicit Intelligence, Strength, and Wisdom D20 checks", () => {
     expect(Object.values(MOSSWATCH_EXPLORATION).map(({ attribute, difficultyClass }) => [attribute, difficultyClass])).toEqual([["intelligence", 12], ["strength", 13], ["wisdom", 14]]);
-    const success = resolveQuestExplorationStage(MOSSWATCH_EXPLORATION.mosswatch_cipher!, [testHero()], sequenceRandom([.50]));
+    const skilledHero = { ...testHero(), baseAttributes: { ...testHero().baseAttributes, intelligence: 14, strength: 14 } };
+    const success = resolveQuestExplorationStage(MOSSWATCH_EXPLORATION.mosswatch_cipher!, [skilledHero], sequenceRandom([.50]));
     expect(success.check).toMatchObject({ diceRoll: 11, modifier: 2, total: 13, success: true });
-    const failure = resolveQuestExplorationStage(MOSSWATCH_EXPLORATION.mosswatch_gate!, [testHero()], sequenceRandom([0]));
+    const failure = resolveQuestExplorationStage(MOSSWATCH_EXPLORATION.mosswatch_gate!, [skilledHero], sequenceRandom([0]));
     expect(failure).toMatchObject({ appliedConditionId: "injured", check: { diceRoll: 1, modifier: 2, total: 3, success: false } });
   });
 

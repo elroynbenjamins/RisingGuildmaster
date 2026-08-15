@@ -29,10 +29,12 @@ describe("new-game onboarding and progression gates", () => {
     expect(isQuestBoardCategoryUnlocked("contract", world)).toBe(false);
     expect(isQuestBoardCategoryUnlocked("boss", world)).toBe(false);
     const afterMerchant = { ...world, completedCampaignNodeIds: ["missing_merchant"] };
-    expect(isQuestBoardCategoryUnlocked("contract", afterMerchant)).toBe(true);
+    expect(isQuestBoardCategoryUnlocked("contract", afterMerchant)).toBe(false);
     expect(isQuestBoardCategoryUnlocked("side", afterMerchant)).toBe(true);
     expect(isQuestBoardCategoryUnlocked("boss", afterMerchant)).toBe(false);
-    expect(isQuestBoardCategoryUnlocked("boss", { ...afterMerchant, completedCampaignNodeIds: ["missing_merchant", "broken_wardstone"] })).toBe(true);
+    const afterChapterOne = { ...afterMerchant, completedCampaignNodeIds: ["missing_merchant", "broken_wardstone"] };
+    expect(isQuestBoardCategoryUnlocked("contract", afterChapterOne)).toBe(true);
+    expect(isQuestBoardCategoryUnlocked("boss", afterChapterOne)).toBe(true);
   });
 
   it("offers exactly three roguelite themes only after Chapter 1", () => {

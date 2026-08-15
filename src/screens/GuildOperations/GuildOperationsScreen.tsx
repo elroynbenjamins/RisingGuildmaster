@@ -1,0 +1,64 @@
+import React, { useMemo, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { NpcPortrait } from "../../components/characters/NpcPortrait";
+import { ActionButton, BackButton, EmptyState, Panel, Portrait, SecondaryButton, SectionTitle, colors } from "../../components/ui";
+import { GUILD_OPERATIONS } from "../../data/operations/guildOperations";
+import { REGIONS } from "../../data/world/regions";
+import { GUILD_OPERATION_STAMINA_COST, getAvailableGuildOperations, getEligibleOperationHeroIds, isGuildOperationsUnlocked, resolveGuildOperation } from "../../game/operations/guildOperationService";
+import type { GuildOperationResult } from "../../game/operations/guildOperationTypes";
+import { useGuild } from "../../state/GuildContext";
+import { getRaceNameColor } from "../../ui/raceColors";
+import { createSeededRandom, randomSeed } from "../../utils/random";
+
+type Team = "vanguard" | "support";
+const rankName = (rank: GuildOperationResult["rank"]): string => rank === "decisive_victory" ? "Decisive Victory" : rank === "hard_won_victory" ? "Hard-Won Victory" : "Operational Setback";
+
+export function GuildOperationsScreen({ onBack }: { onBack(): void }) {
+  const { guild, updateGuild } = useGuild();
+  const operations = getAvailableGuildOperations(guild);
+  const [operationId, setOperationId] = useState(operations[0]?.id);
+  const [assignments, setAssignments] = useState<Record<string, Team | undefined>>({});
+  const [result, setResult] = useState<GuildOperationResult>();
+  const [error, setError] = useState<string>();
+  const operation = operationId ? GUILD_OPERATIONS[operationId] : undefined;
+  const eligibleIds = useMemo(() => new Set(getEligibleOperationHeroIds(guild)), [guild.heroes]);
+  const vanguardIds = Object.keys(assignments).filter((id) => assignments[id] === "vanguard");
+  const supportIds = Object.keys(assignments).filter((id) => assignments[id] === "support");
+  const unlocked = isGuildOperationsUnlocked(guild);
+  const coolingDown = guild.currentDay < guild.guildOperations.nextAvailableDay;
+
+  const assign = (heroId: string, team: Team | undefined) => {
+    setError(undefined);
+    if (team && !eligibleIds.has(heroId)) { setError(`This hero needs ${GUILD_OPERATION_STAMINA_COST} readiness stamina and must be available.`); return; }
+    const count = Object.values(assignments).filter((value) => value === team).length;
+    if (team && assignments[heroId] !== team && count >= 3) { setError(`${team === "vanguard" ? "Vanguard" : "Support"} already has three heroes.`); return; }
+    setAssignments((current) => ({ ...current, [heroId]: team }));
+  };
+  const chooseOperation = (id: string) => { setOperationId(id); setAssignments({}); setError(undefined); };
+  const deploy = () => {
+    if (!operation) return;
+    try {
+      const resolved = resolveGuildOperation(guild, operation.id, vanguardIds, supportIds, createSeededRandom(randomSeed()));
+      updateGuild(resolved.guild); setResult(resolved.result); setError(undefined);
+    } catch (caught) { setError(caught instanceof Error ? caught.message : "The operation could not begin"); }
+  };
+
+  if (result && operation) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack}/><Text style={styles.eyebrow}>CRISIS OPERATION COMPLETE</Text><Text style={styles.title}>{operation.name}</Text><Panel style={[styles.result, result.rank === "setback" && styles.setback]}><Text style={result.rank === "setback" ? styles.danger : styles.success}>{rankName(result.rank).toUpperCase()}</Text><Text style={styles.score}>{result.successes} / {result.totalChecks} objectives achieved</Text><View style={styles.rewardRow}><Text style={styles.reward}>{result.goldReward} gold</Text><Text style={styles.reward}>{result.xpRewardPerHero} XP / hero</Text><Text style={styles.reward}>+{result.reputationReward} reputation</Text></View>{result.threatDelta !== 0 && <Text style={result.threatDelta < 0 ? styles.successNote : styles.dangerNote}>REGIONAL THREAT {result.threatDelta > 0 ? "+" : ""}{result.threatDelta}</Text>}</Panel>
+    <Panel style={styles.dialogue}><NpcPortrait portraitId={operation.patron.portraitId} size={72}/><View style={styles.dialogueCopy}><Text style={styles.speaker}>{operation.patron.speaker}</Text><Text style={styles.quote}>“{result.dialogue}”</Text></View></Panel>
+    <SectionTitle>OPERATION LEDGER</SectionTitle>{operation.phases.map((phase) => <Panel key={phase.id} style={styles.phase}><Text style={styles.phaseTitle}>{phase.title}</Text>{result.checks.filter((check) => check.phaseId === phase.id).map((check) => { const hero = guild.heroes.find((item) => item.id === check.result.heroId); return <View key={check.team} style={styles.check}><Text style={styles.team}>{check.team.toUpperCase()} · {check.title}</Text><Text style={check.result.success ? styles.pass : styles.fail}>{hero?.name ?? "Hero"}: D20 {check.result.diceRoll} {check.result.modifier >= 0 ? "+" : ""}{check.result.modifier} = {check.result.total} vs DC {check.result.difficultyClass} · {check.result.success ? "SUCCESS" : "FAILURE"}</Text></View>; })}</Panel>)}
+    <Text style={styles.cooldown}>The command staff requires three recovery days. Next operation: Day {guild.guildOperations.nextAvailableDay}.</Text><ActionButton label="Return to Command Center" onPress={onBack}/>
+  </ScrollView>;
+
+  return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack}/><Text style={styles.eyebrow}>SIX-HERO STRATEGIC MODE</Text><Text style={styles.title}>Crisis Operations</Text><Text style={styles.intro}>Split six heroes into two teams. Each operation resolves three parallel phases with six D20 checks, consumes one day, and pressures a wider roster than normal quests.</Text>
+    {!unlocked ? <EmptyState title="Crisis Operations locked" message="Defeat the Chapter 1 campaign boss and repair the Broken Wardstone to establish a command staff."/> : coolingDown ? <EmptyState title="Command staff recovering" message={`The next Crisis Operation becomes available on Day ${guild.guildOperations.nextAvailableDay}. Advance the guild calendar or pursue normal quests.`}/> : !operations.length ? <EmptyState title="No active operations" message="Progress the campaign and unlock more regions to reveal multi-squad emergencies."/> : <>
+      <SectionTitle>CHOOSE OPERATION</SectionTitle>{operations.map((entry) => <Pressable key={entry.id} onPress={() => chooseOperation(entry.id)}><Panel style={[styles.operation, operationId === entry.id && styles.selected]}><View style={styles.operationTop}><View style={styles.flex}><Text style={styles.operationName}>{entry.name}</Text><Text style={styles.region}>{REGIONS[entry.regionId]?.name ?? entry.regionId} · 6 heroes · 1 day</Text></View><Text style={styles.marker}>{operationId === entry.id ? "◆" : "◇"}</Text></View><Text style={styles.description}>{entry.description}</Text><Text style={styles.rewardPreview}>Base reward: {entry.baseGoldReward} gold · {entry.baseXpReward} XP/hero</Text></Panel></Pressable>)}
+      {operation && <><SectionTitle>COMMAND BRIEFING</SectionTitle><Panel style={styles.dialogue}><NpcPortrait portraitId={operation.patron.portraitId} size={72}/><View style={styles.dialogueCopy}><Text style={styles.speaker}>{operation.patron.speaker}</Text><Text style={styles.quote}>“{operation.patron.briefing}”</Text></View></Panel>
+        <View style={styles.teamSummary}><Panel style={styles.teamPanel}><Text style={styles.teamName}>VANGUARD</Text><Text style={styles.teamCount}>{vanguardIds.length} / 3</Text><Text style={styles.teamHint}>Force · mobility · endurance</Text></Panel><Panel style={styles.teamPanel}><Text style={styles.teamName}>SUPPORT</Text><Text style={styles.teamCount}>{supportIds.length} / 3</Text><Text style={styles.teamHint}>Knowledge · judgment · diplomacy</Text></Panel></View>
+        <SectionTitle>ASSIGN SIX HEROES · {GUILD_OPERATION_STAMINA_COST} STAMINA</SectionTitle>{guild.heroes.map((hero) => { const assigned = assignments[hero.id]; const eligible = eligibleIds.has(hero.id); return <Panel key={hero.id} style={[styles.hero, !eligible && styles.dim]}><Portrait hero={hero} size={58}/><View style={styles.flex}><Text style={[styles.heroName, { color: getRaceNameColor(hero.raceId) }]}>{hero.name}</Text><Text style={styles.heroMeta}>Level {hero.level} · {hero.adventureStamina} stamina{!hero.isAvailable ? " · UNAVAILABLE" : hero.currentHP <= 0 ? " · FALLEN" : ""}</Text></View><View style={styles.assignment}><SecondaryButton label={assigned === "vanguard" ? "✓ Vanguard" : "Vanguard"} disabled={!eligible} onPress={() => assign(hero.id, assigned === "vanguard" ? undefined : "vanguard")}/><SecondaryButton label={assigned === "support" ? "✓ Support" : "Support"} disabled={!eligible} onPress={() => assign(hero.id, assigned === "support" ? undefined : "support")}/></View></Panel>; })}
+        {guild.heroes.length < 6 && <Text style={styles.dangerNote}>Recruit at least six heroes to field both teams.</Text>}{error && <Text style={styles.dangerNote}>{error}</Text>}<ActionButton label={`Deploy ${operation.name}`} disabled={vanguardIds.length !== 3 || supportIds.length !== 3} onPress={deploy}/>
+      </>}
+    </>}
+  </ScrollView>;
+}
+
+const styles = StyleSheet.create({ content:{padding:18,paddingBottom:46},eyebrow:{color:colors.gold,fontSize:11,fontWeight:"900",letterSpacing:1.5,marginTop:12},title:{color:colors.text,fontSize:30,fontWeight:"900",marginTop:5},intro:{color:colors.muted,lineHeight:20,marginVertical:10},operation:{marginBottom:10},selected:{borderColor:colors.gold,backgroundColor:"#25271f"},operationTop:{flexDirection:"row",alignItems:"center"},operationName:{color:colors.text,fontSize:18,fontWeight:"900"},region:{color:colors.gold,fontSize:12,marginTop:3},marker:{color:colors.gold,fontSize:24},description:{color:colors.muted,lineHeight:19,marginTop:9},rewardPreview:{color:colors.green,fontSize:12,fontWeight:"800",marginTop:8},dialogue:{flexDirection:"row",gap:13,alignItems:"center",marginBottom:14,borderColor:"#806a3d"},dialogueCopy:{flex:1},speaker:{color:colors.gold,fontWeight:"900",marginBottom:6},quote:{color:colors.text,fontSize:15,lineHeight:21,fontStyle:"italic"},teamSummary:{flexDirection:"row",gap:10,marginBottom:8},teamPanel:{flex:1,padding:12},teamName:{color:colors.gold,fontWeight:"900",fontSize:12},teamCount:{color:colors.text,fontWeight:"900",fontSize:22,marginTop:3},teamHint:{color:colors.muted,fontSize:11,marginTop:3},hero:{flexDirection:"row",alignItems:"center",gap:10,marginBottom:9,padding:10},dim:{opacity:.48},flex:{flex:1},heroName:{fontWeight:"900",fontSize:16},heroMeta:{color:colors.muted,fontSize:11,marginTop:3},assignment:{gap:5,minWidth:102},result:{marginVertical:14,borderColor:colors.green},setback:{borderColor:colors.danger},success:{color:colors.green,fontWeight:"900",letterSpacing:1.1},danger:{color:colors.danger,fontWeight:"900",letterSpacing:1.1},score:{color:colors.text,fontSize:22,fontWeight:"900",marginTop:7},rewardRow:{flexDirection:"row",flexWrap:"wrap",gap:10,marginTop:10},reward:{color:colors.gold,fontWeight:"800"},phase:{marginBottom:9},phaseTitle:{color:colors.text,fontSize:17,fontWeight:"900",marginBottom:7},check:{borderTopColor:colors.border,borderTopWidth:1,paddingTop:7,marginTop:5},team:{color:colors.muted,fontSize:11,fontWeight:"900"},pass:{color:colors.green,fontSize:12,marginTop:3},fail:{color:colors.danger,fontSize:12,marginTop:3},successNote:{color:colors.green,fontWeight:"800",marginTop:10},dangerNote:{color:colors.danger,fontWeight:"800",marginVertical:10},cooldown:{color:colors.muted,textAlign:"center",marginVertical:14} });

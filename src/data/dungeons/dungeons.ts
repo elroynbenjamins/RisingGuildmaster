@@ -2,15 +2,17 @@ import type { DungeonDefinition, DungeonNodeDefinition, DungeonRunModifierDefini
 import type { AttributeKey } from "../../game/attributes/types";
 const enemyPct = (sourceId: string, target: "physicalDamage" | "damage", value: number) => ({ source: "quest" as const, sourceId, target, operation: "percentage" as const, value });
 export const DUNGEON_RUN_MODIFIERS: Record<string, DungeonRunModifierDefinition> = {
-  brutal_host: { id: "brutal_host", name: "Brutal Host", description: "Enemies deal 15% more physical damage; gold rewards increase by 30%.", enemyModifiers: [enemyPct("brutal_host", "physicalDamage", .15)], rewardGoldModifier: .30, rareLootModifier: 0, healingPowerModifier: 0 },
-  withered_grace: { id: "withered_grace", name: "Withered Grace", description: "Healing is 25% weaker; rare loot chance increases by 20%.", enemyModifiers: [], rewardGoldModifier: 0, rareLootModifier: .20, healingPowerModifier: -.25 },
+  brutal_host: { id: "brutal_host", name: "Brutal Host", description: "Enemies deal 15% more physical damage; gold rewards increase by 30%.", enemyModifiers: [enemyPct("brutal_host", "physicalDamage", .15)], rewardGoldModifier: .30, rareLootModifier: 0, healingPowerModifier: 0, scoreBonus: 100 },
+  withered_grace: { id: "withered_grace", name: "Withered Grace", description: "Healing is 25% weaker; rare loot chance increases by 20%.", enemyModifiers: [], rewardGoldModifier: 0, rareLootModifier: .20, healingPowerModifier: -.25, scoreBonus: 100 },
+  predators_clock: { id: "predators_clock", name: "Predator's Clock", description: "Enemies gain +2 initiative; gold rewards increase by 15%.", enemyModifiers: [], rewardGoldModifier: .15, rareLootModifier: 0, healingPowerModifier: 0, enemyInitiativeModifier: 2, scoreBonus: 100 },
+  iron_vow: { id: "iron_vow", name: "Iron Vow", description: "Enemies deal 20% more damage and healing is 10% weaker; gold increases by 20% and rare loot by 10%.", enemyModifiers: [enemyPct("iron_vow", "damage", .20)], rewardGoldModifier: .20, rareLootModifier: .10, healingPowerModifier: -.10, scoreBonus: 150 },
 };
 
 interface ThemeConfig { id: string; prefix: string; themeId: DungeonThemeId; name: string; description: string; themeRule: string; levels: [number, number]; accentColor: string; attribute: AttributeKey; dc: number; regular: string[]; elite: string[]; boss: string[]; titles: [string, string, string, string, string, string, string, string]; combatModifiers: DungeonDefinition["combatModifiers"] }
 function buildTheme(config: ThemeConfig): { dungeon: DungeonDefinition; nodes: Record<string, DungeonNodeDefinition> } {
   const id = (suffix: string) => `${config.prefix}_${suffix}`; const [start, combat, elite, treasure, rest, merchant, guard, boss] = config.titles;
   const nodes: Record<string, DungeonNodeDefinition> = {
-    [id("start")]: { id: id("start"), type: "event", title: start, description: `The party enters ${config.name} and tests the safest route forward.`, abilityCheck: { attribute: config.attribute, difficultyClass: config.dc }, successGoldReward: 45, nextNodeIds: [id("combat"), id("elite")] },
+    [id("start")]: { id: id("start"), type: "event", title: start, description: `The party enters ${config.name} and tests the safest route forward.`, abilityCheck: { attribute: config.attribute, difficultyClass: config.dc }, successGoldReward: 45, failureDamageMaxHpModifier: .10, nextNodeIds: [id("combat"), id("elite")] },
     [id("combat")]: { id: id("combat"), type: "combat", title: combat, description: "A changing enemy formation controls this route.", encounterPoolIds: config.regular, xpRewardPerHero: 90, goldReward: 35, nextNodeIds: [id("treasure")] },
     [id("elite")]: { id: id("elite"), type: "elite", title: elite, description: "An elite force guards a more dangerous but rewarding path.", encounterPoolIds: config.elite, xpRewardPerHero: 145, goldReward: 80, nextNodeIds: [id("treasure")] },
     [id("treasure")]: { id: id("treasure"), type: "treasure", title: treasure, description: "A sealed cache may fund the rest of the expedition.", goldReward: 120, nextNodeIds: [id("rest"), id("merchant")] },

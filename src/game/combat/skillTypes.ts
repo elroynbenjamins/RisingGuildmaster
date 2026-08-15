@@ -1,4 +1,5 @@
 import type { EnemyFactionId } from "../enemies/enemyTypes";
+import type { D20RollMode } from "./dice/d20RollMode";
 
 export type CombatSkillType = "basic_attack" | "active" | "passive" | "aura";
 export type DamageType = "physical" | "magic" | "true";
@@ -19,6 +20,7 @@ export interface CombatSkillDefinition {
   damageMultiplier?: number;
   accuracyModifier?: number;
   attackRollModifier?: number;
+  attackRollMode?: D20RollMode;
   criticalChanceModifier?: number;
   targetType?: SkillTargetType;
   cooldownTurns?: number;

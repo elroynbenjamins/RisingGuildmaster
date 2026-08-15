@@ -4,4 +4,6 @@ export interface TacticalBehavior {
   preferredRange: number;
   retreatRange?: number;
   targetPriority: TargetPriority;
+  /** Higher values make this enemy less willing to leave a hero's melee reach. */
+  reactionRiskWeight?: number;
 }

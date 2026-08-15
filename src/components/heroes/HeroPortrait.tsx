@@ -1,6 +1,6 @@
 import React from "react";
 import { Image, StyleSheet, View } from "react-native";
-import { getHeroPortraitCrop, type HeroGender } from "../../data/heroes/heroPortraits";
+import { getHeroPortraitCrop, HERO_BASE_PORTRAIT_LAYOUT, HERO_VARIANT_PORTRAIT_LAYOUTS, type HeroGender } from "../../data/heroes/heroPortraits";
 import type { ClassId, RaceId } from "../../game/heroes/types";
 
 const ATLASES: Record<ClassId, number> = {
@@ -26,9 +26,12 @@ export function HeroPortrait({ raceId, classId, gender, variant = 0, label, size
   const variantAtlas = VARIANT_ATLASES[classId];
   const useVariant = variant > 0 && variantAtlas !== undefined;
   const row = useVariant ? (variant - 1) * 2 + (gender === "female" ? 0 : 1) : crop.row;
-  const rows = useVariant ? 4 : 3;
-  return <View accessibilityLabel={`${label} pixel portrait`} style={[styles.frame, { width: size, height: size, borderRadius: Math.max(6, size * .12) }]}>
-    <Image source={useVariant ? variantAtlas : ATLASES[crop.atlasId]} resizeMode="stretch" style={{ position: "absolute", width: size * 4, height: size * rows, left: -crop.column * size, top: -row * size }} />
+  const layout = useVariant ? HERO_VARIANT_PORTRAIT_LAYOUTS[classId] : HERO_BASE_PORTRAIT_LAYOUT;
+  const cellHeight = size * layout.cellHeightRatio;
+  return <View accessibilityLabel={`${label} pixel portrait`} style={[styles.frame, { width: size, height: size, borderRadius: Math.max(6, size * .12) }]}> 
+    <View style={{ position: "absolute", width: size, height: cellHeight, top: (size - cellHeight) / 2, overflow: "hidden" }}>
+      <Image fadeDuration={0} source={useVariant ? variantAtlas : ATLASES[crop.atlasId]} resizeMode="stretch" style={{ position: "absolute", width: size * layout.columns, height: cellHeight * layout.rows, left: -crop.column * size, top: -row * cellHeight }} />
+    </View>
   </View>;
 }
 

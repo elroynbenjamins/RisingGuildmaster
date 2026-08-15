@@ -18,11 +18,12 @@ describe("The Queen Beneath the Roots", () => {
   });
 
   it("resolves search checks with the best hero and applies an explicit failure consequence", () => {
-    const tracker = { ...testHero(), baseAttributes: { ...testHero().baseAttributes, wisdom: 11 } };
+    const tracker = { ...testHero(), baseAttributes: { ...testHero().baseAttributes, wisdom: 16 } };
     const success = resolveQuestExplorationStage(SPIDER_QUEEN_EXPLORATION.queen_tracks!, [tracker], sequenceRandom([.45]));
     expect(success.check).toMatchObject({ diceRoll: 10, modifier: 3, total: 13, success: true });
 
-    const failure = resolveQuestExplorationStage(SPIDER_QUEEN_EXPLORATION.queen_ravine!, [testHero()], sequenceRandom([0]));
+    const acrobat = { ...testHero(), baseAttributes: { ...testHero().baseAttributes, dexterity: 14 } };
+    const failure = resolveQuestExplorationStage(SPIDER_QUEEN_EXPLORATION.queen_ravine!, [acrobat], sequenceRandom([0]));
     expect(failure).toMatchObject({ appliedConditionId: "injured", check: { diceRoll: 1, modifier: 2, total: 3, success: false } });
   });
 

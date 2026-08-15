@@ -1,6 +1,7 @@
 import { CAMPAIGN_CHAPTERS } from "../../data/campaign/chapter1";
 import type { GameIconId } from "../../data/ui/gameIcons";
 import { getAvailableCampaignNodes } from "../campaign/campaignService";
+import { isQuestBoardCategoryUnlocked } from "../quests/questAvailability";
 import type { GuildState } from "./types";
 
 export type GuildPriorityDestination = "recruitment" | "training" | "temple" | "campaign" | "world" | "management";
@@ -18,9 +19,17 @@ export function getGuildPriority(guild: GuildState): GuildPriority {
   if (nodes.length) {
     const party = [...available].sort((a, b) => b.level - a.level).slice(0, 4); const average = party.reduce((sum, hero) => sum + hero.level, 0) / Math.max(1, party.length);
     const recommendedLevelMin = chapter?.recommendedLevelMin ?? 1;
-    if (average < recommendedLevelMin) return { id: "prepare_campaign", title: "Prepare for the Next Chapter", description: `Your strongest available party averages Level ${average.toFixed(1)}. Train or complete contracts before the recommended Level ${recommendedLevelMin}.`, actionLabel: "Open Training", destination: "training", iconId: "training", tone: "progress" };
+    if (average < recommendedLevelMin) {
+      const preparation = isQuestBoardCategoryUnlocked("contract", guild.world)
+        ? "Train or complete contracts"
+        : "Train, recruit, or complete available side stories";
+      return { id: "prepare_campaign", title: "Prepare for the Next Chapter", description: `Your strongest available party averages Level ${average.toFixed(1)}. ${preparation} before the recommended Level ${recommendedLevelMin}.`, actionLabel: "Open Training", destination: "training", iconId: "training", tone: "progress" };
+    }
     return { id: `campaign_${nodes[0]!.id}`, title: nodes[0]!.title, description: nodes[0]!.description ?? `Continue Chapter ${guild.world.campaignChapter} of the Wardstone campaign.`, actionLabel: nodes[0]!.questId ? "Prepare Campaign Quest" : "Continue Story", destination: "campaign", iconId: nodes[0]!.type === "boss" ? "boss" : "quests", tone: "progress" };
   }
   if (guild.trainingGround.sessions.length) return { id: "advance_day", title: "Training in Progress", description: "Advance the guild calendar when your contracts and preparations for the day are complete.", actionLabel: "Open Management", destination: "management", iconId: "calendar", tone: "opportunity" };
-  return { id: "seek_contracts", title: "Strengthen the Guild", description: "Take regional contracts, gather materials, and improve equipment before the next campaign push.", actionLabel: "Explore Eldoria", destination: "world", iconId: "world", tone: "opportunity" };
+  const contractsUnlocked = isQuestBoardCategoryUnlocked("contract", guild.world);
+  return contractsUnlocked
+    ? { id: "seek_contracts", title: "Strengthen the Guild", description: "Take regional contracts, gather materials, and improve equipment before the next campaign push.", actionLabel: "Explore Eldoria", destination: "world", iconId: "world", tone: "opportunity" }
+    : { id: "continue_campaign", title: "Earn Guildhaven's Trust", description: "Continue Chapter 1 to establish the guild. Repeatable regional contracts will unlock after the Broken Wardstone finale.", actionLabel: "Continue Campaign", destination: "campaign", iconId: "quests", tone: "progress" };
 }

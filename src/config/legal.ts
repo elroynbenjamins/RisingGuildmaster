@@ -1,2 +1,1 @@
-export const PRIVACY_POLICY_URL = "https://elroynbenjamins.github.io/RisingGuildmaster/privacy-policy.html";
-
+export const PRIVACY_POLICY_URL = "https://rising-guildmaster-privacy.expo.app/privacy-policy.html";

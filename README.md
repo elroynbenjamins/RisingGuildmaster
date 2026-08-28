@@ -11,6 +11,14 @@ npm start
 
 Use `npm run android`, `npm run ios`, or scan the Expo QR code. Run the domain tests with `npm test` and the strict compiler check with `npm run typecheck`.
 
+## Privacy
+
+Guildmaster's public privacy policy is available at:
+
+https://rising-guildmaster-privacy.expo.app/privacy-policy.html
+
+The policy covers local save data, Google Mobile Ads (AdMob), advertising privacy choices, retention, deletion, security, and contact information. The Android app also links to this page from **Settings → Privacy & Ads**.
+
 ## Current milestone
 
 - Seeded, data-driven hero generation

@@ -14,7 +14,7 @@ export type MaterialInventory = Record<MaterialId, number>;
 
 export interface MaterialDefinition { id: MaterialId; name: string; rarity: "common" | "uncommon" | "rare"; description: string; sourceTags: string[] }
 export interface ArtisanDefinition { id: ArtisanType; name: string; fantasyRole: string; description: string; supportedSlots: EquipmentSlot[] }
-export type RecipeUnlockSource = "roguelite_elite" | "roguelite_boss" | "side_quest";
+export type RecipeUnlockSource = "roguelite_elite" | "roguelite_boss" | "side_quest" | "traveling_merchant";
 export interface CraftingRecipeDefinition { id: string; artisanType: ArtisanType; artisanLevel: number; outputEquipmentId: string; goldCost: number; materials: Partial<Record<MaterialId, number>>; description: string; unlockSource?: RecipeUnlockSource }
 export interface EnchantmentDefinition { id: string; name: string; artisanLevel: number; applicableSlots: EquipmentSlot[]; goldCost: number; materials: Partial<Record<MaterialId, number>>; modifiers: Modifier[]; specialEffectIds?: string[]; description: string }
 export interface ArtisanConstructionProject { targetLevel: number; startDay: number; completionDay: number; goldCost: number }

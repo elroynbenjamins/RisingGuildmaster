@@ -1,0 +1,27 @@
+# Dependencies and local Expo state
+node_modules/
+.expo/
+
+# Codex/local caches and attachments are never part of the app
+.codex*/
+.pnpm-store/
+
+# Tests, reports, documentation, and local build output
+tests/
+docs/
+coverage/
+dist/
+build/
+*.log
+*.aab
+*.apk
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Git metadata is not required by the remote Android compiler
+.git/
+

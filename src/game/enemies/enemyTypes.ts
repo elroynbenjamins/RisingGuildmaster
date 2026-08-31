@@ -9,12 +9,14 @@ export type EnemyRole =
   | "heavy_attacker"
   | "mini_boss";
 
-export type EnemyFactionId = "goblins" | "undead" | "beasts" | "bandits" | "orcs" | "constructs";
+export type EnemyFactionId = "goblins" | "undead" | "beasts" | "bandits" | "orcs" | "constructs" | "crownless";
 import type { GridPosition } from "../combat/grid/gridTypes";
 
 export interface EnemyDefinition {
   id: string;
   name: string;
+  /** Allows a titled variant to intentionally reuse its base creature portrait. */
+  portraitSourceId?: string;
   factionId: EnemyFactionId;
   role: EnemyRole;
   hpModifier: number;

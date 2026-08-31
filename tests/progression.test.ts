@@ -6,7 +6,7 @@ import { potentialMultiplier } from "../src/game/progression/potential";
 import { xpRequiredForNextLevel } from "../src/game/progression/xpSystem";
 import { testHero } from "./testHero";
 describe("XP and fractional growth", () => {
-  it("calculates level requirements", () => { expect(xpRequiredForNextLevel(1)).toBe(1000); expect(xpRequiredForNextLevel(2)).toBe(2829); });
+  it("calculates level requirements", () => { expect(xpRequiredForNextLevel(1)).toBe(1000); expect(xpRequiredForNextLevel(2)).toBe(2298); });
   it("levels up and subtracts the requirement", () => expect(grantHeroXp(testHero(), 1020)).toMatchObject({ level: 2, xp: 20 }));
-  it("uses potential multiplier and preserves fractional growth", () => { expect(potentialMultiplier(90)).toBe(1.4); const hero = { ...testHero(), potential: 90 }; const grown = applyLevelAttributeGrowth(hero); const integerGains = ATTRIBUTE_KEYS.reduce((sum, key) => sum + grown.baseAttributes[key] - hero.baseAttributes[key], 0); const fractional = ATTRIBUTE_KEYS.reduce((sum, key) => sum + grown.attributeGrowthProgress[key], 0); expect(integerGains + fractional).toBeCloseTo(4.2); expect(fractional).toBeGreaterThan(0); });
+  it("uses potential only for XP and preserves potential-neutral growth", () => { expect(potentialMultiplier(90)).toBe(1.4); const hero = { ...testHero(), potential: 90 }; const grown = applyLevelAttributeGrowth(hero); const integerGains = ATTRIBUTE_KEYS.reduce((sum, key) => sum + grown.baseAttributes[key] - hero.baseAttributes[key], 0); const fractional = ATTRIBUTE_KEYS.reduce((sum, key) => sum + grown.attributeGrowthProgress[key], 0); expect(integerGains + fractional).toBeCloseTo(3); expect(fractional).toBeGreaterThan(0); });
 });

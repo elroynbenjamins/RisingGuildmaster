@@ -12,11 +12,13 @@ import { resolveTrainingGroundDay } from "../training/trainingService";
 import { recoverAdventureStamina } from "../heroes/adventureStaminaService";
 import { GAME_CONFIG } from "../../config/gameConfig";
 import { getDifficulty } from "../../data/difficulty/difficulties";
+import { hasGuildmasterSkill } from "../guildmaster/guildmasterProgression";
+import { createGuildLegacyState, displayedTrophyBonus, getGuildRank } from "../renown/guildLegacyService";
 
 const dueOnDay = (startDay: number, endDay: number, day: number): boolean => day > startDay && day <= endDay && (day - startDay) % 7 === 0;
 export const totalSalaryArrears = (guild: GuildState): number => Object.values(guild.finance.salaryArrearsByHeroId).reduce((sum, value) => sum + value, 0);
 export const payrollDueOnDay = (guild: GuildState, day: number): number => guild.heroContracts.filter((contract) => dueOnDay(contract.startDay, contract.endDay, day)).reduce((sum, contract) => sum + contract.weeklySalary, 0);
-export const dailyTavernIncome = (guild: GuildState): number => Math.round(GAME_CONFIG.dailyTavernIncome * Math.max(1, guild.finance.tavernLevel) * getDifficulty(guild.difficultyId).tavernIncomeMultiplier);
+export const dailyTavernIncome = (guild: GuildState): number => Math.round(GAME_CONFIG.dailyTavernIncome * Math.max(1, guild.finance.tavernLevel) * getDifficulty(guild.difficultyId).tavernIncomeMultiplier * (hasGuildmasterSkill(guild.guildmaster, "tavern_stewardship") ? 1.2 : 1) * (1 + getGuildRank(guild.reputation).benefits.tavernIncomeModifier + displayedTrophyBonus(guild.legacy ?? createGuildLegacyState(), "tavern_income")));
 
 function processPayroll(guild: GuildState, day: number): { guild: GuildState; due: number; paid: number; arrearsAdded: number; events: GuildDayEvent[] } {
   const dueContracts = guild.heroContracts.filter((contract) => dueOnDay(contract.startDay, contract.endDay, day));
@@ -57,7 +59,7 @@ function resolveSingleDay(guild: GuildState): { guild: GuildState; resolution: G
   updated = completeArtisanConstructions(updated);
   const training = resolveTrainingGroundDay(updated); updated = training.guild;
   training.completedHeroNames.forEach((name) => events.push({ type: "training_complete", text: `${name} completed training and is available again.` }));
-  if (training.upgraded) events.push({ type: "training_upgrade_complete", text: `Training Grounds Level ${updated.trainingGround.level} construction completed.` });
+  if (training.upgraded) events.push({ type: "training_upgrade_complete", text: `Training Hall Level ${updated.trainingGround.level} construction completed.` });
   updated = purgeExpiredCandidates(updated);
   const payroll = processPayroll(updated, day); updated = payroll.guild; events.push(...payroll.events);
 

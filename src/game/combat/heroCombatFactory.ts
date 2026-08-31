@@ -10,11 +10,16 @@ import { calculateMaxMana, calculateMaxStamina } from "./resourceService";
 import type { SkillModifier } from "./skillTypes";
 import { calculateArmorClass, calculateD20AbilityModifier, calculateMagicAttackBonus, calculateMagicDefenseScore, calculatePhysicalAttackBonus } from "./tacticalStats";
 import { calculateMovementRange } from "./grid/movementService";
-import { getTraitPercentage } from "../traits/traitService";
+import { getTraitFlat, getTraitPercentage } from "../traits/traitService";
 import { getBackgroundModifier } from "../../data/backgrounds/backgrounds";
 import { getEquipmentSpecialModifierValue, getHeroIgnoredTerrainMovementCosts } from "../equipment/equipmentSpecialEffectService";
 import { getPersistentConditionModifierValue } from "../conditions/conditionService";
 import { CONDITIONS } from "../../data/conditions/conditions";
+import { resolveEquipmentDefinition } from "../equipment/equipmentResolver";
+
+function equipmentModifier(hero: Hero, target: string, operation: "flat" | "percentage"): number {
+  return Object.values(hero.equipment).reduce((sum, key) => sum + (key ? resolveEquipmentDefinition(key)?.modifiers.filter((modifier) => modifier.target === target && modifier.operation === operation).reduce((value, modifier) => value + modifier.value, 0) ?? 0 : 0), 0);
+}
 
 function persistentConditionCombatModifiers(hero: Hero): SkillModifier[] {
   const modifiers: SkillModifier[] = [];
@@ -43,14 +48,14 @@ export function createHeroCombatInstance(hero: Hero): HeroCombatInstance {
 export function createHeroCombatUnit(hero: Hero, instance: HeroCombatInstance): CombatUnit {
   const calculated = calculateHero(hero); const classDefinition = CLASSES[hero.classId]; const race = RACES[hero.raceId]; const hpRatio = instance.maxHP ? instance.currentHP / instance.maxHP : 0; const equipmentContext = { currentHP: instance.currentHP, maxHP: instance.maxHP };
   return { combatantId: hero.id, side: "heroes", currentHP: instance.currentHP, maxHP: instance.maxHP, stats: {
-    physicalDamage: calculated.stats.physicalAttack * (1 + classDefinition.tactical.physicalDamageModifier + getSubclassModifierValue(hero, "physicalDamage", "percentage", hpRatio) + getTraitPercentage(hero, "physicalDamage", { currentHP: instance.currentHP, maxHP: instance.maxHP }) + getBackgroundModifier(hero.backgroundId, "physicalDamage") + getEquipmentSpecialModifierValue(hero, "physicalDamage", "percentage", equipmentContext)), physicalDefense: calculated.stats.physicalDefense,
-    magicDamage: calculated.stats.magicPower * (1 + classDefinition.tactical.magicDamageModifier + getSubclassModifierValue(hero, "magicPower", "percentage", hpRatio) + getEquipmentSpecialModifierValue(hero, "magicDamage", "percentage", equipmentContext)), magicDefense: calculated.stats.magicDefense,
-    speed: calculated.stats.speed, initiativeBonus: calculateD20AbilityModifier(calculated.attributes.dexterity) + getEquipmentSpecialModifierValue(hero, "initiative", "flat", equipmentContext), evasion: 0, criticalChance: calculated.stats.criticalChance, accuracy: 0,
-    healingPower: classDefinition.tactical.healingPowerModifier + getSubclassModifierValue(hero, "healingPower", "percentage") + getEquipmentSpecialModifierValue(hero, "healingPower", "percentage", equipmentContext),
+    physicalDamage: calculated.stats.physicalAttack * (1 + classDefinition.tactical.physicalDamageModifier + getSubclassModifierValue(hero, "physicalDamage", "percentage", hpRatio) + getTraitPercentage(hero, "physicalDamage", { currentHP: instance.currentHP, maxHP: instance.maxHP }) + getBackgroundModifier(hero.backgroundId, "physicalDamage") + equipmentModifier(hero, "physicalDamage", "percentage") + getEquipmentSpecialModifierValue(hero, "physicalDamage", "percentage", equipmentContext)), physicalDefense: calculated.stats.physicalDefense,
+    magicDamage: calculated.stats.magicPower * (1 + classDefinition.tactical.magicDamageModifier + getSubclassModifierValue(hero, "magicPower", "percentage", hpRatio) + getTraitPercentage(hero, "magicDamage", equipmentContext) + getEquipmentSpecialModifierValue(hero, "magicDamage", "percentage", equipmentContext)), magicDefense: calculated.stats.magicDefense,
+    speed: calculated.stats.speed, initiativeBonus: calculateD20AbilityModifier(calculated.attributes.dexterity) + getTraitFlat(hero, "initiative", equipmentContext) + getEquipmentSpecialModifierValue(hero, "initiative", "flat", equipmentContext), evasion: 0, criticalChance: calculated.stats.criticalChance, accuracy: 0,
+    healingPower: classDefinition.tactical.healingPowerModifier + getSubclassModifierValue(hero, "healingPower", "percentage") + getTraitPercentage(hero, "healingPower", equipmentContext) + getEquipmentSpecialModifierValue(hero, "healingPower", "percentage", equipmentContext),
     physicalAttackBonus: calculatePhysicalAttackBonus(calculated.attributes, hero.level), magicAttackBonus: calculateMagicAttackBonus(calculated.attributes, hero.level),
-    armorClass: calculateArmorClass(calculated.attributes, 0, classDefinition.tactical.armorClassModifier + race.tactical.armorClassModifier + getSubclassModifierValue(hero, "armorClass", "flat") + getEquipmentSpecialModifierValue(hero, "armorClass", "flat", equipmentContext)),
-    magicDefenseScore: calculateMagicDefenseScore(calculated.attributes, 0, classDefinition.tactical.magicDefenseScoreModifier + getSubclassModifierValue(hero, "magicDefenseScore", "flat") + getEquipmentSpecialModifierValue(hero, "magicDefenseScore", "flat", equipmentContext)),
-    attackRollModifier: race.tactical.attackRollModifier, rangedAttackRollModifier: race.tactical.rangedAttackRollModifier + getSubclassModifierValue(hero, "rangedAttackRoll", "flat"),
+    armorClass: calculateArmorClass(calculated.attributes, 0, classDefinition.tactical.armorClassModifier + race.tactical.armorClassModifier + getSubclassModifierValue(hero, "armorClass", "flat") + getTraitFlat(hero, "armorClass", equipmentContext) + getEquipmentSpecialModifierValue(hero, "armorClass", "flat", equipmentContext)),
+    magicDefenseScore: calculateMagicDefenseScore(calculated.attributes, 0, classDefinition.tactical.magicDefenseScoreModifier + getSubclassModifierValue(hero, "magicDefenseScore", "flat") + getTraitFlat(hero, "magicDefenseScore", equipmentContext) + getEquipmentSpecialModifierValue(hero, "magicDefenseScore", "flat", equipmentContext)),
+    attackRollModifier: race.tactical.attackRollModifier + equipmentModifier(hero, "attackRoll", "flat"), rangedAttackRollModifier: race.tactical.rangedAttackRollModifier + getSubclassModifierValue(hero, "rangedAttackRoll", "flat"),
   }, activeConditions: instance.activeConditions, activeModifiers: [...getHeroPermanentPassiveModifiers(hero).map((modifier) => ({ ...modifier, sourceSkillId: "class_or_subclass_passive" })), ...persistentConditionCombatModifiers(hero).map((modifier) => ({ ...modifier, sourceSkillId: "persistent_condition" }))], isAlive: instance.isAlive, position: instance.position, movementRange: instance.movementRange, ignoredTerrainMovementCosts: instance.ignoredTerrainMovementCosts ?? getHeroIgnoredTerrainMovementCosts(hero) };
 }
 export function getHeroPermanentPassiveModifiers(hero: Hero): SkillModifier[] { return getHeroSkillIds(hero).flatMap((id) => HERO_SKILLS[id]?.type === "passive" ? HERO_SKILLS[id]?.selfModifiers ?? [] : []); }

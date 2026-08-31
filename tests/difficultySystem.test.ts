@@ -7,6 +7,7 @@ import { freeRefreshRecruitment, initializeRecruitment, manualRefreshRecruitment
 import { selectTacticalTarget } from "../src/game/combat/tacticalAiService";
 import { combatUnit, sequenceRandom } from "./combatTestUtils";
 import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
+import { GAME_CONFIG } from "../src/config/gameConfig";
 
 describe("game difficulty", () => {
   it("keeps Standard at intended balance and progressively scales enemies", () => {
@@ -33,9 +34,9 @@ describe("game difficulty", () => {
     const standard = advanceGuildTime(createGuild("Standard", "standard")).days[0]!;
     const veteran = advanceGuildTime(createGuild("Veteran", "veteran")).days[0]!;
     const iron = advanceGuildTime(createGuild("Iron", "iron_guild")).days[0]!;
-    expect(standard.events.find((event) => event.type === "tavern_income")?.amount).toBe(50);
-    expect(veteran.events.find((event) => event.type === "tavern_income")?.amount).toBe(43);
-    expect(iron.events.find((event) => event.type === "tavern_income")?.amount).toBe(35);
+    expect(standard.events.find((event) => event.type === "tavern_income")?.amount).toBe(Math.round(GAME_CONFIG.dailyTavernIncome * DIFFICULTIES.standard.tavernIncomeMultiplier));
+    expect(veteran.events.find((event) => event.type === "tavern_income")?.amount).toBe(Math.round(GAME_CONFIG.dailyTavernIncome * DIFFICULTIES.veteran.tavernIncomeMultiplier));
+    expect(iron.events.find((event) => event.type === "tavern_income")?.amount).toBe(Math.round(GAME_CONFIG.dailyTavernIncome * DIFFICULTIES.iron_guild.tavernIncomeMultiplier));
   });
 
   it("blocks paid Iron Guild refreshes but permits scheduled free refreshes", () => {

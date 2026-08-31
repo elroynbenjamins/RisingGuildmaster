@@ -11,6 +11,7 @@ import { useGuild } from "../../state/GuildContext";
 import { mapChromeStyles } from "../../ui/worldMap";
 import { GameIcon } from "../../components/icons/GameIcon";
 import type { GameIconId } from "../../data/ui/gameIcons";
+import { visitSettlement } from "../../game/world/travelService";
 
 const LOCATION_MARKERS: Record<RegionLocationType, GameIconId> = {
   city: "settlement",
@@ -24,11 +25,12 @@ const LOCATION_MARKERS: Record<RegionLocationType, GameIconId> = {
 };
 
 export function RegionMapScreen({ regionId, onBack, openQuest }: { regionId: string; onBack(): void; openQuest(questId: string): void }) {
-  const { guild } = useGuild();
+  const { guild, updateGuild } = useGuild();
   const region = REGIONS[regionId];
   const locations = useMemo(() => getRegionLocations(regionId), [regionId]);
   const [selectedId, setSelectedId] = useState(locations[0]?.id ?? "");
   const [showChronicle, setShowChronicle] = useState(false);
+  const [travelMessage, setTravelMessage] = useState<string>();
   const selected = locations.find((entry) => entry.id === selectedId) ?? locations[0];
   if (!region || !REGION_MAP_ART[regionId]) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={styles.title}>Unknown Region</Text></ScrollView>;
   const regionUnlocked = guild.world.unlockedRegionIds.includes(regionId);
@@ -67,7 +69,9 @@ export function RegionMapScreen({ regionId, onBack, openQuest }: { regionId: str
                 ]}
               >
                 <GameIcon id={completed ? "complete" : LOCATION_MARKERS[entry.type]} size={18} framed={false} />
-                <Text numberOfLines={2} style={styles.markerName}>{entry.name}</Text>
+                <Text numberOfLines={2} style={[styles.markerName, active && styles.activeMarkerName]}>
+                  {entry.name}
+                </Text>
               </Pressable>
             );
           })}
@@ -76,7 +80,8 @@ export function RegionMapScreen({ regionId, onBack, openQuest }: { regionId: str
         <View style={mapChromeStyles.legend}><Text style={styles.legendText}>CITY</Text><Text style={styles.legendText}>HOMELAND</Text><Text style={styles.legendText}>DUNGEON</Text><Text style={styles.legendText}>LANDMARK</Text></View>
       </View>
 
-      {selected && <LocationPanel location={selected} regionUnlocked={regionUnlocked} discoveredSettlementIds={guild.world.discoveredSettlementIds} completedQuestIds={guild.world.completedQuestIds} openQuest={openQuest} />}
+      {selected && <LocationPanel location={selected} regionUnlocked={regionUnlocked} discoveredSettlementIds={guild.world.discoveredSettlementIds} completedQuestIds={guild.world.completedQuestIds} currentSettlementId={guild.world.currentSettlementId} openQuest={openQuest} onVisit={(settlementId) => { try { const partySize = Math.max(1, guild.recentPartyHeroIds.length || Math.min(4, guild.heroes.filter((hero) => hero.isAvailable).length)); updateGuild(visitSettlement(guild, settlementId, partySize)); setTravelMessage(`Reached ${SETTLEMENTS[settlementId]?.name}. 1 day passed.`); } catch (error) { setTravelMessage(error instanceof Error ? error.message : "Local travel failed"); } }} />}
+      {travelMessage && <Text style={styles.travelMessage}>{travelMessage}</Text>}
       {regionLore && <RegionChronicle lore={regionLore} unlocked={regionLoreDiscovered} expanded={showChronicle} toggle={() => setShowChronicle((value) => !value)} />}
     </ScrollView>
   );
@@ -109,7 +114,7 @@ function LoreSection({ title, text }: { title: string; text: string }) {
   return <View><Text style={styles.loreHeading}>{title}</Text><Text style={styles.chronicleText}>{text}</Text></View>;
 }
 
-function LocationPanel({ location, regionUnlocked, discoveredSettlementIds, completedQuestIds, openQuest }: { location: RegionLocationDefinition; regionUnlocked: boolean; discoveredSettlementIds: string[]; completedQuestIds: string[]; openQuest(questId: string): void }) {
+function LocationPanel({ location, regionUnlocked, discoveredSettlementIds, completedQuestIds, currentSettlementId, openQuest, onVisit }: { location: RegionLocationDefinition; regionUnlocked: boolean; discoveredSettlementIds: string[]; completedQuestIds: string[]; currentSettlementId: string | null; openQuest(questId: string): void; onVisit(settlementId: string): void }) {
   const settlement = location.settlementId ? SETTLEMENTS[location.settlementId] : undefined;
   const discovered = settlement ? discoveredSettlementIds.includes(settlement.id) : true;
   const questComplete = location.questId ? completedQuestIds.includes(location.questId) : false;
@@ -118,6 +123,8 @@ function LocationPanel({ location, regionUnlocked, discoveredSettlementIds, comp
       <View style={styles.locationHeader}><GameIcon id={LOCATION_MARKERS[location.type]} size={34} /><View style={styles.flex}><Text style={styles.locationName}>{location.name}</Text><Text style={styles.locationType}>{location.type.toUpperCase()}{location.recommendedLevel ? ` · RECOMMENDED LEVEL ${location.recommendedLevel}` : ""}</Text></View><Text style={discovered ? styles.known : styles.unknown}>{discovered ? "KNOWN" : "UNDISCOVERED"}</Text></View>
       <Text style={styles.description}>{location.description}</Text>
       {settlement && <><Text style={styles.label}>SERVICES</Text><Text style={styles.services}>{settlement.serviceIds.map(pretty).join(" · ")}</Text></>}
+      {settlement && regionUnlocked && <ActionButton label={currentSettlementId === settlement.id ? "Current Location" : "Walk Here · 1 day"} disabled={currentSettlementId === settlement.id} onPress={() => onVisit(settlement.id)} />}
+      {settlement && settlement.questIds.length > 0 && <><Text style={styles.label}>LOCAL QUESTS</Text><Text style={styles.services}>{settlement.questIds.map(pretty).join(" · ")}</Text></>}
       {location.questId && <View style={styles.questRow}><View style={styles.flex}><Text style={styles.label}>ASSOCIATED QUEST</Text><Text style={questComplete ? styles.complete : styles.questName}>{pretty(location.questId)}{questComplete ? " · Complete" : ""}</Text></View><ActionButton label={questComplete ? "Review" : "Open Quest"} disabled={!regionUnlocked} onPress={() => openQuest(location.questId!)} /></View>}
       {!regionUnlocked && <Text style={styles.lockedNote}>Unlock and travel to this region before beginning its quests or using local services.</Text>}
     </Panel>
@@ -136,13 +143,15 @@ const styles = StyleSheet.create({
   open: { color: colors.green, fontSize: 10, fontWeight: "900" },
   locked: { color: colors.danger, fontSize: 10, fontWeight: "900" },
   mapShade: { backgroundColor: "rgba(3, 9, 14, .08)", bottom: 0, left: 0, position: "absolute", right: 0, top: 0 },
-  marker: { alignItems: "center", backgroundColor: "rgba(20, 29, 32, .94)", borderColor: "#d2c18c", borderRadius: 4, borderWidth: 2, marginLeft: -32, marginTop: -20, minHeight: 40, paddingHorizontal: 3, paddingVertical: 2, position: "absolute", width: 64 },
-  unknownMarker: { borderColor: "#68706f", opacity: .78 },
-  completedMarker: { borderColor: colors.green },
-  activeMarker: { backgroundColor: "rgba(77, 59, 27, .97)", borderColor: colors.gold, borderWidth: 3, transform: [{ scale: 1.08 }] },
+  // The coordinate is the center of the 18px map icon; the label flows below it.
+  marker: { alignItems: "center", backgroundColor: "transparent", marginLeft: -36, marginTop: -9, minHeight: 40, paddingHorizontal: 3, position: "absolute", width: 72 },
+  unknownMarker: { opacity: .78 },
+  completedMarker: { opacity: 1 },
+  activeMarker: { transform: [{ scale: 1.08 }] },
   pressedMarker: { opacity: .7 },
   markerIcon: { color: colors.gold, fontSize: 12, fontWeight: "900", lineHeight: 13 },
-  markerName: { color: colors.text, fontSize: 7, fontWeight: "900", lineHeight: 9, textAlign: "center" },
+  markerName: { color: colors.text, fontSize: 7, fontWeight: "900", lineHeight: 9, textAlign: "center", textShadowColor: "#050707", textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 2 },
+  activeMarkerName: { color: colors.gold },
   fog: { alignItems: "center", backgroundColor: "rgba(12, 17, 20, .34)", bottom: 0, justifyContent: "flex-end", left: 0, paddingBottom: 5, position: "absolute", right: 0, top: 0 },
   fogText: { backgroundColor: "rgba(12, 17, 20, .9)", color: colors.muted, fontSize: 8, fontWeight: "900", letterSpacing: .6, padding: 4 },
   legendText: { color: colors.muted, fontSize: 7, fontWeight: "900" },
@@ -161,6 +170,7 @@ const styles = StyleSheet.create({
   questName: { color: colors.text, fontSize: 12, fontWeight: "800", marginTop: 3 },
   complete: { color: colors.green, fontSize: 12, fontWeight: "800", marginTop: 3 },
   lockedNote: { color: colors.danger, fontSize: 11, lineHeight: 16, marginTop: 10 },
+  travelMessage: { color: colors.green, fontSize: 11, marginTop: 8 },
   chronicle: { borderColor: colors.gold, marginTop: 12 },
   chronicleEyebrow: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: 1.5 },
   chronicleTitle: { color: colors.text, fontSize: 20, fontWeight: "900", marginBottom: 7, marginTop: 3 },

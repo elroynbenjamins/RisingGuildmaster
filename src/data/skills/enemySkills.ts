@@ -2,12 +2,24 @@ import type { CombatSkillDefinition, SkillModifier } from "../../game/combat/ski
 import { BLACKBRIDGE_ENEMY_SKILLS } from "./blackbridgeEnemySkills";
 import { ASH_BENEATH_GREENVEIL_ENEMY_SKILLS } from "./ashBeneathGreenveilEnemySkills";
 import { STONEGATE_ASSASSIN_SKILLS } from "./stonegateAssassinSkills";
+import { FROSTMARCH_CHAPTER_3_ENEMY_SKILLS } from "./frostmarchChapter3EnemySkills";
+import { SHADOWFEN_CHAPTER_4_ENEMY_SKILLS } from "./shadowfenChapter4EnemySkills";
+import { CHAPTER_6_ENEMY_SKILLS } from "./chapter6EnemySkills";
+import { CHAPTER_7_ENEMY_SKILLS } from "./chapter7EnemySkills";
+import { CHAPTER_8_ENEMY_SKILLS } from "./chapter8EnemySkills";
+import { CHAPTER_9_ENEMY_SKILLS } from "./chapter9EnemySkills";
 
 const permanent = (stat: string, operation: SkillModifier["operation"], value: number): SkillModifier => ({ stat, operation, value, durationTurns: -1 });
 export const ENEMY_SKILLS: Record<string, CombatSkillDefinition> = {
   ...BLACKBRIDGE_ENEMY_SKILLS,
   ...ASH_BENEATH_GREENVEIL_ENEMY_SKILLS,
   ...STONEGATE_ASSASSIN_SKILLS,
+  ...FROSTMARCH_CHAPTER_3_ENEMY_SKILLS,
+  ...SHADOWFEN_CHAPTER_4_ENEMY_SKILLS,
+  ...CHAPTER_6_ENEMY_SKILLS,
+  ...CHAPTER_7_ENEMY_SKILLS,
+  ...CHAPTER_8_ENEMY_SKILLS,
+  ...CHAPTER_9_ENEMY_SKILLS,
   goblin_stab: { id: "goblin_stab", name: "Stab", type: "basic_attack", damageType: "physical", damageMultiplier: 1, accuracyModifier: 0, criticalChanceModifier: 0, targetType: "single_enemy", cooldownTurns: 0, range: 1 },
   quick_strike: { id: "quick_strike", name: "Quick Strike", type: "active", damageType: "physical", damageMultiplier: 0.75, accuracyModifier: 0.10, attackRollModifier: 1, criticalChanceModifier: 0, targetType: "single_enemy", cooldownTurns: 2, range: 1 },
   goblin_dodge: { id: "goblin_dodge", name: "Goblin Dodge", type: "passive", selfModifiers: [permanent("evasion", "percentage", 0.10)] },
@@ -50,7 +62,7 @@ export const ENEMY_SKILLS: Record<string, CombatSkillDefinition> = {
   troll_smash: { id: "troll_smash", name: "Smash", type: "basic_attack", damageType: "physical", damageMultiplier: 1.15, accuracyModifier: -0.05, attackRollModifier: -1, targetType: "single_enemy", cooldownTurns: 0, range: 1 },
   ground_slam: { id: "ground_slam", name: "Ground Slam", type: "active", damageType: "physical", damageMultiplier: 0.70, accuracyModifier: 0, targetType: "all_enemies", cooldownTurns: 3, range: 1 },
   troll_regeneration: { id: "troll_regeneration", name: "Troll Regeneration", type: "passive", healMaxHpModifier: 0.05 },
-  chieftain_cleave: { id: "chieftain_cleave", name: "Chieftain Cleave", type: "basic_attack", damageType: "physical", damageMultiplier: 1, targetType: "all_enemies", cooldownTurns: 0, range: 1 },
+  chieftain_cleave: { id: "chieftain_cleave", name: "Chieftain Cleave", type: "basic_attack", damageType: "physical", damageMultiplier: 1.20, targetType: "all_enemies", cooldownTurns: 0, range: 1 },
   chieftain_war_cry: { id: "chieftain_war_cry", name: "War Cry", type: "active", targetType: "all_allies", cooldownTurns: 4, range: 4, targetModifiers: [{ stat: "physicalDamage", operation: "percentage", value: .15, durationTurns: 2 }] },
   chieftain_presence: { id: "chieftain_presence", name: "Chieftain's Presence", type: "aura", aura: { target: "same_faction_allies", factionId: "goblins", excludeSelf: true, modifiers: [permanent("attackRollModifier", "flat", 1)] } },
   desperate_command: { id: "desperate_command", name: "Desperate Command", type: "aura", aura: { target: "same_faction_allies", factionId: "goblins", excludeSelf: true, trigger: { selfHpRatioMax: .4 }, modifiers: [permanent("physicalDamage", "percentage", .2), permanent("speed", "percentage", .1)] } },

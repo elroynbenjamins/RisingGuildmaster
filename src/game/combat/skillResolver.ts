@@ -57,7 +57,8 @@ export function resolveSkill(actor: CombatUnit, targets: readonly CombatUnit[], 
     const factionDamageBonus = originalTarget.factionId ? skill.factionDamageModifiers?.[originalTarget.factionId] ?? 0 : 0;
     const queuedDamageReduction = Math.max(-.50, percentageFor(originalTarget.activeModifiers, "nextIncomingDamage"));
     const unreducedDamage = causesDamage && hit ? calculateSkillDamage(attackerStats, defenderStats, skill, critical, baseDamageBonus + factionDamageBonus) : 0;
-    const damage = unreducedDamage > 0 ? Math.max(1, Math.round(unreducedDamage * (1 + queuedDamageReduction))) : 0;
+    const conditionDamageReceived = getConditionStatPercentage(originalTarget, "damageReceived");
+    const damage = unreducedDamage > 0 ? Math.max(1, Math.round(unreducedDamage * Math.max(0, 1 + queuedDamageReduction + conditionDamageReceived))) : 0;
     const healingReceived = percentageFor(originalTarget.activeModifiers, "healingReceived") + (options.healingReceivedModifier?.(originalTarget) ?? 0);
     const rawHealing = skill.healMaxHpModifier ? originalTarget.maxHP * skill.healMaxHpModifier * (1 + attackerStats.healingPower) * Math.max(0, 1 + healingReceived) : 0;
     const healing = Math.round(rawHealing + 1e-9);
@@ -80,7 +81,7 @@ export function resolveSkill(actor: CombatUnit, targets: readonly CombatUnit[], 
       }
     }
     updatedTargets.push(target);
-    hits.push({ targetId: target.combatantId, hit, critical, damage, appliedConditionIds, ...(attackRoll ? { diceRoll: attackRoll.diceRoll, diceRolls: attackRoll.diceRolls, rollMode: attackRoll.rollMode, attackBonus: attackRoll.attackBonus, skillAttackModifier: attackRoll.skillModifier, attackTotal: attackRoll.total, targetValue: attackRoll.targetValue, rollResult: attackRoll.result } : {}) });
+    hits.push({ targetId: target.combatantId, hit, critical, damage, healing, appliedConditionIds, ...(attackRoll ? { diceRoll: attackRoll.diceRoll, diceRolls: attackRoll.diceRolls, rollMode: attackRoll.rollMode, attackBonus: attackRoll.attackBonus, skillAttackModifier: attackRoll.skillModifier, attackTotal: attackRoll.total, targetValue: attackRoll.targetValue, rollResult: attackRoll.result } : {}) });
   }
   const selfModifiers = skill.selfModifiers ?? [];
   const withModifiers = selfModifiers.length ? { ...actor, activeModifiers: [...actor.activeModifiers, ...selfModifiers.map((modifier) => ({ ...modifier, sourceSkillId: skill.id }))] } : actor;

@@ -1,6 +1,20 @@
 import type { EnemyAbilityDefinition } from "../../game/enemies/enemyAbilityTypes";
 
 export const ENEMY_ABILITIES: Record<string, EnemyAbilityDefinition> = {
+  bog_ambush:{id:"bog_ambush",name:"Bog Ambush",type:"active",damageMultiplier:1.3},
+  shield_of_silt:{id:"shield_of_silt",name:"Shield of Silt",type:"passive",armorClassModifier:2},
+  stolen_name:{id:"stolen_name",name:"Stolen Name",type:"active",damageMultiplier:.7},
+  funeral_toll:{id:"funeral_toll",name:"Funeral Toll",type:"active",damageMultiplier:.9},
+  widows_refrain:{id:"widows_refrain",name:"Widow's Refrain",type:"passive",trigger:{selfHpRatioMax:.4},magicDamageModifier:.3},
+  erase_from_record:{id:"erase_from_record",name:"Erase from the Record",type:"active",damageMultiplier:1},
+  archive_unbound:{id:"archive_unbound",name:"Archive Unbound",type:"passive",trigger:{selfHpRatioMax:.33},magicDamageModifier:.25},
+  rime_pounce: { id: "rime_pounce", name: "Rime Pounce", type: "active", damageMultiplier: 1.25 },
+  deathless_watch: { id: "deathless_watch", name: "Deathless Watch", type: "passive", armorClassModifier: 2 },
+  false_sky_chorus: { id: "false_sky_chorus", name: "False-Sky Chorus", type: "active", damageModifier: .10 },
+  blue_horn_call: { id: "blue_horn_call", name: "Call of the Blue Horn", type: "aura", targetFactionId: "beasts", physicalDamageModifier: .15 },
+  iceblood_fury: { id: "iceblood_fury", name: "Iceblood Fury", type: "passive", trigger: { selfHpRatioMax: .40 }, physicalDamageModifier: .30 },
+  pale_breath: { id: "pale_breath", name: "Pale Breath", type: "active", damageMultiplier: 1.05 },
+  echo_of_the_first: { id: "echo_of_the_first", name: "Echo of the First Crown", type: "passive", trigger: { selfHpRatioMax: .30 }, damageModifier: .25 },
   death_from_shadow: { id: "death_from_shadow", name: "Death from Shadow", type: "passive", criticalChanceModifier: .05 },
   prepared_killbox: { id: "prepared_killbox", name: "Prepared Killbox", type: "passive", armorClassModifier: 1 },
   silent_coordination: { id: "silent_coordination", name: "Silent Coordination", type: "aura", targetFactionId: "bandits", physicalDamageModifier: .10 },

@@ -15,6 +15,8 @@ export function regionalScoutDaysRemaining(guild: GuildState): number {
 export function dispatchRegionalScout(guild: GuildState, raceId: RaceId, random: RandomSource, classId: ClassId | null = null): GuildState {
   const homeland = RACE_HOMELANDS[raceId];
   if (!homeland) throw new Error("Unknown scouting destination");
+  if (!guild.entitlements.unlockedRaceIds.includes(raceId)) throw new Error("Unlock this race before regional scouting");
+  if (classId && !guild.entitlements.unlockedClassIds.includes(classId)) throw new Error("Unlock this class before adding a scouting focus");
   if (!hasGuildmasterSkill(guild.guildmaster, "regional_network")) throw new Error("Unlock Regional Network in the Guildmaster skill tree");
   if (guild.recruitment.regionalScoutMission) throw new Error("A regional scout is already away");
   const classCost = classId ? RECRUITMENT_CONFIG.regionalScoutClassFocusGemCost : 0;
@@ -80,6 +82,7 @@ export function speedUpRegionalScout(guild: GuildState): GuildState {
 export function focusRegionalScoutClass(guild: GuildState, classId: ClassId): GuildState {
   const mission = guild.recruitment.regionalScoutMission;
   if (!mission) throw new Error("No regional scout is currently away");
+  if (!guild.entitlements.unlockedClassIds.includes(classId)) throw new Error("Unlock this class before adding a scouting focus");
   if (!hasGuildmasterSkill(guild.guildmaster, "specialist_headhunting")) throw new Error("Unlock Specialist Headhunting in the Guildmaster skill tree");
   if (mission.classId) throw new Error("This scout already has a class focus");
   if (regionalScoutDaysRemaining(guild) === 0) throw new Error("The scouting report is already ready");

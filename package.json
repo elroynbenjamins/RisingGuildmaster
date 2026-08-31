@@ -9,15 +9,20 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "vitest run",
+    "simulate:balance": "vitest run tests/balanceSimulation.test.ts --reporter=verbose",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "validate:release": "node scripts/validate-release-config.mjs",
+    "check:release": "npm run validate:release && npm run typecheck && npm test"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~56.0.0",
+    "expo-iap": "^5.4.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.85.0",
+    "react-native-google-mobile-ads": "16.3.4",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-web": "0.21.2"
   },

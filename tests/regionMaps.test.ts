@@ -8,7 +8,7 @@ import { discoverRegionSettlements } from "../src/game/world/worldService";
 
 describe("interactive regional maps", () => {
   it("gives every Eldoria region at least six mapped locations", () => {
-    expect(Object.keys(REGION_LOCATIONS)).toHaveLength(31);
+    expect(Object.keys(REGION_LOCATIONS)).toHaveLength(33);
     for (const regionId of Object.keys(REGIONS)) expect(getRegionLocations(regionId).length).toBeGreaterThanOrEqual(6);
   });
 

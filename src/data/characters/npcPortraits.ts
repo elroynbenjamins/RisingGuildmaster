@@ -105,6 +105,9 @@ const speakerAliases: Record<string, string> = {
   "Lady Octavia Vane": "lady_octavia_vane", "Marshal Roderic Thorne": "marshal_roderic_thorne", "Selene Ashglass": "selene_ashglass", "Brother Caldus": "brother_caldus",
   "Varka Ember-Tongue": "varka_ember_tongue", "Edrin Mosswake": "edrin_mosswake", "Kesta Flintvein": "kesta_flintvein", "The Scale Collector": "scale_collector",
   "Sable-Eye": "sable_eye", "The Ash Herald": "ash_herald", "The Dreaming Wyrmling": "dreaming_wyrmling", "The First Crown": "first_crown",
+  "Envoy Tharos": "elf_diplomatic_envoy", "The Dragon Concord": "first_crown", "The Crownless Navigator": "scale_collector", "Voice of the Crownless Host": "first_crown",
+  "Nhal Veyr": "master_veyr", "Voice Beneath the Fleet": "first_crown",
+  "A Crownless Deckhand": "master_veyr", "Thalassyr": "first_crown",
 };
 
 export function getNpcPortraitForSpeaker(speaker: string): NpcPortraitDefinition | undefined {

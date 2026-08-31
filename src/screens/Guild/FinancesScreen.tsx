@@ -7,6 +7,7 @@ import { advanceGuildTime, paySalaryArrears, previewNextGuildDay, totalSalaryArr
 import type { GuildDayResolution } from "../../game/economy/economyTypes";
 import { useGuild } from "../../state/GuildContext";
 import { getRaceNameColor } from "../../ui/raceColors";
+import { presentPendingDayMilestoneAd } from "../../game/monetization/dayMilestoneAdPresenter";
 
 export function FinancesScreen({ onBack }: { onBack(): void }) {
   const { showDialog } = useGameDialog();
@@ -26,7 +27,7 @@ export function FinancesScreen({ onBack }: { onBack(): void }) {
     ...(preview.contractChanges ? [preview.contractChanges + " contract status update" + (preview.contractChanges === 1 ? "" : "s")] : []),
     ...preview.threatIncreaseRegionIds.map((id) => (REGIONS[id]?.name ?? id) + " threat increases"),
   ];
-  const advance = () => showDialog({ title: "End Guild Day?", message: "Advance from Day " + guild.currentDay + " to Day " + preview.targetDay + "?\n\n" + previewLines.join("\n"), eyebrow: "ADVANCE CALENDAR", actions: [{ label: "Cancel", tone: "secondary" }, { label: "End Day", tone: "primary", onPress: () => { const result = advanceGuildTime(guild); updateGuild(result.guild); setLastDay(result.days[0] ?? null); } }] });
+  const advance = () => showDialog({ title: "End Guild Day?", message: "Advance from Day " + guild.currentDay + " to Day " + preview.targetDay + "?\n\n" + previewLines.join("\n"), eyebrow: "ADVANCE CALENDAR", actions: [{ label: "Cancel", tone: "secondary" }, { label: "End Day", tone: "primary", onPress: () => { const result = advanceGuildTime(guild); updateGuild(result.guild); setLastDay(result.days[0] ?? null); presentPendingDayMilestoneAd(result.guild, updateGuild, showDialog); } }] });
   const settle = () => { try { updateGuild(paySalaryArrears(guild)); } catch (error) { showDialog({ title: "Payroll order failed", message: error instanceof Error ? error.message : "Payment failed", tone: "danger" }); } };
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} />

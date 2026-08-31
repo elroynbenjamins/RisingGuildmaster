@@ -13,7 +13,7 @@ import { testHero } from "./testHero";
 
 describe("Echoes of Mosswatch", () => {
   it("adds a Chapter 1 Greenveil side story with three checks and two encounters", () => {
-    expect(QUESTS.echoes_of_mosswatch).toMatchObject({ questType: "side", regionId: "greenveil", repeatable: false, recommendedLevelMin: 2, recommendedLevelMax: 4, explorationStageIds: ["mosswatch_cipher", "mosswatch_gate", "mosswatch_resonance"], encounterIds: ["mosswatch_courtyard_encounter", "mosswatch_vault_encounter"] });
+    expect(QUESTS.echoes_of_mosswatch).toMatchObject({ questType: "side", regionId: "greenveil", repeatable: false, recommendedLevelMin: 3, recommendedLevelMax: 4, explorationStageIds: ["mosswatch_cipher", "mosswatch_gate", "mosswatch_resonance"], encounterIds: ["mosswatch_courtyard_encounter", "mosswatch_vault_encounter"] });
     expect(QUESTS.echoes_of_mosswatch!.explorationStageIds?.every((id) => QUEST_EXPLORATION_STAGES[id]?.questId === "echoes_of_mosswatch")).toBe(true);
   });
 
@@ -23,7 +23,7 @@ describe("Echoes of Mosswatch", () => {
     const success = resolveQuestExplorationStage(MOSSWATCH_EXPLORATION.mosswatch_cipher!, [skilledHero], sequenceRandom([.50]));
     expect(success.check).toMatchObject({ diceRoll: 11, modifier: 2, total: 13, success: true });
     const failure = resolveQuestExplorationStage(MOSSWATCH_EXPLORATION.mosswatch_gate!, [skilledHero], sequenceRandom([0]));
-    expect(failure).toMatchObject({ appliedConditionId: "injured", check: { diceRoll: 1, modifier: 2, total: 3, success: false } });
+    expect(failure).toMatchObject({ appliedConditionId: "injured", check: { diceRoll: 1, modifier: 4, proficiencyBonus: 2, skillId: "athletics", total: 5, success: false } });
   });
 
   it("progresses from a battlefield courtyard to a grand Warden vault", () => {

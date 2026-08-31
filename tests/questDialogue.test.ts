@@ -21,4 +21,15 @@ describe("quest dialogue", () => {
       if (line.enemyId) expect(getEnemyDefinition(line.enemyId), `${quest.id}: ${line.enemyId}`).toBeDefined();
     }
   });
+
+  it("explains the motive and campaign connection for the opening quests", () => {
+    for (const id of ["goblin_patrol", "missing_merchant", "attack_on_guildhaven", "goblin_chieftain_boss", "brambleway_caravan"]) {
+      const context = QUESTS[id]?.storyContext;
+      expect(context?.patron.length, id).toBeGreaterThan(5);
+      expect(context?.guildReason.length, id).toBeGreaterThan(40);
+      expect(context?.immediateGoal.length, id).toBeGreaterThan(30);
+      expect(context?.campaignConnection.length, id).toBeGreaterThan(30);
+    }
+    expect(QUESTS.brambleway_caravan?.storyContext?.campaignConnection).toContain("optional");
+  });
 });

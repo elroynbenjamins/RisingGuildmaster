@@ -15,7 +15,7 @@ import { createWorldState } from "../src/game/world/worldState";
 describe("The Knives of Stonegate", () => {
   it("is a lethal four-hero Chapter 2 side quest gated behind Voices Under Stone", () => {
     const quest = QUESTS.knives_of_stonegate!;
-    expect(quest).toMatchObject({ campaignChapter: 2, difficulty: 9, recommendedLevelMin: 8, recommendedLevelMax: 9, minPartySize: 4, maxPartySize: 4 });
+    expect(quest).toMatchObject({ campaignChapter: 2, difficulty: 6, recommendedLevelMin: 5, recommendedLevelMax: 5, minPartySize: 4, maxPartySize: 4 });
     expect(CHAPTER_2.sideQuestIds).toContain(quest.id);
     expect(isQuestAvailable(quest, createWorldState())).toBe(false);
     expect(isQuestAvailable(quest, { ...createWorldState(), completedCampaignNodeIds: ["voices_under_stone"] })).toBe(true);

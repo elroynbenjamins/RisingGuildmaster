@@ -3,13 +3,25 @@ import { BATTLEFIELDS } from "../src/data/combat/battlefields";
 import { QUEST_ENCOUNTERS } from "../src/data/encounters/questEncounters";
 import { QUESTS } from "../src/data/quests/quests";
 import { createCombatBoard } from "../src/game/combat/grid/boardFactory";
-import { COMBAT_BOARD_SIZES, getTile, isPositionInBounds } from "../src/game/combat/grid/gridTypes";
+import { COMBAT_BOARD_SIZES, getTile, isPositionInBounds, positionKey } from "../src/game/combat/grid/gridTypes";
 import { hasLineOfSight } from "../src/game/combat/grid/lineOfSight";
 import { findShortestPath } from "../src/game/combat/grid/pathfinding";
 import { spawnOccupants } from "../src/game/combat/grid/spawnService";
 
 describe("battlefield sizes and terrain variants", () => {
-  it("supports combat boards through the 15x11 warfront", () => { expect(createCombatBoard([], "skirmish").tiles).toHaveLength(35); expect(createCombatBoard([], "battlefield")).toMatchObject({ width: 9, height: 7 }); expect(createCombatBoard([], "battlefield").tiles).toHaveLength(63); expect(createCombatBoard([], "grand_battlefield")).toMatchObject({ width: 11, height: 9 }); expect(createCombatBoard([], "grand_battlefield").tiles).toHaveLength(99); expect(createCombatBoard([], "warfront")).toMatchObject({ width: 15, height: 11 }); expect(createCombatBoard([], "warfront").tiles).toHaveLength(165); expect(Object.keys(COMBAT_BOARD_SIZES)).toEqual(["skirmish", "battlefield", "grand_battlefield", "warfront"]); });
+  it("fills the outer deployment bands with deterministic biome ground art", () => {
+    for (const field of Object.values(BATTLEFIELDS)) {
+      const board = createCombatBoard([], field.boardSizeId, field.terrainPlacements, field.id);
+      const outerBand = board.tiles.filter((tile) => tile.position.x < 3 || tile.position.x >= board.width - 3);
+      expect(outerBand.length, field.id).toBeGreaterThan(0);
+      for (const tile of outerBand) {
+        expect(tile.groundTheme, `${field.id}:${positionKey(tile.position)}`).toBeTruthy();
+        expect(tile.groundVariant, `${field.id}:${positionKey(tile.position)}`).toBeGreaterThanOrEqual(1);
+        expect(tile.groundVariant, `${field.id}:${positionKey(tile.position)}`).toBeLessThanOrEqual(4);
+      }
+    }
+  });
+  it("supports combat boards through the 19x15 raid arena", () => { expect(createCombatBoard([], "skirmish").tiles).toHaveLength(35); expect(createCombatBoard([], "battlefield")).toMatchObject({ width: 9, height: 7 }); expect(createCombatBoard([], "battlefield").tiles).toHaveLength(63); expect(createCombatBoard([], "grand_battlefield")).toMatchObject({ width: 11, height: 9 }); expect(createCombatBoard([], "grand_battlefield").tiles).toHaveLength(99); expect(createCombatBoard([], "warfront")).toMatchObject({ width: 15, height: 11 }); expect(createCombatBoard([], "warfront").tiles).toHaveLength(165); expect(createCombatBoard([], "raid_field").tiles).toHaveLength(221); expect(createCombatBoard([], "raid_arena").tiles).toHaveLength(285); expect(Object.keys(COMBAT_BOARD_SIZES)).toEqual(["skirmish", "battlefield", "grand_battlefield", "warfront", "raid_field", "raid_arena"]); });
   it("applies forest, mountain, water, web, egg-sac, caravan, and NPC rules from data", () => { const board = createCombatBoard([], "battlefield", [{ position: { x: 1, y: 2 }, terrainType: "forest" }, { position: { x: 2, y: 2 }, terrainType: "mountain" }, { position: { x: 3, y: 2 }, terrainType: "shallow_water" }, { position: { x: 4, y: 2 }, terrainType: "web" }, { position: { x: 5, y: 2 }, terrainType: "egg_sac" }, { position: { x: 6, y: 2 }, terrainType: "caravan" }, { position: { x: 7, y: 2 }, terrainType: "escort_npc" }]); expect(getTile(board, { x: 1, y: 2 })).toMatchObject({ movementCost: 2, blocksMovement: false, blocksLineOfSight: true }); expect(getTile(board, { x: 2, y: 2 })).toMatchObject({ movementCost: 0, blocksMovement: true, blocksLineOfSight: true }); expect(getTile(board, { x: 3, y: 2 })).toMatchObject({ movementCost: 2, blocksMovement: false, blocksLineOfSight: false }); expect(getTile(board, { x: 4, y: 2 })).toMatchObject({ movementCost: 2, blocksMovement: false, blocksLineOfSight: false }); expect(getTile(board, { x: 5, y: 2 })).toMatchObject({ movementCost: 0, blocksMovement: true, blocksLineOfSight: true }); expect(getTile(board, { x: 6, y: 2 })).toMatchObject({ movementCost: 0, blocksMovement: true, blocksLineOfSight: true }); expect(getTile(board, { x: 7, y: 2 })).toMatchObject({ movementCost: 0, blocksMovement: true, blocksLineOfSight: false }); });
   it("uses movement cost for water and blocks paths through mountains", () => { const water = createCombatBoard([], "battlefield", [{ position: { x: 2, y: 2 }, terrainType: "shallow_water" }]); expect(findShortestPath(water, { x: 1, y: 2 }, { x: 2, y: 2 }, 1)).toBeNull(); expect(findShortestPath(water, { x: 1, y: 2 }, { x: 2, y: 2 }, 2)).not.toBeNull(); const mountain = createCombatBoard([], "battlefield", Array.from({ length: 7 }, (_, y) => ({ position: { x: 4, y }, terrainType: "mountain" as const }))); expect(findShortestPath(mountain, { x: 1, y: 3 }, { x: 7, y: 3 }, 20)).toBeNull(); });
   it("forest and cave walls interrupt line of sight", () => { const forest = createCombatBoard([], "battlefield", [{ position: { x: 4, y: 3 }, terrainType: "forest" }]); const cave = createCombatBoard([], "battlefield", [{ position: { x: 4, y: 3 }, terrainType: "cave_wall" }]); expect(hasLineOfSight({ x: 1, y: 3 }, { x: 7, y: 3 }, forest)).toBe(false); expect(hasLineOfSight({ x: 1, y: 3 }, { x: 7, y: 3 }, cave)).toBe(false); });
@@ -29,3 +41,10 @@ describe("Shattered Wardstone Warfront", () => {
 describe("Goblin Cave Hideout", () => { it("progresses from narrow cave paths into a grand command room", () => { const quest = QUESTS.goblin_cave_hideout!; expect(quest.encounterIds).toEqual(["cave_hideout_entrance", "cave_hideout_tunnels", "cave_hideout_command_room"]); expect(quest.questType).toBe("contract"); expect(BATTLEFIELDS[QUEST_ENCOUNTERS[quest.encounterIds[0]!]!.battlefieldId]?.boardSizeId).toBe("battlefield"); expect(BATTLEFIELDS[QUEST_ENCOUNTERS[quest.encounterIds[2]!]!.battlefieldId]?.boardSizeId).toBe("grand_battlefield"); expect(BATTLEFIELDS.goblin_command_room?.terrainPlacements.some((tile) => tile.terrainType === "barricade")).toBe(true); }); });
 
 describe("Spider Queen hunt", () => { it("ends in a unique grand cavern with webs and egg sacs", () => { const quest = QUESTS.hunt_spider_queen!; expect(quest.encounterIds).toEqual(["spider_queen_outer_brood", "spider_queen_boss"]); const field = BATTLEFIELDS[QUEST_ENCOUNTERS.spider_queen_boss!.battlefieldId]!; expect(field).toMatchObject({ id: "spider_queen_sanctum", boardSizeId: "grand_battlefield" }); expect(field.terrainPlacements.some((tile) => tile.terrainType === "web")).toBe(true); expect(field.terrainPlacements.some((tile) => tile.terrainType === "egg_sac")).toBe(true); }); });
+
+describe("tactical elevation", () => {
+  it("gives goblin archer towers and the queen dais explicit height", () => {
+    expect(Math.max(...BATTLEFIELDS.goblin_command_room!.terrainPlacements.map((tile) => tile.elevation ?? 0))).toBe(2);
+    expect(Math.max(...BATTLEFIELDS.spider_queen_sanctum!.terrainPlacements.map((tile) => tile.elevation ?? 0))).toBe(1);
+  });
+});

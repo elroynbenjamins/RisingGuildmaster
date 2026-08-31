@@ -6,6 +6,7 @@ import { appendHeroHistoryEvent } from "../heroes/heroHistoryService";
 import type { WorldState } from "../world/worldTypes";
 import type { QuestChronicleEntry, QuestConsequenceRecord, QuestHeroMoment, QuestHeroOutcomeRecord, QuestLoreRecord, QuestRelationshipChange } from "./questChronicleTypes";
 import type { QuestDefinition } from "./questTypes";
+import type { CampConversationRecord } from "../relationships/campConversationTypes";
 
 function sentenceFromId(id: string): string { const text = id.replace(/_/g, " "); return text.charAt(0).toUpperCase() + text.slice(1) + "."; }
 function changedTrueFlags(before: WorldState, after: WorldState): string[] { return Object.keys(after.worldFlags).filter((flag) => after.worldFlags[flag] === true && before.worldFlags[flag] !== true); }
@@ -38,9 +39,9 @@ function momentForHero(hero: QuestHeroOutcomeRecord, questName: string, status: 
   return { ...portrait, title: status === "victory" ? "Shared in the victory" : "Survived the withdrawal", description: status === "victory" ? `${hero.name} returned beneath the guild banner after completing ${questName}.` : `${hero.name} returned from ${questName} carrying lessons from the defeat.`, tone: status === "victory" ? "positive" : "neutral" };
 }
 
-export function createQuestChronicleEntry(input: { quest: QuestDefinition; status: "victory" | "defeat"; day: number; worldBefore: WorldState; worldAfter: WorldState; heroOutcomes: QuestHeroOutcomeRecord[]; relationshipChanges?: QuestRelationshipChange[] }): QuestChronicleEntry {
+export function createQuestChronicleEntry(input: { quest: QuestDefinition; status: "victory" | "defeat"; day: number; worldBefore: WorldState; worldAfter: WorldState; heroOutcomes: QuestHeroOutcomeRecord[]; relationshipChanges?: QuestRelationshipChange[]; campConversation?: CampConversationRecord }): QuestChronicleEntry {
   const narrative = QUEST_OUTCOME_NARRATIVES[input.quest.id];
-  return { id: `${input.quest.id}:${input.day}:${input.status}`, day: input.day, questId: input.quest.id, questName: input.quest.name, status: input.status, aftermath: input.status === "victory" ? narrative?.victory ?? "The guild completes its objective." : narrative?.defeat ?? "The party is forced to withdraw.", consequences: buildConsequences(input.quest, input.status, input.worldBefore, input.worldAfter, input.heroOutcomes), loreDiscoveries: buildLore(input.quest, input.status, input.worldBefore, input.worldAfter), heroMoments: input.heroOutcomes.map((hero) => momentForHero(hero, input.quest.name, input.status)), relationshipChanges: input.relationshipChanges ?? [] };
+  return { id: `${input.quest.id}:${input.day}:${input.status}`, day: input.day, questId: input.quest.id, questName: input.quest.name, status: input.status, aftermath: input.status === "victory" ? narrative?.victory ?? "The guild completes its objective." : narrative?.defeat ?? "The party is forced to withdraw.", consequences: buildConsequences(input.quest, input.status, input.worldBefore, input.worldAfter, input.heroOutcomes), loreDiscoveries: buildLore(input.quest, input.status, input.worldBefore, input.worldAfter), heroMoments: input.heroOutcomes.map((hero) => momentForHero(hero, input.quest.name, input.status)), relationshipChanges: input.relationshipChanges ?? [], ...(input.campConversation ? { campConversation: input.campConversation } : {}) };
 }
 
 export function recordQuestChronicle(guild: GuildState, entry: QuestChronicleEntry): GuildState {

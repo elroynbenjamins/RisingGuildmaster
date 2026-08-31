@@ -1,6 +1,9 @@
 export const GAME_CONFIG = {
   startingGold: 5_000,
   startingGems: 5,
+  startingRations: 24,
+  rationBundleSize: 8,
+  rationBundleGoldCost: 40,
   startingReputation: 0,
   startingDay: 1,
   recruitmentCandidateCount: 3,
@@ -14,5 +17,7 @@ export const GAME_CONFIG = {
   maxAdventureStamina: 100,
   adventureStaminaRecoveryPerDay: 25,
   standardQuestStaminaCost: 50,
-  dailyTavernIncome: 50,
+  // Passive income keeps the guild alive, but quests must fund treatment,
+  // maintenance, crafting, and expansion.
+  dailyTavernIncome: 40,
 } as const;

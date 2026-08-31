@@ -18,7 +18,6 @@ const MODIFIER_TARGET_LABELS: Record<string, string> = {
   questGold: "Quest Gold",
   salary: "Salary",
   recoveryDuration: "Recovery Duration",
-  intelligenceGrowth: "Intelligence Growth",
   rareLoot: "Rare Loot Chance",
   rangedDamage: "Ranged Damage",
   physicalDamage: "Physical Damage",

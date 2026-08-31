@@ -9,13 +9,14 @@ import { RACES } from "../../data/races/races";
 import type { GuildState } from "../../game/guild/types";
 import { isBossAvailable, isRegionCompleted } from "../../game/world/regionService";
 import { discoverRegionSettlements } from "../../game/world/worldService";
-import { canTravel, travelToRegion } from "../../game/world/travelService";
+import { buyRations, canTravel, getRationBundleAmount, getRegionalTravelDays, getTravelRationCost, travelGuildToRegion } from "../../game/world/travelService";
 import type { WorldEventDefinition } from "../../game/world/worldTypes";
 import { WORLD_NAME } from "../../game/world/worldState";
 import { mapChromeStyles } from "../../ui/worldMap";
 import type { RandomSource } from "../../utils/random";
 import { GameIcon } from "../../components/icons/GameIcon";
 import { isMatchingDoubleTap, type TapRecord } from "../../utils/doubleTap";
+import { GAME_CONFIG } from "../../config/gameConfig";
 
 interface WorldMapProps {
   guild: GuildState;
@@ -31,6 +32,7 @@ interface WorldMapProps {
 export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, openRegion, openCampaign, openEvent }: WorldMapProps) {
   const [selectedId, setSelectedId] = useState(guild.world.currentRegionId);
   const [message, setMessage] = useState<string>();
+  const [showRegionIntel, setShowRegionIntel] = useState(false);
   const lastRegionTap = useRef<TapRecord | null>(null);
   const selected = REGIONS[selectedId]!;
   const unlocked = guild.world.unlockedRegionIds.includes(selectedId);
@@ -40,22 +42,29 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
   const averageLevel = guild.heroes.length ? guild.heroes.reduce((sum, hero) => sum + hero.level, 0) / guild.heroes.length : 0;
   const completedRegionQuests = selected.questPoolIds.filter((id) => guild.world.completedQuestIds.includes(id)).length;
   const selectedThreat = guild.world.regionThreat?.[selectedId] ?? 0;
+  const availableHeroes = guild.heroes.filter((hero) => hero.isAvailable);
+  const recentAvailable = guild.recentPartyHeroIds.filter((id) => availableHeroes.some((hero) => hero.id === id));
+  const travelPartySize = Math.max(1, recentAvailable.length || Math.min(4, availableHeroes.length));
+  const travelDays = current ? 0 : getRegionalTravelDays(guild.world.currentRegionId, selectedId);
+  const rationCost = current ? 0 : getTravelRationCost(travelDays, travelPartySize, guild.guildmaster);
+  const travelBlocker = current ? null : !unlocked ? "Region locked by campaign progress." : !travelAllowed ? "No direct unlocked road from the current region." : !availableHeroes.length ? "No living, available heroes can form a travel party." : guild.rations < rationCost ? `Need ${rationCost-guild.rations} more rations.` : null;
 
   const selectRegion = (regionId: string) => {
     const timestamp = Date.now();
     const doubleTapped = isMatchingDoubleTap(lastRegionTap.current, regionId, timestamp);
     lastRegionTap.current = doubleTapped ? null : { targetKey: regionId, timestamp };
     setSelectedId(regionId);
+    if (regionId !== selectedId) setShowRegionIntel(false);
     setMessage(undefined);
     if (doubleTapped) openRegion(regionId);
   };
 
   const travel = () => {
     try {
-      const result = travelToRegion(guild.world, selectedId, random);
-      const world = discoverRegionSettlements(result.state, selectedId);
-      updateGuild({ ...guild, world });
-      setMessage(`Arrived in ${selected.name}.`);
+      const result = travelGuildToRegion(guild, selectedId, travelPartySize, random);
+      const world = discoverRegionSettlements(result.guild.world, selectedId);
+      updateGuild({ ...result.guild, world });
+      setMessage(`Arrived in ${selected.name} after ${result.days} days. Used ${result.rationCost} rations. d100: ${result.d100Roll}${result.tier ? ` · ${result.tier.toUpperCase()} event` : " · quiet journey"}.`);
       if (result.event) openEvent(result.event);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Travel failed");
@@ -71,7 +80,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
       <View style={styles.overview}>
         <View style={styles.overviewStat}><Text style={styles.overviewValue}>{guild.world.unlockedRegionIds.length}/{Object.keys(REGIONS).length}</Text><Text style={styles.overviewLabel}>REGIONS OPEN</Text></View>
         <View style={styles.overviewStat}><Text style={styles.overviewValue}>{guild.world.discoveredSettlementIds.length}/{Object.keys(SETTLEMENTS).length}</Text><Text style={styles.overviewLabel}>SETTLEMENTS</Text></View>
-        <View style={styles.overviewStat}><Text style={styles.overviewValue}>{guild.world.completedQuestIds.length}</Text><Text style={styles.overviewLabel}>QUESTS WON</Text></View>
+        <View style={styles.overviewStat}><Text style={styles.overviewValue}>{guild.rations}</Text><Text style={styles.overviewLabel}>RATIONS</Text></View>
       </View>
 
       <View style={mapChromeStyles.frame}>
@@ -110,7 +119,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
                 <Text style={styles.nodeState}>{status}</Text>
                 {selectedRegion && <Text style={styles.nodeHint}>DOUBLE TAP · OPEN</Text>}
                 {(guild.world.regionThreat?.[region.id] ?? 0) > 0 && <Text style={styles.threatBadge}>THREAT {guild.world.regionThreat?.[region.id]}</Text>}
-                {settlementDiscovered && <View style={styles.settlementRow}><GameIcon id="settlement" size={13} framed={false} /><Text style={styles.settlement}>{SETTLEMENTS[region.settlementIds[0]!]?.name}</Text></View>}
+                {settlementDiscovered && (selectedRegion || isCurrent) && <View style={styles.settlementRow}><GameIcon id="settlement" size={13} framed={false} /><Text style={styles.settlement}>{SETTLEMENTS[region.settlementIds[0]!]?.name}</Text></View>}
               </Pressable>
             );
           })}
@@ -131,19 +140,24 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
         </View>
         <Text style={styles.description}>{selected.description}</Text>
         {unlocked && averageLevel > 0 && averageLevel < selected.recommendedLevelMin && <Text style={styles.danger}>⚠ DANGER: Party level below recommended range.</Text>}
-        <Text style={styles.detail}>Enemy factions: {selected.enemyFactionIds.join(", ") || "Unknown"}</Text>
         <Text style={styles.detail}>Settlement: {selected.settlementIds.map((id) => SETTLEMENTS[id]!.name).join(", ")}</Text>
-        {homelandContacts.length > 0 && <Text style={styles.detail}>Recruitment homeland: {homelandContacts.map((homeland) => `${RACES[homeland.raceId].name} · ${homeland.locationName}`).join(", ")}</Text>}
-        <Text style={styles.detail}>Available contracts: {selected.questPoolIds.length}</Text>
-        <Text style={styles.detail}>Regional progress: {completedRegionQuests}/{selected.questPoolIds.length} listed quests complete</Text>
-        {selectedThreat > 0 && <Text style={styles.threat}>Regional threat {selectedThreat}/4 · Delaying unresolved dangers can strengthen enemies and disrupt settlements.</Text>}
-        {selected.bossQuestId && <Text style={styles.boss}>! Regional boss: {guild.world.completedQuestIds.includes(selected.bossQuestId) ? "Defeated" : "Available through campaign"}</Text>}
-        {!current && unlocked && !travelAllowed && <Text style={styles.routeWarning}>No direct road from your current region. Travel through a connected region first.</Text>}
-        <Text style={styles.roadTitle}>DIRECT ROADS</Text>
-        <View style={styles.roads}>{selected.connectedRegionIds.map((regionId) => { const destination = REGIONS[regionId]!; const destinationUnlocked = guild.world.unlockedRegionIds.includes(regionId); return <Pressable accessibilityRole="button" key={regionId} onPress={() => setSelectedId(regionId)} style={[styles.road, !destinationUnlocked && styles.roadLocked]}><GameIcon id={destinationUnlocked ? "region_open" : "locked"} size={18} framed={false}/><Text style={destinationUnlocked ? styles.roadName : styles.roadNameLocked}>{destination.name}</Text></Pressable>; })}</View>
+        <Text style={styles.detail}>Travel party: {travelPartySize} · Supplies are consumed per hero per day.</Text>
+        {!current&&<View style={[styles.travelReadiness,travelBlocker?styles.travelBlocked:styles.travelReady]}><Text style={travelBlocker?styles.routeWarning:styles.travelReadyText}>{travelBlocker?`TRAVEL BLOCKED · ${travelBlocker}`:`TRAVEL READY · ${travelDays} day${travelDays===1?"":"s"} · ${rationCost} rations · ${travelPartySize} heroes`}</Text></View>}
+        <Pressable accessibilityRole="button" accessibilityState={{ expanded: showRegionIntel }} onPress={() => setShowRegionIntel((value) => !value)} style={styles.intelButton}><Text style={styles.intelLabel}>{showRegionIntel ? "− HIDE" : "+ SHOW"} REGIONAL INTELLIGENCE</Text></Pressable>
+        {showRegionIntel && <View style={styles.intelBlock}>
+          <Text style={styles.detail}>Enemy factions: {selected.enemyFactionIds.join(", ") || "Unknown"}</Text>
+          {homelandContacts.length > 0 && <Text style={styles.detail}>Recruitment homeland: {homelandContacts.map((homeland) => `${RACES[homeland.raceId].name} · ${homeland.locationName}`).join(", ")}</Text>}
+          <Text style={styles.detail}>Available contracts: {selected.questPoolIds.length}</Text>
+          <Text style={styles.detail}>Regional progress: {completedRegionQuests}/{selected.questPoolIds.length} listed quests complete</Text>
+          {selectedThreat > 0 && <Text style={styles.threat}>Regional threat {selectedThreat}/4 · Delaying unresolved dangers can strengthen enemies and disrupt settlements.</Text>}
+          {selected.bossQuestId && <Text style={styles.boss}>! Regional boss: {guild.world.completedQuestIds.includes(selected.bossQuestId) ? "Defeated" : "Available through campaign"}</Text>}
+          <Text style={styles.roadTitle}>DIRECT ROADS</Text>
+          <View style={styles.roads}>{selected.connectedRegionIds.map((regionId) => { const destination = REGIONS[regionId]!; const destinationUnlocked = guild.world.unlockedRegionIds.includes(regionId); return <Pressable accessibilityRole="button" key={regionId} onPress={() => { setSelectedId(regionId); setShowRegionIntel(false); }} style={[styles.road, !destinationUnlocked && styles.roadLocked]}><GameIcon id={destinationUnlocked ? "region_open" : "locked"} size={18} framed={false}/><Text style={destinationUnlocked ? styles.roadName : styles.roadNameLocked}>{destination.name}</Text></Pressable>; })}</View>
+        </View>}
         <View style={styles.buttons}>
           <ActionButton label="Open Region Map" onPress={() => openRegion(selectedId)} />
-          {!current && unlocked && <ActionButton label="Travel" disabled={!travelAllowed} onPress={travel} />}
+          {!current && unlocked && <ActionButton label={`Travel · ${travelDays}d · ${rationCost} rations`} disabled={Boolean(travelBlocker)} onPress={travel} />}
+          {current && guild.world.currentSettlementId && <ActionButton label={`Buy ${getRationBundleAmount(guild)} rations · ${GAME_CONFIG.rationBundleGoldCost}g`} onPress={() => { try { const before = guild.rations; const next = buyRations(guild); updateGuild(next); setMessage(`Bought ${next.rations - before} rations.`); } catch (error) { setMessage(error instanceof Error ? error.message : "Purchase failed"); } }} />}
           {unlocked && selected.questPoolIds[0] && <ActionButton label="View Contract" onPress={() => openQuest(selected.questPoolIds[0]!)} />}
           <ActionButton label="Campaign" onPress={openCampaign} />
         </View>
@@ -165,17 +179,18 @@ const styles = StyleSheet.create({
   overviewValue: { color: colors.text, fontSize: 18, fontWeight: "900" },
   overviewLabel: { color: colors.gold, fontSize: 7, fontWeight: "900", letterSpacing: .6, marginTop: 2, textAlign: "center" },
   mapShade: { backgroundColor: "rgba(4, 11, 17, 0.10)", bottom: 0, left: 0, position: "absolute", right: 0, top: 0 },
-  node: { alignItems: "center", backgroundColor: "rgba(25, 34, 36, 0.92)", borderColor: "#9b9278", borderRadius: 4, borderWidth: 2, marginLeft: -50, marginTop: -34, minHeight: 67, padding: 5, position: "absolute", width: 100 },
-  lockedNode: { backgroundColor: "rgba(25, 29, 31, 0.88)", borderColor: "#666b69", opacity: 0.82 },
-  currentNode: { borderColor: colors.green, borderWidth: 3 },
-  selectedNode: { backgroundColor: "rgba(72, 57, 29, 0.96)", borderColor: colors.gold, borderWidth: 3 },
+  // mapPosition identifies the center of the flag, not the top-left of its label.
+  node: { alignItems: "center", backgroundColor: "transparent", borderWidth: 0, marginLeft: -50, marginTop: -15, minHeight: 67, paddingHorizontal: 5, position: "absolute", width: 100 },
+  lockedNode: { opacity: 0.78 },
+  currentNode: { opacity: 1 },
+  selectedNode: { transform: [{ scale: 1.05 }] },
   pressedNode: { opacity: 0.72, transform: [{ scale: 0.96 }] },
-  marker: { alignItems: "center", backgroundColor: "#374449", borderColor: "#d4c59d", borderRadius: 2, borderWidth: 1, height: 18, justifyContent: "center", marginTop: -14, width: 18 },
+  marker: { alignItems: "center", backgroundColor: "#374449", borderColor: "#d4c59d", borderRadius: 4, borderWidth: 1, height: 30, justifyContent: "center", width: 30 },
   currentMarker: { backgroundColor: "#27633e", borderColor: colors.green },
   bossMarker: { backgroundColor: "#762f29", borderColor: colors.danger },
   markerText: { color: colors.text, fontSize: 11, fontWeight: "900", lineHeight: 14 },
-  nodeName: { color: colors.text, fontSize: 11, fontWeight: "900", marginTop: 3, textAlign: "center" },
-  nodeState: { color: colors.gold, fontSize: 8, fontWeight: "900", letterSpacing: 0.7, marginTop: 2 },
+  nodeName: { color: colors.text, fontSize: 11, fontWeight: "900", marginTop: 3, textAlign: "center", textShadowColor: "#000", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 },
+  nodeState: { color: colors.gold, fontSize: 8, fontWeight: "900", letterSpacing: 0.7, marginTop: 2, textShadowColor: "#000", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 },
   nodeHint: { color: colors.green, fontSize: 6, fontWeight: "900", letterSpacing: .4, marginTop: 2 },
   threatBadge: { backgroundColor: "rgba(113, 38, 34, .95)", borderRadius: 3, color: "#ffb0a8", fontSize: 6, fontWeight: "900", marginTop: 2, overflow: "hidden", paddingHorizontal: 3, paddingVertical: 1 },
   settlementRow: { alignItems: "center", flexDirection: "row", gap: 2, marginTop: 2 },
@@ -194,6 +209,13 @@ const styles = StyleSheet.create({
   danger: { color: colors.danger, fontWeight: "800", marginTop: 8 },
   boss: { color: colors.gold, fontWeight: "700", marginTop: 8 },
   routeWarning: { color: colors.danger, fontSize: 12, lineHeight: 17, marginTop: 9 },
+  travelReadiness: { borderRadius: 8, borderWidth: 1, marginTop: 10, padding: 9 },
+  travelBlocked: { backgroundColor: "#25191a", borderColor: colors.danger },
+  travelReady: { backgroundColor: "#16241c", borderColor: colors.green },
+  travelReadyText: { color: colors.green, fontSize: 11, fontWeight: "900" },
+  intelButton: { alignItems: "center", borderColor: colors.border, borderTopWidth: 1, marginTop: 12, paddingVertical: 11 },
+  intelLabel: { color: colors.gold, fontSize: 10, fontWeight: "900", letterSpacing: .9 },
+  intelBlock: { backgroundColor: colors.panel2, borderRadius: 8, marginTop: 2, padding: 9 },
   roadTitle: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: 1, marginTop: 13 },
   roads: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 6 },
   road: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, borderRadius: 7, borderWidth: 1, flexDirection: "row", gap: 5, paddingHorizontal: 8, paddingVertical: 6 },

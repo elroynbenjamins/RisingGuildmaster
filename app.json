@@ -3,10 +3,37 @@
     "name": "Guildmaster",
     "slug": "guildmaster",
     "version": "0.1.0",
+    "icon": "./assets/app/guildmaster-app-icon-v1.png",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
-    "assetBundlePatterns": ["**/*"],
-    "android": { "package": "com.guildmaster.game" },
-    "ios": { "bundleIdentifier": "com.guildmaster.game" }
+    "android": {
+      "package": "com.elroybenjamins.risingguildmaster",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/app/guildmaster-app-icon-v1.png",
+        "backgroundColor": "#101416"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.elroybenjamins.risingguildmaster"
+    },
+    "web": {
+      "favicon": "./assets/app/guildmaster-app-icon-v1.png"
+    },
+    "plugins": [
+      "expo-iap",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-2222059903000796~6020835595",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "abcde749-f0ab-4ba2-9135-068b26ef2b4f"
+      }
+    },
+    "owner": "snelroy"
   }
 }

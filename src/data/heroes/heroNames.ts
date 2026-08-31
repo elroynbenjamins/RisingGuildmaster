@@ -40,6 +40,27 @@ export const HERO_NAME_POOLS: Record<RaceId, RaceNamePool> = {
     },
     familyNames: ["Ash-Tusk", "Blackscar", "Bloodaxe", "Ember-Eye", "Grimjaw", "Ironhide", "Redfang", "Skullcleaver", "Stonefist", "Wolf-Breaker", "Bonegrinder", "Doomhammer", "Fireblood", "Frostfang", "Gravelung", "Ironmaw", "Rageborn", "Storm-Tusk", "Thunderfist", "Warsong"],
   },
+  tiefling: {
+    givenNames: {
+      female: ["Akta", "Bryseis", "Criella", "Damaia", "Ea", "Kallista", "Lerissa", "Makaria", "Nemeia", "Orianna", "Phelaia", "Rieta", "Sedra", "Vespera", "Zamira", "Ashka", "Calista", "Euphemia", "Lilith", "Nerissa", "Perseph", "Sable", "Valindra", "Zethaya"],
+      male: ["Akmenos", "Amnon", "Barakas", "Damakos", "Ekemon", "Iados", "Kairon", "Leucis", "Melech", "Mordai", "Morthos", "Pelaios", "Skamos", "Therai", "Zevon", "Azriel", "Cassian", "Dravos", "Kael", "Malach", "Nethros", "Raziel", "Varek", "Xarith"],
+    },
+    familyNames: ["Ashborn", "Brightflame", "Cinderheart", "Duskveil", "Emberwake", "Fellstar", "Gloamward", "Hellward", "Nightglass", "Oathflame", "Redspire", "Sablehorn", "Shadowbrand", "Starfall", "Thornfire", "Vex", "Voidmark", "Wyrd", "Zeal", "Dawnscar"],
+  },
+  stoneborn: {
+    givenNames: {
+      female: ["Avara", "Basra", "Dolma", "Edrin", "Ghala", "Korra", "Marn", "Orra", "Petra", "Runa", "Tavra", "Veyra", "Alma", "Brinna", "Cindra", "Dorra", "Garnet", "Helra", "Kelda", "Mora", "Narra", "Sorra", "Ursa", "Zedra"],
+      male: ["Ardan", "Basalt", "Dorr", "Garran", "Keld", "Marnok", "Orun", "Rokan", "Torr", "Urdan", "Varr", "Zorun", "Bramm", "Cairn", "Dagan", "Flint", "Gorram", "Harkan", "Korr", "Noran", "Slate", "Thar", "Uld", "Zarn"],
+    },
+    familyNames: ["Cairn-Born", "Deepmark", "Granite-Soul", "Greycrag", "Hearthstone", "Obsidian-Vow", "Runecliff", "Slatehand", "Stonewake", "Underroot", "Basalt-Brow", "Bellkeeper", "Cragheart", "Flint-Echo", "Ironmemory", "Quartz-Eye", "Riftstone", "Shardmantle", "Vault-Woken", "Worldroot"],
+  },
+  veilborn: {
+    givenNames: {
+      female: ["Aestra", "Cyrene", "Elira", "Ione", "Letha", "Mirael", "Nyssa", "Oria", "Selyne", "Thessa", "Vaela", "Ysil", "Aelune", "Ceris", "Eirra", "Ilune", "Lys", "Naera", "Olyss", "Rielle", "Syra", "Tirenne", "Vesper", "Zaira"],
+      male: ["Aevren", "Caelis", "Eryx", "Ithran", "Lorien", "Myrel", "Noxen", "Orris", "Saev", "Theron", "Vael", "Zyren", "Aster", "Cyran", "Elyon", "Iovar", "Leth", "Naev", "Oryn", "Rhaes", "Soren", "Tavian", "Veyl", "Zeph"],
+    },
+    familyNames: ["Between-Stars", "Duskmirror", "Echo-Veil", "Gloamstep", "Mistbound", "Moon-Scar", "Quiet-Reed", "Riftwatch", "Twilight-Glass", "Whisperwake", "Ashen-Moon", "Dreamward", "Eventide", "Far-Echo", "Lantern-Veil", "Night-Tide", "Pale-Comet", "Softstep", "Starless", "Threshold"],
+  },
 };
 
 export function generateHeroName(random: RandomSource, raceId: RaceId, gender: HeroGender): string {

@@ -6,6 +6,9 @@ export const RACE_NAME_COLORS: Record<RaceId, string> = {
   elf: "#7FD7FF",
   dwarf: "#F28C6B",
   orc: "#A7D66D",
+  tiefling: "#D687D9",
+  stoneborn: "#B9C4C7",
+  veilborn: "#A99AF2",
 };
 
 export function getRaceNameColor(raceId: RaceId): string { return RACE_NAME_COLORS[raceId]; }

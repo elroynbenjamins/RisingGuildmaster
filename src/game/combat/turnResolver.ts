@@ -14,6 +14,7 @@ import { getHeroEquipmentConditionResistance, getHeroReactiveDefenseModifiers } 
 import { selectEnemySkillTargets } from "./enemyAiUtilityService";
 import { getEnemyTacticalBehavior } from "./tacticalAiService";
 import type { EnemyAiLevel } from "../difficulty/difficultyTypes";
+import { getElevationAttackRollModifier } from "./grid/elevationService";
 
 export interface EnemyTurnInput { instance: EnemyInstance; actor: CombatUnit; heroes: CombatUnit[]; allies: CombatUnit[]; enemyInstances: EnemyInstance[]; heroDefinitionsById?: Readonly<Record<string, Hero>>; board?: CombatBoardState; aiLevel?: EnemyAiLevel }
 export interface EnemyTurnResult extends EnemyTurnInput { skipped: boolean; skillResult?: ResolveSkillResult }
@@ -36,6 +37,8 @@ export function resolveEnemyTurn(input: EnemyTurnInput, random: RandomSource): E
   }
   const firstTarget = targets[0];
   const passiveModifiers = [...getConditionalPassiveModifiers(definition, actor, firstTarget), ...getAuraModifiersForEnemy(input.enemyInstances, input.instance)];
+  const elevationModifier = getElevationAttackRollModifier(input.board, actor.position, firstTarget!.position, skill.range ?? 1);
+  if (elevationModifier) passiveModifiers.push({ stat: "attackRollModifier", operation: "flat", value: elevationModifier, durationTurns: -1 });
   const skillResult = resolveSkill(actor, targets, skill, random, { actorModifiers: passiveModifiers, conditionChance: (target, conditionId, baseChance) => { const hero = input.heroDefinitionsById?.[target.combatantId]; return hero ? baseChance * (1 - getHeroEquipmentConditionResistance(hero, conditionId as import("../heroes/types").ConditionId)) : baseChance; }, reactiveDefenseModifiers: (target, damageType) => { const hero = input.heroDefinitionsById?.[target.combatantId]; return hero ? getHeroReactiveDefenseModifiers(hero, damageType) : []; } });
   actor = { ...skillResult.actor, activeConditions: advanceCombatConditions(skillResult.actor.activeConditions) };
   const activeCooldowns = advanceCooldowns(setSkillCooldown(input.instance.activeCooldowns, skill.id, skill.cooldownTurns ?? 0), skill.id);

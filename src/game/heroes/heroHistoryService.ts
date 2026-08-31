@@ -46,11 +46,13 @@ export interface QuestHistoryInput {
 export function recordQuestHistory(hero: Hero, input: QuestHistoryInput): Hero {
   const status = input.victory ? "Completed" : "Failed";
   const survival = input.fellInBattle ? " Fell in battle and was returned to the guild for revival." : input.newlyInjured ? " Returned with a serious injury." : " Returned safely.";
+  const firstVictory = input.victory && hero.history.questsCompleted === 0; const ideal = hero.roleplayProfile?.idealId;
+  const reflection = !ideal ? "" : ideal === "protection" ? " The record notes who was brought home safely." : ideal === "knowledge" ? " The hero preserved clues others might have overlooked." : ideal === "honor" ? " The result was measured against the promise that began the mission." : ideal === "community" ? " The hero asked first how the nearby people would be affected." : ideal === "ambition" ? " The deed became another mark toward a name worth remembering." : " The hero valued having chosen the road freely.";
   let updated: Hero = {
     ...hero,
     history: {
       ...hero.history,
-      questsCompleted: hero.history.questsCompleted + (input.victory ? 1 : 0),
+      questsCompleted: hero.history.questsCompleted + (input.victory ? 1 : 0), achievements: firstVictory && !hero.history.achievements.includes("First Guild Victory") ? [...hero.history.achievements, "First Guild Victory"] : hero.history.achievements,
     },
   };
   updated = appendHeroHistoryEvent(updated, {
@@ -58,7 +60,7 @@ export function recordQuestHistory(hero: Hero, input: QuestHistoryInput): Hero {
     type: "quest",
     outcome: input.victory ? "positive" : "negative",
     title: `${status}: ${input.questName}`,
-    description: `${input.victory ? "The guild completed the objective" : "The party was forced to withdraw"}.${survival}${input.xpEarned > 0 ? ` Earned ${input.xpEarned} XP.` : ""}`,
+    description: `${input.victory ? "The guild completed the objective" : "The party was forced to withdraw"}.${survival}${input.xpEarned > 0 ? ` Earned ${input.xpEarned} XP.` : ""}${reflection}`,
     questId: input.questId,
     tags: [input.victory ? "victory" : "defeat", input.fellInBattle ? "fallen" : input.newlyInjured ? "injured" : "survived"],
   });

@@ -21,6 +21,12 @@ const heroSkillVisualAliases: Record<string, string> = {
   berserker_reckless_attack: "berserker_frenzied_strike", berserker_war_cry: "commander_arcane_rally", berserker_blood_rush: "berserker_rage", berserker_groundbreaker: "berserker_whirlwind", berserker_brutal_critical: "berserker_rage", berserker_refuse_death: "warrior_battle_hardened",
 };
 for (const [skillId, visualId] of Object.entries(heroSkillVisualAliases)) HERO_SKILL_ICON_COORDINATES[skillId] = HERO_SKILL_ICON_COORDINATES[visualId]!;
+const masterySkillVisualAliases: Record<string, string> = {
+  vanguard_rallying_advance: "commander_arcane_rally", warmaster_battle_standard: "commander_arcane_rally", pathfinder_trailblazer: "ranger_hunters_focus", huntmaster_marked_quarry: "ranger_hunters_mark",
+  high_arcanist_confluence: "mage_arcane_knowledge", warcaster_overchannel: "mage_fireball", beacon_consecrated_presence: "templar_defensive_aura", exorcist_banish_corruption: "hexbreaker_null_seal",
+  crusader_radiant_challenge: "paladin_smite", oathkeeper_steadfast_oath: "paladin_guardians_oath", ravager_rending_sweep: "berserker_whirlwind", totem_bearer_war_totem: "berserker_war_cry"
+};
+for (const [skillId, visualId] of Object.entries(masterySkillVisualAliases)) HERO_SKILL_ICON_COORDINATES[skillId] = HERO_SKILL_ICON_COORDINATES[visualId]!;
 
 /** Enemy abilities reuse this visual vocabulary deterministically pending a dedicated bestiary atlas. */
 const enemyCoordinates = [
@@ -57,13 +63,48 @@ const enemyExpansionBCoordinates = [
   "blood_in_water", "ice_shard", "freezing_gust", "yeti_maul", "thick_winter_fur", "whiteout_fury",
 ] as const;
 export const ENEMY_SKILL_EXPANSION_B_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(enemyExpansionBCoordinates.map((id, index) => [id, { column: index % 6, row: Math.floor(index / 6) }])) as Record<string, SkillIconCoordinate>;
+const frostmarchChapter3Coordinates = ["rimefang_bite", "rime_pounce", "frozen_halberd", "deathless_watch", "aurora_lance", "false_sky_chorus", "hroth_greataxe", "blue_horn_call", "iceblood_fury", "drake_fang", "pale_breath", "echo_of_the_first"] as const;
+export const FROSTMARCH_CHAPTER_3_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(frostmarchChapter3Coordinates.map((id,index)=>[id,{column:index%4,row:Math.floor(index/4)}]));
+for (const id of frostmarchChapter3Coordinates) ENEMY_SKILL_EXPANSION_B_COORDINATES[id] = FROSTMARCH_CHAPTER_3_SKILL_ICON_COORDINATES[id]!;
+const shadowfenChapter4Coordinates = ["mire_claw", "bog_ambush", "rusted_glaive", "shield_of_silt", "gravewater_bolt", "stolen_name", "bell_claw", "funeral_toll", "widows_refrain", "memory_quill", "erase_from_record", "archive_unbound"] as const;
+export const SHADOWFEN_CHAPTER_4_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(shadowfenChapter4Coordinates.map((id,index)=>[id,{column:index%4,row:Math.floor(index/4)}]));
+for (const id of shadowfenChapter4Coordinates) ENEMY_SKILL_EXPANSION_B_COORDINATES[id] = SHADOWFEN_CHAPTER_4_SKILL_ICON_COORDINATES[id]!;
+const chapter6Coordinates=["laurel_sword","formation_rebuke","writ_of_order","laurel_bolt","pinning_volley","oath_spark","binding_clause","examiner_hammer","unlawful_command","echo_touch","borrowed_face","cassian_blade","crown_decree","perfected_authority","sixth_denial"] as const;
+export const GREENVEIL_CHAPTER_6_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(chapter6Coordinates.map((id,index)=>[id,{column:index%4,row:Math.floor(index/4)}]));
+const chapter7Coordinates=["brass_halberd","embassy_interdict","hollow_protocol","crown_pick","sever_anchor","storm_beak","mimic_cry","gale_wings","drake_fang_brass","thunder_sweep","beacon_spark","crown_refraction","gilded_bite","rupture_breath","stolen_concord","storm_rupture"] as const;
+export const IRON_HILLS_CHAPTER_7_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(chapter7Coordinates.map((id,index)=>[id,{column:index%4,row:Math.floor(index/4)}]));
+const chapter8Coordinates=["salt_iron_cutlass","boarding_hook","drowned_discipline","nullwake_bolt","black_squall_volley","devour_oath","hush_the_sixth","borrowed_resolve","reaver_blade","undertow_charge","leviathan_maul","abyssal_hide","admirals_sabre","black_tide_broadside","no_harbor_aura","last_flag_phase"] as const;
+export const WESTERN_SEA_CHAPTER_8_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(chapter8Coordinates.map((id,index)=>[id,{column:index%4,row:Math.floor(index/4)}]));
+const chapter9Coordinates=["drowned_halberd","undertow_guard","lantern_ray","borrowed_light","eat_the_name","swarm_of_doubt","tideglass_claw","mirror_step","gate_fist","civic_bulwark","chartmakers_blade","redraw_battlefield","law_of_the_drowned","below_the_chart","tidal_sentence","chained_voice"] as const;
+export const DROWNED_SEVENTH_CHAPTER_9_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(chapter9Coordinates.map((id,index)=>[id,{column:index%4,row:Math.floor(index/4)}]));
+const masteryCoordinates=["vanguard_rallying_advance","warmaster_battle_standard","pathfinder_trailblazer","huntmaster_marked_quarry","high_arcanist_confluence","warcaster_overchannel","beacon_consecrated_presence","exorcist_banish_corruption","crusader_radiant_challenge","oathkeeper_steadfast_oath","ravager_rending_sweep","totem_bearer_war_totem"] as const;
+export const LEVEL_10_MASTERY_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(masteryCoordinates.map((id,index)=>[id,{column:index%4,row:Math.floor(index/4)}]));
+const monkBardCoordinates = ["monk_unarmed_strike","monk_flurry_of_blows","monk_patient_defense","monk_deflect_missiles","monk_step_of_wind","monk_stunning_strike","monk_sweeping_kick","monk_stillness","monk_quivering_palm","open_hand_push","shadow_step","enlightened_fist_radiant_blow","zen_master_centered_aura","bard_rapier_strike","bard_inspiration","bard_dissonant_whisper","bard_song_of_rest","bard_cutting_words","bard_healing_word","bard_shatter","bard_countercharm","bard_grand_finale","lore_bard_secrets","valor_bard_combat_inspiration","virtuoso_crescendo","war_skald_battle_hymn","monk_perfect_self","bard_jack_of_all_trades"] as const;
+export const MONK_BARD_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(monkBardCoordinates.map((id,index)=>[id,{column:index%5,row:Math.floor(index/5)}]));
+for (const id of monkBardCoordinates) HERO_SKILL_ICON_COORDINATES[id] = MONK_BARD_SKILL_ICON_COORDINATES[id]!;
+const spellbowBulwarkCoordinates = ["spellbow_arcane_arrow","spellbow_ember_arrow","spellbow_frost_arrow","spellbow_runic_aim","spellbow_chain_arrow","spellbow_phase_step","spellbow_null_arrow","spellbow_arcane_volley","spellbow_wardpiercer","spellbow_arcane_reservoir","elemental_archer_trinity_shot","hexstalker_witchbolt","stormshot_tempest_mark","dusk_reaper_silence_arrow","spellbow_class_crest","bulwark_shield_bash","bulwark_interpose","bulwark_brace","bulwark_hold_line","bulwark_challenge","bulwark_guarded_advance","bulwark_shield_sweep","bulwark_last_bastion","bulwark_iron_rebuke","bulwark_unyielding","bastion_sanctuary_wall","vanguard_shield_rush","adamant_sentinel_immovable","ironbreaker_break_line","bulwark_class_crest"] as const;
+export const SPELLBOW_BULWARK_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(spellbowBulwarkCoordinates.map((id,index)=>[id,{column:index%5,row:Math.floor(index/5)}]));
+for (const id of spellbowBulwarkCoordinates) HERO_SKILL_ICON_COORDINATES[id] = SPELLBOW_BULWARK_SKILL_ICON_COORDINATES[id]!;
+const summonerCoordinates = ["summoner_spirit_bolt","summoner_call_wisp","summoner_binding_ward","summoner_shared_essence","summoner_spirit_chain","summoner_planar_step","summoner_banish","summoner_twin_invocation","summoner_greater_eidolon","summoner_soul_conduit","conjurer_elemental_host","spirit_shepherd_recall","planar_binder_seal","legion_master_command","summoner_class_crest"] as const;
+export const SUMMONER_SKILL_ICON_COORDINATES: Record<string, SkillIconCoordinate> = Object.fromEntries(summonerCoordinates.map((id,index)=>[id,{column:index%4,row:Math.floor(index/4)}]));
+for (const id of summonerCoordinates) HERO_SKILL_ICON_COORDINATES[id] = SUMMONER_SKILL_ICON_COORDINATES[id]!;
 
-export type SkillIconAtlasId = "hero" | "enemy" | "ashStory" | "enemyExpansionA" | "enemyExpansionB";
+export type SkillIconAtlasId = "hero" | "enemy" | "ashStory" | "enemyExpansionA" | "enemyExpansionB" | "frostmarchChapter3" | "shadowfenChapter4" | "greenveilChapter6" | "ironHillsChapter7" | "westernSeaChapter8" | "drownedSeventhChapter9" | "level10Mastery" | "monkBard" | "spellbowBulwark" | "summoner";
 
 export function getSkillIconArt(skillId: string): SkillIconCoordinate & { atlas: SkillIconAtlasId } {
+  const summoner = SUMMONER_SKILL_ICON_COORDINATES[skillId]; if (summoner) return { ...summoner, atlas: "summoner" };
+  const spellbowBulwark = SPELLBOW_BULWARK_SKILL_ICON_COORDINATES[skillId]; if (spellbowBulwark) return { ...spellbowBulwark, atlas: "spellbowBulwark" };
+  const monkBard = MONK_BARD_SKILL_ICON_COORDINATES[skillId]; if (monkBard) return { ...monkBard, atlas: "monkBard" };
+  const mastery = LEVEL_10_MASTERY_SKILL_ICON_COORDINATES[skillId]; if (mastery) return { ...mastery, atlas: "level10Mastery" };
   const authored = HERO_SKILL_ICON_COORDINATES[skillId]; if (authored) return { ...authored, atlas: "hero" };
   const enemy = ENEMY_SKILL_ICON_COORDINATES[skillId]; if (enemy) return { ...enemy, atlas: "enemy" };
   const ashStory = ASH_STORY_SKILL_ICON_COORDINATES[skillId]; if (ashStory) return { ...ashStory, atlas: "ashStory" };
+  const frost = FROSTMARCH_CHAPTER_3_SKILL_ICON_COORDINATES[skillId]; if (frost) return { ...frost, atlas: "frostmarchChapter3" };
+  const shadowfen = SHADOWFEN_CHAPTER_4_SKILL_ICON_COORDINATES[skillId]; if (shadowfen) return { ...shadowfen, atlas: "shadowfenChapter4" };
+  const greenveil = GREENVEIL_CHAPTER_6_SKILL_ICON_COORDINATES[skillId]; if (greenveil) return { ...greenveil, atlas: "greenveilChapter6" };
+  const ironHills = IRON_HILLS_CHAPTER_7_SKILL_ICON_COORDINATES[skillId]; if (ironHills) return { ...ironHills, atlas: "ironHillsChapter7" };
+  const westernSea = WESTERN_SEA_CHAPTER_8_SKILL_ICON_COORDINATES[skillId]; if (westernSea) return { ...westernSea, atlas: "westernSeaChapter8" };
+  const drownedSeventh = DROWNED_SEVENTH_CHAPTER_9_SKILL_ICON_COORDINATES[skillId]; if (drownedSeventh) return { ...drownedSeventh, atlas: "drownedSeventhChapter9" };
   const enemyExpansionA = ENEMY_SKILL_EXPANSION_A_COORDINATES[skillId]; if (enemyExpansionA) return { ...enemyExpansionA, atlas: "enemyExpansionA" };
   const enemyExpansionB = ENEMY_SKILL_EXPANSION_B_COORDINATES[skillId]; if (enemyExpansionB) return { ...enemyExpansionB, atlas: "enemyExpansionB" };
   let hash = 0;

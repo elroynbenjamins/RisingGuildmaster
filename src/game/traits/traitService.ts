@@ -10,3 +10,7 @@ export function getHeroTraitModifiers(hero: Hero): Modifier[] {
 export function getTraitPercentage(hero: Hero, target: ModifierTarget, context: ModifierContext = {}): number {
   return getHeroTraitModifiers(hero).filter((modifier) => modifier.target === target && modifier.operation === "percentage" && isModifierActive(modifier, context)).reduce((sum, modifier) => sum + modifier.value, 0);
 }
+
+export function getTraitFlat(hero: Hero, target: ModifierTarget, context: ModifierContext = {}): number {
+  return getHeroTraitModifiers(hero).filter((modifier) => modifier.target === target && modifier.operation === "flat" && isModifierActive(modifier, context)).reduce((sum, modifier) => sum + modifier.value, 0);
+}

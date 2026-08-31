@@ -31,6 +31,7 @@ export function getConditionStatPercentage(unit: CombatUnit, stat: string): numb
     if (stat === "physicalDamage") return sum + (definition.physicalDamageModifier ?? 0);
     if (stat === "magicDamage") return sum + (definition.magicDamageModifier ?? 0);
     if (stat === "speed") return sum + (definition.speedModifier ?? 0);
+    if (stat === "damageReceived") return sum + (definition.damageReceivedModifier ?? 0);
     return sum;
   }, 0);
 }

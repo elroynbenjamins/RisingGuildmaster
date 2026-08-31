@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "../ui";
+import { useTheme } from "../../theme/theme";
 
 export type GameDialogTone = "default" | "success" | "danger";
 export type GameDialogActionTone = "primary" | "secondary" | "danger";
@@ -27,6 +28,7 @@ interface GameDialogContextValue {
 const GameDialogContext = createContext<GameDialogContextValue | null>(null);
 
 export function GameDialogProvider({ children }: React.PropsWithChildren) {
+  const {colors:themeColors}=useTheme();
   const [dialog, setDialog] = useState<GameDialogOptions | null>(null);
   const dismissDialog = useCallback(() => setDialog(null), []);
   const showDialog = useCallback((options: GameDialogOptions) => setDialog(options), []);
@@ -42,15 +44,15 @@ export function GameDialogProvider({ children }: React.PropsWithChildren) {
   return <GameDialogContext.Provider value={value}>
     {children}
     <Modal visible={dialog !== null} transparent animationType="fade" statusBarTranslucent onRequestClose={() => { if (canDismiss) dismissDialog(); }}>
-      <View style={styles.backdrop} accessibilityViewIsModal>
+      <View style={[styles.backdrop,{backgroundColor:themeColors.backdrop}]} accessibilityViewIsModal>
         <Pressable style={StyleSheet.absoluteFill} onPress={() => { if (canDismiss) dismissDialog(); }} accessibilityLabel={canDismiss ? "Close dialog" : undefined} />
-        {dialog && <View style={[styles.card, dialog.tone === "danger" && styles.dangerCard, dialog.tone === "success" && styles.successCard]}>
+        {dialog && <View style={[styles.card,{backgroundColor:themeColors.panel,borderColor:themeColors.gold}, dialog.tone === "danger" && styles.dangerCard, dialog.tone === "success" && styles.successCard]}>
           <View style={styles.crest}><Text style={styles.crestText}>{dialog.tone === "danger" ? "!" : dialog.tone === "success" ? "✓" : "◆"}</Text></View>
           <Text style={[styles.eyebrow, dialog.tone === "danger" && styles.dangerText, dialog.tone === "success" && styles.successText]}>{dialog.eyebrow ?? (dialog.tone === "danger" ? "GUILD WARNING" : dialog.tone === "success" ? "GUILD RECORD" : "GUILD NOTICE")}</Text>
-          <Text style={styles.title}>{dialog.title}</Text>
+          <Text style={[styles.title,{color:themeColors.text}]}>{dialog.title}</Text>
           <View style={styles.rule} />
-          <Text style={styles.message}>{dialog.message}</Text>
-          <View style={styles.actions}>{actions.map((action) => <Pressable key={action.label} accessibilityRole="button" onPress={() => choose(action)} style={({ pressed }) => [styles.action, action.tone === "primary" && styles.primaryAction, action.tone === "danger" && styles.dangerAction, pressed && styles.pressed]}><Text style={[styles.actionText, action.tone === "primary" && styles.primaryActionText, action.tone === "danger" && styles.dangerActionText]}>{action.label}</Text></Pressable>)}</View>
+          <Text style={[styles.message,{color:themeColors.muted}]}>{dialog.message}</Text>
+          <View style={[styles.actions,actions.length>2&&styles.actionStack]}>{actions.map((action) => <Pressable key={action.label} accessibilityRole="button" onPress={() => choose(action)} style={({ pressed }) => [styles.action,{borderColor:themeColors.border}, action.tone === "primary" && {backgroundColor:themeColors.gold,borderColor:themeColors.gold}, action.tone === "danger" && styles.dangerAction, pressed && styles.pressed]}><Text style={[styles.actionText,{color:themeColors.text}, action.tone === "primary" && {color:themeColors.buttonText}, action.tone === "danger" && styles.dangerActionText]}>{action.label}</Text></Pressable>)}</View>
         </View>}
       </View>
     </Modal>
@@ -75,6 +77,7 @@ const styles = StyleSheet.create({
   rule: { alignSelf: "center", backgroundColor: colors.gold, height: 1, marginVertical: 14, opacity: 0.55, width: 72 },
   message: { color: colors.muted, fontSize: 14, lineHeight: 21, textAlign: "center" },
   actions: { flexDirection: "row", gap: 9, marginTop: 20 },
+  actionStack: { flexDirection: "column" },
   action: { alignItems: "center", borderColor: colors.border, borderRadius: 10, borderWidth: 1, flex: 1, justifyContent: "center", minHeight: 46, paddingHorizontal: 10 },
   primaryAction: { backgroundColor: colors.gold, borderColor: colors.gold }, dangerAction: { backgroundColor: "#492725", borderColor: colors.danger },
   actionText: { color: colors.text, fontSize: 13, fontWeight: "900" }, primaryActionText: { color: "#17130c" }, dangerActionText: { color: "#ffd8d4" }, pressed: { opacity: 0.65 },

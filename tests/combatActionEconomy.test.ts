@@ -11,7 +11,10 @@ describe("tactical action economy", () => {
     const enemyId = state.enemies[1]!.instance.instanceId;
     state = performHeroTurn(state, "ranger_precise_shot", sequenceRandom([.999]), enemyId);
     expect(state.awaitingHeroId).toBe(hero.id); expect(state.actions).toMatchObject({ movementUsed: false, combatActionUsed: true });
+    expect(state.lastVisualEvent).toMatchObject({actionId:"ranger_precise_shot",actorId:hero.id,damageType:"physical",range:6});
+    expect(state.lastVisualEvent?.effects[0]).toMatchObject({targetId:enemyId,hit:true});
     state = moveCurrentHero(state, { x: 0, y: 0 }, sequenceRandom([.5]));
     expect(state.actions).toMatchObject({ movementUsed: true, combatActionUsed: true }); expect(state.heroes[0]?.unit.position).toEqual({ x: 0, y: 0 }); expect(() => moveCurrentHero(state, { x: 1, y: 0 }, sequenceRandom([.5]))).toThrow();
+    expect(state.lastVisualEvent).toMatchObject({kind:"movement",actionId:"move",toPosition:{x:0,y:0}});
   });
 });

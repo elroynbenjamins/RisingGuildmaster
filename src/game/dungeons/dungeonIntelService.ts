@@ -3,6 +3,7 @@ import { DUNGEONS, DUNGEON_NODES, DUNGEON_RUN_MODIFIERS } from "../../data/dunge
 import { ROGUELITE_ENCOUNTERS } from "../../data/dungeons/rogueliteEncounters";
 import { ENEMIES } from "../../data/enemies";
 import type { DungeonNodeDefinition, DungeonRunGrade, DungeonRunScore, DungeonRunState } from "./dungeonTypes";
+import { isRogueliteEncounterDiscovered } from "./dungeonService";
 
 export type DungeonRisk = "SAFE" | "UNCERTAIN" | "DANGEROUS" | "DEADLY" | "BOSS";
 
@@ -12,6 +13,29 @@ const riskByType: Record<DungeonNodeDefinition["type"], DungeonRisk> = {
 
 export function getDungeonNodeRisk(node: DungeonNodeDefinition): DungeonRisk { return riskByType[node.type]; }
 
+export interface DungeonDiscoveryReadiness {
+  ready: boolean;
+  eligibleByType: Record<"combat" | "elite" | "boss", number>;
+  totalByType: Record<"combat" | "elite" | "boss", number>;
+  missingEnemyIds: string[];
+}
+
+export function getDungeonDiscoveryReadiness(dungeonId: string, discoveredEnemyIds: readonly string[]): DungeonDiscoveryReadiness {
+  const dungeon = DUNGEONS[dungeonId];
+  const types = ["combat", "elite", "boss"] as const;
+  const eligibleByType = { combat: 0, elite: 0, boss: 0 };
+  const totalByType = { combat: 0, elite: 0, boss: 0 };
+  const missingEnemyIds = new Set<string>();
+  const discovered = new Set(discoveredEnemyIds);
+  for (const type of types) {
+    const encounterIds = [...new Set((dungeon?.nodeIds ?? []).map((id) => DUNGEON_NODES[id]).filter((node) => node?.type === type).flatMap((node) => node?.encounterPoolIds ?? []))];
+    totalByType[type] = encounterIds.length;
+    eligibleByType[type] = encounterIds.filter((id) => isRogueliteEncounterDiscovered(id, discoveredEnemyIds)).length;
+    for (const id of encounterIds) for (const group of ROGUELITE_ENCOUNTERS[id]?.enemies ?? []) if (!discovered.has(group.enemyDefinitionId)) missingEnemyIds.add(group.enemyDefinitionId);
+  }
+  return { ready: types.every((type) => eligibleByType[type] > 0), eligibleByType, totalByType, missingEnemyIds: [...missingEnemyIds] };
+}
+
 export function getDungeonEncounterSummary(encounterId?: string): string | null {
   const encounter = encounterId ? ROGUELITE_ENCOUNTERS[encounterId] : undefined;
   if (!encounter) return null;
@@ -20,9 +44,9 @@ export function getDungeonEncounterSummary(encounterId?: string): string | null 
 
 export function getDungeonNodeRewardSummary(node: DungeonNodeDefinition): string {
   if (node.type === "event") return `D20 ${node.abilityCheck?.attribute.toUpperCase()} · DC ${node.abilityCheck?.difficultyClass} · Success: +${node.successGoldReward ?? 0} base gold · Failure: party loses ${Math.round((node.failureDamageMaxHpModifier ?? 0) * 100)}% max HP`;
-  if (node.type === "combat") return `${node.goldReward ?? 0} base gold · ${node.xpRewardPerHero ?? 0} XP per survivor`;
-  if (node.type === "elite") return `${node.goldReward ?? 0} base gold · ${node.xpRewardPerHero ?? 0} XP · uncommon ring recipe chance`;
-  if (node.type === "boss") return `${node.goldReward ?? 0} base gold · ${node.xpRewardPerHero ?? 0} XP · rare weapon recipe chance`;
+  if (node.type === "combat") return `${node.goldReward ?? 0} base gold · up to ${node.xpRewardPerHero ?? 0} XP per survivor`;
+  if (node.type === "elite") return `${node.goldReward ?? 0} base gold · up to ${node.xpRewardPerHero ?? 0} XP · uncommon ring recipe chance or theme gear`;
+  if (node.type === "boss") return `${node.goldReward ?? 0} base gold · up to ${node.xpRewardPerHero ?? 0} XP · rare weapon recipe chance or theme gear`;
   if (node.type === "treasure") return `${node.goldReward ?? 0} base gold · no combat`;
   if (node.type === "rest") return `Recover ${Math.round((node.healMaxHpModifier ?? 0) * 100)}% HP · ${Math.round((node.manaRecoveryModifier ?? 0) * 100)}% mana/stamina`;
   return `Supplies cost ${node.merchantCost ?? 0} gold · recover ${Math.round((node.healMaxHpModifier ?? 0) * 100)}% HP and ${Math.round((node.manaRecoveryModifier ?? 0) * 100)}% mana/stamina`;

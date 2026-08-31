@@ -12,18 +12,47 @@ import { getEffectiveMovementRange } from "./conditionResolver";
 import { hasLineOfSight } from "./grid/lineOfSight";
 import { leavesMeleeReach } from "./opportunityAttackService";
 import type { EnemyAiLevel } from "../difficulty/difficultyTypes";
+import { getTile } from "./grid/gridTypes";
+import { orthogonalNeighbors } from "./grid/distanceCalculator";
+
+function targetPriorityScore(actor: CombatUnit, target: CombatUnit, behavior: TacticalBehavior): number {
+  if (behavior.targetPriority === "lowest_hp") return (1 - target.currentHP / Math.max(1, target.maxHP)) * 55;
+  if (behavior.targetPriority === "highest_damage") return Math.max(target.stats.physicalDamage, target.stats.magicDamage) * .12;
+  return 28 / Math.max(1, manhattanDistance(actor.position, target.position));
+}
+
+function tacticalAccessScore(actor: CombatUnit, target: CombatUnit, behavior: TacticalBehavior, board: CombatBoardState): number {
+  const connectedToTarget = orthogonalNeighbors(target.position).some((position) => findShortestPath(board, actor.position, position, Infinity, actor.ignoredTerrainMovementCosts));
+  if (!connectedToTarget) return -120;
+  const positions = [actor.position, ...getReachablePositions(board, actor.position, getEffectiveMovementRange(actor), actor.ignoredTerrainMovementCosts)];
+  const currentDistance = manhattanDistance(actor.position, target.position);
+  let bestDistance = currentDistance;
+  let canAttack = false;
+  for (const position of positions) {
+    const distance = manhattanDistance(position, target.position);
+    bestDistance = Math.min(bestDistance, distance);
+    if (distance <= behavior.preferredRange && (behavior.preferredRange <= 1 || hasLineOfSight(position, target.position, board))) canAttack = true;
+  }
+  if (canAttack) return 45;
+  const progress = currentDistance - bestDistance;
+  return progress > 0 ? progress * 8 : -60;
+}
 
 export function getEnemyTacticalBehavior(instance: EnemyInstance): TacticalBehavior {
   const definition = getEnemyDefinition(instance.enemyDefinitionId);
   return TACTICAL_BEHAVIORS[definition.id] ?? defaultTacticalBehavior(definition.role);
 }
 
-export function selectTacticalTarget(actor: CombatUnit, heroes: readonly CombatUnit[], behavior: TacticalBehavior, random: RandomSource, aiLevel: EnemyAiLevel = "trained"): CombatUnit | undefined {
+export function selectTacticalTarget(actor: CombatUnit, heroes: readonly CombatUnit[], behavior: TacticalBehavior, random: RandomSource, aiLevel: EnemyAiLevel = "trained", board?: CombatBoardState): CombatUnit | undefined {
   const living = heroes.filter((hero) => hero.isAlive);
   if (!living.length) return undefined;
   const critical = living.filter((hero) => hero.currentHP / Math.max(1, hero.maxHP) <= (aiLevel === "ruthless" ? .65 : .35));
-  if (aiLevel !== "trained" && critical.length) return [...critical].sort((a, b) => a.currentHP / a.maxHP - b.currentHP / b.maxHP)[0];
+  if (aiLevel !== "trained" && critical.length && !board) return [...critical].sort((a, b) => a.currentHP / a.maxHP - b.currentHP / b.maxHP)[0];
   if (behavior.targetPriority === "random") return random.pick(living);
+  if (board && aiLevel !== "trained") return [...living].sort((a, b) => {
+    const score = (target: CombatUnit) => targetPriorityScore(actor, target, behavior) + tacticalAccessScore(actor, target, behavior, board) + (aiLevel === "ruthless" ? (1 - target.currentHP / Math.max(1, target.maxHP)) * 45 : 0);
+    return score(b) - score(a) || manhattanDistance(actor.position, a.position) - manhattanDistance(actor.position, b.position);
+  })[0];
   return [...living].sort((a, b) => {
     if (behavior.targetPriority === "lowest_hp") return a.currentHP / a.maxHP - b.currentHP / b.maxHP;
     if (behavior.targetPriority === "highest_damage") return Math.max(b.stats.physicalDamage, b.stats.magicDamage) - Math.max(a.stats.physicalDamage, a.stats.magicDamage);
@@ -42,12 +71,12 @@ export function countPathReactionRisks(path: readonly GridPosition[], reactionTh
 
 export function chooseEnemyDestination(board: CombatBoardState, actor: CombatUnit, target: CombatUnit, behavior: TacticalBehavior, reactionThreats: readonly CombatUnit[] = [], aiLevel: EnemyAiLevel = "tactical"): GridPosition {
   const currentDistance = manhattanDistance(actor.position, target.position);
-  const candidates = [actor.position, ...getReachablePositions(board, actor.position, getEffectiveMovementRange(actor))];
+  const candidates = [actor.position, ...getReachablePositions(board, actor.position, getEffectiveMovementRange(actor), actor.ignoredTerrainMovementCosts)];
   const retreating = behavior.retreatRange !== undefined && currentDistance < behavior.retreatRange;
   const lowHealthCaution = (1 - actor.currentHP / Math.max(1, actor.maxHP)) * 20;
   const score = (position: GridPosition): number => {
     const distance = manhattanDistance(position, target.position);
-    const path = position.x === actor.position.x && position.y === actor.position.y ? [actor.position] : findShortestPath(board, actor.position, position, getEffectiveMovementRange(actor)) ?? [actor.position];
+    const path = position.x === actor.position.x && position.y === actor.position.y ? [actor.position] : findShortestPath(board, actor.position, position, getEffectiveMovementRange(actor), actor.ignoredTerrainMovementCosts) ?? [actor.position];
     const reactions = countPathReactionRisks(path, reactionThreats);
     const awareness = aiLevel === "trained" ? .45 : aiLevel === "ruthless" ? 1.35 : 1;
     const reactionPenalty = reactions * ((behavior.reactionRiskWeight ?? 35) + lowHealthCaution) * awareness;
@@ -56,7 +85,8 @@ export function chooseEnemyDestination(board: CombatBoardState, actor: CombatUni
       : Math.abs(distance - behavior.preferredRange) * 12;
     const lineOfSightPenalty = behavior.preferredRange > 1 && !hasLineOfSight(position, target.position, board) ? 24 : 0;
     const adjacentHeroPenalty = behavior.retreatRange !== undefined ? reactionThreats.filter((hero) => manhattanDistance(position, hero.position) <= 1).length * 8 : 0;
-    return rangePenalty + reactionPenalty + lineOfSightPenalty + adjacentHeroPenalty;
+    const elevationReward = behavior.preferredRange > 1 && aiLevel !== "trained" ? (getTile(board, position)?.elevation ?? 0) * (aiLevel === "ruthless" ? 8 : 5) : 0;
+    return rangePenalty + reactionPenalty + lineOfSightPenalty + adjacentHeroPenalty - elevationReward;
   };
   return candidates.sort((a, b) => score(a) - score(b) || manhattanDistance(a, target.position) - manhattanDistance(b, target.position))[0]!;
 }

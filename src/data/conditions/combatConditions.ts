@@ -15,6 +15,7 @@ export interface CombatConditionDefinition {
   attacksAgainstRollMode?: D20RollMode;
   armorClassModifier?: number;
   magicDefenseScoreModifier?: number;
+  damageReceivedModifier?: number;
   movementRangeModifier?: number;
   movementRangeOverride?: number;
   blocksMagicSkills?: boolean;
@@ -39,4 +40,12 @@ export const COMBAT_CONDITIONS: Record<string, CombatConditionDefinition> = {
   restrained: { id: "restrained", name: "Restrained", description: "Cannot move and suffers -2 to attacks and Armor Class.", movementRangeOverride: 0, attackRollModifier: -2, armorClassModifier: -2, durationTurns: 2, stackable: false, persistsAfterCombat: false },
   prone: { id: "prone", name: "Prone", description: "Knocked down: suffers -2 to attacks and Armor Class and loses 2 movement tiles.", movementRangeModifier: -2, attackRollModifier: -2, armorClassModifier: -2, durationTurns: 1, stackable: false, persistsAfterCombat: false },
   slowed: { id: "slowed", name: "Slowed", description: "Movement is hindered, reducing movement range by 2 tiles.", movementRangeModifier: -2, durationTurns: 2, stackable: false, persistsAfterCombat: false },
+  charmed: { id: "charmed", name: "Charmed", description: "Magically influenced; harmful actions are made with Disadvantage until source-aware targeting is added.", attackRollMode: "disadvantage", durationTurns: 2, stackable: false, persistsAfterCombat: false },
+  deafened: { id: "deafened", name: "Deafened", description: "Cannot hear and automatically fails hearing-dependent checks.", durationTurns: 2, stackable: false, persistsAfterCombat: false },
+  grappled: { id: "grappled", name: "Grappled", description: "Movement becomes 0, but combat actions remain available.", movementRangeOverride: 0, durationTurns: 2, stackable: false, persistsAfterCombat: false },
+  incapacitated: { id: "incapacitated", name: "Incapacitated", description: "Cannot take actions or reactions.", skipTurn: true, movementRangeOverride: 0, durationTurns: 1, stackable: false, persistsAfterCombat: false },
+  invisible: { id: "invisible", name: "Invisible", description: "Attacks have Advantage and attacks against the unit have Disadvantage.", attackRollMode: "advantage", attacksAgainstRollMode: "disadvantage", durationTurns: 2, stackable: false, persistsAfterCombat: false },
+  paralyzed: { id: "paralyzed", name: "Paralyzed", description: "Cannot act or move; attacks against the unit have Advantage.", skipTurn: true, movementRangeOverride: 0, attacksAgainstRollMode: "advantage", durationTurns: 1, stackable: false, persistsAfterCombat: false },
+  petrified: { id: "petrified", name: "Petrified", description: "Turned to stone: cannot act or move, attacks gain Advantage, and incoming damage is halved.", skipTurn: true, movementRangeOverride: 0, attacksAgainstRollMode: "advantage", damageReceivedModifier: -.50, durationTurns: 2, stackable: false, persistsAfterCombat: false },
+  unconscious: { id: "unconscious", name: "Unconscious", description: "Cannot act or move; attacks against the unit have Advantage.", skipTurn: true, movementRangeOverride: 0, attacksAgainstRollMode: "advantage", durationTurns: 1, stackable: false, persistsAfterCombat: false },
 };

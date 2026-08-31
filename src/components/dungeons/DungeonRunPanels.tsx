@@ -6,6 +6,7 @@ import { getDungeonEncounterSummary, getDungeonNodeRewardSummary, getDungeonNode
 import type { GuildState } from "../../game/guild/types";
 import { Panel, Portrait, colors } from "../ui";
 import { DungeonNodeArtworkIcon } from "./DungeonArtwork";
+import { useTheme } from "../../theme/theme";
 
 const RISK_COLORS = { SAFE: colors.green, UNCERTAIN: colors.gold, DANGEROUS: "#e29a55", DEADLY: colors.danger, BOSS: "#d277ff" } as const;
 
@@ -14,12 +15,13 @@ function Bar({ value, color }: { value: number; color: string }) {
 }
 
 export function DungeonPartyHud({ guild, run }: { guild: GuildState; run: DungeonRunState }) {
-  return <Panel style={styles.partyPanel}><View style={styles.partyHeader}><Text style={styles.heading}>EXPEDITION PARTY</Text><Text style={styles.survivors}>{run.heroInstances.filter((entry) => entry.isAlive).length}/4 standing</Text></View><View style={styles.partyGrid}>{run.heroInstances.map((instance) => { const hero = guild.heroes.find((entry) => entry.id === instance.heroId); if (!hero) return null; const hp = instance.maxHP ? instance.currentHP / instance.maxHP * 100 : 0; const mana = instance.maxMana ? instance.currentMana / instance.maxMana * 100 : 0; return <View key={instance.heroId} style={[styles.partyHero, !instance.isAlive && styles.fallen]}><Portrait hero={hero} size={42}/><View style={styles.heroInfo}><Text numberOfLines={1} style={styles.heroName}>{hero.name}</Text><Text style={styles.resource}>HP {Math.max(0, Math.round(instance.currentHP))}/{Math.round(instance.maxHP)}</Text><Bar value={hp} color={hp <= 30 ? colors.danger : colors.green}/><Text style={styles.resource}>MP {Math.round(instance.currentMana)}/{Math.round(instance.maxMana)}</Text><Bar value={mana} color="#5797d1"/></View></View>; })}</View></Panel>;
+  const{colors:themeColors}=useTheme();return <Panel style={styles.partyPanel}><View style={styles.partyHeader}><Text style={[styles.heading,{color:themeColors.gold}]}>EXPEDITION PARTY</Text><Text style={[styles.survivors,{color:themeColors.muted}]}>{run.heroInstances.filter((entry) => entry.isAlive).length}/4 standing</Text></View><View style={styles.partyGrid}>{run.heroInstances.map((instance) => { const hero = guild.heroes.find((entry) => entry.id === instance.heroId); if (!hero) return null; const hp = instance.maxHP ? instance.currentHP / instance.maxHP * 100 : 0; const mana = instance.maxMana ? instance.currentMana / instance.maxMana * 100 : 0; return <View key={instance.heroId} style={[styles.partyHero,{backgroundColor:themeColors.panel2},!instance.isAlive&&styles.fallen]}><Portrait hero={hero} size={42}/><View style={styles.heroInfo}><Text numberOfLines={1} style={[styles.heroName,{color:themeColors.text}]}>{hero.name}</Text><Text style={[styles.resource,{color:themeColors.muted}]}>HP {Math.max(0, Math.round(instance.currentHP))}/{Math.round(instance.maxHP)}</Text><Bar value={hp} color={hp<=30?themeColors.danger:themeColors.green}/><Text style={[styles.resource,{color:themeColors.muted}]}>MP {Math.round(instance.currentMana)}/{Math.round(instance.maxMana)}</Text><Bar value={mana} color={themeColors.blue}/></View></View>; })}</View></Panel>;
 }
 
 function MapNode({ node, run, accentColor }: { node: DungeonNodeDefinition; run: DungeonRunState; accentColor: string }) {
+  const {colors:themeColors}=useTheme();
   const current = node.id === run.currentNodeId; const cleared = run.resolvedNodeIds.includes(node.id); const visited = run.visitedNodeIds.includes(node.id);
-  return <View style={[styles.mapNode, current && { borderColor: accentColor, borderWidth: 2 }, cleared && styles.cleared]}><DungeonNodeArtworkIcon type={node.type}/><Text numberOfLines={1} style={styles.mapName}>{node.title}</Text><Text style={[styles.mapState, current && { color: accentColor }]}>{current ? "◆ CURRENT" : cleared ? "✓ CLEARED" : visited ? "• VISITED" : node.type.toUpperCase()}</Text></View>;
+  return <View style={[styles.mapNode,{backgroundColor:themeColors.panel2,borderColor:themeColors.border},current&&{borderColor:accentColor,borderWidth:2},cleared&&{backgroundColor:themeColors.panel}]}><DungeonNodeArtworkIcon type={node.type}/><Text numberOfLines={1} style={[styles.mapName,{color:themeColors.text}]}>{node.title}</Text><Text style={[styles.mapState,{color:themeColors.muted},current&&{color:accentColor}]}>{current?"◆ CURRENT":cleared?"✓ CLEARED":visited?"• VISITED":node.type.toUpperCase()}</Text></View>;
 }
 
 export function DungeonRouteMap({ dungeon, run }: { dungeon: DungeonDefinition; run: DungeonRunState }) {
@@ -28,8 +30,8 @@ export function DungeonRouteMap({ dungeon, run }: { dungeon: DungeonDefinition; 
 }
 
 export function DungeonNodeIntel({ node, encounterId }: { node: DungeonNodeDefinition; encounterId?: string }) {
-  const risk = getDungeonNodeRisk(node); const encounter = getDungeonEncounterSummary(encounterId);
-  return <View style={styles.intel}><View style={styles.intelTop}><Text style={[styles.risk, { color: RISK_COLORS[risk] }]}>{risk} ROUTE</Text><Text style={styles.reward}>{getDungeonNodeRewardSummary(node)}</Text></View>{encounter && <Text style={styles.enemies}>ENEMIES: {encounter}</Text>}</View>;
+  const{colors:themeColors}=useTheme();const risk=getDungeonNodeRisk(node);const encounter=getDungeonEncounterSummary(encounterId);
+  return <View style={[styles.intel,{borderTopColor:themeColors.border}]}><View style={styles.intelTop}><Text style={[styles.risk,{color:RISK_COLORS[risk]}]}>{risk} ROUTE</Text><Text style={[styles.reward,{color:themeColors.text}]}>{getDungeonNodeRewardSummary(node)}</Text></View>{encounter&&<Text style={[styles.enemies,{color:themeColors.muted}]}>ENEMIES: {encounter}</Text>}</View>;
 }
 
 const styles = StyleSheet.create({

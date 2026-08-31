@@ -11,6 +11,17 @@ export interface SkillModifier { stat: string; operation: SkillModifierOperation
 export interface AuraDefinition { target: "all_allies" | "same_faction_allies"; factionId?: EnemyFactionId; modifiers: SkillModifier[]; excludeSelf: boolean; trigger?: SkillTriggerConditions }
 export interface SkillTriggerConditions { selfHpRatioMax?: number; selfHpRatioMin?: number; targetHpRatioMax?: number; targetHpRatioMin?: number }
 export interface ConditionalSkillModifier { conditions: SkillTriggerConditions; modifiers: SkillModifier[] }
+export interface CompanionSkillDefinition {
+  id: string;
+  hpMultiplier: number;
+  damageMultiplier: number;
+  damageScalingStat: "physicalDamage" | "magicDamage";
+  damageType: "physical" | "magic";
+  armorClassModifier: number;
+  movementRange: number;
+  durationTurns: number;
+  maxActive: 1;
+}
 
 export interface CombatSkillDefinition {
   id: string;
@@ -38,7 +49,7 @@ export interface CombatSkillDefinition {
   aura?: AuraDefinition;
   conditionalModifiers?: ConditionalSkillModifier[];
   taunt?: { durationTurns: number; offTargetAttackRollModifier: number };
-  companion?: { id: string; hpMultiplier: number; physicalDamageMultiplier: number; armorClassModifier: number; movementRange: number; maxActive: number };
+  companion?: CompanionSkillDefinition;
   flameWall?: { connectedTileCount: number; durationRounds: number; magicPowerDamageMultiplier: number };
   savingThrowCondition?: { type: "strength" | "dexterity" | "constitution" | "intelligence" | "wisdom" | "charisma"; difficultyClass: number; conditionId: string; durationTurns: number };
   clearTargetBuffsDurationTurns?: number;

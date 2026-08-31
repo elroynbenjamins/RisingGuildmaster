@@ -9,6 +9,8 @@ import { collectRegionalScoutReport as collectScout, dispatchRegionalScout as di
 import type { ClassId, RaceId } from "../game/heroes/types";
 import { recordTutorialRecruit, recordTutorialRefresh } from "../game/onboarding/tutorialService";
 import type { GameDifficultyId } from "../game/difficulty/difficultyTypes";
+import { loadAccountContentEntitlements } from "../game/monetization/accountEntitlementService";
+import { applyContentEntitlements } from "../game/monetization/contentUnlockService";
 
 interface GuildContextValue { guild: GuildState; candidates: RecruitmentCandidate[]; isHydrated: boolean; hasSave: boolean; gameStarted: boolean; startNewGame(difficultyId?: GameDifficultyId): void; continueGame(): void; refreshCandidates(free?: boolean): string | null; dispatchRegionalScout(raceId: RaceId, classId?: ClassId | null): string | null; focusRegionalScoutClass(classId: ClassId): string | null; speedUpRegionalScout(): string | null; collectRegionalScoutReport(): string | null; recruitCandidate(candidateId: string): string | null; scoutCandidate(candidateId: string): string | null; reserveCandidate(candidateId: string): string | null; rejectCandidate(candidateId: string): string | null; updateGuild(guild: GuildState): void }
 const GuildContext = createContext<GuildContextValue | null>(null);
@@ -16,11 +18,11 @@ const resultOf = (action: () => GuildState, setGuild: React.Dispatch<React.SetSt
 
 export function GuildProvider({ children }: React.PropsWithChildren) {
   const [guild, setGuild] = useState(() => createGuild()); const [hydrated, setHydrated] = useState(false); const [hasSave, setHasSave] = useState(false); const [gameStarted, setGameStarted] = useState(false);
-  useEffect(() => { void loadGuild().then((saved) => { const loaded = saved ?? createGuild(); setGuild(initializeRecruitment(loaded, createSeededRandom(randomSeed()))); setHasSave(Boolean(saved)); setHydrated(true); }).catch(() => { setGuild(initializeRecruitment(createGuild(), createSeededRandom(randomSeed()))); setHydrated(true); }); }, []);
+  useEffect(() => { void Promise.all([loadGuild(), loadAccountContentEntitlements()]).then(([saved, accountEntitlements]) => { const loaded = applyContentEntitlements(saved ?? createGuild(), accountEntitlements); setGuild(initializeRecruitment(loaded, createSeededRandom(randomSeed()))); setHasSave(Boolean(saved)); setHydrated(true); }).catch(() => { setGuild(initializeRecruitment(createGuild(), createSeededRandom(randomSeed()))); setHydrated(true); }); }, []);
   useEffect(() => { if (hydrated && gameStarted) { setHasSave(true); void saveGuild(guild); } }, [guild, hydrated, gameStarted]);
   const value = useMemo<GuildContextValue>(() => ({
     guild, candidates: guild.recruitment.candidates, isHydrated: hydrated, hasSave, gameStarted,
-    startNewGame: (difficultyId = "standard") => { setGuild(initializeRecruitment(createGuild("The Wayfarers", difficultyId), createSeededRandom(randomSeed()))); setGameStarted(true); setHasSave(true); },
+    startNewGame: (difficultyId = "standard") => { const freshGuild = applyContentEntitlements(createGuild("The Wayfarers", difficultyId), guild.entitlements); setGuild(initializeRecruitment(freshGuild, createSeededRandom(randomSeed()))); setGameStarted(true); setHasSave(true); },
     continueGame: () => setGameStarted(true),
     refreshCandidates: (free = false) => resultOf(() => guild.tutorial.active && guild.tutorial.step === "refresh_board" ? recordTutorialRefresh(tutorialRefreshRecruitment(guild, createSeededRandom(randomSeed()))) : free ? freeRefreshRecruitment(guild, createSeededRandom(randomSeed())) : manualRefreshRecruitment(guild, createSeededRandom(randomSeed())), setGuild),
     dispatchRegionalScout: (raceId, classId = null) => resultOf(() => dispatchScout(guild, raceId, createSeededRandom(randomSeed()), classId), setGuild),

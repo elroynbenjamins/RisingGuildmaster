@@ -1,11 +1,14 @@
 import React from "react";
-import { Image, StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { GAME_ICON_COORDINATES, type GameIconId } from "../../data/ui/gameIcons";
 import { colors } from "../ui";
+import { AtlasCrop } from "../art/AtlasCrop";
+import { useTheme } from "../../theme/theme";
 
 const ATLAS = require("../../../assets/ui/game-icons-atlas-v1.png");
 export function GameIcon({ id, size = 42, framed = true }: { id: GameIconId; size?: number; framed?: boolean }) {
+  const {colors:themeColors}=useTheme();
   const coordinate = GAME_ICON_COORDINATES[id];
-  return <View accessibilityLabel={`${id.replace(/_/g, " ")} icon`} style={[styles.crop, { width: size, height: size, borderRadius: framed ? Math.max(4, size * .13) : 0 }, framed && styles.frame]}><Image fadeDuration={0} resizeMode="stretch" source={ATLAS} style={{ position: "absolute", width: size * 6, height: size * 6, left: -coordinate.column * size, top: -coordinate.row * size }} /></View>;
+  return <AtlasCrop accessibilityLabel={`${id.replace(/_/g, " ")} icon`} source={ATLAS} columns={6} rows={6} column={coordinate.column} row={coordinate.row} size={size} borderWidth={framed ? 1 : 0} frameStyle={[styles.crop,{backgroundColor:themeColors.panel2,borderRadius:framed?Math.max(4,size*.13):0},framed&&{borderColor:themeColors.gold}]} />;
 }
-const styles = StyleSheet.create({ crop: { backgroundColor: "#09111b", overflow: "hidden" }, frame: { borderColor: colors.gold, borderWidth: 1 } });
+const styles = StyleSheet.create({ crop: { backgroundColor: "#09111b" }, frame: { borderColor: colors.gold } });

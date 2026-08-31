@@ -11,12 +11,15 @@ import { guildmasterXpToNextLevel } from "../../game/guildmaster/guildmasterProg
 import { useGuild } from "../../state/GuildContext";
 import { getGuildNotifications } from "../../ui/guildStatus";
 import { getRaceNameColor } from "../../ui/raceColors";
+import { presentPendingDayMilestoneAd } from "../../game/monetization/dayMilestoneAdPresenter";
+import { useTheme } from "../../theme/theme";
 
 type Destination = GuildPriorityDestination | "heroes";
 const QUICK_ACTIONS: { label: string; target: Destination; iconId: GameIconId }[] = [{ label: "Recruit", target: "recruitment", iconId: "recruitment" }, { label: "Train", target: "training", iconId: "training" }, { label: "Temple", target: "temple", iconId: "temple" }, { label: "Manage", target: "management", iconId: "management" }];
 
 export function GuildScreen({ navigate }: { navigate(destination: Destination): void }) {
   const { showDialog } = useGameDialog();
+  const { colors: themeColors } = useTheme();
   const { guild, updateGuild } = useGuild();
   const recent = guild.recentPartyHeroIds.map((id) => guild.heroes.find((hero) => hero.id === id)).filter((hero): hero is NonNullable<typeof hero> => Boolean(hero));
   const notifications = getGuildNotifications(guild);
@@ -24,9 +27,9 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
   const priority = getGuildPriority(guild);
   const nextDay = previewNextGuildDay(guild);
   const tavernIncome = dailyTavernIncome(guild);
-  const endDay = () => showDialog({ title: "End Guild Day?", message: `Advance to Day ${nextDay.targetDay}?\n\nHeroes recover ${GAME_CONFIG.adventureStaminaRecoveryPerDay} readiness and the tavern earns ${tavernIncome} gold.`, eyebrow: "ADVANCE CALENDAR", actions: [{ label: "Cancel", tone: "secondary" }, { label: "End Day", tone: "primary", onPress: () => { const result = advanceGuildTime(guild); updateGuild(result.guild); const resolution = result.days[0]; showDialog({ title: `Day ${resolution?.day ?? result.guild.currentDay}`, message: resolution?.events.map((event) => event.text).join("\n") || "A quiet day passes in Guildhaven.", tone: "success" }); } }] });
+  const endDay = () => showDialog({ title: "End Guild Day?", message: `Advance to Day ${nextDay.targetDay}?\n\nHeroes recover ${GAME_CONFIG.adventureStaminaRecoveryPerDay} readiness and the tavern earns ${tavernIncome} gold.`, eyebrow: "ADVANCE CALENDAR", actions: [{ label: "Cancel", tone: "secondary" }, { label: "End Day", tone: "primary", onPress: () => { const result = advanceGuildTime(guild); updateGuild(result.guild); if (presentPendingDayMilestoneAd(result.guild, updateGuild, showDialog)) return; const resolution = result.days[0]; showDialog({ title: `Day ${resolution?.day ?? result.guild.currentDay}`, message: resolution?.events.map((event) => event.text).join("\n") || "A quiet day passes in Guildhaven.", tone: "success" }); } }] });
 
-  return <ScrollView contentContainerStyle={styles.content}>
+  return <ScrollView style={{ backgroundColor: themeColors.background }} contentContainerStyle={styles.content}>
     <Text style={styles.eyebrow}>GUILD HALL</Text><View style={styles.titleRow}><Text style={styles.title}>Command Center</Text><Text style={styles.day}>DAY {guild.currentDay}</Text></View>
     <Pressable onPress={() => navigate("management")}><Panel style={styles.guildmaster}><View style={styles.levelBadge}><Text style={styles.levelLabel}>GUILDMASTER</Text><Text style={styles.level}>LV {guild.guildmaster.level}</Text></View><View style={styles.flex}><Text style={styles.progress}>{guild.guildmaster.xp} / {xpRequired} XP | {guild.guildmaster.skillPoints} skill point{guild.guildmaster.skillPoints === 1 ? "" : "s"}</Text><View style={styles.track}><View style={[styles.fill, { width: `${Math.min(100, guild.guildmaster.xp / xpRequired * 100)}%` }]} /></View><Text style={styles.manageHint}>Tap Manage to develop leadership skills</Text></View></Panel></Pressable>
     <View style={styles.quick}>{QUICK_ACTIONS.map((action) => <Pressable key={action.target} onPress={() => navigate(action.target)} style={styles.quickButton}><GameIcon id={action.iconId} size={34} framed={false} /><Text style={styles.quickLabel}>{action.label}</Text></Pressable>)}</View>

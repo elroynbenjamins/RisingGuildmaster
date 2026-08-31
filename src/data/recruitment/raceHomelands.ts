@@ -2,7 +2,7 @@ import type { RaceId } from "../../game/heroes/types";
 
 export interface RaceHomelandDefinition {
   raceId: RaceId;
-  regionId: "greenveil" | "iron_hills" | "frostmarch" | "ashlands";
+  regionId: "greenveil" | "iron_hills" | "frostmarch" | "ashlands" | "shadowfen";
   locationName: string;
   peopleName: string;
   scoutApproach: string;
@@ -56,4 +56,16 @@ export const RACE_HOMELANDS: Record<RaceId, RaceHomelandDefinition> = {
     wardstoneLegacy: "The eastern Wardstone once drew poisonous magic out of the soil. Its failure has ruined wells and ignited old blood-feuds over safe ground, while signs suggest someone is deliberately directing desperate warbands westward.",
     loreUnlockFlag: "lore_red_mesa_clanroads",
   },
+  tiefling: {
+    raceId: "tiefling",
+    regionId: "ashlands",
+    locationName: "Emberfall's Veiled Quarter",
+    peopleName: "Ember-Blooded",
+    scoutApproach: "Bring sealed references to the lantern courts, listen before asking about bloodlines, and seek performers, ward-scribes, and caravan mediators at dusk.",
+    description: "Tiefling families have lived around Emberfall for generations, where infernal features are treated as ancestry rather than allegiance. The Veiled Quarter is famous for oath-law, music halls, discreet arcane tutors, and mutual-aid companies that protect those judged by appearance.",
+    wardstoneLegacy: "Ashlands scholars believe the eastern Wardstone once filtered planar residue from volcanic leylines. Its failure has intensified old magic—and made the Ember-Blooded invaluable guides to effects others mistake for curses.",
+    loreUnlockFlag: "lore_veiled_quarter",
+  },
+  stoneborn: { raceId: "stoneborn", regionId: "iron_hills", locationName: "The Seventh Cairn-Vault", peopleName: "Awakened Cairnfolk", scoutApproach: "Bring a witnessed memory, speak softly beside the Bell, and let each awakened Stoneborn choose whether the guild's road should become their own.", description: "Stoneborn are living mineral bodies carrying ancestral echoes without being ruled by them. Since the Seventh Bell rang again, a small community has gathered below Kharum-Deep to learn surface customs and decide what their second lives mean.", wardstoneLegacy: "Their awakening rite was once tied to the central Wardstone. Its damage silenced generations of cairn-vaults until the guild restored the Seventh Bell's broken resonance.", loreUnlockFlag: "lore_stoneborn_awakened" },
+  veilborn: { raceId: "veilborn", regionId: "shadowfen", locationName: "The Twilight Archive", peopleName: "Veil-Kin", scoutApproach: "Carry a lit memory-lantern through Blackwater and ask the archive's living keepers, never its echoes, who wishes to walk beyond the fen.", description: "Veilborn communities inhabit sanctums where the mortal world overlaps its echo. They preserve dangerous memories, mediate with peaceful spirits, and distrust anyone who treats the dead as fuel.", wardstoneLegacy: "Shadowfen's Wardstone held the Echo Veil at a safe distance. The archive below revealed that the Veilborn have quietly repaired its smallest fractures for centuries.", loreUnlockFlag: "lore_veilborn_archive" },
 };

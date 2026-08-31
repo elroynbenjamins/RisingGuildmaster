@@ -29,11 +29,12 @@ describe("new-game onboarding and progression gates", () => {
     expect(isQuestBoardCategoryUnlocked("contract", world)).toBe(false);
     expect(isQuestBoardCategoryUnlocked("boss", world)).toBe(false);
     const afterMerchant = { ...world, completedCampaignNodeIds: ["missing_merchant"] };
-    expect(isQuestBoardCategoryUnlocked("contract", afterMerchant)).toBe(false);
-    expect(isQuestBoardCategoryUnlocked("side", afterMerchant)).toBe(true);
+    expect(isQuestBoardCategoryUnlocked("contract", afterMerchant, 2)).toBe(true);
+    expect(isQuestBoardCategoryUnlocked("side", afterMerchant, 2)).toBe(false);
+    expect(isQuestBoardCategoryUnlocked("side", afterMerchant, 3)).toBe(true);
     expect(isQuestBoardCategoryUnlocked("boss", afterMerchant)).toBe(false);
     const afterChapterOne = { ...afterMerchant, completedCampaignNodeIds: ["missing_merchant", "broken_wardstone"] };
-    expect(isQuestBoardCategoryUnlocked("contract", afterChapterOne)).toBe(true);
+    expect(isQuestBoardCategoryUnlocked("contract", afterChapterOne, 2)).toBe(true);
     expect(isQuestBoardCategoryUnlocked("boss", afterChapterOne)).toBe(true);
   });
 
@@ -60,7 +61,7 @@ describe("gems, economy, and hero rotation", () => {
   it("spends quest readiness and recovers it gradually when days advance", () => {
     const hero = generateHero(createSeededRandom(7));
     const base = { ...createGuild(), heroes: [hero] };
-    const spent = spendPartyAdventureStamina(base, [hero.id], QUESTS.goblin_patrol!);
+    const spent = spendPartyAdventureStamina(base, [hero.id], QUESTS.orchard_road_patrol!);
     expect(spent.heroes[0]!.adventureStamina).toBe(50);
     expect(recoverAdventureStamina(spent).heroes[0]!.adventureStamina).toBe(75);
     const nextDay = advanceGuildTime(spent).guild;

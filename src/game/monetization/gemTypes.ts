@@ -1,4 +1,4 @@
-export type GemTransactionType = "rewarded_ad" | "purchase" | "revival" | "scouting" | "gold_exchange" | "grant";
+export type GemTransactionType = "rewarded_ad" | "purchase" | "revival" | "scouting" | "gold_exchange" | "grant" | "daily_login" | "content_unlock";
 
 export interface GemTransaction {
   id: string;

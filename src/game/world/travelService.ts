@@ -1,19 +1,49 @@
 import { REGIONS } from "../../data/world/regions";
+import { SETTLEMENTS } from "../../data/world/settlements";
+import { REGION_TRAVEL_DAYS, TRAVEL_TIER_RANGES } from "../../data/world/travelTables";
 import { WORLD_EVENTS } from "../../data/world/worldEvents";
+import { GAME_CONFIG } from "../../config/gameConfig";
 import type { RandomSource } from "../../utils/random";
-import type { WorldEventDefinition, WorldState } from "./worldTypes";
-import { WORLD_DEFINITION } from "../../data/world/world";
-export const TRAVEL_EVENT_CHANCE = WORLD_DEFINITION.travelEventChance;
-export interface TravelResult { state: WorldState; event: WorldEventDefinition | null }
+import { advanceGuildTime } from "../economy/guildCalendarService";
+import type { GuildState } from "../guild/types";
+import type { TravelEventTier, WorldEventDefinition, WorldState } from "./worldTypes";
+import type { GuildmasterProfile } from "../guildmaster/guildmasterTypes";
+import { hasGuildmasterSkill } from "../guildmaster/guildmasterProgression";
+import { createGuildLegacyState, displayedTrophyBonus } from "../renown/guildLegacyService";
+
+export const TRAVEL_EVENT_CHANCE = .45;
+export interface TravelResult { state: WorldState; event: WorldEventDefinition | null; d100Roll?: number; tier?: TravelEventTier | null }
+export interface GuildTravelResult extends TravelResult { guild: GuildState; days: number; rationCost: number }
 export function canTravel(state: WorldState, destinationRegionId: string): boolean { const current = REGIONS[state.currentRegionId]; return Boolean(current && state.unlockedRegionIds.includes(destinationRegionId) && current.connectedRegionIds.includes(destinationRegionId)); }
+export function getRegionalTravelDays(fromRegionId: string, toRegionId: string): number { return REGION_TRAVEL_DAYS[`${fromRegionId}:${toRegionId}`] ?? 1; }
+export function getTravelRationCost(days: number, partySize: number, profile?: GuildmasterProfile): number { const base = Math.max(1, days) * Math.max(1, partySize); return Math.max(1, Math.ceil(base * (profile && hasGuildmasterSkill(profile, "careful_rationing") ? .75 : 1))); }
+export function getTravelTier(roll: number): TravelEventTier | null { return (Object.entries(TRAVEL_TIER_RANGES) as [TravelEventTier, { min: number; max: number }][]).find(([, range]) => roll >= range.min && roll <= range.max)?.[0] ?? null; }
 export function rollTravelEvent(regionId: string, random: RandomSource): WorldEventDefinition | null {
-  if (random.next() >= TRAVEL_EVENT_CHANCE) return null;
-  const available = Object.values(WORLD_EVENTS).filter((event) => event.regionIds.includes(regionId)); if (!available.length) return null;
-  const total = available.reduce((sum, event) => sum + event.weight, 0); let roll = random.next() * total;
-  for (const event of available) { roll -= event.weight; if (roll <= 0) return event; } return available[available.length - 1] ?? null;
+  const roll = random.int(1, 100); const tier = getTravelTier(roll); if (!tier) return null;
+  const available = Object.values(WORLD_EVENTS).filter((event) => event.regionIds.includes(regionId) && (event.tier ?? "common") === tier); if (!available.length) return null;
+  const total = available.reduce((sum, event) => sum + event.weight, 0); let weighted = random.next() * total;
+  for (const event of available) { weighted -= event.weight; if (weighted <= 0) return event; } return available.at(-1) ?? null;
 }
+function destinationSettlement(regionId: string): string | null { return REGIONS[regionId]?.settlementIds.find((id) => Boolean(SETTLEMENTS[id])) ?? null; }
 export function travelToRegion(state: WorldState, destinationRegionId: string, random: RandomSource): TravelResult {
   if (!REGIONS[destinationRegionId]) throw new Error("Unknown destination region");
   if (!canTravel(state, destinationRegionId)) throw new Error("Destination must be unlocked and directly connected");
-  return { state: { ...state, currentRegionId: destinationRegionId }, event: rollTravelEvent(destinationRegionId, random) };
+  const d100Roll = random.int(1, 100); const tier = getTravelTier(d100Roll); const available = tier ? Object.values(WORLD_EVENTS).filter((event) => event.regionIds.includes(destinationRegionId) && (event.tier ?? "common") === tier) : [];
+  const event = available.length ? random.pick(available) : null;
+  return { state: { ...state, currentRegionId: destinationRegionId, currentSettlementId: destinationSettlement(destinationRegionId) }, event, d100Roll, tier };
 }
+export function travelGuildToRegion(guild: GuildState, destinationRegionId: string, partySize: number, random: RandomSource): GuildTravelResult {
+  const days = getRegionalTravelDays(guild.world.currentRegionId, destinationRegionId); const rationCost = getTravelRationCost(days, partySize, guild.guildmaster);
+  if (guild.rations < rationCost) throw new Error(`Not enough rations. This ${days}-day journey needs ${rationCost}.`);
+  const travelled = travelToRegion(guild.world, destinationRegionId, random); const advanced = advanceGuildTime({ ...guild, rations: guild.rations - rationCost }, days).guild;
+  return { ...travelled, guild: { ...advanced, world: travelled.state }, days, rationCost };
+}
+export function visitSettlement(guild: GuildState, settlementId: string, partySize: number): GuildState {
+  const settlement = SETTLEMENTS[settlementId]; if (!settlement || settlement.regionId !== guild.world.currentRegionId) throw new Error("Settlement is outside the current region");
+  if (guild.world.currentSettlementId === settlementId) return guild;
+  const rationCost = getTravelRationCost(1, partySize, guild.guildmaster); if (guild.rations < rationCost) throw new Error(`Local travel needs ${rationCost} rations.`);
+  const advanced = advanceGuildTime({ ...guild, rations: guild.rations - rationCost }, 1).guild;
+  return { ...advanced, world: { ...advanced.world, currentSettlementId: settlementId, discoveredSettlementIds: [...new Set([...advanced.world.discoveredSettlementIds, settlementId])] } };
+}
+export function getRationBundleAmount(guild: GuildState): number { return Math.round(GAME_CONFIG.rationBundleSize * (hasGuildmasterSkill(guild.guildmaster, "quartermaster_network") ? 1.5 : 1) * (1 + displayedTrophyBonus(guild.legacy ?? createGuildLegacyState(), "ration_bundle"))); }
+export function buyRations(guild: GuildState): GuildState { if (!guild.world.currentSettlementId) throw new Error("Rations can only be bought in a settlement"); if (guild.gold < GAME_CONFIG.rationBundleGoldCost) throw new Error("Not enough gold"); return { ...guild, gold: guild.gold - GAME_CONFIG.rationBundleGoldCost, rations: guild.rations + getRationBundleAmount(guild) }; }

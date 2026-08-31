@@ -6,7 +6,7 @@ import { calculateTrainingQuote, getTrainingProgressionLimit, grantTrainingXp, s
 import { xpRequiredForNextLevel } from "../src/game/progression/xpSystem";
 import { testHero } from "./testHero";
 
-describe("Training Grounds", () => {
+describe("Training Hall", () => {
   it("charges gold, occupies the hero, and completes through the guild calendar", () => {
     const hero = testHero(); let guild = createGuild(); guild.heroes = [hero]; const quote = calculateTrainingQuote(hero, "sparring_drills");
     guild = startHeroTraining(guild, hero.id, "sparring_drills");
@@ -34,7 +34,7 @@ describe("Training Grounds", () => {
   it("limits catch-up training by campaign progress and the strongest four peers", () => {
     const trainee = { ...testHero(), id: "trainee" }; const guild = createGuild();
     guild.heroes = [trainee, ...[8, 8, 7, 7].map((level, index) => ({ ...testHero(), id: `veteran-${index}`, level }))];
-    expect(getTrainingProgressionLimit(guild, trainee)).toMatchObject({ campaignCap: 3, rosterCap: 6, levelCap: 3 });
+    expect(getTrainingProgressionLimit(guild, trainee)).toMatchObject({ campaignCap: 4, rosterCap: 6, levelCap: 4 });
     guild.world.completedCampaignNodeIds.push("broken_wardstone"); guild.world.campaignChapter = 2;
     expect(getTrainingProgressionLimit(guild, trainee).levelCap).toBe(6);
   });
@@ -44,10 +44,10 @@ describe("Training Grounds", () => {
     expect(progressed.level).toBe(3); expect(progressed.xp).toBe(xpRequiredForNextLevel(3) - 1);
   });
 
-  it("allows three focused development sessions per hero level and resets on level-up", () => {
+  it("never grants permanent attribute growth", () => {
     const hero = { ...testHero(), focusedTrainingLevel: 1, focusedTrainingSessions: 3 }; const guild = createGuild(); guild.heroes = [hero];
     expect(calculateTrainingQuote(hero, "focused_practice", guild).growthReward).toBe(0);
     const levelled = { ...hero, level: 2 };
-    expect(calculateTrainingQuote(levelled, "focused_practice", { ...guild, heroes: [levelled] }).growthReward).toBeGreaterThan(0);
+    expect(calculateTrainingQuote(levelled, "focused_practice", { ...guild, heroes: [levelled] }).growthReward).toBe(0);
   });
 });

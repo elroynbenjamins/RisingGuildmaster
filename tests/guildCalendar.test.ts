@@ -6,6 +6,7 @@ import { createHeroContract } from "../src/game/recruitment/contractService";
 import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
 import { createSeededRandom } from "../src/utils/random";
 import { testHero } from "./testHero";
+import { GAME_CONFIG } from "../src/config/gameConfig";
 
 describe("central guild calendar and economy", () => {
   it("charges weekly salary on each contract anniversary", () => {
@@ -13,7 +14,8 @@ describe("central guild calendar and economy", () => {
     let guild = createGuild(); guild.heroes = [hero]; guild.heroContracts = [createHeroContract(hero, 100, 12, guild.currentDay)];
     expect(payrollDueOnDay(guild, 7)).toBe(0); expect(payrollDueOnDay(guild, 8)).toBe(100);
     const result = advanceGuildTime(guild, 7);
-    expect(result.guild.currentDay).toBe(8); expect(result.guild.gold).toBe(5250); expect(result.guild.finance.totalSalaryPaid).toBe(100); expect(result.guild.finance.totalTavernIncome).toBe(350);
+    const tavernIncome = GAME_CONFIG.dailyTavernIncome * 7;
+    expect(result.guild.currentDay).toBe(8); expect(result.guild.gold).toBe(GAME_CONFIG.startingGold + tavernIncome - 100); expect(result.guild.finance.totalSalaryPaid).toBe(100); expect(result.guild.finance.totalTavernIncome).toBe(tavernIncome);
     expect(result.days[6]).toMatchObject({ day: 8, payrollDue: 100, payrollPaid: 100, arrearsAdded: 0 });
   });
 
@@ -21,8 +23,9 @@ describe("central guild calendar and economy", () => {
     const hero = { ...testHero(), id: "arrears-hero", name: "Brakka" };
     let guild = createGuild(); guild.gold = 40; guild.heroes = [hero]; guild.heroContracts = [createHeroContract(hero, 500, 12, 1)];
     const result = advanceGuildTime(guild, 7);
-    expect(result.guild.gold).toBe(0); expect(result.guild.finance.salaryArrearsByHeroId[hero.id]).toBe(110); expect(totalSalaryArrears(result.guild)).toBe(110);
-    expect(result.days[6]).toMatchObject({ payrollDue: 500, payrollPaid: 390, arrearsAdded: 110 });
+    const available = 40 + GAME_CONFIG.dailyTavernIncome * 7; const arrears = 500 - available;
+    expect(result.guild.gold).toBe(0); expect(result.guild.finance.salaryArrearsByHeroId[hero.id]).toBe(arrears); expect(totalSalaryArrears(result.guild)).toBe(arrears);
+    expect(result.days[6]).toMatchObject({ payrollDue: 500, payrollPaid: available, arrearsAdded: arrears });
   });
 
   it("allows arrears to be paid later from available treasury gold", () => {

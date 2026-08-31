@@ -1,11 +1,14 @@
 import type { Hero } from "../heroes/types";
 import type { ClassId, RaceId } from "../heroes/types";
+import type { AttributeKey } from "../attributes/types";
 
 export type RecruitmentArchetype = "prospect" | "standard" | "veteran" | "elite";
 export type ScoutingLevel = 0 | 1 | 2 | 3;
 export type ContractLengthWeeks = 12 | 24 | 52;
 export type ContractStatus = "active" | "expiring" | "expired";
 export type RecruitmentCandidateSource = "guild_board" | "regional_scout";
+export interface AttributeEstimate { minimum: number; maximum: number }
+export type AttributeEstimates = Record<AttributeKey, AttributeEstimate>;
 
 export interface RecruitmentCandidate {
   candidateId: string;
@@ -21,6 +24,7 @@ export interface RecruitmentCandidate {
   contractLengthWeeks: ContractLengthWeeks;
   potentialEstimateMin: number;
   potentialEstimateMax: number;
+  attributeEstimates: AttributeEstimates;
   scoutingLevel: ScoutingLevel;
   generatedAtDay: number;
   expiresAtDay: number;

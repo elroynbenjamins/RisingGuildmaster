@@ -9,4 +9,5 @@ export const ENEMY_FACTIONS: Record<EnemyFactionId, EnemyFactionDefinition> = {
   bandits: { id: "bandits", name: "Bandits" },
   orcs: { id: "orcs", name: "Orcs" },
   constructs: { id: "constructs", name: "Ward Constructs" },
+  crownless: { id: "crownless", name: "Crownless Host" },
 };

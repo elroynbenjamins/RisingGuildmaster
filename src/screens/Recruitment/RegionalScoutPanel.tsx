@@ -13,8 +13,8 @@ import { regionalScoutDaysRemaining } from "../../game/recruitment/regionalScout
 import { useGuild } from "../../state/GuildContext";
 import { getRaceNameColor } from "../../ui/raceColors";
 
-const RACE_IDS = ["human", "elf", "dwarf", "orc"] as const;
-const CLASS_IDS = ["warrior", "ranger", "mage", "cleric", "paladin", "berserker"] as const;
+const ALL_RACE_IDS = ["human", "elf", "dwarf", "orc", "tiefling"] as const;
+const ALL_CLASS_IDS = ["warrior", "ranger", "mage", "cleric", "paladin", "berserker", "monk", "bard"] as const;
 
 export function RegionalScoutPanel({ openCalendar }: { openCalendar(): void }) {
   const { showDialog } = useGameDialog();
@@ -27,6 +27,8 @@ export function RegionalScoutPanel({ openCalendar }: { openCalendar(): void }) {
   const regionalUnlocked = hasGuildmasterSkill(guild.guildmaster, "regional_network");
   const classFocusUnlocked = hasGuildmasterSkill(guild.guildmaster, "specialist_headhunting");
   const speedUpUnlocked = hasGuildmasterSkill(guild.guildmaster, "express_dispatches");
+  const RACE_IDS = ALL_RACE_IDS.filter((id) => guild.entitlements.unlockedRaceIds.includes(id));
+  const CLASS_IDS = ALL_CLASS_IDS.filter((id) => guild.entitlements.unlockedClassIds.includes(id));
 
   if (mission) {
     const remaining = regionalScoutDaysRemaining(guild);

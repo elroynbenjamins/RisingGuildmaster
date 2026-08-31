@@ -61,7 +61,7 @@ describe("The Aurora That Fell regional crisis", () => {
     world = advanceRegionalThreats(world, 10);
     expect(world.regionThreat?.frostmarch).toBe(2);
     expect(getRegionThreatEffects(world, "frostmarch").enemyLevelModifier).toBe(1);
-    expect(createQuestEncounter("fallen_aurora_road", createSeededRandom(4), "standard", 1)[0]?.instance.level).toBe(8);
+    expect(createQuestEncounter("fallen_aurora_road", createSeededRandom(4), "standard", 1)[0]?.instance.level).toBe(6);
     world = advanceRegionalThreats(world, 10);
     expect(getRegionThreatEffects(world, "frostmarch").unavailableSettlementIds).toEqual(["northwatch"]);
 

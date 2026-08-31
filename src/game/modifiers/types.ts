@@ -3,7 +3,7 @@ import type { AttributeKey, DerivedStatKey } from "../attributes/types";
 export type SystemModifierTarget =
   | "xp" | "trainingCost" | "physicalDamage" | "magicDamage" | "rangedDamage" | "rareLoot"
   | "equipmentDurability" | "movementSpeed" | "craftingCost" | "questGold"
-  | "salary" | "trainingXp" | "recoveryDuration" | "intelligenceGrowth"
+  | "salary" | "trainingXp" | "recoveryDuration"
   | "injuryChance" | "damage" | "healingReceived" | "armorClass" | "magicDefenseScore"
   | "movementRange" | "maxHP" | "fireDamage" | "frostDamage" | "burnChance" | "attackRoll"
   | "healingPower" | "rangedSkillRange" | "rangedAttackRoll" | "recruitmentFee" | "initiative";

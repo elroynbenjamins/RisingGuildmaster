@@ -31,7 +31,7 @@ describe("NPC bitmap portrait library", () => {
   });
 
   it("gives every behind-the-scenes interlude speaker a dialogue portrait", () => {
-    expect(Object.keys(STORY_INTERLUDES_BY_NODE_ID)).toHaveLength(6);
+    expect(Object.keys(STORY_INTERLUDES_BY_NODE_ID)).toHaveLength(15);
     for (const scene of Object.values(STORY_INTERLUDES_BY_NODE_ID)) {
       expect(scene.perspective).toMatch(/elsewhere|memory/);
       for (const line of scene.speakerLines) expect(getNpcPortraitForSpeaker(line.speaker), line.speaker).toBeDefined();

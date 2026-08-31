@@ -1,6 +1,13 @@
 export type QuestType = "campaign" | "side" | "contract" | "boss";
 export interface HuntRewardDefinition { recipeFragmentMaterialId: MaterialId; firstVictoryCount: number; repeatDropChance: number; pityAfterFailures: number }
-export interface QuestDefinition { id: string; name: string; description?: string; questType: QuestType; regionId: string; repeatable: boolean; hiddenFromQuestBoard?: boolean; difficulty: number; recommendedLevelMin?: number; recommendedLevelMax?: number; minPartySize: number; maxPartySize: number; explorationStageIds?: string[]; decisionStageIds?: string[]; encounterIds: string[]; goldRewardMin: number; goldRewardMax: number; xpRewardPerHero: number; lootTableId: string; huntReward?: HuntRewardDefinition; recipeUnlockIdsOnVictory?: string[]; storyArcId?: string; campaignChapter?: number; prerequisiteQuestIds?: string[]; prerequisiteCampaignNodeIds?: string[]; requiredWorldFlags?: string[]; setWorldFlagsOnVictory?: Record<string, boolean> }
+export interface QuestStoryContext {
+  patron: string;
+  guildReason: string;
+  immediateGoal: string;
+  campaignConnection: string;
+}
+export interface PersonalHeroRequirement { raceIds?: string[]; classIds?: string[]; backgroundIds?: string[]; minimumLevel?: number }
+export interface QuestDefinition { id: string; name: string; description?: string; storyContext?: QuestStoryContext; personalHeroRequirement?: PersonalHeroRequirement; questType: QuestType; regionId: string; settlementIds?: string[]; repeatable: boolean; hiddenFromQuestBoard?: boolean; difficulty: number; recommendedLevelMin?: number; recommendedLevelMax?: number; minimumPartyAverageLevel?: number; preparationNotes?: string[]; minPartySize: number; maxPartySize: number; explorationStageIds?: string[]; decisionStageIds?: string[]; encounterIds: string[]; goldRewardMin: number; goldRewardMax: number; xpRewardPerHero: number; lootTableId: string; huntReward?: HuntRewardDefinition; recipeUnlockIdsOnVictory?: string[]; storyArcId?: string; campaignChapter?: number; prerequisiteQuestIds?: string[]; prerequisiteCampaignNodeIds?: string[]; requiredWorldFlags?: string[]; setWorldFlagsOnVictory?: Record<string, boolean> }
 import type { GridPosition } from "../combat/grid/gridTypes";
 
 export interface EncounterEnemyGroup {
@@ -15,6 +22,8 @@ export interface EncounterEnemyGroup {
 export interface EncounterDefinition {
   id: string;
   battlefieldId: string;
+  /** Roguelite-only progression gate. Ordinary quest encounters ignore this field. */
+  minimumRoguelitePartyLevel?: number;
   heroSpawnPositions: GridPosition[];
   obstaclePositions?: GridPosition[];
   enemies: EncounterEnemyGroup[];

@@ -12,5 +12,5 @@ export interface CampaignChapterDefinition {
   completionReputationReward?: number;
 }
 export type CampaignNodeType = "dialogue" | "quest" | "choice" | "boss";
-export interface CampaignNodeDefinition { id: string; chapterId: string; type: CampaignNodeType; title: string; description?: string; storySceneId?: string; prerequisiteNodeIds: string[]; questId?: string; choiceIds?: string[]; unlockRegionIds?: string[]; setWorldFlags?: Record<string, boolean> }
+export interface CampaignNodeDefinition { id: string; chapterId: string; type: CampaignNodeType; title: string; description?: string; storySceneId?: string; prerequisiteNodeIds: string[]; questId?: string; choiceIds?: string[]; unlockRegionIds?: string[]; discoverSettlementIds?: string[]; setWorldFlags?: Record<string, boolean> }
 export interface CampaignChoiceDefinition { id: string; text: string; description?: string; requirements?: EventRequirement[]; setWorldFlags: Record<string, boolean>; mutuallyExclusiveFlagIds?: string[] }

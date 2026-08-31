@@ -5,5 +5,5 @@ export function clampPotential(value: number): number {
 }
 
 export function potentialMultiplier(potential: number): number {
-  return 0.5 + clampPotential(potential) / 100;
+  return 1 + (clampPotential(potential) - GAME_CONFIG.potentialMin) / 100;
 }

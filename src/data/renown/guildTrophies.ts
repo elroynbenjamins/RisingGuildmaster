@@ -1,0 +1,12 @@
+import type { GuildTrophyDefinition } from "../../game/renown/guildLegacyTypes";
+export const GUILD_TROPHIES:Record<string,GuildTrophyDefinition>={
+ chieftains_banner:{id:"chieftains_banner",name:"Chieftain's Banner",sourceQuestId:"goblin_chieftain_boss",description:"The war-banner taken from the assault on Guildhaven.",bonus:{target:"tavern_income",value:.02,label:"Daily tavern income +2%"}},
+ spider_queen_fang:{id:"spider_queen_fang",name:"Spider Queen Fang",sourceQuestId:"hunt_spider_queen",description:"A venom-dark fang from the Queen Beneath the Roots.",bonus:{target:"gathering_xp",value:.03,label:"Material expedition XP +3%"}},
+ blackbridge_bell:{id:"blackbridge_bell",name:"Blackbridge Bell",sourceQuestId:"oath_of_the_broken_bridge",description:"The restored witness bell that carried the abandoned recruits' testimony.",bonus:{target:"ration_bundle",value:.05,label:"Purchased ration bundles +5%"}},
+ vaelith_ice_crystal:{id:"vaelith_ice_crystal",name:"Vaelith Ice Crystal",sourceQuestId:"vaelith_pale_echo_boss",description:"A pale shard left when Vaelith's hostile echo broke apart.",bonus:{target:"gathering_xp",value:.05,label:"Material expedition XP +5%"}},
+ ash_herald_mask:{id:"ash_herald_mask",name:"Ash Herald Mask",sourceQuestId:"solkar_ash_herald_boss",description:"Solkar's cracked mask, still warm with an unfinished verdict.",bonus:{target:"tavern_income",value:.03,label:"Daily tavern income +3%"}},
+ broken_crown_beacon:{id:"broken_crown_beacon",name:"Varkesh's Broken Beacon",sourceQuestId:"varkesh_gilded_rupture_boss",description:"A severed beacon vane from the storm above Skyvault.",bonus:{target:"ration_bundle",value:.05,label:"Purchased ration bundles +5%"}},
+ broodheart_crown:{id:"broodheart_crown",name:"Broodheart Crown",sourceQuestId:"raid_broodheart_awakening",description:"The royal web-crown cut from the heart of the living cathedral.",bonus:{target:"gathering_xp",value:.02,label:"Material expedition XP +2%"}},
+ white_maw_skull:{id:"white_maw_skull",name:"White Maw Skull",sourceQuestId:"raid_white_maw_unbound",description:"An ice-scored skull proving the guild endured the collapsing caldera.",bonus:{target:"ration_bundle",value:.02,label:"Purchased ration bundles +2%"}},
+ last_margin_compass:{id:"last_margin_compass",name:"Compass of the Last Margin",sourceQuestId:"raid_chartmaker_ascendant",description:"A compass that still points toward roads Serekh erased.",bonus:{target:"tavern_income",value:.02,label:"Daily tavern income +2%"}},
+};

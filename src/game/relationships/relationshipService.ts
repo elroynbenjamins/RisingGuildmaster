@@ -3,6 +3,8 @@ import type { HeroRelationship, RelationshipBand } from "./relationshipTypes";
 import type { GuildState } from "../guild/types";
 import { appendHeroHistoryEvent } from "../heroes/heroHistoryService";
 import type { QuestHeroOutcomeRecord, QuestRelationshipChange } from "../quests/questChronicleTypes";
+import type { Hero } from "../heroes/types";
+import { defaultRoleplayProfile, getRoleplayPillar } from "../../data/heroes/heroRoleplay";
 export function clampRelationshipScore(score: number): number { return Math.max(-100, Math.min(100, Math.round(score))); }
 export function relationshipBand(score: number): RelationshipBand { const value = clampRelationshipScore(score); return value <= -51 ? "rival" : value <= -21 ? "dislike" : value <= 20 ? "neutral" : value <= 50 ? "friend" : "close_friend"; }
 export function relationshipScore(relationships: readonly HeroRelationship[], a: string, b: string): number { return relationships.find((item) => (item.heroIdA === a && item.heroIdB === b) || (item.heroIdA === b && item.heroIdB === a))?.score ?? 0; }
@@ -13,25 +15,36 @@ export function healingReceivedFromHeroModifier(healerId: string, targetId: stri
 
 export const RELATIONSHIP_BAND_LABELS: Record<RelationshipBand, string> = { rival: "Rival", dislike: "Dislike", neutral: "Neutral", friend: "Friend", close_friend: "Close Friend" };
 
-function questRelationshipDelta(status: "victory" | "defeat", a: QuestHeroOutcomeRecord, b: QuestHeroOutcomeRecord): { delta: number; reason: string } {
-  if (status === "defeat") return { delta: -2, reason: "The failed mission strained their trust." };
-  if (a.fellInBattle || b.fellInBattle) return { delta: 2, reason: "Shared danger strengthened their bond." };
-  return { delta: 4, reason: "Returning victorious together strengthened their bond." };
+export function getHeroCompatibility(a: Hero | undefined, b: Hero | undefined): { modifier: number; reason?: string } {
+  if (!a?.roleplayProfile || !b?.roleplayProfile) return { modifier: 0 };
+  const aProfile = a.roleplayProfile ?? defaultRoleplayProfile(a.backgroundId ?? "mercenary"); const bProfile = b.roleplayProfile ?? defaultRoleplayProfile(b.backgroundId ?? "mercenary");
+  if (aProfile.idealId === bProfile.idealId) return { modifier: 2, reason: `Their shared ideal of ${getRoleplayPillar(aProfile.idealId)?.name.toLowerCase()} drew them together.` };
+  if (aProfile.bondId === bProfile.bondId) return { modifier: 1, reason: `A common bond to ${getRoleplayPillar(aProfile.bondId)?.name.toLowerCase()} gave them common ground.` };
+  const volatile = new Set(["reckless", "glory_hungry"]); const guarded = new Set(["rigid", "suspicious"]);
+  if ((volatile.has(aProfile.flawId) && guarded.has(bProfile.flawId)) || (volatile.has(bProfile.flawId) && guarded.has(aProfile.flawId))) return { modifier: -1, reason: "One hero's appetite for risk clashed with the other's caution." };
+  if (aProfile.flawId === bProfile.flawId) return { modifier: -1, reason: `Their shared ${getRoleplayPillar(aProfile.flawId)?.name.toLowerCase()} weakness caused friction.` };
+  return { modifier: 0 };
+}
+
+function questRelationshipDelta(status: "victory" | "defeat", a: QuestHeroOutcomeRecord, b: QuestHeroOutcomeRecord, heroA?: Hero, heroB?: Hero): { delta: number; reason: string } {
+  const compatibility = getHeroCompatibility(heroA, heroB); const base = status === "defeat" ? -2 : a.fellInBattle || b.fellInBattle ? 2 : 4;
+  const reason = status === "defeat" ? "The failed mission strained their trust." : a.fellInBattle || b.fellInBattle ? "Shared danger strengthened their bond." : "Returning victorious together strengthened their bond.";
+  return { delta: base + compatibility.modifier, reason: [reason, compatibility.reason].filter(Boolean).join(" ") };
 }
 
 export function applyQuestRelationshipConsequences(guild: GuildState, status: "victory" | "defeat", outcomes: readonly QuestHeroOutcomeRecord[], questId: string, questName: string): { guild: GuildState; changes: QuestRelationshipChange[] } {
   let relationships = [...guild.relationships]; const changes: QuestRelationshipChange[] = [];
   for (let aIndex = 0; aIndex < outcomes.length; aIndex += 1) for (let bIndex = aIndex + 1; bIndex < outcomes.length; bIndex += 1) {
-    const a = outcomes[aIndex]!; const b = outcomes[bIndex]!; const previousScore = relationshipScore(relationships, a.heroId, b.heroId); const consequence = questRelationshipDelta(status, a, b); const newScore = clampRelationshipScore(previousScore + consequence.delta); const previousBand = relationshipBand(previousScore); const newBand = relationshipBand(newScore);
+    const a = outcomes[aIndex]!; const b = outcomes[bIndex]!; const previousScore = relationshipScore(relationships, a.heroId, b.heroId); const consequence = questRelationshipDelta(status, a, b, guild.heroes.find((hero) => hero.id === a.heroId), guild.heroes.find((hero) => hero.id === b.heroId)); const newScore = clampRelationshipScore(previousScore + consequence.delta); const previousBand = relationshipBand(previousScore); const newBand = relationshipBand(newScore);
     relationships = setRelationship(relationships, a.heroId, b.heroId, newScore);
     changes.push({ heroIdA: a.heroId, heroNameA: a.name, heroIdB: b.heroId, heroNameB: b.name, previousScore, newScore, delta: newScore - previousScore, previousBand, newBand, reason: consequence.reason });
   }
   let heroes = guild.heroes;
-  for (const change of changes.filter((item) => item.previousBand !== item.newBand)) {
+  for (const change of changes.filter((item) => item.previousBand !== item.newBand || Math.abs(item.delta) >= 5 || status === "defeat" || outcomes.some((outcome) => outcome.fellInBattle && (outcome.heroId === item.heroIdA || outcome.heroId === item.heroIdB)))) {
     heroes = heroes.map((hero) => {
       if (hero.id !== change.heroIdA && hero.id !== change.heroIdB) return hero;
       const partnerName = hero.id === change.heroIdA ? change.heroNameB : change.heroNameA; const positive = change.newScore > change.previousScore;
-      return appendHeroHistoryEvent(hero, { day: guild.currentDay, type: "relationship", outcome: positive ? "positive" : "negative", title: `${RELATIONSHIP_BAND_LABELS[change.newBand as RelationshipBand]}: ${partnerName}`, description: `${questName} changed their relationship from ${RELATIONSHIP_BAND_LABELS[change.previousBand as RelationshipBand]} to ${RELATIONSHIP_BAND_LABELS[change.newBand as RelationshipBand]}.`, questId, relatedHeroIds: [hero.id === change.heroIdA ? change.heroIdB : change.heroIdA], tags: ["relationship", change.newBand] });
+      const changedBand = change.previousBand !== change.newBand; return appendHeroHistoryEvent(hero, { day: guild.currentDay, type: "relationship", outcome: positive ? "positive" : "negative", title: changedBand ? `${RELATIONSHIP_BAND_LABELS[change.newBand as RelationshipBand]}: ${partnerName}` : `A defining mission with ${partnerName}`, description: changedBand ? `${questName} changed their relationship from ${RELATIONSHIP_BAND_LABELS[change.previousBand as RelationshipBand]} to ${RELATIONSHIP_BAND_LABELS[change.newBand as RelationshipBand]}. ${change.reason}` : `${questName} changed their bond by ${change.delta >= 0 ? "+" : ""}${change.delta}. ${change.reason}`, questId, relatedHeroIds: [hero.id === change.heroIdA ? change.heroIdB : change.heroIdA], tags: ["relationship", change.newBand] });
     });
   }
   return { guild: { ...guild, heroes, relationships }, changes };

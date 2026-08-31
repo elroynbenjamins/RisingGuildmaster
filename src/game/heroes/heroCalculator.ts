@@ -10,6 +10,7 @@ import { SUBCLASSES } from "../../data/subclasses/subclasses";
 import { resolveEquipmentDefinition } from "../equipment/equipmentResolver";
 import { BACKGROUNDS } from "../../data/backgrounds/backgrounds";
 import { getHeroEquipmentSpecialModifiers } from "../equipment/equipmentSpecialEffectService";
+import { MASTERIES } from "../../data/masteries/masteries";
 
 export function collectHeroModifiers(hero: Hero): Modifier[] {
   const equipment = Object.values(hero.equipment).flatMap((id) => id ? (resolveEquipmentDefinition(id)?.modifiers ?? []) : []);
@@ -19,6 +20,7 @@ export function collectHeroModifiers(hero: Hero): Modifier[] {
     ...CLASSES[hero.classId].modifiers,
     ...(hero.backgroundId ? BACKGROUNDS[hero.backgroundId].modifiers : []),
     ...(hero.subclassId ? SUBCLASSES[hero.subclassId]?.modifiers ?? [] : []),
+    ...(hero.masteryId ? MASTERIES[hero.masteryId]?.modifiers ?? [] : []),
     ...hero.traitIds.flatMap((id) => TRAITS[id].modifiers),
     ...conditions,
     ...equipment,

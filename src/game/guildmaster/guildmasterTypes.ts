@@ -8,7 +8,12 @@ export type GuildmasterSkillId =
   | "loom_charter"
   | "lapidary_charter"
   | "advanced_workshops"
-  | "masterwork_district";
+  | "masterwork_district"
+  | "logistics_office"
+  | "careful_rationing"
+  | "tavern_stewardship"
+  | "expedition_routes"
+  | "quartermaster_network";
 
 export interface GuildmasterProfile {
   level: number;
@@ -24,6 +29,6 @@ export interface GuildmasterSkillDefinition {
   levelRequirement: number;
   pointCost: number;
   prerequisiteSkillIds: GuildmasterSkillId[];
-  branch: "scouting" | "artisans";
+  branch: "scouting" | "artisans" | "logistics";
   icon: string;
 }

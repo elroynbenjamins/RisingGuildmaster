@@ -1,0 +1,8 @@
+import type { EnemyDefinition } from "../../game/enemies/enemyTypes";
+
+/** Low-level D&D-inspired vermin used by the Guildhaven introduction. */
+export const SEWER_VERMIN_ENEMIES = {
+  sewer_rat: { id: "sewer_rat", name: "Sewer Rat", factionId: "beasts", role: "skirmisher", hpModifier: -.65, physicalDamageModifier: -.45, physicalDefenseModifier: -.40, magicDamageModifier: 0, magicDefenseModifier: -.30, speedModifier: .20, xpReward: 25, goldRewardMin: 0, goldRewardMax: 1, abilityIds: [], skillIds: ["wolf_bite", "wolf_pounce", "predator_instinct"], behaviorId: "dire_wolf_behavior", conditionImmunities: [], resistanceModifiers: {}, lootTableId: "wolf_loot" },
+  giant_rat: { id: "giant_rat", name: "Giant Rat", factionId: "beasts", role: "skirmisher", hpModifier: -.35, physicalDamageModifier: -.20, physicalDefenseModifier: -.25, magicDamageModifier: 0, magicDefenseModifier: -.20, speedModifier: .15, xpReward: 50, goldRewardMin: 0, goldRewardMax: 2, abilityIds: [], skillIds: ["wolf_bite", "wolf_pounce", "predator_instinct"], behaviorId: "dire_wolf_behavior", conditionImmunities: [], resistanceModifiers: { poison: .10 }, lootTableId: "wolf_loot" },
+  sewer_slime: { id: "sewer_slime", name: "Sewer Slime", factionId: "beasts", role: "tank", hpModifier: -.15, physicalDamageModifier: -.30, physicalDefenseModifier: .15, magicDamageModifier: 0, magicDefenseModifier: -.25, speedModifier: -.55, xpReward: 200, goldRewardMin: 0, goldRewardMax: 3, abilityIds: [], skillIds: ["zombie_claw", "infectious_bite"], behaviorId: "zombie_behavior", conditionImmunities: ["poisoned"], resistanceModifiers: { poison: 1 }, lootTableId: "giant_spider_loot" },
+} satisfies Record<string, EnemyDefinition>;

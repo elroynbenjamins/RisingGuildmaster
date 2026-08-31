@@ -25,6 +25,10 @@ export function rollDndAbilityScore(random: RandomSource): number {
 export function generateDndAttributes(random: RandomSource, priority: readonly AttributeKey[]): Attributes {
   const uniquePriority = [...new Set(priority)];
   const assignmentOrder = [...uniquePriority, ...ATTRIBUTE_KEYS.filter((key) => !uniquePriority.includes(key))];
-  const scores = ATTRIBUTE_KEYS.map(() => rollDndAbilityScore(random)).sort((a, b) => b - a);
+  const standardArray = [15, 14, 13, 12, 10, 8];
+  const rolled = ATTRIBUTE_KEYS.map(() => rollDndAbilityScore(random)).sort((a, b) => b - a);
+  // Blend the dependable standard array with 4d6-drop-lowest. Recruits retain
+  // D&D's variance without producing too many unusable or extreme arrays.
+  const scores = rolled.map((score, index) => Math.max(3, Math.min(18, Math.round((score + standardArray[index]!) / 2))));
   return Object.fromEntries(assignmentOrder.map((key, index) => [key, scores[index]!])) as Attributes;
 }

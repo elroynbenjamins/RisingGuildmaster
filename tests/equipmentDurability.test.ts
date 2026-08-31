@@ -1,0 +1,13 @@
+import { describe, expect, it } from "vitest";
+import { createGuild } from "../src/game/guild/guildService";
+import { applyCombatEquipmentWear, getRepairCost, repairHeroEquipment, repairInventoryEquipment } from "../src/game/equipment/equipmentDurabilityService";
+import { createEnchantedEquipmentKey, createEquipmentKeyWithDurability, parseEquipmentKey, resolveEquipmentDefinition } from "../src/game/equipment/equipmentResolver";
+import { sequenceRandom } from "./combatTestUtils";
+import { testHero } from "./testHero";
+
+describe("equipment durability", () => {
+  it("persists durability through storage and enchanting", () => { const worn = createEquipmentKeyWithDurability("worn-sword", 63); expect(parseEquipmentKey(worn).durability).toBe(63); expect(parseEquipmentKey(createEnchantedEquipmentKey(worn, "ember_edge")).durability).toBe(63); });
+  it("uses damage percentage for a small chance and small durability loss", () => { const hero = { ...testHero(), equipment: { ...testHero().equipment, weapon: "worn-sword" } }; const result = applyCombatEquipmentWear(hero, .40, sequenceRandom([0, 0])); expect(result).toMatchObject({ damagedSlot: "weapon", durabilityLost: 2 }); expect(parseEquipmentKey(result.hero.equipment.weapon!).durability).toBe(98); expect(applyCombatEquipmentWear(hero, .09, sequenceRandom([0])).damagedSlot).toBeNull(); });
+  it("scales bonuses with durability and disables broken special effects", () => { expect(resolveEquipmentDefinition(createEquipmentKeyWithDurability("iron-longsword", 50))!.modifiers[0]!.value).toBe(.025); const broken = resolveEquipmentDefinition(createEquipmentKeyWithDurability("cinder-edge-axe", 0))!; expect(broken.modifiers.every((modifier) => modifier.value === 0)).toBe(true); expect(broken.specialEffectIds).toEqual([]); });
+  it("repairs stored and equipped gear only at an operational blacksmith", () => { let guild = createGuild(); const hero = { ...testHero(), equipment: { ...testHero().equipment, weapon: createEquipmentKeyWithDurability("worn-sword", 50) } }; guild = { ...guild, heroes: [hero], inventory: [createEquipmentKeyWithDurability("worn-sword", 40)] }; expect(() => repairHeroEquipment(guild, hero.id, "weapon")).toThrow("Build the Blacksmith"); guild.artisans.blacksmith = { level: 1, recruited: true, construction: null }; const cost = getRepairCost(guild.inventory[0]!); const stored = repairInventoryEquipment(guild, 0); expect(parseEquipmentKey(stored.inventory[0]!).durability).toBe(100); expect(stored.gold).toBe(guild.gold - cost); const equipped = repairHeroEquipment(guild, hero.id, "weapon"); expect(parseEquipmentKey(equipped.heroes[0]!.equipment.weapon!).durability).toBe(100); });
+});

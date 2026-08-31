@@ -1,15 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { CRAFTING_RECIPES } from "../src/data/crafting/recipes";
 import { EQUIPMENT } from "../src/data/equipment/equipment";
+import { CLASSES } from "../src/data/classes/classes";
 import { GATHERING_MISSIONS } from "../src/data/gathering/gatheringMissions";
 import { ENEMY_LOOT_TABLES } from "../src/data/loot/enemyLootTables";
 import { QUEST_LOOT_TABLES } from "../src/data/loot/questLootTables";
 import type { ClassId, EquipmentSlot } from "../src/game/heroes/types";
 
 describe("expanded equipment data", () => {
-  it("provides 80 items across every slot and progression tier", () => {
+  it("provides the expanded item roster across every slot and progression tier", () => {
     const items = Object.values(EQUIPMENT);
-    expect(items).toHaveLength(80);
+    expect(items).toHaveLength(156);
     for (const slot of ["weapon", "armor", "helmet", "boots", "accessory1", "accessory2"] satisfies EquipmentSlot[]) {
       expect(items.some((item) => item.slot === slot)).toBe(true);
     }
@@ -19,7 +20,7 @@ describe("expanded equipment data", () => {
   });
 
   it("offers an equippable weapon progression for every base class", () => {
-    const classes: ClassId[] = ["warrior", "ranger", "mage", "cleric", "paladin", "berserker"];
+    const classes = Object.keys(CLASSES) as ClassId[];
     const weapons = Object.values(EQUIPMENT).filter((item) => item.slot === "weapon");
     for (const classId of classes) {
       expect(weapons.some((item) => !item.classRestrictions.length || item.classRestrictions.includes(classId))).toBe(true);

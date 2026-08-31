@@ -20,7 +20,8 @@ export function getGuildNotifications(guild: GuildState): GuildNotification[] {
   const campaign = getAvailableCampaignNodes(guild.world).length;
   const arrears = totalSalaryArrears(guild);
   const tomorrowPayroll = payrollDueOnDay(guild, guild.currentDay + 1);
-  const contractsUnlocked = isQuestBoardCategoryUnlocked("contract", guild.world);
+  const highestHeroLevel = Math.max(1, ...guild.heroes.map((hero) => hero.level));
+  const contractsUnlocked = isQuestBoardCategoryUnlocked("contract", guild.world, highestHeroLevel);
 
   return [
     contractsUnlocked
@@ -31,7 +32,7 @@ export function getGuildNotifications(guild: GuildState): GuildNotification[] {
         }
       : {
           id: "contracts_locked",
-          text: "Repeatable contracts unlock after completing Chapter 1",
+          text: `Repeatable contracts unlock when a hero reaches Level 2 (${highestHeroLevel}/2)`,
           tone: "info",
         },
     ...(campaign

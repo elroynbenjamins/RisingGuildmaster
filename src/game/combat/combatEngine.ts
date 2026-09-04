@@ -20,6 +20,7 @@ import { getTargetsInSkillRange, getValidTargets } from "./targetSelector";
 import { rollInitiative } from "./turnOrder";
 import { resolveEnemyTurn } from "./turnResolver";
 import { createCombatBoard, setOccupant } from "./grid/boardFactory";
+import { ensureConnectedBattlefield } from "./grid/boardConnectivity";
 import type { CombatBoardState, GridPosition } from "./grid/gridTypes";
 import { getTile, positionKey } from "./grid/gridTypes";
 import { getElevationAttackRollModifier } from "./grid/elevationService";
@@ -80,7 +81,7 @@ export function createCombatState(questId: string, encounterIndex: number, heroe
     const magicMultiplier = 1 + (setup?.enemyDamageModifier ?? 0);
     return { ...item, instance: { ...item.instance, movementRange }, unit: { ...item.unit, movementRange, stats: { ...item.unit.stats, physicalDamage: item.unit.stats.physicalDamage * physicalMultiplier, magicDamage: item.unit.stats.magicDamage * magicMultiplier, initiativeBonus: item.unit.stats.initiativeBonus + (setup?.enemyInitiativeModifier ?? 0) + (environment.enemyInitiativeModifier ?? 0) }, activeModifiers: [...item.unit.activeModifiers, ...((setup?.enemyOpeningAttackRollModifier ?? 0) ? [{ stat: "attackRollModifier", operation: "flat" as const, value: setup!.enemyOpeningAttackRollModifier, durationTurns: 2, sourceSkillId: "quest_preparation" }] : [])] } };
   });
-  let board = createCombatBoard(encounter.obstaclePositions, battlefield.boardSizeId, battlefield.terrainPlacements, battlefield.id);
+  let board = ensureConnectedBattlefield(createCombatBoard(encounter.obstaclePositions, battlefield.boardSizeId, battlefield.terrainPlacements, battlefield.id));
   board = spawnOccupants(board, [...heroCombatants.map((item) => ({ occupantId: item.unit.combatantId, position: item.unit.position })), ...enemies.map((item) => ({ occupantId: item.unit.combatantId, position: item.unit.position }))]);
   const units = [...heroCombatants.map((item) => item.unit), ...enemies.map((item) => item.unit)];
   const initiative = rollInitiative(units, random);

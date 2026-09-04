@@ -147,7 +147,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
         {showRegionIntel && <View style={styles.intelBlock}>
           <Text style={styles.detail}>Enemy factions: {selected.enemyFactionIds.join(", ") || "Unknown"}</Text>
           {homelandContacts.length > 0 && <Text style={styles.detail}>Recruitment homeland: {homelandContacts.map((homeland) => `${RACES[homeland.raceId].name} · ${homeland.locationName}`).join(", ")}</Text>}
-          <Text style={styles.detail}>Available contracts: {selected.questPoolIds.length}</Text>
+          <Text style={styles.detail}>Possible quests and road encounters: {selected.questPoolIds.length}</Text>
           <Text style={styles.detail}>Regional progress: {completedRegionQuests}/{selected.questPoolIds.length} listed quests complete</Text>
           {selectedThreat > 0 && <Text style={styles.threat}>Regional threat {selectedThreat}/4 · Delaying unresolved dangers can strengthen enemies and disrupt settlements.</Text>}
           {selected.bossQuestId && <Text style={styles.boss}>! Regional boss: {guild.world.completedQuestIds.includes(selected.bossQuestId) ? "Defeated" : "Available through campaign"}</Text>}

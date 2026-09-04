@@ -7,6 +7,7 @@ node_modules/
 .expo/
 dist/
 .codex-export/
+.store-preview-web/
 .codex-tmp/
 .codex-pnpm-store/
 

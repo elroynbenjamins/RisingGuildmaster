@@ -1,6 +1,7 @@
 import type { GridPosition, GroundTheme } from "./gridTypes";
 
 const THEME_HINTS: readonly [GroundTheme, readonly string[]][] = [
+  ["stone", ["sewer", "cistern"]],
   ["cave", ["cave", "forge", "vault", "sewer", "cistern", "tomb", "lift", "under", "cellar", "sanctum"]],
   ["snow", ["frost", "ice", "glacier", "white", "northwatch", "aurora", "rime"]],
   ["swamp", ["fen", "drowned", "water", "abbey", "mire", "sunken"]],

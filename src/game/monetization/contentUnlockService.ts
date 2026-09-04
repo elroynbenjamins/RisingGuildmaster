@@ -7,11 +7,12 @@ export const DAILY_LOGIN_GEMS = 10;
 export const BASE_CLASS_IDS: ClassId[] = ["warrior", "ranger", "mage", "cleric", "paladin", "berserker"];
 export const BASE_RACE_IDS: RaceId[] = ["human", "elf", "dwarf", "orc"];
 export type PremiumContentId = "monk" | "bard" | "spellbow" | "bulwark" | "summoner" | "tiefling";
-export interface ContentEntitlements { unlockedClassIds: ClassId[]; unlockedRaceIds: RaceId[] }
+export interface ContentEntitlements { unlockedClassIds: ClassId[]; unlockedRaceIds: RaceId[]; adsRemoved?: boolean }
 export interface DailyLoginState { lastClaimDate: string | null; totalClaims: number }
 export const createContentEntitlements = (): ContentEntitlements => ({ unlockedClassIds: [...BASE_CLASS_IDS], unlockedRaceIds: [...BASE_RACE_IDS] });
 export function mergeContentEntitlements(...sources: Array<Partial<ContentEntitlements> | null | undefined>): ContentEntitlements {
   return {
+    adsRemoved: sources.some((source) => source?.adsRemoved === true),
     unlockedClassIds: [...new Set([...BASE_CLASS_IDS, ...sources.flatMap((source) => source?.unlockedClassIds ?? [])])],
     unlockedRaceIds: [...new Set([...BASE_RACE_IDS, ...sources.flatMap((source) => source?.unlockedRaceIds ?? [])])],
   };
@@ -36,7 +37,7 @@ export function unlockPremiumContent(guild: GuildState, contentId: PremiumConten
   if (alreadyOwned) throw new Error("Content already unlocked");
   if (guild.gems < CONTENT_UNLOCK_COST) throw new Error(`Requires ${CONTENT_UNLOCK_COST} gems`);
   const transaction: GemTransaction = { id: `content-${contentId}-${guild.currentDay}-${guild.gemTransactions.length}`, type: "content_unlock", amount: -CONTENT_UNLOCK_COST, day: guild.currentDay, note: `Unlocked ${contentId}` };
-  return { ...guild, gems: guild.gems - CONTENT_UNLOCK_COST, entitlements: { unlockedClassIds: isClass ? [...guild.entitlements.unlockedClassIds, contentId] : guild.entitlements.unlockedClassIds, unlockedRaceIds: isClass ? guild.entitlements.unlockedRaceIds : [...guild.entitlements.unlockedRaceIds, contentId] }, gemTransactions: [...guild.gemTransactions, transaction] };
+  return { ...guild, gems: guild.gems - CONTENT_UNLOCK_COST, entitlements: { ...guild.entitlements, unlockedClassIds: isClass ? [...guild.entitlements.unlockedClassIds, contentId] : guild.entitlements.unlockedClassIds, unlockedRaceIds: isClass ? guild.entitlements.unlockedRaceIds : [...guild.entitlements.unlockedRaceIds, contentId] }, gemTransactions: [...guild.gemTransactions, transaction] };
 }
 
 export const STORY_RACE_UNLOCKS = { stoneborn: "kharum_seventh_bell", veilborn: "archive_below" } as const;

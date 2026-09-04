@@ -1,1 +1,1 @@
-export { useGemStore } from "./useGemStore";
+export { useGemStore } from "./gemStoreFallback";

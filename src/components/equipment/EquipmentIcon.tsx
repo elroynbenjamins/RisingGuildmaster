@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { EQUIPMENT } from "../../data/equipment/equipment";
 import { getBowIconCell, getWeaponIconCell } from "../../data/equipment/weaponIcons";
 import { equipmentSlotIcon } from "../../data/ui/gameIcons";
@@ -25,6 +25,7 @@ const PREMIUM_CLASS_EQUIPMENT_ATLAS = require("../../../assets/equipment/spellbo
 const SUMMONER_EQUIPMENT_ATLAS = require("../../../assets/equipment/summoner-equipment-atlas-v1.png");
 
 export function EquipmentIcon({ equipmentKey, slot, label, size = 48 }: { equipmentKey?: string | null; slot?: string; label?: string; size?: number }) {
+  if (!equipmentKey) return <View accessibilityLabel="Empty equipment slot" style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}><Text style={{ color: "#d76565", fontSize: size * .45 }}>×</Text></View>;
   const parsedId = equipmentKey ? parseEquipmentKey(equipmentKey).equipmentId : undefined;
   const definition = parsedId ? EQUIPMENT[parsedId] : undefined;
   const campaignGearCell = equipmentKey ? getCampaignGearIconCell(equipmentKey) : undefined;

@@ -9,7 +9,7 @@ import type { RandomSource } from "../../utils/random";
 
 interface EventResult { resolution: GuildEventResolution; choice: EventChoice }
 
-export function StoryEventScreen({ event, guild, random, updateGuild, onDone }: { event: WorldEventDefinition; guild: GuildState; random: RandomSource; updateGuild(guild: GuildState): void; onDone(): void }) {
+export function StoryEventScreen({ event, guild, random, updateGuild, onDone, openQuest }: { event: WorldEventDefinition; guild: GuildState; random: RandomSource; updateGuild(guild: GuildState): void; onDone(): void; openQuest?(questId: string): void }) {
   const [result, setResult] = useState<EventResult>();
   const party = useMemo(() => {
     const recent = guild.recentPartyHeroIds.map((id) => guild.heroes.find((hero) => hero.id === id)).filter((hero): hero is NonNullable<typeof hero> => Boolean(hero));
@@ -26,7 +26,7 @@ export function StoryEventScreen({ event, guild, random, updateGuild, onDone }: 
   const leadLine = result ? (succeeded ? result.choice.dialogue?.successLead : result.choice.dialogue?.failureLead) : undefined;
   const rewards = result ? describeEventOutcomes(result.resolution.outcomes) : [];
   return <ScrollView contentContainerStyle={styles.content}>
-    <Text style={styles.eyebrow}>{event.tier?.toUpperCase() ?? "COMMON"} TRAVEL EVENT</Text><Text style={styles.title}>{event.title}</Text><Text style={styles.description}>{event.description}</Text>
+    <Text style={styles.eyebrow}>{event.choices.some((choice) => choice.questId) ? "ROAD OPPORTUNITY" : `${event.tier?.toUpperCase() ?? "COMMON"} TRAVEL EVENT`}</Text><Text style={styles.title}>{event.title}</Text><Text style={styles.description}>{event.description}</Text>
     {!!party.length && <View style={styles.partyStrip}>{party.map((hero) => <View key={hero.id} style={styles.partyHero}><Portrait hero={hero} size={38}/><Text numberOfLines={1} style={styles.partyName}>{hero.name}</Text></View>)}</View>}
     <Panel>{!result ? event.choices.map((choice) => { const enabled = choiceRequirementsMet(choice, party, guild.world); return <Pressable key={choice.id} disabled={!enabled} onPress={() => choose(choice.id)} style={[styles.choice, !enabled && styles.disabled]}><Text style={styles.choiceText}>{choice.text}</Text>{choice.abilityCheck && <Text style={styles.check}>{choice.abilityCheck.skillId?.replace(/_/g, " ").toUpperCase() ?? choice.abilityCheck.attribute.toUpperCase()} · {choice.abilityCheck.attribute.toUpperCase()} · DC {choice.abilityCheck.difficultyClass}</Text>}{!enabled && <Text style={styles.check}>Requirements not met</Text>}</Pressable>; }) : <>
       <Text style={[styles.verdict, succeeded ? styles.success : styles.failure]}>{result.resolution.check ? (succeeded ? "CHECK SUCCEEDED" : "CHECK FAILED") : "CHOICE RESOLVED"}</Text>
@@ -36,7 +36,7 @@ export function StoryEventScreen({ event, guild, random, updateGuild, onDone }: 
       {companion && result.choice.dialogue?.companion && <Dialogue hero={companion} text={result.choice.dialogue.companion}/>}
       {!!rewards.length && <View style={styles.consequences}><Text style={styles.consequenceTitle}>CONSEQUENCES</Text>{rewards.map((reward) => <Text key={reward} style={styles.reward}>◆ {reward}</Text>)}</View>}
       {result.resolution.relationshipChange && lead && companion && <Text style={styles.bond}>{lead.name} & {companion.name} · {result.resolution.relationshipChange.delta >= 0 ? "+" : ""}{result.resolution.relationshipChange.delta} bond · {RELATIONSHIP_BAND_LABELS[result.resolution.relationshipChange.newBand]}</Text>}
-      <ActionButton label="Continue Journey" onPress={onDone}/>
+      <ActionButton label={result.choice.questId ? "Prepare Road Encounter" : "Continue Journey"} onPress={() => result.choice.questId && openQuest ? openQuest(result.choice.questId) : onDone()}/>
     </>}</Panel>
   </ScrollView>;
 }

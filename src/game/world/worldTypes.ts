@@ -23,7 +23,7 @@ export interface AbilityCheck { attribute: AttributeKey; skillId?: SkillId; diff
 export type EventRequirement = { type: "party_attribute_at_least"; attribute: AttributeKey; value: number } | { type: "world_flag"; flag: string; value: boolean };
 export type EventOutcome = { type: "gold"; value: number } | { type: "rations"; value: number } | { type: "faction_reputation"; factionId: string; value: number } | { type: "world_flag"; flag: string; value: boolean } | { type: "party_relationship"; value: number } | { type: "equipment"; equipmentId: string } | { type: "recipe_unlock"; recipeId: string } | { type: "none" };
 export interface EventDialogue { successNarration?: string; failureNarration?: string; successLead?: string; failureLead?: string; companion?: string }
-export interface EventChoice { id: string; text: string; requirements?: EventRequirement[]; abilityCheck?: AbilityCheck; successOutcomes: EventOutcome[]; failureOutcomes?: EventOutcome[]; dialogue?: EventDialogue }
+export interface EventChoice { id: string; text: string; requirements?: EventRequirement[]; abilityCheck?: AbilityCheck; successOutcomes: EventOutcome[]; failureOutcomes?: EventOutcome[]; dialogue?: EventDialogue; questId?: string }
 export type TravelEventTier = "common" | "uncommon" | "rare" | "legendary";
 export interface WorldEventDefinition { id: string; title: string; description: string; weight: number; tier?: TravelEventTier; regionIds: string[]; choices: EventChoice[] }
 export type LorePerspectiveKind = "eyewitness" | "oral_tradition" | "official_claim" | "scholarly_record" | "field_note";

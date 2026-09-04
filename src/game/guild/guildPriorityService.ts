@@ -24,15 +24,15 @@ export function getGuildPriority(guild: GuildState): GuildPriority {
     const recommendedLevelMin = chapter?.recommendedLevelMin ?? 1;
     if (average < recommendedLevelMin) {
       const preparation = isQuestBoardCategoryUnlocked("contract", guild.world, highestHeroLevel)
-        ? "Train or complete contracts"
+        ? "Train or pursue road encounters"
         : "Train, recruit, or complete available side stories";
       return { id: "prepare_campaign", title: "Prepare for the Next Chapter", description: `Your strongest available party averages Level ${average.toFixed(1)}. ${preparation} before the recommended Level ${recommendedLevelMin}.`, actionLabel: "Open Training", destination: "training", iconId: "training", tone: "progress" };
     }
     return { id: `campaign_${nodes[0]!.id}`, title: nodes[0]!.title, description: nodes[0]!.description ?? `Continue Chapter ${guild.world.campaignChapter} of the Wardstone campaign.`, actionLabel: nodes[0]!.questId ? "Prepare Campaign Quest" : "Continue Story", destination: "campaign", iconId: nodes[0]!.type === "boss" ? "boss" : "quests", tone: "progress" };
   }
-  if (guild.trainingGround.sessions.length) return { id: "advance_day", title: "Training in Progress", description: "Advance the guild calendar when your contracts and preparations for the day are complete.", actionLabel: "Open Management", destination: "management", iconId: "calendar", tone: "opportunity" };
+  if (guild.trainingGround.sessions.length) return { id: "advance_day", title: "Training in Progress", description: "Advance the guild calendar when your journeys and preparations for the day are complete.", actionLabel: "Open Management", destination: "management", iconId: "calendar", tone: "opportunity" };
   const contractsUnlocked = isQuestBoardCategoryUnlocked("contract", guild.world, highestHeroLevel);
   return contractsUnlocked
-    ? { id: "seek_contracts", title: "Strengthen the Guild", description: "Take regional contracts, gather materials, and improve equipment before the next campaign push.", actionLabel: "Explore Eldoria", destination: "world", iconId: "world", tone: "opportunity" }
-    : { id: "continue_campaign", title: "Earn Guildhaven's Trust", description: "Continue Chapter 1 and raise a hero to Level 2 to unlock repeatable Greenveil contracts.", actionLabel: "Continue Campaign", destination: "campaign", iconId: "quests", tone: "progress" };
+    ? { id: "seek_contracts", title: "Strengthen the Guild", description: "Travel regional roads to discover repeatable encounters, gather materials, and improve equipment before the next campaign push.", actionLabel: "Explore Eldoria", destination: "world", iconId: "world", tone: "opportunity" }
+    : { id: "continue_campaign", title: "Earn Guildhaven's Trust", description: "Continue Chapter 1 and raise a hero to Level 2 to unlock repeatable Greenveil road encounters.", actionLabel: "Continue Campaign", destination: "campaign", iconId: "quests", tone: "progress" };
 }

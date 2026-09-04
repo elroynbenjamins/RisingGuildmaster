@@ -1,5 +1,7 @@
+import { fulfillStorePurchase } from "./storePurchaseService";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ErrorCode, useIAP, type Purchase } from "expo-iap";
+import { REMOVE_ADS_PRODUCT_ID, type PermanentPurchaseHandler } from "./supportProducts";
 import { GEM_PACK_PRODUCT_IDS, getGemPack } from "../../data/monetization/gemPacks";
 import type { GemStoreController, VerifiedPurchaseHandler } from "./gemStoreTypes";
 
@@ -8,8 +10,10 @@ function purchaseTransactionId(purchase: Purchase): string {
   return platformTransactionId?.trim() || purchase.id.trim();
 }
 
-export function useGemStore(onVerifiedPurchase: VerifiedPurchaseHandler): GemStoreController {
+export function useGemStore(onVerifiedPurchase: VerifiedPurchaseHandler, onRemoveAds?: PermanentPurchaseHandler): GemStoreController {
   const handlerRef = useRef(onVerifiedPurchase);
+  const removeAdsRef = useRef(onRemoveAds);
+  removeAdsRef.current = onRemoveAds;
   const processingRef = useRef(new Set<string>());
   const [loading, setLoading] = useState(true);
   const [purchasingProductId, setPurchasingProductId] = useState<string | null>(null);
@@ -18,22 +22,20 @@ export function useGemStore(onVerifiedPurchase: VerifiedPurchaseHandler): GemSto
 
   const processPurchase = useCallback(async (purchase: Purchase) => {
     const pack = getGemPack(purchase.productId);
-    if (!pack || purchase.purchaseState !== "purchased") {
-      if (purchase.purchaseState === "pending") setError("Payment is pending approval in Google Play. Gems will be delivered after it completes.");
+    const removeAds = purchase.productId === REMOVE_ADS_PRODUCT_ID;
+    if ((!pack && !removeAds) || purchase.purchaseState !== "purchased") {
+      if (purchase.purchaseState === "pending") setError("Payment is pending approval in Google Play. Your purchase will unlock after it completes.");
       return;
     }
     const transactionId = purchaseTransactionId(purchase);
     if (!transactionId || processingRef.current.has(transactionId)) return;
     processingRef.current.add(transactionId);
     try {
-      await handlerRef.current({
-        transactionId: `google-play-${transactionId}`,
-        source: "purchase",
-        gems: pack.gems,
-        verified: true,
-        note: `${pack.name} purchased through Google Play`,
+      await fulfillStorePurchase({ productId: purchase.productId, purchaseState: purchase.purchaseState, transactionId }, {
+        creditGems: (credit) => handlerRef.current(credit),
+        removeAds: removeAdsRef.current ? () => removeAdsRef.current!() : undefined,
+        finish: (isConsumable) => finishTransaction({ purchase, isConsumable }),
       });
-      await finishTransaction({ purchase, isConsumable: true });
       setError(null);
     } catch (purchaseError) {
       setError(purchaseError instanceof Error ? purchaseError.message : "The purchase could not be completed.");
@@ -66,7 +68,7 @@ export function useGemStore(onVerifiedPurchase: VerifiedPurchaseHandler): GemSto
     setLoading(true);
     setError(null);
     try {
-      await fetchProducts({ skus: [...GEM_PACK_PRODUCT_IDS], type: "in-app" });
+      await fetchProducts({ skus: [...GEM_PACK_PRODUCT_IDS, REMOVE_ADS_PRODUCT_ID], type: "in-app" });
       await getAvailablePurchases();
     } catch (storeError) {
       setError(storeError instanceof Error ? storeError.message : "Could not load Google Play products.");
@@ -79,7 +81,7 @@ export function useGemStore(onVerifiedPurchase: VerifiedPurchaseHandler): GemSto
   useEffect(() => { for (const purchase of availablePurchases) void processPurchase(purchase); }, [availablePurchases, processPurchase]);
 
   const products = useMemo(() => Object.fromEntries(storeProducts
-    .filter((product) => getGemPack(product.id))
+    .filter((product) => getGemPack(product.id) || product.id === REMOVE_ADS_PRODUCT_ID)
     .map((product) => [product.id, { productId: product.id, displayPrice: product.displayPrice, title: product.title, description: product.description }])), [storeProducts]);
 
   return {
@@ -89,7 +91,7 @@ export function useGemStore(onVerifiedPurchase: VerifiedPurchaseHandler): GemSto
     products,
     error,
     purchase: async (productId) => {
-      if (!getGemPack(productId)) throw new Error("Unknown gem pack.");
+      if (!getGemPack(productId) && productId !== REMOVE_ADS_PRODUCT_ID) throw new Error("Unknown store product.");
       if (!connected) throw new Error("Google Play Billing is not connected.");
       if (!products[productId]) throw new Error("This product is not active in Google Play for your account or country.");
       setPurchasingProductId(productId);

@@ -14,8 +14,13 @@ export async function loadAccountContentEntitlements(): Promise<ContentEntitleme
   }
 }
 
-/** Entitlements only ever merge forward: saving another guild cannot revoke owned content. */
-export async function saveAccountContentEntitlements(entitlements: ContentEntitlements): Promise<void> {
-  const existing = await loadAccountContentEntitlements();
-  await AsyncStorage.setItem(ACCOUNT_ENTITLEMENTS_KEY, JSON.stringify(mergeContentEntitlements(existing, entitlements)));
+let pendingWrite: Promise<void> = Promise.resolve();
+/** Serialize merges so an overlapping autosave cannot revoke a just-purchased unlock. */
+export function saveAccountContentEntitlements(entitlements: ContentEntitlements): Promise<void> {
+  const write = pendingWrite.catch(() => undefined).then(async () => {
+    const existing = await loadAccountContentEntitlements();
+    await AsyncStorage.setItem(ACCOUNT_ENTITLEMENTS_KEY, JSON.stringify(mergeContentEntitlements(existing, entitlements)));
+  });
+  pendingWrite = write;
+  return write;
 }

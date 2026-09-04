@@ -17,11 +17,11 @@ import { createGuildLegacyState, displayedTrophyBonus, getGuildRank } from "../r
 
 const dueOnDay = (startDay: number, endDay: number, day: number): boolean => day > startDay && day <= endDay && (day - startDay) % 7 === 0;
 export const totalSalaryArrears = (guild: GuildState): number => Object.values(guild.finance.salaryArrearsByHeroId).reduce((sum, value) => sum + value, 0);
-export const payrollDueOnDay = (guild: GuildState, day: number): number => guild.heroContracts.filter((contract) => dueOnDay(contract.startDay, contract.endDay, day)).reduce((sum, contract) => sum + contract.weeklySalary, 0);
+export const payrollDueOnDay = (guild: GuildState, day: number): number => guild.heroContracts.filter((contract) => guild.heroes.some((hero) => hero.id === contract.heroId && hero.currentHP > 0) && dueOnDay(contract.startDay, contract.endDay, day)).reduce((sum, contract) => sum + contract.weeklySalary, 0);
 export const dailyTavernIncome = (guild: GuildState): number => Math.round(GAME_CONFIG.dailyTavernIncome * Math.max(1, guild.finance.tavernLevel) * getDifficulty(guild.difficultyId).tavernIncomeMultiplier * (hasGuildmasterSkill(guild.guildmaster, "tavern_stewardship") ? 1.2 : 1) * (1 + getGuildRank(guild.reputation).benefits.tavernIncomeModifier + displayedTrophyBonus(guild.legacy ?? createGuildLegacyState(), "tavern_income")));
 
 function processPayroll(guild: GuildState, day: number): { guild: GuildState; due: number; paid: number; arrearsAdded: number; events: GuildDayEvent[] } {
-  const dueContracts = guild.heroContracts.filter((contract) => dueOnDay(contract.startDay, contract.endDay, day));
+  const dueContracts = guild.heroContracts.filter((contract) => guild.heroes.some((hero) => hero.id === contract.heroId && hero.currentHP > 0) && dueOnDay(contract.startDay, contract.endDay, day));
   let gold = guild.gold; let paidTotal = 0; let arrearsAdded = 0;
   const arrears = { ...guild.finance.salaryArrearsByHeroId }; const transactions = [...guild.finance.transactions]; const events: GuildDayEvent[] = [];
   for (const contract of dueContracts) {

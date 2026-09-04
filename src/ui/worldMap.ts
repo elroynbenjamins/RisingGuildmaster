@@ -16,6 +16,8 @@ export const mapChromeStyles = StyleSheet.create({
     width: "100%",
   },
   image: {
+    width: "100%",
+    height: "100%",
     borderRadius: 8,
   },
   legend: {

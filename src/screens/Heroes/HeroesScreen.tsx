@@ -11,6 +11,7 @@ import { useGuild } from "../../state/GuildContext";
 import { filterAndSortHeroes, type HeroFilter, type HeroSort } from "../../ui/heroList";
 import { useTheme } from "../../theme/theme";
 
+import { heroHasSkillChoice } from "../../ui/actionNotifications";
 const FILTERS: HeroFilter[] = ["All", "Available", "Injured", "Fallen"];
 const SORTS: HeroSort[] = ["Level", "Name", "Class", "Potential"];
 
@@ -42,7 +43,7 @@ export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void
     <SegmentedTabs values={SORTS} value={sort} onChange={setSort} />
     {heroes.map((hero) => {
       const stats = calculateHero(hero); const skillPoints = getAvailableClassSkillPoints(hero);
-      return <HeroCard key={hero.id} hero={hero} onPress={() => openHero(hero)} subtitle={`${hero.currentHP <= 0 ? "FALLEN" : hero.conditions.length ? "CONDITIONED" : hero.isAvailable ? "READY" : "BUSY"} • ${RACES[hero.raceId].name} ${CLASSES[hero.classId].name} • Lv ${hero.level} • HP ${Math.round(hero.currentHP)}/${Math.round(stats.stats.maxHP)} • Potential ${hero.potentialEstimateMin}–${hero.potentialEstimateMax}${skillPoints ? ` • ★ ${skillPoints} skill point${skillPoints === 1 ? "" : "s"}` : ""}`} />;
+      return <HeroCard notification={heroHasSkillChoice(hero)} key={hero.id} hero={hero} onPress={() => openHero(hero)} subtitle={`${hero.currentHP <= 0 ? "FALLEN" : hero.conditions.length ? "CONDITIONED" : hero.isAvailable ? "READY" : "BUSY"} • ${RACES[hero.raceId].name} ${CLASSES[hero.classId].name} • Lv ${hero.level} • HP ${Math.round(hero.currentHP)}/${Math.round(stats.stats.maxHP)} • Potential ${hero.potentialEstimateMin}–${hero.potentialEstimateMax}${skillPoints ? ` • ★ ${skillPoints} skill point${skillPoints === 1 ? "" : "s"}` : ""}`} />;
     })}
     {!heroes.length && <EmptyState title={filter === "Fallen" && !query ? "No fallen heroes" : guild.heroes.length ? "No matching heroes" : "Your roster is empty"} message={query ? "Try another hero name, race, or class." : filter === "Fallen" ? "Every guild member is still standing." : guild.heroes.length ? "Change the current roster filter." : "Recruit candidates to begin building your guild."} actionLabel={!guild.heroes.length ? "Open Recruitment" : undefined} onAction={!guild.heroes.length ? recruit : undefined} />}
   </ScrollView>;

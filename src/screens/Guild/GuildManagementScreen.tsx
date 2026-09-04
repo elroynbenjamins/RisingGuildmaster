@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BackButton, Panel, colors } from "../../components/ui";
 
-type EntryId = "guildmaster" | "roster" | "temple" | "operations" | "legacy" | "content" | "finances" | "manual" | "heroCodex" | "skillCodex" | "loreJournal" | "settings";
+import { NotificationDot } from "../../components/navigation/NotificationDot";
+import { useActionNotifications } from "../../state/useActionNotifications";
+type EntryId = "gems" | "guildmaster" | "roster" | "temple" | "operations" | "legacy" | "content" | "finances" | "manual" | "heroCodex" | "skillCodex" | "loreJournal" | "settings";
 type Entry = { id: EntryId; name: string; detail: string };
 
 const GROUPS: { title: string; entries: Entry[] }[] = [
@@ -13,6 +15,7 @@ const GROUPS: { title: string; entries: Entry[] }[] = [
     { id: "legacy", name: "Renown & Trophy Hall", detail: "Track guild rank, milestones, and victories." },
   ] },
   { title: "GUILD SERVICES", entries: [
+    { id: "gems", name: "Gems & Support", detail: "Daily gems, gem shop, gold exchange, and Remove Ads." },
     { id: "temple", name: "Temple of Renewal", detail: "Heal injuries and restore fallen heroes." },
     { id: "operations", name: "Crisis Operations", detail: "Manage urgent threats and special deployments." },
     { id: "content", name: "Races & Classes Unlocks", detail: "Review earned and premium guild options." },
@@ -27,15 +30,16 @@ const GROUPS: { title: string; entries: Entry[] }[] = [
 ];
 
 interface GuildManagementScreenProps {
-  onBack(): void; openGuildmasterSkills(): void; openHeroes(): void; openTemple(): void; openMonsterManual(): void;
+  onBack(): void; openGemsSupport(): void; openGuildmasterSkills(): void; openHeroes(): void; openTemple(): void; openMonsterManual(): void;
   openHeroCodex(): void; openSkillCodex(): void; openLoreJournal(): void; openFinances(): void; openOperations(): void;
   openLegacy(): void; openContentUnlocks(): void; openSettings(): void;
 }
 
 export function GuildManagementScreen(props: GuildManagementScreenProps) {
+  const notices = useActionNotifications();
   const [showFuture, setShowFuture] = useState(false);
   const actions: Record<EntryId, () => void> = {
-    guildmaster: props.openGuildmasterSkills, roster: props.openHeroes, temple: props.openTemple,
+    gems: props.openGemsSupport, guildmaster: props.openGuildmasterSkills, roster: props.openHeroes, temple: props.openTemple,
     operations: props.openOperations, legacy: props.openLegacy, content: props.openContentUnlocks,
     finances: props.openFinances, manual: props.openMonsterManual, heroCodex: props.openHeroCodex,
     skillCodex: props.openSkillCodex, loreJournal: props.openLoreJournal, settings: props.openSettings,
@@ -48,7 +52,7 @@ export function GuildManagementScreen(props: GuildManagementScreenProps) {
     {GROUPS.map((group) => <View key={group.title} style={styles.group}>
       <Text style={styles.section}>{group.title}</Text>
       {group.entries.map((entry) => <Pressable key={entry.id} accessibilityRole="button" accessibilityLabel={`Open ${entry.name}`} onPress={actions[entry.id]}>
-        <Panel style={styles.row}><View style={styles.copy}><Text style={styles.name}>{entry.name}</Text><Text style={styles.detail}>{entry.detail}</Text></View><Text style={styles.arrow}>›</Text></Panel>
+        <Panel style={styles.row}><View style={styles.copy}><Text style={styles.name}>{entry.name}</Text><Text style={styles.detail}>{entry.detail}</Text></View>{(entry.id === "gems" && notices.daily || entry.id === "guildmaster" && notices.guildmaster || entry.id === "roster" && notices.heroes) ? <NotificationDot/> : null}<Text style={styles.arrow}>›</Text></Panel>
       </Pressable>)}
     </View>)}
     <Pressable accessibilityRole="button" accessibilityState={{ expanded: showFuture }} onPress={() => setShowFuture((value) => !value)} style={styles.futureButton}>

@@ -11,7 +11,10 @@ import { useGuild } from "../../state/GuildContext";
 import { mapChromeStyles } from "../../ui/worldMap";
 import { GameIcon } from "../../components/icons/GameIcon";
 import type { GameIconId } from "../../data/ui/gameIcons";
-import { visitSettlement } from "../../game/world/travelService";
+import { visitSettlementWithEvent } from "../../game/world/travelService";
+import { QUESTS } from "../../data/quests/quests";
+import type { RandomSource } from "../../utils/random";
+import type { WorldEventDefinition } from "../../game/world/worldTypes";
 
 const LOCATION_MARKERS: Record<RegionLocationType, GameIconId> = {
   city: "settlement",
@@ -24,7 +27,7 @@ const LOCATION_MARKERS: Record<RegionLocationType, GameIconId> = {
   dungeon: "boss",
 };
 
-export function RegionMapScreen({ regionId, onBack, openQuest }: { regionId: string; onBack(): void; openQuest(questId: string): void }) {
+export function RegionMapScreen({ regionId, onBack, openQuest, random, openEvent }: { regionId: string; onBack(): void; openQuest(questId: string): void; random: RandomSource; openEvent(event: WorldEventDefinition): void }) {
   const { guild, updateGuild } = useGuild();
   const region = REGIONS[regionId];
   const locations = useMemo(() => getRegionLocations(regionId), [regionId]);
@@ -80,7 +83,7 @@ export function RegionMapScreen({ regionId, onBack, openQuest }: { regionId: str
         <View style={mapChromeStyles.legend}><Text style={styles.legendText}>CITY</Text><Text style={styles.legendText}>HOMELAND</Text><Text style={styles.legendText}>DUNGEON</Text><Text style={styles.legendText}>LANDMARK</Text></View>
       </View>
 
-      {selected && <LocationPanel location={selected} regionUnlocked={regionUnlocked} discoveredSettlementIds={guild.world.discoveredSettlementIds} completedQuestIds={guild.world.completedQuestIds} currentSettlementId={guild.world.currentSettlementId} openQuest={openQuest} onVisit={(settlementId) => { try { const partySize = Math.max(1, guild.recentPartyHeroIds.length || Math.min(4, guild.heroes.filter((hero) => hero.isAvailable).length)); updateGuild(visitSettlement(guild, settlementId, partySize)); setTravelMessage(`Reached ${SETTLEMENTS[settlementId]?.name}. 1 day passed.`); } catch (error) { setTravelMessage(error instanceof Error ? error.message : "Local travel failed"); } }} />}
+      {selected && <LocationPanel location={selected} regionUnlocked={regionUnlocked} discoveredSettlementIds={guild.world.discoveredSettlementIds} completedQuestIds={guild.world.completedQuestIds} currentSettlementId={guild.world.currentSettlementId} openQuest={openQuest} onVisit={(settlementId) => { try { const partySize = Math.max(1, guild.recentPartyHeroIds.length || Math.min(4, guild.heroes.filter((hero) => hero.isAvailable).length)); const result = visitSettlementWithEvent(guild, settlementId, partySize, random); updateGuild(result.guild); setTravelMessage(`Reached ${SETTLEMENTS[settlementId]?.name}. 1 day passed.${result.event ? " A road encounter was discovered." : ""}`); if (result.event) openEvent(result.event); } catch (error) { setTravelMessage(error instanceof Error ? error.message : "Local travel failed"); } }} />}
       {travelMessage && <Text style={styles.travelMessage}>{travelMessage}</Text>}
       {regionLore && <RegionChronicle lore={regionLore} unlocked={regionLoreDiscovered} expanded={showChronicle} toggle={() => setShowChronicle((value) => !value)} />}
     </ScrollView>
@@ -116,6 +119,9 @@ function LoreSection({ title, text }: { title: string; text: string }) {
 
 function LocationPanel({ location, regionUnlocked, discoveredSettlementIds, completedQuestIds, currentSettlementId, openQuest, onVisit }: { location: RegionLocationDefinition; regionUnlocked: boolean; discoveredSettlementIds: string[]; completedQuestIds: string[]; currentSettlementId: string | null; openQuest(questId: string): void; onVisit(settlementId: string): void }) {
   const settlement = location.settlementId ? SETTLEMENTS[location.settlementId] : undefined;
+  const localQuestIds = settlement?.questIds.filter((questId) => QUESTS[questId]?.questType !== "contract") ?? [];
+  const associatedQuest = location.questId ? QUESTS[location.questId] : undefined;
+  const isTravelOnlyEncounter = associatedQuest?.questType === "contract";
   const discovered = settlement ? discoveredSettlementIds.includes(settlement.id) : true;
   const questComplete = location.questId ? completedQuestIds.includes(location.questId) : false;
   return (
@@ -124,8 +130,9 @@ function LocationPanel({ location, regionUnlocked, discoveredSettlementIds, comp
       <Text style={styles.description}>{location.description}</Text>
       {settlement && <><Text style={styles.label}>SERVICES</Text><Text style={styles.services}>{settlement.serviceIds.map(pretty).join(" · ")}</Text></>}
       {settlement && regionUnlocked && <ActionButton label={currentSettlementId === settlement.id ? "Current Location" : "Walk Here · 1 day"} disabled={currentSettlementId === settlement.id} onPress={() => onVisit(settlement.id)} />}
-      {settlement && settlement.questIds.length > 0 && <><Text style={styles.label}>LOCAL QUESTS</Text><Text style={styles.services}>{settlement.questIds.map(pretty).join(" · ")}</Text></>}
-      {location.questId && <View style={styles.questRow}><View style={styles.flex}><Text style={styles.label}>ASSOCIATED QUEST</Text><Text style={questComplete ? styles.complete : styles.questName}>{pretty(location.questId)}{questComplete ? " · Complete" : ""}</Text></View><ActionButton label={questComplete ? "Review" : "Open Quest"} disabled={!regionUnlocked} onPress={() => openQuest(location.questId!)} /></View>}
+      {settlement && localQuestIds.length > 0 && <><Text style={styles.label}>LOCAL QUESTS</Text><Text style={styles.services}>{localQuestIds.map(pretty).join(" · ")}</Text></>}
+      {location.questId && !isTravelOnlyEncounter && <View style={styles.questRow}><View style={styles.flex}><Text style={styles.label}>ASSOCIATED QUEST</Text><Text style={questComplete ? styles.complete : styles.questName}>{pretty(location.questId)}{questComplete ? " · Complete" : ""}</Text></View><ActionButton label={questComplete ? "Review" : "Open Quest"} disabled={!regionUnlocked} onPress={() => openQuest(location.questId!)} /></View>}
+      {isTravelOnlyEncounter && <Text style={styles.lockedNote}>ROAD ENCOUNTER · This opportunity can be discovered while travelling through the region.</Text>}
       {!regionUnlocked && <Text style={styles.lockedNote}>Unlock and travel to this region before beginning its quests or using local services.</Text>}
     </Panel>
   );

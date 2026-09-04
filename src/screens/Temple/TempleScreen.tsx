@@ -1,42 +1,22 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { TEMPLE_CONFIG } from "../../config/templeConfig";
 import { CONDITIONS } from "../../data/conditions/conditions";
-import { GEM_PACKS } from "../../data/monetization/gemPacks";
 import { BackButton, EmptyState, Panel, Portrait, SegmentedTabs, colors } from "../../components/ui";
 import { calculateHero } from "../../game/heroes/heroCalculator";
-import { creditVerifiedGems, exchangeGemsForGold } from "../../game/monetization/gemService";
-import { showAdMobRewardedAd } from "../../game/monetization/admobRewardedAdProvider";
-import type { VerifiedGemCredit } from "../../game/monetization/gemTypes";
-import { useGemStore } from "../../game/monetization/useGemStore";
-import { saveGuild } from "../../game/save/saveService";
 import { fullyTreatHero, getConditionTreatmentCost, getFullTreatmentCost, getHealingCost, healHero, reviveHero, treatHeroConditions } from "../../game/temple/templeService";
 import { useGuild } from "../../state/GuildContext";
 import { getRaceNameColor } from "../../ui/raceColors";
 
-type Tab = "Treatment" | "Revival" | "Gems";
+type Tab = "Treatment" | "Revival";
 export function TempleScreen({ onBack }: { onBack(): void }) {
   const { guild, updateGuild } = useGuild();
   const [tab, setTab] = useState<Tab>("Treatment");
   const [message, setMessage] = useState<string | null>(null);
   const [confirmHeroId, setConfirmHeroId] = useState<string | null>(null);
-  const [adBusy, setAdBusy] = useState(false);
-  const guildRef = useRef(guild);
-  guildRef.current = guild;
-  const applyPurchasedGems = useCallback(async (credit: VerifiedGemCredit) => {
-    const previous = guildRef.current;
-    const updated = creditVerifiedGems(previous, credit);
-    await saveGuild(updated);
-    guildRef.current = updated;
-    updateGuild(updated);
-    if (updated !== previous) setMessage(`Purchase complete. +${credit.gems} gems added to the guild treasury.`);
-  }, [updateGuild]);
-  const gemStore = useGemStore(applyPurchasedGems);
   const living = guild.heroes.filter((hero) => hero.currentHP > 0);
   const fallen = guild.heroes.filter((hero) => hero.currentHP <= 0);
   const act = (action: () => ReturnType<typeof fullyTreatHero>, success: string) => { try { updateGuild(action()); setMessage(success); } catch (error) { setMessage(error instanceof Error ? error.message : "Temple service failed"); } };
-  const watchRewardedAd = async () => { if (adBusy) return; setAdBusy(true); setMessage("Preparing a rewarded ad…"); try { const credit = await showAdMobRewardedAd(); updateGuild(creditVerifiedGems(guild, credit)); setMessage(`Thank you for supporting Guildmaster. +${credit.gems} gems received.`); } catch (error) { setMessage(error instanceof Error ? error.message : "The rewarded ad is unavailable right now."); } finally { setAdBusy(false); } };
-  const exchangeGem = () => act(() => exchangeGemsForGold(guild, 1), "1 gem exchanged for 250 gold.");
 
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} />
@@ -44,7 +24,7 @@ export function TempleScreen({ onBack }: { onBack(): void }) {
     <Text style={styles.intro}>Restore wounded adventurers with guild gold. Fallen heroes require rare soul gems before ordinary treatment can continue.</Text>
     <View style={styles.wallet}><Text style={styles.gold}>◆ {guild.gold.toLocaleString()} gold</Text><Text style={styles.gems}>◇ {guild.gems} gems</Text></View>
     {message ? <Panel style={styles.message}><Text style={styles.messageText}>{message}</Text><Pressable onPress={() => setMessage(null)}><Text style={styles.dismiss}>Dismiss</Text></Pressable></Panel> : null}
-    <SegmentedTabs values={["Treatment", "Revival", "Gems"] as const} value={tab} onChange={setTab} />
+    <SegmentedTabs values={["Treatment", "Revival"] as const} value={tab} onChange={setTab} />
     {tab === "Treatment" ? (living.length ? living.map((hero) => {
       const maxHP = calculateHero(hero).stats.maxHP; const healingCost = getHealingCost(hero); const conditionCost = getConditionTreatmentCost(hero); const fullCost = getFullTreatmentCost(hero); const ailments = hero.conditions.filter((item) => item.conditionId !== "inspired");
       return <Panel key={hero.id} style={styles.heroCard}><View style={styles.heroHeader}><Portrait hero={hero} size={58} /><View style={styles.heroInfo}><Text style={[styles.heroName,{color:getRaceNameColor(hero.raceId)}]}>{hero.name}</Text><Text style={styles.hp}>HP {Math.round(hero.currentHP)} / {Math.round(maxHP)}</Text><View style={styles.bar}><View style={[styles.hpFill, { width: `${Math.max(0, Math.min(100, hero.currentHP / maxHP * 100))}%` }]} /></View></View></View>
@@ -57,10 +37,7 @@ export function TempleScreen({ onBack }: { onBack(): void }) {
       </Panel>;
     }) : <EmptyState title="No heroes to treat" message="Recruit heroes or return after an expedition." />) : null}
     {tab === "Revival" ? (fallen.length ? fallen.map((hero) => <Panel key={hero.id} style={styles.heroCard}><View style={styles.heroHeader}><Portrait hero={hero} size={58} /><View style={styles.heroInfo}><Text style={[styles.heroName,{color:getRaceNameColor(hero.raceId)}]}>{hero.name}</Text><Text style={styles.fallen}>FALLEN • Level {hero.level}</Text></View></View><Text style={styles.conditions}>Revival restores 25% HP and leaves the hero Injured. Further healing costs gold.</Text>{confirmHeroId === hero.id ? <View style={styles.confirm}><Text style={styles.confirmText}>Spend ◇ {TEMPLE_CONFIG.revivalGemCost} to revive {hero.name}?</Text><View style={styles.actions}><TempleAction label="Cancel" onPress={() => setConfirmHeroId(null)} /><TempleAction primary label={`Confirm · ◇${TEMPLE_CONFIG.revivalGemCost}`} disabled={guild.gems < TEMPLE_CONFIG.revivalGemCost} onPress={() => { act(() => reviveHero(guild, hero.id), `${hero.name} has returned from the brink.`); setConfirmHeroId(null); }} /></View></View> : <TempleAction primary label={`Revive · ◇${TEMPLE_CONFIG.revivalGemCost}`} disabled={guild.gems < TEMPLE_CONFIG.revivalGemCost} onPress={() => setConfirmHeroId(hero.id)} />}</Panel>) : <EmptyState title="No fallen heroes" message="All guild members are alive. May the temple bells remain silent." />) : null}
-    {tab === "Gems" ? <><Panel style={styles.gemPanel}><Text style={styles.panelTitle}>Support Guildmaster</Text><Text style={styles.conditions}>Watching an optional rewarded ad helps support continued development of the game. As thanks, the guild receives ◇ {TEMPLE_CONFIG.rewardedAdGems}. You never need to watch an ad to continue playing.</Text><TempleAction primary disabled={adBusy} label={adBusy ? "Preparing advertisement…" : `Watch Ad · Support Development · +◇${TEMPLE_CONFIG.rewardedAdGems}`} onPress={() => { void watchRewardedAd(); }} /></Panel><Panel style={styles.gemPanel}><Text style={styles.panelTitle}>Guild Treasury Exchange</Text><Text style={styles.conditions}>Exchange gems into ordinary guild funds. Current rate: 1 gem = 250 gold.</Text><TempleAction label="Exchange 1 Gem · +250 Gold" disabled={guild.gems < 1} onPress={exchangeGem} /></Panel><Text style={styles.section}>GEM SHOP</Text>
-      {gemStore.error ? <Panel style={styles.storeNotice}><Text style={styles.storeNoticeTitle}>Google Play Store</Text><Text style={styles.conditions}>{gemStore.error}</Text><TempleAction label="Retry Store Connection" onPress={() => { void gemStore.retry(); }} /></Panel> : null}
-      {GEM_PACKS.map((pack) => { const product = gemStore.products[pack.productId]; const buying = gemStore.purchasingProductId === pack.productId; return <Panel key={pack.productId} style={[styles.pack, pack.recommended && styles.recommendedPack]}><View style={styles.packCopy}><View style={styles.packHeading}><Text style={styles.panelTitle}>{pack.name}</Text>{pack.recommended ? <Text style={styles.recommended}>BEST VALUE</Text> : null}</View><Text style={styles.gems}>◇ {pack.gems.toLocaleString()} gems{pack.bonusGems ? ` · includes ${pack.bonusGems} bonus` : ""}</Text><Text style={styles.packDescription}>{pack.description}</Text></View><View style={styles.buyArea}><Text style={styles.price}>{product?.displayPrice ?? (gemStore.loading ? "Loading…" : "Unavailable")}</Text><TempleAction primary label={buying ? "Processing…" : "Buy"} disabled={!product || Boolean(gemStore.purchasingProductId)} onPress={() => { void gemStore.purchase(pack.productId).catch((error: unknown) => setMessage(error instanceof Error ? error.message : "Purchase could not be started.")); }} /></View></Panel>; })}
-      <Text style={styles.legal}>Prices and currency are supplied by Google Play for your account and region. Gem packs are consumable and can be purchased more than once. Payment is charged to your Google Play account after confirmation.</Text></> : null}
+
   </ScrollView>;
 }
 

@@ -21,6 +21,7 @@ export interface GameDialogOptions {
 }
 
 interface GameDialogContextValue {
+  isDialogOpen: boolean;
   showDialog(options: GameDialogOptions): void;
   dismissDialog(): void;
 }
@@ -32,7 +33,7 @@ export function GameDialogProvider({ children }: React.PropsWithChildren) {
   const [dialog, setDialog] = useState<GameDialogOptions | null>(null);
   const dismissDialog = useCallback(() => setDialog(null), []);
   const showDialog = useCallback((options: GameDialogOptions) => setDialog(options), []);
-  const value = useMemo(() => ({ showDialog, dismissDialog }), [dismissDialog, showDialog]);
+  const value = useMemo(() => ({ showDialog, dismissDialog, isDialogOpen: dialog !== null }), [dismissDialog, showDialog, dialog]);
   const actions = dialog?.actions?.length ? dialog.actions : [{ label: "Continue", tone: "primary" as const }];
   const canDismiss = actions.some((action) => action.tone === "secondary");
 

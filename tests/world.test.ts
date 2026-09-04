@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { REGIONS } from "../src/data/world/regions";
 import { SETTLEMENTS } from "../src/data/world/settlements";
 import { WORLD_EVENTS } from "../src/data/world/worldEvents";
+import { getTravelContractEvents } from "../src/data/world/travelContractEvents";
 import { CHAPTER_1 } from "../src/data/campaign/chapter1";
 import { CHAPTER_5 } from "../src/data/campaign/chapter5";
 import { QUEST_ENCOUNTERS } from "../src/data/encounters/questEncounters";
@@ -19,6 +20,7 @@ import { sequenceRandom } from "./combatTestUtils";
 import { testHero } from "./testHero";
 
 describe("persistent world and campaign", () => {
+  it("turns contracts into travel-only opportunities with an accept route", () => { const greenveil = getTravelContractEvents("greenveil"); expect(greenveil.map((event) => event.choices.find((choice) => choice.questId)?.questId)).toEqual(expect.arrayContaining(["orchard_road_patrol", "spider_nest", "goblin_cave_hideout"])); expect(getTravelContractEvents("shadowfen")).toEqual([]); });
   it("defines Eldoria's five connected regions and expanded settlements", () => { expect(Object.keys(REGIONS)).toHaveLength(5); expect(Object.keys(SETTLEMENTS)).toHaveLength(15); expect(REGIONS.greenveil?.connectedRegionIds).toEqual(["iron_hills", "shadowfen"]); expect(REGIONS.iron_hills?.connectedRegionIds).toEqual(["greenveil", "frostmarch", "ashlands"]); });
   it("rejects locked travel, then permits direct travel after Chapter 1", () => { let world = createWorldState(); expect(canTravel(world, "iron_hills")).toBe(false); expect(() => travelToRegion(world, "iron_hills", sequenceRandom([.9]))).toThrow(); for (const id of CHAPTER_1.nodeIds) world = completeCampaignNode(world, id).worldState; expect(world.unlockedRegionIds).toEqual(expect.arrayContaining(["greenveil", "iron_hills", "shadowfen"])); expect(travelToRegion(world, "iron_hills", sequenceRandom([.9])).state.currentRegionId).toBe("iron_hills"); expect(() => travelToRegion(world, "ashlands", sequenceRandom([.9]))).toThrow(); });
   it("uses a tiered regional d100 travel table", () => { expect(rollTravelEvent("greenveil", sequenceRandom([.55, 0]))?.tier).toBe("common"); expect(rollTravelEvent("greenveil", sequenceRandom([.54]))).toBeNull(); expect(rollTravelEvent("shadowfen", sequenceRandom([.99, 0]))?.tier).toBe("legendary"); });

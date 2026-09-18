@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createGuild } from "../src/game/guild/guildService";
-import { advanceGuildDays, calculateGatheringModifier, claimGatheringMission, resolveGatheringMission, startGatheringMission } from "../src/game/gathering/gatheringService";
+import { advanceGuildDays, calculateGatheringModifier, claimGatheringMission, getIdleMissionLevelProgressXp, resolveGatheringMission, startGatheringMission } from "../src/game/gathering/gatheringService";
 import type { GatheringMissionInstance } from "../src/game/gathering/gatheringTypes";
 import { createSeededRandom } from "../src/utils/random";
 import { sequenceRandom } from "./combatTestUtils";
@@ -29,6 +29,13 @@ describe("persistent two-hero gathering missions", () => {
     const claimed = claimGatheringMission(guild, id);
     expect(claimed.guild.gatheringMissions[0]?.status).toBe("claimed");
     expect(claimed.guild.heroes.every((hero) => hero.isAvailable)).toBe(true);
+  });
+
+  it("adds five percent of next-level XP when an idle mission is claimed", () => {
+    let guild = createGuild(); guild.heroes = heroes(); guild = startGatheringMission(guild, "greenveil_foraging", ["g1", "g2"], createSeededRandom(44)); guild = advanceGuildDays(guild, 2);
+    const id = guild.gatheringMissions[0]!.id; const resolved = resolveGatheringMission(guild, id); const beforeXp = guild.heroes[0]!.xp;
+    const claimed = claimGatheringMission(guild, id);
+    expect(claimed.guild.heroes[0]!.xp - beforeXp).toBe(resolved.xpPerHero + getIdleMissionLevelProgressXp(3));
   });
 
   it("can fail even after the required days while stronger teams improve quality", () => {

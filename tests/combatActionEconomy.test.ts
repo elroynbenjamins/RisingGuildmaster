@@ -18,16 +18,16 @@ describe("tactical action economy", () => {
     expect(state.lastVisualEvent).toMatchObject({kind:"movement",actionId:"move",toPosition:{x:0,y:0}});
   });
   it("can pause and step one automatic enemy turn for readable combat pacing", () => {
-    const hero = testHero();
-    let state = createCombatState("goblin_patrol", 0, [hero], createSeededRandom(88));
-    const enemyId = state.enemies[0]!.unit.combatantId;
-    state = { ...state, combatStarted: true, awaitingHeroId: null, turnOrderIds: [enemyId, hero.id], turnCursor: 0 };
+    const heroA = testHero(); const heroB = { ...testHero(), id: "paced-hero-b", name: "Bryn" };
+    let state = createCombatState("goblin_patrol", 0, [heroA, heroB], createSeededRandom(88));
+    const enemyA = state.enemies[0]!.unit.combatantId; const enemyB = state.enemies[1]!.unit.combatantId;
+    state = { ...state, combatStarted: true, awaitingHeroId: null, turnOrderIds: [enemyA, enemyB, heroA.id, heroB.id], turnCursor: 0 };
     const paused = advanceCombat(state, createSeededRandom(2), 0);
     expect(paused.turnCursor).toBe(0);
     expect(paused.awaitingHeroId).toBeNull();
     const stepped = advanceCombat(paused, createSeededRandom(2), 1);
     expect(stepped.turnCursor).toBe(1);
-    expect(stepped.awaitingHeroId).toBe(hero.id);
+    expect(stepped.awaitingHeroId).toBeNull();
     expect(stepped.log.length).toBeGreaterThan(0);
   });
 });

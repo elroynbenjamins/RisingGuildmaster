@@ -1,6 +1,7 @@
 import { getDifficulty } from "../../data/difficulty/difficulties";
 import { GUILD_OPERATIONS } from "../../data/operations/guildOperations";
 import { REGIONAL_THREATS } from "../../data/world/regionalThreats";
+import { areRegionalThreatsUnlocked } from "../world/regionalThreatService";
 import type { RandomSource } from "../../utils/random";
 import { advanceGuildTime } from "../economy/guildCalendarService";
 import type { GuildState } from "../guild/types";
@@ -42,7 +43,7 @@ function validateTeams(guild: GuildState, vanguardHeroIds: readonly string[], su
 
 function applyThreatOutcome(guild: GuildState, operation: GuildOperationDefinition, rank: GuildOperationResult["rank"]): { guild: GuildState; threatDelta: number } {
   const crisis = REGIONAL_THREATS[operation.regionId];
-  if (!crisis || guild.world.completedQuestIds.includes(crisis.resolutionQuestId)) return { guild, threatDelta: 0 };
+  if (!areRegionalThreatsUnlocked(guild.world) || !crisis || guild.world.completedQuestIds.includes(crisis.resolutionQuestId)) return { guild, threatDelta: 0 };
   const before = guild.world.regionThreat?.[operation.regionId] ?? 0;
   const requestedDelta = rank === "decisive_victory" ? -2 : rank === "hard_won_victory" ? -1 : 1;
   const after = Math.max(0, Math.min(crisis.maximumThreat, before + requestedDelta));

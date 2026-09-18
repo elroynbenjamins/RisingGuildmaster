@@ -22,7 +22,7 @@ export function areRegionalThreatsUnlocked(state: WorldState): boolean {
 
 export function unlockRegionalThreats(state: WorldState): WorldState {
   if (areRegionalThreatsUnlocked(state)) return state;
-  return { ...state, worldFlags: { ...state.worldFlags, [REGIONAL_THREAT_UNLOCK_FLAG]: true } };
+  return { ...state, regionCrisisDays: {}, regionThreat: {}, worldFlags: { ...state.worldFlags, [REGIONAL_THREAT_UNLOCK_FLAG]: true } };
 }
 
 function isCrisisActive(state: WorldState, regionId: string): boolean {

@@ -42,6 +42,7 @@ import { getRegionThreatEffects } from "../game/world/regionalThreatService";
 import { findRaidByQuestId, getActiveRaidPhase } from "../game/raids/raidService";
 import { strikeRaidObjective } from "../game/raids/raidCombatMechanicService";
 import { getCombatAttackPreview } from "../game/combat/combatPreviewService";
+import { applyQuestDifficultyCombatSetup } from "../game/quests/questCombatProfileService";
 import { EnemyPortrait } from "../components/enemies/EnemyPortrait";
 
 const ENEMY_TURN_DELAY_MS = 700;
@@ -50,9 +51,10 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
   const { showDialog } = useGameDialog();
   const { guild, updateGuild } = useGuild();
   const random = useRef(createSeededRandom(randomSeed())); const quest = QUESTS[questId]!;
+  const effectiveCombatSetup = applyQuestDifficultyCombatSetup(quest, combatSetup);
   const threatEnemyLevelModifier = getRegionThreatEffects(guild.world, quest.regionId).enemyLevelModifier;
   const lastTargetTap = useRef<CombatTapRecord | null>(null);
-  const [state, setState] = useState(() => createCombatState(questId, 0, heroes, random.current, initialHeroInstances, combatSetup, guild.relationships, guild.difficultyId, threatEnemyLevelModifier));
+  const [state, setState] = useState(() => createCombatState(questId, 0, heroes, random.current, initialHeroInstances, effectiveCombatSetup, guild.relationships, guild.difficultyId, threatEnemyLevelModifier));
   const [mode, setMode] = useState<"move" | "skill" | null>(null); const [selectedSkillId, setSelectedSkillId] = useState<string>();
   const [inspectedSkillId, setInspectedSkillId] = useState<string>();
   const [inspectedCombatantId, setInspectedCombatantId] = useState<string>();
@@ -128,7 +130,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
   const executeEndTurn = () => { try { setState((value) => endCurrentHeroTurn(value, random.current, 0)); resetSelection(); } catch (caught) { setError(caught instanceof Error ? caught.message : "Could not end turn"); } };
   const endTurn=()=>guild.uiPreferences.confirmEndTurn?showDialog({title:"End this hero's turn?",message:state.actions.combatActionUsed?"The combat action has been used. Any remaining movement will be lost.":"This hero has not used a combat action yet.",eyebrow:"TACTICAL ORDER",tone:state.actions.combatActionUsed?"default":"danger",actions:[{label:"Keep Playing",tone:"secondary"},{label:"End Turn",tone:"danger",onPress:executeEndTurn}]}):executeEndTurn();
   const usePotion = (potionId: PotionId) => { try { const result = consumePotion(guild, state, potionId); updateGuild(result.guild); setState(result.state); resetSelection(); } catch (caught) { setError(caught instanceof Error ? caught.message : "Could not use potion"); } };
-  const continueQuest = () => { const carried = state.heroes.map((item) => recoverBetweenEncounters(item.instance)); setState(createCombatState(questId, state.encounterIndex + 1, heroes, random.current, carried, combatSetup, guild.relationships, guild.difficultyId, threatEnemyLevelModifier)); resetSelection(); };
+  const continueQuest = () => { const carried = state.heroes.map((item) => recoverBetweenEncounters(item.instance)); setState(createCombatState(questId, state.encounterIndex + 1, heroes, random.current, carried, effectiveCombatSetup, guild.relationships, guild.difficultyId, threatEnemyLevelModifier)); resetSelection(); };
   const lastEncounter = state.encounterIndex >= state.encounterIds.length - 1;
   const skillItems = current ? getHeroSkillIds(current.hero).map((id) => HERO_SKILLS[id]!).filter((skill) => skill.type === "basic_attack" || skill.type === "active").map((skill) => { const available = getHeroSkillAvailability(current.hero, current.instance, current.unit, skill.id, state.heroes.map((item) => item.unit), state.enemies.map((item) => item.unit), state.board); return { id: skill.id, name: skill.name, damageType:skill.damageType, enabled: available.enabled && !state.actions.combatActionUsed, detail: available.enabled ? `Range ${getHeroSkillRange(current.hero, skill)} · ${skill.resourceCost ?? 0} ${skill.resourceType ?? "none"}` : available.reasons.join(" · ") }; }) : [];
   if (!state.combatStarted) return <ScrollView contentContainerStyle={styles.content}><View style={styles.titleRow}><Text style={styles.title}>{quest.name}</Text><Pressable onPress={onExit ?? (() => onQuestEnd("defeat", state.heroes.map((item) => item.instance)))}><Text style={styles.exit}>Exit</Text></Pressable></View><Text style={styles.encounter}>Encounter {state.encounterIndex + 1} / {state.encounterIds.length} · {battlefield?.name ?? "Battlefield"}</Text>{state.setupLabel && <Panel><Text style={styles.setup}>{state.setupLabel}</Text></Panel>}<InitiativePreview rolls={state.initiativeRolls} labels={labels} labelColors={labelColors} sides={sides} onBegin={() => setState((value) => beginCombat(value, random.current, 0))} /></ScrollView>;

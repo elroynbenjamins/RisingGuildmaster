@@ -7,6 +7,7 @@ import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
 import { createSeededRandom } from "../src/utils/random";
 import { testHero } from "./testHero";
 import { GAME_CONFIG } from "../src/config/gameConfig";
+import { areRegionalThreatsUnlocked, unlockRegionalThreats } from "../src/game/world/regionalThreatService";
 
 describe("central guild calendar and economy", () => {
   it("charges weekly salary on each contract anniversary", () => {
@@ -40,7 +41,7 @@ describe("central guild calendar and economy", () => {
   it("previews and resolves all existing day-based systems together", () => {
     const hero = { ...testHero(), id: "calendar-hero", name: "Ysra", level: 2, conditions: [{ conditionId: "injured" as const, remainingDuration: 1 }] };
     const candidate = { ...generateRecruitmentCandidate(createSeededRandom(4), 1), expiresAtDay: 2 };
-    const guild = createGuild(); guild.heroes = [hero, ...Array.from({ length: 5 }, (_, index) => ({ ...testHero(), id: `threat-hero-${index}`, name: `Reserve ${index + 1}`, level: 2 }))]; guild.world.regionCrisisDays = { shadowfen: 19 }; guild.world.regionThreat = { shadowfen: 0 };
+    const guild = createGuild(); guild.heroes = [hero, ...Array.from({ length: 5 }, (_, index) => ({ ...testHero(), id: `threat-hero-${index}`, name: `Reserve ${index + 1}`, level: 2 }))]; guild.world = unlockRegionalThreats(guild.world); guild.world.regionCrisisDays = { shadowfen: 19 }; guild.world.regionThreat = { shadowfen: 0 };
     guild.artisans.blacksmith = { level: 0, recruited: false, construction: { targetLevel: 1, startDay: 1, completionDay: 2, goldCost: 800 } };
     guild.gatheringMissions = [{ id: "gather-ready", definitionId: "greenveil_foraging", heroIds: [hero.id, "second"], startDay: 1, completionDay: 2, resolutionSeed: 1, status: "active" }];
     guild.recruitment = { ...guild.recruitment, candidates: [candidate], candidateIds: [candidate.candidateId], regionalScoutMission: { id: "scout-ready", raceId: "human", classId: null, regionId: "greenveil", locationName: "Guildhaven", startDay: 1, completionDay: 2, resolutionSeed: 4 } };
@@ -49,6 +50,16 @@ describe("central guild calendar and economy", () => {
     const result = advanceGuildTime(guild);
     expect(result.guild.artisans.blacksmith).toMatchObject({ recruited: true, level: 1, construction: null }); expect(result.guild.heroes[0]?.conditions).toHaveLength(0); expect(result.guild.recruitment.candidates).toHaveLength(0); expect(result.guild.world.regionThreat?.shadowfen).toBe(1);
     expect(new Set(result.days[0]?.events.map((event) => event.type))).toEqual(new Set(["tavern_income", "workshop_complete", "gathering_ready", "scout_ready", "condition_recovered", "candidate_expired", "regional_threat"]));
+  });
+
+  it("unlocks regional threat at six level-2 heroes and discards premature save buildup", () => {
+    const guild = createGuild();
+    guild.heroes = Array.from({ length: 6 }, (_, index) => ({ ...testHero(), id: `unlock-hero-${index}`, level: 2 }));
+    guild.world.regionCrisisDays = { shadowfen: 40 }; guild.world.regionThreat = { shadowfen: 2 };
+    const result = advanceGuildTime(guild);
+    expect(areRegionalThreatsUnlocked(result.guild.world)).toBe(true);
+    expect(result.guild.world.regionCrisisDays?.shadowfen).toBe(1);
+    expect(result.guild.world.regionThreat?.shadowfen ?? 0).toBe(0);
   });
 
   it("recovers 35 readiness stamina when a day ends", () => {

@@ -4,7 +4,7 @@ import { TEMPLE_CONFIG } from "../../config/templeConfig";
 import { CONDITIONS } from "../../data/conditions/conditions";
 import { BackButton, EmptyState, Panel, Portrait, SegmentedTabs, colors } from "../../components/ui";
 import { calculateHero } from "../../game/heroes/heroCalculator";
-import { fullyTreatHero, getConditionTreatmentCost, getFullTreatmentCost, getHealingCost, healHero, reviveHero, treatHeroConditions } from "../../game/temple/templeService";
+import { fullyTreatHero, getConditionTreatmentCost, getFullTreatmentCost, getHalfHealingCost, getHealingCost, healHero, healHeroToHalf, reviveHero, treatHeroConditions } from "../../game/temple/templeService";
 import { useGuild } from "../../state/GuildContext";
 import { getRaceNameColor } from "../../ui/raceColors";
 
@@ -26,13 +26,14 @@ export function TempleScreen({ onBack }: { onBack(): void }) {
     {message ? <Panel style={styles.message}><Text style={styles.messageText}>{message}</Text><Pressable onPress={() => setMessage(null)}><Text style={styles.dismiss}>Dismiss</Text></Pressable></Panel> : null}
     <SegmentedTabs values={["Treatment", "Revival"] as const} value={tab} onChange={setTab} />
     {tab === "Treatment" ? (living.length ? living.map((hero) => {
-      const maxHP = calculateHero(hero).stats.maxHP; const healingCost = getHealingCost(hero); const conditionCost = getConditionTreatmentCost(hero); const fullCost = getFullTreatmentCost(hero); const ailments = hero.conditions.filter((item) => item.conditionId !== "inspired");
+      const maxHP = calculateHero(hero).stats.maxHP; const halfHealingCost = getHalfHealingCost(hero); const healingCost = getHealingCost(hero); const conditionCost = getConditionTreatmentCost(hero); const fullCost = getFullTreatmentCost(hero); const ailments = hero.conditions.filter((item) => item.conditionId !== "inspired");
       return <Panel key={hero.id} style={styles.heroCard}><View style={styles.heroHeader}><Portrait hero={hero} size={58} /><View style={styles.heroInfo}><Text style={[styles.heroName,{color:getRaceNameColor(hero.raceId)}]}>{hero.name}</Text><Text style={styles.hp}>HP {Math.round(hero.currentHP)} / {Math.round(maxHP)}</Text><View style={styles.bar}><View style={[styles.hpFill, { width: `${Math.max(0, Math.min(100, hero.currentHP / maxHP * 100))}%` }]} /></View></View></View>
         <Text style={styles.conditions}>{ailments.length ? ailments.map((item) => `${CONDITIONS[item.conditionId].name} (${item.remainingDuration}d)`).join(" • ") : "No treatable conditions"}</Text>
         <View style={styles.actions}>
-          <TempleAction label={`Heal · ◆${healingCost}`} disabled={!healingCost || guild.gold < healingCost} onPress={() => act(() => healHero(guild, hero.id), `${hero.name}'s health was restored.`)} />
-          <TempleAction label={`Cure · ◆${conditionCost}`} disabled={!conditionCost || guild.gold < conditionCost} onPress={() => act(() => treatHeroConditions(guild, hero.id), `${hero.name}'s ailments were cured.`)} />
+          <TempleAction label={`Heal to 50% · ◆${halfHealingCost}`} disabled={!halfHealingCost || guild.gold < halfHealingCost} onPress={() => act(() => healHeroToHalf(guild, hero.id), `${hero.name} was restored to at least 50% health.`)} />
+          <TempleAction label={`Heal Full · ◆${healingCost}`} disabled={!healingCost || guild.gold < healingCost} onPress={() => act(() => healHero(guild, hero.id), `${hero.name}'s health was restored.`)} />
         </View>
+        <TempleAction label={`Cure · ◆${conditionCost}`} disabled={!conditionCost || guild.gold < conditionCost} onPress={() => act(() => treatHeroConditions(guild, hero.id), `${hero.name}'s ailments were cured.`)} />
         <TempleAction primary label={`Full treatment · ◆${fullCost}`} disabled={!fullCost || guild.gold < fullCost} onPress={() => act(() => fullyTreatHero(guild, hero.id), `${hero.name} received full treatment.`)} />
       </Panel>;
     }) : <EmptyState title="No heroes to treat" message="Recruit heroes or return after an expedition." />) : null}

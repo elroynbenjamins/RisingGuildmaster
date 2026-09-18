@@ -35,14 +35,15 @@ export function getLevelAppropriateQuestLootIds(itemIds: readonly string[], hero
   const preferred = itemIds.filter((itemId) => isEligible(itemId, preferredFloor));
   if (preferred.length) return preferred;
   const classIds = new Set(heroes.map((hero) => hero.classId));
+  const isSafeGenericFallback = (item: (typeof EQUIPMENT)[string]) => (item.rarity === "common" || item.rarity === "uncommon") && item.specialEffectIds.length === 0 && (!item.classRestrictions.length || item.classRestrictions.some((classId) => classIds.has(classId)));
   const levelMatchedFallback = Object.values(EQUIPMENT)
-    .filter((item) => item.levelRequirement >= preferredFloor && item.levelRequirement <= highestHeroLevel && (!item.classRestrictions.length || item.classRestrictions.some((classId) => classIds.has(classId))))
+    .filter((item) => item.levelRequirement >= preferredFloor && item.levelRequirement <= highestHeroLevel && isSafeGenericFallback(item))
     .map((item) => item.id);
   if (levelMatchedFallback.length) return levelMatchedFallback;
   const eligible = itemIds.filter((itemId) => isEligible(itemId, 1));
   if (eligible.length) return eligible;
   return Object.values(EQUIPMENT)
-    .filter((item) => item.levelRequirement <= highestHeroLevel && (!item.classRestrictions.length || item.classRestrictions.some((classId) => classIds.has(classId))))
+    .filter((item) => item.levelRequirement <= highestHeroLevel && isSafeGenericFallback(item))
     .map((item) => item.id);
 }
 

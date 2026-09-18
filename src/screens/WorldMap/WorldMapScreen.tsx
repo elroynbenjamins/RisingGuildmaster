@@ -8,6 +8,7 @@ import { RACE_HOMELANDS } from "../../data/recruitment/raceHomelands";
 import { RACES } from "../../data/races/races";
 import type { GuildState } from "../../game/guild/types";
 import { isBossAvailable, isRegionCompleted } from "../../game/world/regionService";
+import { areRegionalThreatsUnlocked } from "../../game/world/regionalThreatService";
 import { discoverRegionSettlements } from "../../game/world/worldService";
 import { buyRations, canTravel, getRationBundleAmount, getRegionalTravelDays, getTravelRationCost, travelGuildToRegion } from "../../game/world/travelService";
 import type { WorldEventDefinition } from "../../game/world/worldTypes";
@@ -41,7 +42,8 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
   const homelandContacts = Object.values(RACE_HOMELANDS).filter((homeland) => homeland.regionId === selectedId);
   const averageLevel = guild.heroes.length ? guild.heroes.reduce((sum, hero) => sum + hero.level, 0) / guild.heroes.length : 0;
   const completedRegionQuests = selected.questPoolIds.filter((id) => guild.world.completedQuestIds.includes(id)).length;
-  const selectedThreat = guild.world.regionThreat?.[selectedId] ?? 0;
+  const threatsUnlocked = areRegionalThreatsUnlocked(guild.world);
+  const selectedThreat = threatsUnlocked ? guild.world.regionThreat?.[selectedId] ?? 0 : 0;
   const availableHeroes = guild.heroes.filter((hero) => hero.isAvailable);
   const recentAvailable = guild.recentPartyHeroIds.filter((id) => availableHeroes.some((hero) => hero.id === id));
   const travelPartySize = Math.max(1, recentAvailable.length || Math.min(4, availableHeroes.length));
@@ -118,7 +120,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
                 <Text numberOfLines={1} style={styles.nodeName}>{region.name}</Text>
                 <Text style={styles.nodeState}>{status}</Text>
                 {selectedRegion && <Text style={styles.nodeHint}>DOUBLE TAP · OPEN</Text>}
-                {(guild.world.regionThreat?.[region.id] ?? 0) > 0 && <Text style={styles.threatBadge}>THREAT {guild.world.regionThreat?.[region.id]}</Text>}
+                {threatsUnlocked && (guild.world.regionThreat?.[region.id] ?? 0) > 0 && <Text style={styles.threatBadge}>THREAT {guild.world.regionThreat?.[region.id]}</Text>}
                 {settlementDiscovered && (selectedRegion || isCurrent) && <View style={styles.settlementRow}><GameIcon id="settlement" size={13} framed={false} /><Text style={styles.settlement}>{SETTLEMENTS[region.settlementIds[0]!]?.name}</Text></View>}
               </Pressable>
             );

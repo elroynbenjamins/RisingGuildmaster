@@ -13,7 +13,7 @@ import { REGIONS } from "../src/data/world/regions";
 import { completeCampaignNode } from "../src/game/campaign/campaignService";
 import { isQuestAvailable } from "../src/game/quests/questAvailability";
 import { createQuestEncounter } from "../src/game/quests/encounterFactory";
-import { advanceRegionalThreats, getRegionThreatEffects, resolveRegionalThreatForQuest } from "../src/game/world/regionalThreatService";
+import { advanceRegionalThreats, getRegionThreatEffects, resolveRegionalThreatForQuest, unlockRegionalThreats } from "../src/game/world/regionalThreatService";
 import { createWorldState } from "../src/game/world/worldState";
 import type { WorldState } from "../src/game/world/worldTypes";
 import { createSeededRandom } from "../src/utils/random";
@@ -57,7 +57,7 @@ describe("The Aurora That Fell regional crisis", () => {
   });
 
   it("escalates every five days, closes Northwatch at Threat 4, and clears on victory", () => {
-    let world: WorldState = { ...createWorldState(), worldFlags: { frostmarch_aurora_crisis: true } };
+    let world: WorldState = unlockRegionalThreats({ ...createWorldState(), worldFlags: { frostmarch_aurora_crisis: true } });
     world = advanceRegionalThreats(world, 10);
     expect(world.regionThreat?.frostmarch).toBe(2);
     expect(getRegionThreatEffects(world, "frostmarch").enemyLevelModifier).toBe(1);

@@ -4,7 +4,6 @@ import type { HeroCombatInstance, QuestCombatSetup } from "../combat/combatTypes
 import { createHeroCombatInstance } from "../combat/heroCombatFactory";
 import type { GuildState } from "../guild/types";
 import { grantHeroXp } from "../progression/levelSystem";
-import { xpRequiredForNextLevel } from "../progression/xpSystem";
 import { finishRogueliteRun, resolveRogueliteRecipeDrop, startRogueliteRun } from "../roguelite/recipeRewardService";
 import { resolveAbilityCheck, type AbilityCheckResult } from "../world/worldEventResolver";
 import { markDungeonNodeResolved, startDungeonRun } from "./dungeonService";
@@ -15,10 +14,6 @@ import { calculateDungeonRunScore } from "./dungeonIntelService";
 import { createRogueliteDungeonRecord } from "./rogueliteRotationTypes";
 
 export type DungeonMerchantChoice = "buy_supplies" | "leave";
-export const EXPEDITION_COMPLETION_XP_PERCENT = .05;
-export function getExpeditionCompletionXpForHero(heroLevel: number): number {
-  return Math.max(1, Math.round(xpRequiredForNextLevel(heroLevel) * EXPEDITION_COMPLETION_XP_PERCENT));
-}
 export interface DungeonNodeResolution { guild: GuildState; check: AbilityCheckResult | null; text: string; goldDelta: number; recipeId: string | null }
 
 function activeRun(guild: GuildState) { const run = guild.activeDungeonRun; if (!run || run.status !== "active") throw new Error("No active dungeon run"); return run; }
@@ -105,15 +100,6 @@ export function resolveDungeonCombat(guild: GuildState, status: "victory" | "def
   let recipeId: string | null = null;
   if (node.type === "elite" || node.type === "boss") { const rareLootModifier = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.rareLootModifier ?? 0), 0); const party = next.heroes.filter((hero) => run.partyHeroIds.includes(hero.id)); const partyAverageLevel = party.reduce((sum, hero) => sum + hero.level, 0) / Math.max(1, party.length); const encounterId = run.selectedEncounterIds[node.id]; const drop = resolveRogueliteRecipeDrop(next, node.type, random, rareLootModifier, DUNGEONS[run.dungeonId]!.themeId, { encounterId, partyAverageLevel }); next = drop.guild; recipeId = drop.result.droppedRecipeId; if (recipeId && next.activeDungeonRun) next = updateRun(next, { ...next.activeDungeonRun, recipeIdsUnlocked: [...next.activeDungeonRun.recipeIdsUnlocked, recipeId] }); }
   if (next.activeDungeonRun?.status === "victory") {
-    const completedRun = next.activeDungeonRun;
-    const partyIds = new Set(completedRun.partyHeroIds);
-    const completionBonuses = next.heroes.filter((hero) => partyIds.has(hero.id) && hero.currentHP > 0).map((hero) => getExpeditionCompletionXpForHero(hero.level));
-    const averageCompletionBonus = completionBonuses.length ? Math.round(completionBonuses.reduce((sum, value) => sum + value, 0) / completionBonuses.length) : 0;
-    next = {
-      ...next,
-      heroes: next.heroes.map((hero) => partyIds.has(hero.id) && hero.currentHP > 0 ? grantHeroXp(hero, getExpeditionCompletionXpForHero(hero.level)) : hero),
-      activeDungeonRun: { ...completedRun, xpEarnedPerHero: completedRun.xpEarnedPerHero + averageCompletionBonus, lastResolutionText: `${completedRun.lastResolutionText ?? "Expedition complete."} Victory bonus: +5% level-progress XP for each surviving hero.` },
-    };
     const score = calculateDungeonRunScore(next.activeDungeonRun); const record = next.rogueliteRotation.records[run.dungeonId] ?? createRogueliteDungeonRecord();
     next = { ...next, rogueliteRotation: { ...next.rogueliteRotation, records: { ...next.rogueliteRotation.records, [run.dungeonId]: { ...record, victories: record.victories + 1, bestScore: Math.max(record.bestScore, score.total), bestGrade: score.total >= record.bestScore ? score.grade : record.bestGrade, lastVictoryDay: next.currentDay } } } };
   }

@@ -1,7 +1,7 @@
 import type { GuildState } from "../guild/types";
 import type { RandomSource } from "../../utils/random";
 
-export const DUNGEON_UNLOCK_HERO_COUNT = 8;
+export const DUNGEON_UNLOCK_HERO_COUNT = 6;
 export const DUNGEON_DRAFT_ROUNDS = 4;
 export const DUNGEON_DRAFT_OFFER_SIZE = 3;
 export interface DungeonDraftState { round: number; eligibleHeroIds: string[]; offeredHeroIds: string[]; selectedHeroIds: string[]; complete: boolean }

@@ -88,9 +88,9 @@ export function createCombatState(questId: string, encounterIndex: number, heroe
   return { questId, encounterIndex, encounterIds, ...(setup?.label ? { setupLabel: setup.label } : {}), round: 1, turn: 1, heroes: heroCombatants, enemies, board, initiativeRolls: initiative.map(({ combatantId, d20, modifier, total }) => ({ combatantId, d20, modifier, total })), combatStarted: false, turnOrderIds: initiative.map((entry) => entry.combatantId), turnCursor: 0, awaitingHeroId: null, actions: { movementUsed: false, combatActionUsed: false }, status: "active", log: [], lastRoll: null, lastVisualEvent:null, relationships: [...relationships], spentReactionIds: [], enemyAiLevel: difficulty.enemyAiLevel, raidMechanic: null };
 }
 
-export function beginCombat(state: CombatState, random: RandomSource): CombatState {
+export function beginCombat(state: CombatState, random: RandomSource, automaticTurnLimit = Number.POSITIVE_INFINITY): CombatState {
   if (state.combatStarted) return state;
-  return advanceCombat(initializeRaidMechanics({ ...state, combatStarted: true }), random);
+  return advanceCombat(initializeRaidMechanics({ ...state, combatStarted: true }), random, automaticTurnLimit);
 }
 
 function withOutcome(state: CombatState): CombatState {
@@ -163,9 +163,9 @@ function applyOpportunityMovement(state: CombatState, moverId: string, path: rea
   return { state: next, travelledTiles: resolution.travelledTiles };
 }
 
-/** Advances automatic turns until player input is needed or combat ends. */
-export function advanceCombat(state: CombatState, random: RandomSource): CombatState {
-  let next = withOutcome(state); let safety = 0;
+/** Advances automatic turns until player input is needed, combat ends, or the optional automatic-turn budget is spent. */
+export function advanceCombat(state: CombatState, random: RandomSource, automaticTurnLimit = Number.POSITIVE_INFINITY): CombatState {
+  let next = withOutcome(state); let safety = 0; let automaticTurnsResolved = 0;
   while (next.status === "active" && !next.awaitingHeroId && safety++ < 100) {
     if (next.turnCursor >= next.turnOrderIds.length) {
       next = withOutcome(resolveRaidRoundStart({ ...next, round: next.round + 1, turnCursor: 0, spentReactionIds: [] }));
@@ -183,12 +183,14 @@ export function advanceCombat(state: CombatState, random: RandomSource): CombatS
       if (started.skipTurn) {
         instance = { ...instance, activeConditions: advanceCombatConditions(instance.activeConditions), activeCooldowns: advanceCooldowns(instance.activeCooldowns), activeCompanion: instance.activeCompanion ? (instance.activeCompanion.remainingTurns > 1 ? { ...instance.activeCompanion, remainingTurns: instance.activeCompanion.remainingTurns - 1 } : undefined) : undefined };
         heroItems[heroIndex] = { ...heroItems[heroIndex]!, instance, unit: { ...started.unit, activeConditions: instance.activeConditions } };
+        automaticTurnsResolved += 1;
         next = { ...next, heroes: heroItems, turnCursor: next.turnCursor + 1, turn: next.turn + 1 }; continue;
       }
       next = { ...next, heroes: heroItems, awaitingHeroId: actorId, actions: { movementUsed: false, combatActionUsed: false } }; break;
     }
     const enemyIndex = next.enemies.findIndex((item) => item.unit.combatantId === actorId);
     if (enemyIndex < 0 || !next.enemies[enemyIndex]!.unit.isAlive) { next = { ...next, turnCursor: next.turnCursor + 1 }; continue; }
+    if (automaticTurnsResolved >= automaticTurnLimit) break;
     let enemy = next.enemies[enemyIndex]!; let board = next.board;
     const behavior = getEnemyTacticalBehavior(enemy.instance); const target = selectTacticalTarget(enemy.unit, next.heroes.map((item) => item.unit), behavior, random, next.enemyAiLevel, board);
     if (target) {
@@ -202,6 +204,7 @@ export function advanceCombat(state: CombatState, random: RandomSource): CombatS
           next = moved.state; board = next.board;
           enemy = next.enemies.find((item) => item.unit.combatantId === actorId)!;
           if (!enemy.unit.isAlive) {
+            automaticTurnsResolved += 1;
             next = withOutcome({ ...next, turnCursor: next.turnCursor + 1, turn: next.turn + 1 });
             continue;
           }
@@ -218,12 +221,13 @@ export function advanceCombat(state: CombatState, random: RandomSource): CombatS
       next = addResolutionLog({ ...next, board }, actorId, getEnemyDefinition(enemy.instance.enemyDefinitionId).name, result.skillResult.resolution.skillId, result.skillResult.targets, result.skillResult.resolution.hits);
     }
     board = clearDefeatedOccupants(board, [...heroes.map((item) => item.unit), ...enemies.map((item) => item.unit)]);
+    automaticTurnsResolved += 1;
     next = withOutcome({ ...next, board, enemies, heroes, turnCursor: next.turnCursor + 1, turn: next.turn + 1 });
   }
   return next;
 }
 
-export function moveCurrentHero(state: CombatState, destination: GridPosition, random: RandomSource): CombatState {
+export function moveCurrentHero(state: CombatState, destination: GridPosition, random: RandomSource, automaticTurnLimit = Number.POSITIVE_INFINITY): CombatState {
   if (!state.awaitingHeroId) throw new Error("No hero is awaiting input");
   if (state.actions.movementUsed) throw new Error("Movement action already used");
   const index = state.heroes.findIndex((item) => item.unit.combatantId === state.awaitingHeroId); const combatant = state.heroes[index]!;
@@ -232,7 +236,7 @@ export function moveCurrentHero(state: CombatState, destination: GridPosition, r
   const moved = applyOpportunityMovement(state, combatant.unit.combatantId, path, random);
   const terrainType=getTile(moved.state.board,destination)?.terrainType;const lastVisualEvent:CombatVisualEvent={id:moved.state.log.length+1+state.turn*1000,kind:"movement",actionId:"move",actorId:combatant.hero.id,range:moved.travelledTiles,fromPosition:combatant.unit.position,toPosition:destination,terrainType,effects:[]};
   const result = { ...moved.state, actions: { ...state.actions, movementUsed: true }, log: [...moved.state.log, { turn: state.turn, actorId: combatant.hero.id, actionId: "move", targetIds: [], message: `${combatant.hero.name} moved ${moved.travelledTiles} tiles${moved.state.heroes[index]?.unit.isAlive ? "." : " before being defeated."}` }],lastVisualEvent };
-  return result.status === "active" && !result.heroes[index]?.unit.isAlive ? endCurrentHeroTurn(result, random) : result;
+  return result.status === "active" && !result.heroes[index]?.unit.isAlive ? endCurrentHeroTurn(result, random, automaticTurnLimit) : result;
 }
 
 export function performHeroTurn(state: CombatState, skillId: string, random: RandomSource, selectedTargetId?: string, targetPosition?: GridPosition): CombatState {
@@ -270,10 +274,10 @@ export function performHeroTurn(state: CombatState, skillId: string, random: Ran
   return withOutcome({ ...logged, actions: { ...state.actions, combatActionUsed: true, usedSkillId: skillId } });
 }
 
-export function endCurrentHeroTurn(state: CombatState, random: RandomSource): CombatState {
+export function endCurrentHeroTurn(state: CombatState, random: RandomSource, automaticTurnLimit = Number.POSITIVE_INFINITY): CombatState {
   if (!state.awaitingHeroId) throw new Error("No hero is awaiting input");
   const index = state.heroes.findIndex((item) => item.hero.id === state.awaitingHeroId); const combatant = state.heroes[index]!;
   const instance = { ...combatant.instance, activeCooldowns: advanceCooldowns(combatant.instance.activeCooldowns, state.actions.usedSkillId), activeConditions: advanceCombatConditions(combatant.instance.activeConditions) };
   const heroes = [...state.heroes]; heroes[index] = { ...combatant, instance, unit: advanceSkillModifiers({ ...combatant.unit, activeConditions: instance.activeConditions }) };
-  return advanceCombat(withOutcome({ ...state, heroes, awaitingHeroId: null, turnCursor: state.turnCursor + 1, turn: state.turn + 1 }), random);
+  return advanceCombat(withOutcome({ ...state, heroes, awaitingHeroId: null, turnCursor: state.turnCursor + 1, turn: state.turn + 1 }), random, automaticTurnLimit);
 }

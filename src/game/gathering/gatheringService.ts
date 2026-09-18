@@ -10,7 +10,11 @@ import type { Hero } from "../heroes/types";
 import type { GatheringMissionInstance, GatheringMissionResult, GatheringQuality } from "./gatheringTypes";
 import { hasGuildmasterSkill } from "../guildmaster/guildmasterProgression";
 import { getTrainingProgressionLimit, grantTrainingXp } from "../training/trainingService";
+import { xpRequiredForNextLevel } from "../progression/xpSystem";
 import { createGuildLegacyState, displayedTrophyBonus } from "../renown/guildLegacyService";
+
+export const IDLE_MISSION_LEVEL_PROGRESS_XP_PERCENT = .05;
+export function getIdleMissionLevelProgressXp(heroLevel: number): number { return Math.max(1, Math.round(xpRequiredForNextLevel(heroLevel) * IDLE_MISSION_LEVEL_PROGRESS_XP_PERCENT)); }
 
 function missionHeroes(guild: GuildState, mission: GatheringMissionInstance): [Hero, Hero] { const heroes = mission.heroIds.map((id) => guild.heroes.find((hero) => hero.id === id)); if (!heroes[0] || !heroes[1]) throw new Error("Gathering heroes are missing"); return [heroes[0], heroes[1]]; }
 
@@ -46,7 +50,7 @@ export function resolveGatheringMission(guild: GuildState, missionId: string): G
 export function claimGatheringMission(guild: GuildState, missionId: string): { guild: GuildState; result: GatheringMissionResult } {
   const mission = guild.gatheringMissions.find((item) => item.id === missionId); if (!mission || mission.status !== "active") throw new Error("Gathering mission cannot be claimed"); const result = resolveGatheringMission(guild, missionId);
   const materials = { ...guild.materials }; for (const [id, amount] of Object.entries(result.materials) as [MaterialId, number][]) materials[id] += amount;
-  return { result, guild: { ...guild, materials, inventory: [...guild.inventory, ...result.equipmentIds], heroes: guild.heroes.map((hero) => { if (!mission.heroIds.includes(hero.id)) return hero; const cap = getTrainingProgressionLimit(guild, hero).levelCap; return { ...grantTrainingXp(hero, result.xpPerHero, cap), isAvailable: hero.currentHP > 0 }; }), gatheringMissions: guild.gatheringMissions.map((item) => item.id === missionId ? { ...item, status: "claimed" } : item) } };
+  return { result, guild: { ...guild, materials, inventory: [...guild.inventory, ...result.equipmentIds], heroes: guild.heroes.map((hero) => { if (!mission.heroIds.includes(hero.id)) return hero; const cap = getTrainingProgressionLimit(guild, hero).levelCap; return { ...grantTrainingXp(hero, result.xpPerHero + getIdleMissionLevelProgressXp(hero.level), cap), isAvailable: hero.currentHP > 0 }; }), gatheringMissions: guild.gatheringMissions.map((item) => item.id === missionId ? { ...item, status: "claimed" } : item) } };
 }
 
 /** @deprecated Prefer advanceGuildTime; retained for compatibility with existing gathering callers. */

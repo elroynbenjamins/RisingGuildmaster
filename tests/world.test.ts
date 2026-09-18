@@ -8,8 +8,9 @@ import { CHAPTER_5 } from "../src/data/campaign/chapter5";
 import { QUEST_ENCOUNTERS } from "../src/data/encounters/questEncounters";
 import { BATTLEFIELDS } from "../src/data/combat/battlefields";
 import { completeCampaignNode, getAvailableCampaignNodes, isCampaignQuestUnlocked } from "../src/game/campaign/campaignService";
+import { getCampaignNodeLocationRequirement, isCampaignNodeAtCurrentLocation } from "../src/game/campaign/campaignLocationService";
 import { QUESTS } from "../src/data/quests/quests";
-import { isQuestAvailable } from "../src/game/quests/questAvailability";
+import { isQuestAvailable, isQuestAvailableAtCurrentLocation } from "../src/game/quests/questAvailability";
 import { resolveCampaignChoice } from "../src/game/campaign/campaignChoiceResolver";
 import { createGuild } from "../src/game/guild/guildService";
 import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
@@ -31,6 +32,16 @@ describe("persistent world and campaign", () => {
   it("describes event rewards and persistent consequences clearly", () => { expect(describeEventOutcomes([{ type: "gold", value: 40 }, { type: "rations", value: -2 }, { type: "world_flag", flag: "road_known", value: true }])).toEqual(["+40 gold", "-2 rations", "World state changed: road known"]); });
   it("enforces campaign prerequisites, choices, flags, rewards, and chapter progression", () => { let world = createWorldState(); expect(getAvailableCampaignNodes(world).map((node) => node.id)).toEqual(["founding_the_guild"]); expect(() => completeCampaignNode(world, "missing_merchant")).toThrow(); for (const id of CHAPTER_1.nodeIds.slice(0, -1)) world = completeCampaignNode(world, id).worldState; world = resolveCampaignChoice(world, "spare_chieftain"); expect(world.worldFlags.chieftain_spared).toBe(true); world = resolveCampaignChoice(world, "execute_chieftain"); expect(world.worldFlags.chieftain_spared).toBe(false); expect(world.worldFlags.chieftain_killed).toBe(true); const final = completeCampaignNode(world, "broken_wardstone"); expect(final).toMatchObject({ goldReward: 500, guildReputationReward: 10 }); expect(final.worldState.campaignChapter).toBe(2); expect(final.worldState.worldFlags.greenveil_wardstone_damaged).toBe(true); });
   it("locks campaign quests to their exact story order", () => { let world = createWorldState(); expect(isQuestAvailable(QUESTS.guildhaven_cellar_slimes!, world)).toBe(false); expect(isQuestAvailable(QUESTS.goblin_patrol!, world)).toBe(false); world = completeCampaignNode(world, "founding_the_guild").worldState; expect(isCampaignQuestUnlocked("guildhaven_cellar_slimes", world)).toBe(true); expect(isQuestAvailable(QUESTS.guildhaven_cellar_slimes!, world)).toBe(true); expect(isQuestAvailable(QUESTS.rats_beneath_guildhaven!, world)).toBe(false); world = completeCampaignNode(world, "guildhaven_cellar_slimes").worldState; expect(isQuestAvailable(QUESTS.guildhaven_cellar_slimes!, world)).toBe(false); expect(isQuestAvailable(QUESTS.rats_beneath_guildhaven!, world)).toBe(true); expect(isQuestAvailable(QUESTS.goblin_chieftain_boss!, world)).toBe(false); });
+  it("requires the guild to travel to the quest and campaign location", () => {
+    const world = createWorldState();
+    expect(isQuestAvailableAtCurrentLocation(QUESTS.highcourt_silent_charter!, world)).toBe(false);
+    expect(isQuestAvailableAtCurrentLocation(QUESTS.highcourt_silent_charter!, { ...world, currentSettlementId: "highcourt" })).toBe(true);
+    expect(getCampaignNodeLocationRequirement("council_of_splinters")).toEqual({ regionId: "iron_hills", settlementIds: [] });
+    const chapterTwo = { ...world, campaignChapter: 2, completedCampaignNodeIds: ["broken_wardstone"], unlockedRegionIds: [...world.unlockedRegionIds, "iron_hills"] };
+    expect(isCampaignNodeAtCurrentLocation("council_of_splinters", chapterTwo)).toBe(false);
+    expect(isCampaignNodeAtCurrentLocation("council_of_splinters", { ...chapterTwo, currentRegionId: "iron_hills", currentSettlementId: "stonegate" })).toBe(true);
+  });
+
   it("round-trips world, subclass and mastery state through save serialization", () => { const guild = createGuild(); guild.world.worldFlags.test = true; guild.world.unlockedRegionIds.push("iron_hills"); guild.heroes = [{ ...testHero(), level: 10, subclassId: "guardian", masteryId: "vanguard" }]; const loaded = deserializeGuild(serializeGuild(guild)); expect(loaded.world.worldFlags.test).toBe(true); expect(loaded.world.unlockedRegionIds).toContain("iron_hills"); expect(loaded.heroes[0]?.subclassId).toBe("guardian"); expect(loaded.heroes[0]?.masteryId).toBe("vanguard"); });
   it("persists gems and migrates older saves with the configured starting balance", () => { const guild = createGuild(); guild.gems = 12; expect(deserializeGuild(serializeGuild(guild)).gems).toBe(12); const legacy = JSON.parse(serializeGuild(guild)); delete legacy.gems; delete legacy.gemTransactions; const migrated = deserializeGuild(JSON.stringify(legacy)); expect(migrated.gems).toBe(5); expect(migrated.gemTransactions).toEqual([]); });
   it("connects Chapter 5 directly to the Drowned Archive finale", () => { expect(CHAPTER_5).toMatchObject({ chapterNumber: 5, recommendedLevelMin: 8, recommendedLevelMax: 9 }); expect(CHAPTER_5.sideQuestIds).toEqual(["the_children_of_cinder", "a_song_for_the_last_phoenix"]); expect(getAvailableCampaignNodes({ ...createWorldState(), campaignChapter: 5, completedCampaignNodeIds: ["drowned_archivist_boss"] }).map((node) => node.id)).toContain("east_with_the_covenant"); });

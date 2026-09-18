@@ -1,5 +1,6 @@
 import { COMBAT_CONDITIONS } from "../../data/conditions/combatConditions";
 import { QUEST_LOOT_TABLES } from "../../data/loot/questLootTables";
+import { EQUIPMENT } from "../../data/equipment/equipment";
 import type { RandomSource } from "../../utils/random";
 import { addCondition, isInjuryCondition } from "../conditions/conditionService";
 import { applyOutcomeInjury } from "../conditions/injuryService";
@@ -22,6 +23,29 @@ import { getEnemyDefinition } from "../../data/enemies";
 import { potentialMultiplier } from "../progression/potential";
 import { applyCombatEquipmentWear } from "../equipment/equipmentDurabilityService";
 import { getGuildRank, getQuestReputationReward } from "../renown/guildLegacyService";
+
+export function getLevelAppropriateQuestLootIds(itemIds: readonly string[], heroes: readonly Hero[]): string[] {
+  if (!itemIds.length) return [];
+  const highestHeroLevel = Math.max(1, ...heroes.map((hero) => hero.level));
+  const preferredFloor = highestHeroLevel >= 2 && highestHeroLevel <= 4 ? 2 : Math.max(1, highestHeroLevel - 2);
+  const isEligible = (itemId: string, minimumLevel: number) => {
+    const item = EQUIPMENT[itemId];
+    return !item || (item.levelRequirement >= minimumLevel && item.levelRequirement <= highestHeroLevel);
+  };
+  const preferred = itemIds.filter((itemId) => isEligible(itemId, preferredFloor));
+  if (preferred.length) return preferred;
+  const classIds = new Set(heroes.map((hero) => hero.classId));
+  const isSafeGenericFallback = (item: (typeof EQUIPMENT)[string]) => (item.rarity === "common" || item.rarity === "uncommon") && item.specialEffectIds.length === 0 && (!item.classRestrictions.length || item.classRestrictions.some((classId) => classIds.has(classId)));
+  const levelMatchedFallback = Object.values(EQUIPMENT)
+    .filter((item) => item.levelRequirement >= preferredFloor && item.levelRequirement <= highestHeroLevel && isSafeGenericFallback(item))
+    .map((item) => item.id);
+  if (levelMatchedFallback.length) return levelMatchedFallback;
+  const eligible = itemIds.filter((itemId) => isEligible(itemId, 1));
+  if (eligible.length) return eligible;
+  return Object.values(EQUIPMENT)
+    .filter((item) => item.levelRequirement <= highestHeroLevel && isSafeGenericFallback(item))
+    .map((item) => item.id);
+}
 
 export function isCombatVictory(enemies: readonly { isAlive: boolean }[]): boolean { return enemies.every((enemy) => !enemy.isAlive); }
 export function isCombatDefeat(heroes: readonly { isAlive: boolean }[]): boolean { return heroes.every((hero) => !hero.isAlive); }
@@ -87,7 +111,7 @@ export function resolveQuestVictory(activeQuest: ActiveQuest, party: Party, guil
     const persisted = persistHeroOutcome(hero, instance, xp, random, guild); const newInjury = persisted.conditions.find((condition) => isInjuryCondition(condition.conditionId) && !hero.conditions.some((old) => old.conditionId === condition.conditionId)); const newlyInjured = Boolean(newInjury);
     return recordQuestHistory(persisted, { day: guild.currentDay, questId: quest.id, questName: quest.name, victory: true, xpEarned: instance.isAlive && instance.currentHP > 0 ? xp : Math.round(xp * .5), fellInBattle: !instance.isAlive || instance.currentHP <= 0, newlyInjured, injuryConditionId: newInjury?.conditionId, previousLevel: hero.level });
   });
-  const lootTable = QUEST_LOOT_TABLES[quest.lootTableId]; const lootId = lootTable?.itemIds.length ? random.pick(lootTable.itemIds) : null; const collectedMaterials: Partial<Record<MaterialId, number>> = {};
+  const lootTable = QUEST_LOOT_TABLES[quest.lootTableId]; const lootCandidates = lootTable ? getLevelAppropriateQuestLootIds(lootTable.itemIds, guild.heroes) : []; const lootId = lootCandidates.length ? random.pick(lootCandidates) : null; const collectedMaterials: Partial<Record<MaterialId, number>> = {};
   for (const drop of lootTable?.materialDrops ?? []) { const amount = random.int(drop.quantityMin, drop.quantityMax); if (amount > 0) collectedMaterials[drop.materialId] = amount; }
   const huntRewardProgress = { ...guild.huntRewardProgress };
   if (quest.huntReward) {

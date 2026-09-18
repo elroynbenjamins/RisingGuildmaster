@@ -1,6 +1,10 @@
 import { REGIONAL_THREATS } from "../../data/world/regionalThreats";
 import type { WorldState } from "./worldTypes";
 
+export const REGIONAL_THREAT_UNLOCK_FLAG = "regional_threats_unlocked";
+export const REGIONAL_THREAT_REQUIRED_HERO_COUNT = 6;
+export const REGIONAL_THREAT_MIN_HERO_LEVEL = 2;
+
 export interface RegionThreatEffects {
   enemyLevelModifier: number;
   enemyCountModifier: number;
@@ -8,7 +12,21 @@ export interface RegionThreatEffects {
   unavailableSettlementIds: string[];
 }
 
+export function canUnlockRegionalThreats(heroes: readonly { level: number }[]): boolean {
+  return heroes.filter((hero) => hero.level >= REGIONAL_THREAT_MIN_HERO_LEVEL).length >= REGIONAL_THREAT_REQUIRED_HERO_COUNT;
+}
+
+export function areRegionalThreatsUnlocked(state: WorldState): boolean {
+  return state.worldFlags[REGIONAL_THREAT_UNLOCK_FLAG] === true;
+}
+
+export function unlockRegionalThreats(state: WorldState): WorldState {
+  if (areRegionalThreatsUnlocked(state)) return state;
+  return { ...state, regionCrisisDays: {}, regionThreat: {}, worldFlags: { ...state.worldFlags, [REGIONAL_THREAT_UNLOCK_FLAG]: true } };
+}
+
 function isCrisisActive(state: WorldState, regionId: string): boolean {
+  if (!areRegionalThreatsUnlocked(state)) return false;
   const crisis = REGIONAL_THREATS[regionId];
   if (!crisis || state.completedQuestIds.includes(crisis.resolutionQuestId)) return false;
   return !crisis.activationWorldFlag || state.worldFlags[crisis.activationWorldFlag] === true;

@@ -18,9 +18,13 @@ export function isQuestAvailable(quest: QuestDefinition, world: WorldState): boo
     && (quest.requiredWorldFlags ?? []).every((id) => world.worldFlags[id] === true);
 }
 
-export function isQuestAvailableAtCurrentLocation(quest: QuestDefinition, world: WorldState): boolean {
-  return isQuestAvailable(quest, world)
+export function isQuestAtCurrentLocation(quest: QuestDefinition, world: WorldState): boolean {
+  return world.currentRegionId === quest.regionId
     && (!(quest.settlementIds?.length) || (!!world.currentSettlementId && quest.settlementIds.includes(world.currentSettlementId)));
+}
+
+export function isQuestAvailableAtCurrentLocation(quest: QuestDefinition, world: WorldState): boolean {
+  return isQuestAvailable(quest, world) && isQuestAtCurrentLocation(quest, world);
 }
 
 export function isHeroEligibleForPersonalQuest(hero:Hero,quest:QuestDefinition):boolean{const requirement=quest.personalHeroRequirement;if(!requirement)return true;return(!requirement.raceIds?.length||requirement.raceIds.includes(hero.raceId))&&(!requirement.classIds?.length||requirement.classIds.includes(hero.classId))&&(!requirement.backgroundIds?.length||Boolean(hero.backgroundId&&requirement.backgroundIds.includes(hero.backgroundId)))&&hero.level>=(requirement.minimumLevel??1);}

@@ -8,6 +8,7 @@ import { RACE_HOMELANDS } from "../../data/recruitment/raceHomelands";
 import { RACES } from "../../data/races/races";
 import type { GuildState } from "../../game/guild/types";
 import { isBossAvailable, isRegionCompleted } from "../../game/world/regionService";
+import { areRegionalThreatsUnlocked } from "../../game/world/regionalThreatService";
 import { discoverRegionSettlements } from "../../game/world/worldService";
 import { buyRations, canTravel, getRationBundleAmount, getRegionalTravelDays, getTravelRationCost, travelGuildToRegion } from "../../game/world/travelService";
 import type { WorldEventDefinition } from "../../game/world/worldTypes";
@@ -15,8 +16,11 @@ import { WORLD_NAME } from "../../game/world/worldState";
 import { mapChromeStyles } from "../../ui/worldMap";
 import type { RandomSource } from "../../utils/random";
 import { GameIcon } from "../../components/icons/GameIcon";
+import { RegionEmblem } from "../../components/world/MapMarkerIcon";
 import { isMatchingDoubleTap, type TapRecord } from "../../utils/doubleTap";
 import { GAME_CONFIG } from "../../config/gameConfig";
+import { getAvailableCampaignNodes } from "../../game/campaign/campaignService";
+import { getCampaignNodeLocationRequirement, isAtCampaignLocation } from "../../game/campaign/campaignLocationService";
 
 interface WorldMapProps {
   guild: GuildState;
@@ -41,7 +45,12 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
   const homelandContacts = Object.values(RACE_HOMELANDS).filter((homeland) => homeland.regionId === selectedId);
   const averageLevel = guild.heroes.length ? guild.heroes.reduce((sum, hero) => sum + hero.level, 0) / guild.heroes.length : 0;
   const completedRegionQuests = selected.questPoolIds.filter((id) => guild.world.completedQuestIds.includes(id)).length;
-  const selectedThreat = guild.world.regionThreat?.[selectedId] ?? 0;
+  const threatsUnlocked = areRegionalThreatsUnlocked(guild.world);
+  const selectedThreat = threatsUnlocked ? guild.world.regionThreat?.[selectedId] ?? 0 : 0;
+  const nextCampaignNode = getAvailableCampaignNodes(guild.world)[0];
+  const campaignRequirement = nextCampaignNode ? getCampaignNodeLocationRequirement(nextCampaignNode.id) : null;
+  const campaignAtLocation = isAtCampaignLocation(guild.world, campaignRequirement);
+  const campaignDestination = campaignRequirement ? ((campaignRequirement.settlementIds.length ? campaignRequirement.settlementIds.map((id) => SETTLEMENTS[id]?.name ?? id.replace(/_/g, " ")).join(" / ") + " · " : "") + (REGIONS[campaignRequirement.regionId]?.name ?? campaignRequirement.regionId.replace(/_/g, " "))) : null;
   const availableHeroes = guild.heroes.filter((hero) => hero.isAvailable);
   const recentAvailable = guild.recentPartyHeroIds.filter((id) => availableHeroes.some((hero) => hero.id === id));
   const travelPartySize = Math.max(1, recentAvailable.length || Math.min(4, availableHeroes.length));
@@ -83,6 +92,8 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
         <View style={styles.overviewStat}><Text style={styles.overviewValue}>{guild.rations}</Text><Text style={styles.overviewLabel}>RATIONS</Text></View>
       </View>
 
+      {nextCampaignNode && campaignRequirement ? <Panel style={[styles.campaignRoute, campaignAtLocation && styles.campaignRouteReady]}><Text style={campaignAtLocation ? styles.campaignRouteReadyLabel : styles.campaignRouteLabel}>{campaignAtLocation ? "✓ CAMPAIGN LOCATION REACHED" : "CAMPAIGN ROUTE"}</Text><Text style={styles.campaignRouteTitle}>{nextCampaignNode.title}</Text><Text style={styles.campaignRouteDestination}>{campaignDestination}</Text>{!campaignAtLocation ? <ActionButton label={guild.world.currentRegionId === campaignRequirement.regionId ? "Open Target Region" : "Focus Destination on Map"} onPress={() => guild.world.currentRegionId === campaignRequirement.regionId ? openRegion(campaignRequirement.regionId) : setSelectedId(campaignRequirement.regionId)} /> : null}</Panel> : null}
+
       <View style={mapChromeStyles.frame}>
         <ImageBackground source={WORLD_ART.eldoria} resizeMode="cover" style={mapChromeStyles.canvas} imageStyle={mapChromeStyles.image}>
           <View pointerEvents="none" style={styles.mapShade} />
@@ -94,7 +105,8 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
             const boss = isBossAvailable(region.id, guild.world);
             const selectedRegion = selectedId === region.id;
             const status = !isUnlocked ? "LOCKED" : isCurrent ? "CURRENT" : completed ? "COMPLETE" : boss ? "BOSS" : "OPEN";
-            const markerIcon = !isUnlocked ? "locked" : isCurrent ? "current" : completed ? "complete" : boss ? "boss" : "region_open";
+            const markerStatus = !isUnlocked ? "locked" : isCurrent ? "current" : completed ? "complete" : boss ? "boss" : "open";
+            const campaignTarget = campaignRequirement?.regionId === region.id;
             const settlementDiscovered = region.settlementIds.some((id) => guild.world.discoveredSettlementIds.includes(id));
 
             return (
@@ -114,11 +126,11 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
                   pressed && styles.pressedNode,
                 ]}
               >
-                <View style={[styles.marker, isCurrent && styles.currentMarker, boss && styles.bossMarker]}><GameIcon id={markerIcon} size={28} framed={false} /></View>
+                <View style={[styles.marker, isCurrent && styles.currentMarker, boss && styles.bossMarker]}><RegionEmblem regionId={region.id} status={markerStatus} size={30} campaign={campaignTarget} /></View>
                 <Text numberOfLines={1} style={styles.nodeName}>{region.name}</Text>
                 <Text style={styles.nodeState}>{status}</Text>
-                {selectedRegion && <Text style={styles.nodeHint}>DOUBLE TAP · OPEN</Text>}
-                {(guild.world.regionThreat?.[region.id] ?? 0) > 0 && <Text style={styles.threatBadge}>THREAT {guild.world.regionThreat?.[region.id]}</Text>}
+                {campaignTarget && <Text style={styles.campaignBadge}>CAMPAIGN</Text>}{selectedRegion && <Text style={styles.nodeHint}>DOUBLE TAP · OPEN</Text>}
+                {threatsUnlocked && (guild.world.regionThreat?.[region.id] ?? 0) > 0 && <Text style={styles.threatBadge}>THREAT {guild.world.regionThreat?.[region.id]}</Text>}
                 {settlementDiscovered && (selectedRegion || isCurrent) && <View style={styles.settlementRow}><GameIcon id="settlement" size={13} framed={false} /><Text style={styles.settlement}>{SETTLEMENTS[region.settlementIds[0]!]?.name}</Text></View>}
               </Pressable>
             );
@@ -192,7 +204,7 @@ const styles = StyleSheet.create({
   nodeName: { color: colors.text, fontSize: 11, fontWeight: "900", marginTop: 3, textAlign: "center", textShadowColor: "#000", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 },
   nodeState: { color: colors.gold, fontSize: 8, fontWeight: "900", letterSpacing: 0.7, marginTop: 2, textShadowColor: "#000", textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 },
   nodeHint: { color: colors.green, fontSize: 6, fontWeight: "900", letterSpacing: .4, marginTop: 2 },
-  threatBadge: { backgroundColor: "rgba(113, 38, 34, .95)", borderRadius: 3, color: "#ffb0a8", fontSize: 6, fontWeight: "900", marginTop: 2, overflow: "hidden", paddingHorizontal: 3, paddingVertical: 1 },
+  threatBadge: { backgroundColor: "rgba(113, 38, 34, .95)", borderRadius: 3, color: "#ffb0a8", fontSize: 6, fontWeight: "900", marginTop: 2, overflow: "hidden", paddingHorizontal: 3, paddingVertical: 1 }, campaignBadge: { backgroundColor: "rgba(76,55,19,.96)", borderColor: "#e8c06b", borderRadius: 3, borderWidth: 1, color: "#f4d78e", fontSize: 6, fontWeight: "900", marginTop: 2, overflow: "hidden", paddingHorizontal: 4, paddingVertical: 1 },
   settlementRow: { alignItems: "center", flexDirection: "row", gap: 2, marginTop: 2 },
   settlement: { color: colors.muted, fontSize: 7 },
   legendItem: { alignItems: "center", flexDirection: "row", gap: 3 },
@@ -203,7 +215,7 @@ const styles = StyleSheet.create({
   regionName: { color: colors.text, fontSize: 23, fontWeight: "900" },
   level: { color: colors.gold, marginTop: 2 },
   state: { color: colors.text, fontWeight: "800" },
-  description: { color: colors.muted, lineHeight: 20, marginVertical: 9 },
+  campaignRoute: { borderColor: colors.gold, gap: 6, marginBottom: 12 }, campaignRouteReady: { borderColor: colors.green }, campaignRouteLabel: { color: colors.gold, fontSize: 10, fontWeight: "900", letterSpacing: 1.2 }, campaignRouteReadyLabel: { color: colors.green, fontSize: 10, fontWeight: "900", letterSpacing: 1.2 }, campaignRouteTitle: { color: colors.text, fontSize: 17, fontWeight: "900" }, campaignRouteDestination: { color: colors.muted, fontSize: 12, marginBottom: 4 }, description: { color: colors.muted, lineHeight: 20, marginVertical: 9 },
   detail: { color: colors.text, marginTop: 6 },
   threat: { backgroundColor: "rgba(78, 30, 29, .72)", borderColor: colors.danger, borderRadius: 7, borderWidth: 1, color: "#ffc0b8", fontSize: 11, lineHeight: 16, marginTop: 9, padding: 8 },
   danger: { color: colors.danger, fontWeight: "800", marginTop: 8 },

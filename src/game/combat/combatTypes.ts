@@ -54,6 +54,7 @@ export interface QuestCombatSetup {
   heroArmorClassModifier: number;
   heroOpeningAttackRollModifier: number;
   enemyOpeningAttackRollModifier: number;
+  enemyAttackRollModifier?: number;
   enemyPhysicalDamageModifier?: number;
   enemyDamageModifier?: number;
   heroHealingPowerModifier?: number;

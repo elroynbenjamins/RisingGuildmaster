@@ -15,7 +15,7 @@ export const GAME_CONFIG = {
   rewardedAdGems: 5,
   goldPerGem: 250,
   maxAdventureStamina: 100,
-  adventureStaminaRecoveryPerDay: 25,
+  adventureStaminaRecoveryPerDay: 35,
   standardQuestStaminaCost: 50,
   // Passive income keeps the guild alive, but quests must fund treatment,
   // maintenance, crafting, and expansion.

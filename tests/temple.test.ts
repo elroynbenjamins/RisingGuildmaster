@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createGuild } from "../src/game/guild/guildService";
 import { calculateHero } from "../src/game/heroes/heroCalculator";
 import { creditVerifiedGems } from "../src/game/monetization/gemService";
-import { fullyTreatHero, getConditionTreatmentCost, getHealingCost, healHero, reviveHero, treatHeroConditions } from "../src/game/temple/templeService";
+import { fullyTreatHero, getConditionTreatmentCost, getHalfHealingCost, getHealingCost, healHero, healHeroToHalf, reviveHero, treatHeroConditions } from "../src/game/temple/templeService";
 import { testHero } from "./testHero";
 
 describe("Temple services", () => {
@@ -14,6 +14,16 @@ describe("Temple services", () => {
     expect(result.gold).toBe(guild.gold - cost);
     expect(result.heroes[0]?.currentHP).toBe(calculateHero(hero).stats.maxHP);
     expect(result.heroes[0]?.baseAttributes).toEqual(hero.baseAttributes);
+  });
+
+  it("can heal a living hero only up to fifty percent for a lower gold cost", () => {
+    const hero = { ...testHero(), currentHP: 30 };
+    const guild = { ...createGuild(), heroes: [hero] };
+    const maxHP = calculateHero(hero).stats.maxHP; const cost = getHalfHealingCost(hero);
+    const result = healHeroToHalf(guild, hero.id);
+    expect(result.heroes[0]?.currentHP).toBe(Math.round(maxHP * .5));
+    expect(result.gold).toBe(guild.gold - cost);
+    expect(cost).toBeLessThan(getHealingCost(hero));
   });
 
   it("charges only for treatable conditions and preserves Inspired", () => {

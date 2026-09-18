@@ -23,6 +23,13 @@ export function getHealingCost(hero: Hero): number {
   return Math.ceil(missingHp * TEMPLE_CONFIG.goldPerMissingHp);
 }
 
+export function getHalfHealingCost(hero: Hero): number {
+  if (hero.currentHP <= 0) return 0;
+  const maxHP = calculateHero(hero).stats.maxHP;
+  const targetHP = Math.max(1, Math.round(maxHP * .5));
+  return Math.ceil(Math.max(0, targetHP - hero.currentHP) * TEMPLE_CONFIG.goldPerMissingHp);
+}
+
 export function getConditionTreatmentCost(hero: Hero): number {
   return hero.conditions.reduce((sum, condition) => sum + (TEMPLE_CONFIG.conditionTreatmentCosts[condition.conditionId as keyof typeof TEMPLE_CONFIG.conditionTreatmentCosts] ?? 0), 0);
 }
@@ -38,6 +45,14 @@ function spendGold(guild: GuildState, cost: number): GuildState {
   if (cost <= 0) throw new Error("No treatment is needed");
   if (guild.gold < cost) throw new Error("Not enough gold");
   return { ...guild, gold: guild.gold - cost };
+}
+
+export function healHeroToHalf(guild: GuildState, heroId: string): GuildState {
+  const hero = findHero(guild, heroId);
+  if (hero.currentHP <= 0) throw new Error("Fallen heroes must be revived first");
+  const paid = spendGold(guild, getHalfHealingCost(hero));
+  const targetHP = Math.max(1, Math.round(calculateHero(hero).stats.maxHP * .5));
+  return replaceHero(paid, { ...hero, currentHP: Math.max(hero.currentHP, targetHP) });
 }
 
 export function healHero(guild: GuildState, heroId: string): GuildState {

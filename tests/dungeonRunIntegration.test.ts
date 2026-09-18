@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DUNGEON_NODES } from "../src/data/dungeons/dungeons";
-import { beginDungeonExpedition, getDungeonCombatSetup, resolveDungeonCombat, resolveDungeonUtilityNode } from "../src/game/dungeons/dungeonRunService";
+import { beginDungeonExpedition, getDungeonCombatSetup, getExpeditionCompletionXpForHero, resolveDungeonCombat, resolveDungeonUtilityNode } from "../src/game/dungeons/dungeonRunService";
 import { chooseDungeonNode } from "../src/game/dungeons/dungeonService";
 import { createGuild } from "../src/game/guild/guildService";
 import { generateHero } from "../src/game/heroes/heroGenerator";
@@ -15,5 +15,15 @@ describe("playable dungeon run integration", () => {
   it("starts one serializable run with carried resources and pre-rolled encounters", () => { const base = expeditionGuild(); const guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base), ["brutal_host"], createSeededRandom(4)); expect(guild.activeDungeonRun).toMatchObject({ currentNodeId: "depths_start", status: "active", selectedModifierIds: ["brutal_host"] }); expect(guild.activeDungeonRun?.heroInstances).toHaveLength(4); expect(Object.keys(guild.activeDungeonRun?.selectedEncounterIds ?? {})).toHaveLength(4); expect(guild.activeRogueliteRun?.id).toBe(guild.activeDungeonRun?.id); expect(() => JSON.parse(JSON.stringify(guild.activeDungeonRun))).not.toThrow(); });
   it("resolves the opening D20 event before allowing a branch", () => { const base = expeditionGuild(); let guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base)); expect(() => chooseDungeonNode(guild.activeDungeonRun!, "depths_elite")).toThrow("not connected"); guild = resolveDungeonUtilityNode(guild, sequenceRandom([.99])).guild; expect(guild.activeDungeonRun?.resolvedNodeIds).toContain("depths_start"); expect(guild.gold).toBe(base.gold + DUNGEON_NODES.depths_start!.successGoldReward!); guild = { ...guild, activeDungeonRun: chooseDungeonNode(guild.activeDungeonRun!, "depths_elite") }; expect(guild.activeDungeonRun?.currentNodeId).toBe("depths_elite"); });
   it("combines theme and run modifiers and awards at most one elite recipe", () => { const base = expeditionGuild(); let guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base), ["brutal_host", "withered_grace"]); guild = resolveDungeonUtilityNode(guild, sequenceRandom([.99])).guild; guild = { ...guild, activeDungeonRun: chooseDungeonNode(guild.activeDungeonRun!, "depths_elite") }; expect(getDungeonCombatSetup(guild)).toMatchObject({ enemyPhysicalDamageModifier: .15, enemyDamageModifier: .15, heroHealingPowerModifier: -.35 }); const instances = guild.activeDungeonRun!.heroInstances; const result = resolveDungeonCombat(guild, "victory", instances, sequenceRandom([0, 0])); guild = result.guild; expect(result.goldDelta).toBe(104); expect(result.recipeId).not.toBeNull(); expect(guild.activeDungeonRun?.recipeIdsUnlocked).toHaveLength(1); expect(guild.activeDungeonRun?.status).toBe("active"); });
+  it("grants surviving heroes a 5 percent level-progress XP bonus on expedition victory", () => {
+    const base = expeditionGuild(); let guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base));
+    const run = guild.activeDungeonRun!; const beforeXp = guild.heroes[0]!.xp;
+    guild = { ...guild, activeDungeonRun: { ...run, currentNodeId: "depths_boss" } };
+    const result = resolveDungeonCombat(guild, "victory", run.heroInstances, sequenceRandom([.99]));
+    const nodeXp = DUNGEON_NODES.depths_boss!.xpRewardPerHero ?? 0;
+    expect(result.guild.activeDungeonRun?.status).toBe("victory");
+    expect(result.guild.heroes[0]!.xp - beforeXp).toBe(nodeXp + getExpeditionCompletionXpForHero(6));
+    expect(result.guild.activeDungeonRun?.lastResolutionText).toContain("+5% level-progress XP");
+  });
   it("persists defeat instead of treating entry into a boss room as victory", () => { const base = expeditionGuild(); let guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base)); const run = guild.activeDungeonRun!; guild = { ...guild, activeDungeonRun: { ...run, currentNodeId: "depths_boss" } }; const result = resolveDungeonCombat(guild, "defeat", run.heroInstances.map((instance) => ({ ...instance, currentHP: 0, isAlive: false })), sequenceRandom([0])); expect(result.guild.activeDungeonRun?.status).toBe("defeat"); expect(result.guild.activeDungeonRun?.resolvedNodeIds).not.toContain("depths_boss"); });
 });

@@ -20,6 +20,7 @@ export function isQuestAvailable(quest: QuestDefinition, world: WorldState): boo
 
 export function isQuestAvailableAtCurrentLocation(quest: QuestDefinition, world: WorldState): boolean {
   return isQuestAvailable(quest, world)
+    && world.currentRegionId === quest.regionId
     && (!(quest.settlementIds?.length) || (!!world.currentSettlementId && quest.settlementIds.includes(world.currentSettlementId)));
 }
 

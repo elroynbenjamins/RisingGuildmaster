@@ -48,7 +48,7 @@ function processContractDepartures(guild: GuildState, day: number): { guild: Gui
       departedDay: day,
       eligibleReturnDay: day + FORMER_MEMBER_RETURN_COOLDOWN_DAYS,
       lastWeeklySalary: contract.weeklySalary,
-      rehireCount: 0,
+      rehireCount: hero.history.events.filter((event) => event.tags?.includes("returning_hero")).length,
       relationships: guild.relationships.filter((relationship) => relationship.heroIdA === hero.id || relationship.heroIdB === hero.id),
     };
   });

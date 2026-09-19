@@ -9,7 +9,9 @@ import { grantGuildmasterXp } from "../guildmaster/guildmasterProgression";
 import { appendHeroHistoryEvent } from "../heroes/heroHistoryService";
 import { grantHeroXp } from "../progression/levelSystem";
 import { resolveAbilityCheck } from "../world/worldEventResolver";
-import type { GuildOperationDefinition, GuildOperationResult, GuildOperationState } from "./guildOperationTypes";
+import type { GuildOperationDefinition, GuildOperationResult, GuildOperationState, GuildOperationSuggestedTeams, GuildOperationTeamPreview } from "./guildOperationTypes";
+import { calculateHero } from "../heroes/heroCalculator";
+import { calculateAbilityModifier } from "../attributes/dndAttributes";
 
 export const GUILD_OPERATION_TEAM_SIZE = 3;
 export const GUILD_OPERATION_STAMINA_COST = 50;
@@ -30,6 +32,69 @@ export function getAvailableGuildOperations(guild: GuildState): GuildOperationDe
 
 export function getEligibleOperationHeroIds(guild: GuildState): string[] {
   return guild.heroes.filter((hero) => hero.currentHP > 0 && hero.isAvailable && hero.adventureStamina >= GUILD_OPERATION_STAMINA_COST).map((hero) => hero.id);
+}
+
+function heroAbilityModifier(hero: GuildState["heroes"][number], attribute: GuildOperationDefinition["phases"][number]["vanguard"]["attribute"]): number {
+  return calculateAbilityModifier(calculateHero(hero).attributes[attribute]);
+}
+
+function teamScore(heroes: readonly GuildState["heroes"][number][], checks: readonly GuildOperationDefinition["phases"][number]["vanguard"][]): number {
+  if (!heroes.length) return -999;
+  return checks.reduce((sum, check) => sum + Math.max(...heroes.map((hero) => heroAbilityModifier(hero, check.attribute))), 0);
+}
+
+export function suggestGuildOperationTeams(guild: GuildState, operation: GuildOperationDefinition): GuildOperationSuggestedTeams {
+  const eligible = guild.heroes.filter((hero) => getEligibleOperationHeroIds(guild).includes(hero.id));
+  if (eligible.length < GUILD_OPERATION_TEAM_SIZE * 2) return { vanguardHeroIds: [], supportHeroIds: [], score: -999 };
+  const vanguardChecks = operation.phases.map((phase) => phase.vanguard);
+  const supportChecks = operation.phases.map((phase) => phase.support);
+  let best: GuildOperationSuggestedTeams = { vanguardHeroIds: [], supportHeroIds: [], score: -999 };
+  for (let a = 0; a < eligible.length - 2; a += 1) for (let b = a + 1; b < eligible.length - 1; b += 1) for (let d = b + 1; d < eligible.length; d += 1) {
+    const vanguard = [eligible[a]!, eligible[b]!, eligible[d]!];
+    const used = new Set(vanguard.map((hero) => hero.id));
+    const support = eligible
+      .filter((hero) => !used.has(hero.id))
+      .map((hero) => ({ hero, score: supportChecks.reduce((sum, check) => sum + heroAbilityModifier(hero, check.attribute), 0) }))
+      .sort((x, y) => y.score - x.score || y.hero.level - x.hero.level)
+      .slice(0, GUILD_OPERATION_TEAM_SIZE)
+      .map((entry) => entry.hero);
+    if (support.length !== GUILD_OPERATION_TEAM_SIZE) continue;
+    const score = teamScore(vanguard, vanguardChecks) + teamScore(support, supportChecks);
+    if (score > best.score) best = { vanguardHeroIds: vanguard.map((hero) => hero.id), supportHeroIds: support.map((hero) => hero.id), score };
+  }
+  return best;
+}
+
+export function previewGuildOperationTeams(guild: GuildState, operation: GuildOperationDefinition, vanguardHeroIds: readonly string[], supportHeroIds: readonly string[]): GuildOperationTeamPreview {
+  const byId = new Map(guild.heroes.map((hero) => [hero.id, hero]));
+  const teams = {
+    vanguard: vanguardHeroIds.map((id) => byId.get(id)).filter((hero): hero is GuildState["heroes"][number] => Boolean(hero)),
+    support: supportHeroIds.map((id) => byId.get(id)).filter((hero): hero is GuildState["heroes"][number] => Boolean(hero)),
+  };
+  const checks = operation.phases.flatMap((phase) => (["vanguard", "support"] as const).map((team) => {
+    const check = phase[team];
+    const ranked = teams[team].map((hero) => ({ hero, modifier: heroAbilityModifier(hero, check.attribute) })).sort((x,y)=>y.modifier-x.modifier || y.hero.level-x.hero.level);
+    const best = ranked[0];
+    const expectedMargin = 10.5 + (best?.modifier ?? 0) - check.difficultyClass;
+    return {
+      phaseId: phase.id,
+      phaseTitle: phase.title,
+      team,
+      title: check.title,
+      difficultyClass: check.difficultyClass,
+      bestHeroId: best?.hero.id ?? null,
+      bestHeroName: best?.hero.name ?? null,
+      modifier: best?.modifier ?? 0,
+      expectedMargin,
+      rating: expectedMargin >= 2 ? "strong" as const : expectedMargin >= -2 ? "tense" as const : "weak" as const,
+    };
+  }));
+  const warnings: string[] = [];
+  if (vanguardHeroIds.length !== GUILD_OPERATION_TEAM_SIZE) warnings.push(`Vanguard needs ${GUILD_OPERATION_TEAM_SIZE - vanguardHeroIds.length} more hero${GUILD_OPERATION_TEAM_SIZE - vanguardHeroIds.length === 1 ? "" : "es"}.`);
+  if (supportHeroIds.length !== GUILD_OPERATION_TEAM_SIZE) warnings.push(`Support needs ${GUILD_OPERATION_TEAM_SIZE - supportHeroIds.length} more hero${GUILD_OPERATION_TEAM_SIZE - supportHeroIds.length === 1 ? "" : "es"}.`);
+  const weak = checks.filter((entry) => entry.rating === "weak");
+  if (weak.length) warnings.push(`${weak.length} operation check${weak.length === 1 ? " is" : "s are"} currently weak against the listed DC.`);
+  return { checks, warnings };
 }
 
 function validateTeams(guild: GuildState, vanguardHeroIds: readonly string[], supportHeroIds: readonly string[]): void {

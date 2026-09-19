@@ -44,6 +44,7 @@ import { strikeRaidObjective } from "../game/raids/raidCombatMechanicService";
 import { getCombatAttackPreview } from "../game/combat/combatPreviewService";
 import { applyQuestDifficultyCombatSetup } from "../game/quests/questCombatProfileService";
 import { EnemyPortrait } from "../components/enemies/EnemyPortrait";
+import { triggerTactileFeedback } from "../ui/tactileFeedback";
 
 const ENEMY_TURN_DELAY_MS: Record<"normal"|"fast"|"very_fast", number> = { normal: 700, fast: 400, very_fast: 120 };
 
@@ -106,6 +107,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
       const targetKey = positionKey(position); const timestamp = Date.now(); const doubleTapped = isMatchingDoubleTap(lastTargetTap.current, targetKey, timestamp);
       if (!occupantId && reachableKeys.has(targetKey) && doubleTapped) {
         setState((value) => moveCurrentHero(value, position, random.current, 0));
+        triggerTactileFeedback(guild.uiPreferences.tactileFeedback, "selection");
         finishMoveSelection();
         return;
       }
@@ -118,7 +120,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
       if (mode !== "skill" && occupantId) { setInspectedCombatantId(occupantId); setSelectedPosition(position); lastTargetTap.current = null; return; }
       if (mode === "skill" && targetableKeys.has(targetKey)) {
         setSelectedPosition(position); setSelectedTargetId(occupantId ?? undefined);
-        if (doubleTapped && selectedSkillId) { setState((value) => performHeroTurn(value, selectedSkillId, random.current, occupantId ?? undefined, position)); resetSelection(); }
+        if (doubleTapped && selectedSkillId) { setState((value) => performHeroTurn(value, selectedSkillId, random.current, occupantId ?? undefined, position)); triggerTactileFeedback(guild.uiPreferences.tactileFeedback, "confirm"); resetSelection(); }
         else lastTargetTap.current = { targetKey, timestamp };
         return;
       }
@@ -128,10 +130,10 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
       } else if (mode === "skill") lastTargetTap.current = null;
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Action failed"); }
   };
-  const confirmSkill = () => { if (!selectedSkillId) return; try { setError(null); setState((value) => performHeroTurn(value, selectedSkillId, random.current, selectedTargetId, selectedPosition)); resetSelection(); } catch (caught) { setError(caught instanceof Error ? caught.message : "Action failed"); } };
-  const executeEndTurn = () => { try { setState((value) => endCurrentHeroTurn(value, random.current, 0)); resetSelection(); } catch (caught) { setError(caught instanceof Error ? caught.message : "Could not end turn"); } };
+  const confirmSkill = () => { if (!selectedSkillId) return; try { setError(null); setState((value) => performHeroTurn(value, selectedSkillId, random.current, selectedTargetId, selectedPosition)); triggerTactileFeedback(guild.uiPreferences.tactileFeedback, "confirm"); resetSelection(); } catch (caught) { setError(caught instanceof Error ? caught.message : "Action failed"); } };
+  const executeEndTurn = () => { try { setState((value) => endCurrentHeroTurn(value, random.current, 0)); triggerTactileFeedback(guild.uiPreferences.tactileFeedback, "selection"); resetSelection(); } catch (caught) { setError(caught instanceof Error ? caught.message : "Could not end turn"); } };
   const endTurn=()=>guild.uiPreferences.confirmEndTurn?showDialog({title:"End this hero's turn?",message:state.actions.combatActionUsed?"The combat action has been used. Any remaining movement will be lost.":"This hero has not used a combat action yet.",eyebrow:"TACTICAL ORDER",tone:state.actions.combatActionUsed?"default":"danger",actions:[{label:"Keep Playing",tone:"secondary"},{label:"End Turn",tone:"danger",onPress:executeEndTurn}]}):executeEndTurn();
-  const usePotion = (potionId: PotionId) => { try { const result = consumePotion(guild, state, potionId); updateGuild(result.guild); setState(result.state); resetSelection(); } catch (caught) { setError(caught instanceof Error ? caught.message : "Could not use potion"); } };
+  const usePotion = (potionId: PotionId) => { try { const result = consumePotion(guild, state, potionId); updateGuild(result.guild); setState(result.state); triggerTactileFeedback(guild.uiPreferences.tactileFeedback, "confirm"); resetSelection(); } catch (caught) { setError(caught instanceof Error ? caught.message : "Could not use potion"); } };
   const continueQuest = () => { const carried = state.heroes.map((item) => recoverBetweenEncounters(item.instance)); setState(createCombatState(questId, state.encounterIndex + 1, heroes, random.current, carried, effectiveCombatSetup, guild.relationships, guild.difficultyId, threatEnemyLevelModifier)); resetSelection(); };
   const lastEncounter = state.encounterIndex >= state.encounterIds.length - 1;
   const skillItems = current ? getHeroSkillIds(current.hero).map((id) => HERO_SKILLS[id]!).filter((skill) => skill.type === "basic_attack" || skill.type === "active").map((skill) => { const available = getHeroSkillAvailability(current.hero, current.instance, current.unit, skill.id, state.heroes.map((item) => item.unit), state.enemies.map((item) => item.unit), state.board); return { id: skill.id, name: skill.name, damageType:skill.damageType, enabled: available.enabled && !state.actions.combatActionUsed, detail: available.enabled ? `Range ${getHeroSkillRange(current.hero, skill)} · ${skill.resourceCost ?? 0} ${skill.resourceType ?? "none"}` : available.reasons.join(" · ") }; }) : [];

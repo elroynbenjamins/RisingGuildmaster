@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { NPC_PORTRAITS } from "../src/data/characters/npcPortraits";
 import { GUILD_OPERATIONS } from "../src/data/operations/guildOperations";
 import { createGuild } from "../src/game/guild/guildService";
-import { getAvailableGuildOperations, getEligibleOperationHeroIds, isGuildOperationsUnlocked, resolveGuildOperation } from "../src/game/operations/guildOperationService";
+import { getAvailableGuildOperations, getEligibleOperationHeroIds, isGuildOperationsUnlocked, previewGuildOperationTeams, resolveGuildOperation, suggestGuildOperationTeams } from "../src/game/operations/guildOperationService";
 import { createGuildOperationState } from "../src/game/operations/guildOperationTypes";
 import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
 import { sequenceRandom } from "./combatTestUtils";
@@ -26,6 +26,19 @@ describe("Crisis Operations", () => {
     expect(isGuildOperationsUnlocked(guild)).toBe(true);
     expect(getAvailableGuildOperations(guild).map((operation) => operation.id)).toEqual(["night_of_three_bells"]);
     expect(getEligibleOperationHeroIds(guild)).toHaveLength(6);
+  });
+
+  it("suggests complete teams and previews all six phase checks", () => {
+    const guild = unlockedGuild();
+    const operation = GUILD_OPERATIONS.night_of_three_bells!;
+    const suggestion = suggestGuildOperationTeams(guild, operation);
+    expect(suggestion.vanguardHeroIds).toHaveLength(3);
+    expect(suggestion.supportHeroIds).toHaveLength(3);
+    expect(new Set([...suggestion.vanguardHeroIds, ...suggestion.supportHeroIds]).size).toBe(6);
+    const preview = previewGuildOperationTeams(guild, operation, suggestion.vanguardHeroIds, suggestion.supportHeroIds);
+    expect(preview.checks).toHaveLength(6);
+    expect(preview.checks.every((check) => check.bestHeroId && Number.isFinite(check.modifier))).toBe(true);
+    expect(preview.warnings.filter((warning) => warning.includes("needs"))).toHaveLength(0);
   });
 
   it("resolves six team checks, grants graded rewards, spends a day, and records all heroes", () => {

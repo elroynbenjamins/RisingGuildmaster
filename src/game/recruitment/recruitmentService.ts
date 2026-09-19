@@ -34,7 +34,6 @@ export function rejectCandidate(guild: GuildState, candidateId: string, random: 
 
 
 export const FORMER_MEMBER_RETURN_COOLDOWN_DAYS = 7;
-export const FORMER_MEMBER_ARCHIVE_LIMIT = 24;
 export function formerMemberRehireSalary(member: RecruitmentState["formerMembers"][number]): number {
   return Math.max(Math.round(member.lastWeeklySalary * 1.10), calculateWeeklySalary(member.hero));
 }

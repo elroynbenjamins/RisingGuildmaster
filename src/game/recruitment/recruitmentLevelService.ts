@@ -11,7 +11,7 @@ export interface RecruitmentLevelProfile {
 export function getRecruitmentLevelProfile(guild: GuildState): RecruitmentLevelProfile {
   const levels=[...guild.heroes].map((hero)=>hero.level).sort((a,b)=>b-a).slice(0,4);
   const topFourAverage=levels.length?levels.reduce((sum,level)=>sum+level,0)/levels.length:1;
-  const campaignCap=Math.max(1,Math.min(18,2+Math.max(0,guild.world.campaignChapter-1)*2));
+  const campaignCap=guild.world.campaignChapter<=1?1:Math.min(18,guild.world.campaignChapter*2);
   const rosterBenchmark=Math.max(1,Math.floor(topFourAverage));
   const standardMax=Math.max(1,Math.min(campaignCap,Math.max(1,rosterBenchmark-1)));
   const eliteMax=guild.world.campaignChapter>=2?Math.max(standardMax,Math.min(campaignCap,rosterBenchmark)):standardMax;

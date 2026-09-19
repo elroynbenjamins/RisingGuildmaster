@@ -52,13 +52,15 @@ import { ContentUnlockScreen } from "./src/screens/ContentUnlock/ContentUnlockSc
 import { RaidScreen } from "./src/screens/Raids/RaidScreen";
 import { findRaidByQuestId, recordRaidOutcome } from "./src/game/raids/raidService";
 import { SettingsScreen } from "./src/screens/Settings/SettingsScreen";
+import { AchievementsScreen } from "./src/screens/Achievements/AchievementsScreen";
+import { acknowledgeUnlockNotices, getNewUnlockNotices } from "./src/game/progression/unlockSummaryService";
 import { ThemeProvider, useTheme } from "./src/theme/theme";
 import { initializeAdMobPrivacy } from "./src/game/monetization/admobRewardedAdProvider";
 
 import { pendingDayMilestone } from "./src/game/monetization/dayMilestoneAdService";
 import type { SaveSlotId } from "./src/game/save/saveService";
 import { presentPendingDayMilestoneAd } from "./src/game/monetization/dayMilestoneAdPresenter";
-type Route = { name: "gemsSupport" } | { name: "main"; tab: MainTab } | { name: "settings" } | { name: "contentUnlock" } | { name: "training" } | { name: "operations" } | { name: "raids" } | { name: "legacy" } | { name: "dungeon" } | { name: "dungeonCombat" } | { name: "regionMap"; regionId: string } | { name: "guildmasterSkills" } | { name: "finances" } | { name: "recruitment" } | { name: "candidate"; candidateId: string } | { name: "service"; title: string } | { name: "temple" } | { name: "monsterManual" } | { name: "heroCodex" } | { name: "skillCodex" } | { name: "loreJournal" } | { name: "management" } | { name: "crafting" } | { name: "gathering" } | { name: "hero"; hero: Hero } | { name: "heroEquipmentPicker"; heroId: string; slot: EquipmentSlot } | { name: "skills"; hero: Hero } | { name: "subclass"; hero: Hero } | { name: "questDetail"; questId: string } | { name: "questBriefing"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "party"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "exploration"; questId: string; party: Party; campaignNodeId?: string } | { name: "decision"; questId: string; party: Party; campaignNodeId?: string } | { name: "combat"; questId: string; party: Party; campaignNodeId?: string; combatSetup?: QuestCombatSetup } | { name: "questResult"; summary: QuestResultSummary } | { name: "campaign" } | { name: "event"; event: WorldEventDefinition; back?: "world" | "campaign" | "quest"; questId?: string } | { name: "item"; itemId: string };
+type Route = { name: "gemsSupport" } | { name: "main"; tab: MainTab } | { name: "settings" } | { name: "achievements" } | { name: "contentUnlock" } | { name: "training" } | { name: "operations" } | { name: "raids" } | { name: "legacy" } | { name: "dungeon" } | { name: "dungeonCombat" } | { name: "regionMap"; regionId: string } | { name: "guildmasterSkills" } | { name: "finances" } | { name: "recruitment" } | { name: "candidate"; candidateId: string } | { name: "service"; title: string } | { name: "temple" } | { name: "monsterManual" } | { name: "heroCodex" } | { name: "skillCodex" } | { name: "loreJournal" } | { name: "management" } | { name: "crafting" } | { name: "gathering" } | { name: "hero"; hero: Hero } | { name: "heroEquipmentPicker"; heroId: string; slot: EquipmentSlot } | { name: "skills"; hero: Hero } | { name: "subclass"; hero: Hero } | { name: "questDetail"; questId: string } | { name: "questBriefing"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "party"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "exploration"; questId: string; party: Party; campaignNodeId?: string } | { name: "decision"; questId: string; party: Party; campaignNodeId?: string } | { name: "combat"; questId: string; party: Party; campaignNodeId?: string; combatSetup?: QuestCombatSetup } | { name: "questResult"; summary: QuestResultSummary } | { name: "campaign" } | { name: "event"; event: WorldEventDefinition; back?: "world" | "campaign" | "quest"; questId?: string } | { name: "item"; itemId: string };
 
 function Game() {
   const [route, setRoute] = useState<Route>({ name: "main", tab: "Guild" });
@@ -121,6 +123,21 @@ function Game() {
     showDialog({ title, eyebrow, message, tone: "default" });
   }, [gameStarted, isHydrated, isDialogOpen, guild, route, updateGuild, showDialog]);
   useEffect(() => {
+    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active) return;
+    const safeBreak = route.name === "main" || route.name === "management" || route.name === "finances";
+    if (!safeBreak) return;
+    const notices = getNewUnlockNotices(guild);
+    if (!notices.length) return;
+    updateGuild(acknowledgeUnlockNotices(guild, notices.map((notice) => notice.id)));
+    showDialog({
+      title: notices.length === 1 ? "New Guild Unlock" : `${notices.length} New Guild Unlocks`,
+      eyebrow: "PROGRESSION",
+      message: notices.map((notice) => `• ${notice.title}\n  ${notice.detail}`).join("\n\n"),
+      tone: "success",
+    });
+  }, [gameStarted, isHydrated, isDialogOpen, guild, route.name, updateGuild, showDialog]);
+
+  useEffect(() => {
     const milestone = pendingDayMilestone(guild);
     if (!gameStarted || milestone === null) { promptedDayRef.current = null; return; }
     const safeBreak = route.name === "main" || route.name === "finances" || route.name === "management";
@@ -159,7 +176,8 @@ function Game() {
   if (route.name === "loreJournal") return <LoreJournalScreen onBack={() => setRoute({ name: "management" })} />;
   if (route.name === "contentUnlock") return <ContentUnlockScreen onBack={() => setRoute({ name: "management" })} />;
   if (route.name === "settings") return <SettingsScreen onBack={() => setRoute({name:"management"})}/>;
-  if (route.name === "management") return <GuildManagementScreen openGemsSupport={() => setRoute({ name: "gemsSupport" })} onBack={() => main("Guild")} openGuildmasterSkills={() => setRoute({ name: "guildmasterSkills" })} openHeroes={() => main("Heroes")} openTemple={() => setRoute({ name: "temple" })} openMonsterManual={() => setRoute({ name: "monsterManual" })} openHeroCodex={() => setRoute({ name: "heroCodex" })} openSkillCodex={() => setRoute({ name: "skillCodex" })} openLoreJournal={() => setRoute({ name: "loreJournal" })} openFinances={() => setRoute({ name: "finances" })} openOperations={() => setRoute({ name: "operations" })} openLegacy={() => setRoute({ name: "legacy" })} openContentUnlocks={() => setRoute({ name: "contentUnlock" })} openSettings={()=>setRoute({name:"settings"})} />;
+  if (route.name === "achievements") return <AchievementsScreen onBack={() => setRoute({name:"management"})}/>;
+  if (route.name === "management") return <GuildManagementScreen openGemsSupport={() => setRoute({ name: "gemsSupport" })} onBack={() => main("Guild")} openGuildmasterSkills={() => setRoute({ name: "guildmasterSkills" })} openHeroes={() => main("Heroes")} openTemple={() => setRoute({ name: "temple" })} openMonsterManual={() => setRoute({ name: "monsterManual" })} openHeroCodex={() => setRoute({ name: "heroCodex" })} openSkillCodex={() => setRoute({ name: "skillCodex" })} openLoreJournal={() => setRoute({ name: "loreJournal" })} openFinances={() => setRoute({ name: "finances" })} openOperations={() => setRoute({ name: "operations" })} openLegacy={() => setRoute({ name: "legacy" })} openAchievements={() => setRoute({ name: "achievements" })} openContentUnlocks={() => setRoute({ name: "contentUnlock" })} openSettings={()=>setRoute({name:"settings"})} />;
   if (route.name === "legacy") return <GuildLegacyScreen onBack={() => setRoute({ name: "management" })} />;
   if (route.name === "operations") return <GuildOperationsScreen onBack={() => main("Quests")} />;
   if (route.name === "raids") return <RaidScreen onBack={() => main("Quests")} inspectRaid={(questId) => setRoute({ name: "questDetail", questId })} />;

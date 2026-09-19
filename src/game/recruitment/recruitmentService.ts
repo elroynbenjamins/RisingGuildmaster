@@ -8,9 +8,13 @@ import type { RecruitmentCandidate, RecruitmentState, ScoutingLevel } from "./re
 import { validateCandidateRecruitment } from "./recruitmentValidator";
 import { appendHeroHistoryEvent } from "../heroes/heroHistoryService";
 import { getDifficulty } from "../../data/difficulty/difficulties";
+import { getTavernRecruitmentBonuses } from "../economy/tavernService";
 
 function withCandidates(state: RecruitmentState, candidates: RecruitmentCandidate[]): RecruitmentState { return { ...state, candidates, candidateIds: candidates.map((candidate) => candidate.candidateId) }; }
-const unlockedPool = (guild: GuildState, random: RandomSource) => generateRecruitmentPool(random, guild.currentDay, guild.reputation, RECRUITMENT_CONFIG.candidateCount, guild.entitlements.unlockedRaceIds, guild.entitlements.unlockedClassIds);
+const unlockedPool = (guild: GuildState, random: RandomSource) => {
+  const tavern=getTavernRecruitmentBonuses(guild);
+  return generateRecruitmentPool(random, guild.currentDay, guild.reputation+tavern.reputationBonus, RECRUITMENT_CONFIG.candidateCount+tavern.extraCandidates, guild.entitlements.unlockedRaceIds, guild.entitlements.unlockedClassIds);
+};
 export function createRecruitmentState(currentDay: number, candidates: RecruitmentCandidate[] = []): RecruitmentState { return { candidateIds: candidates.map((candidate) => candidate.candidateId), candidates, reservedCandidateId: null, reservationExpiresAtDay: null, lastFreeRefreshDay: currentDay, nextFreeRefreshDay: currentDay + RECRUITMENT_CONFIG.freeRefreshDays, manualRefreshCost: RECRUITMENT_CONFIG.manualRefreshCost, regionalScoutMission: null }; }
 export function initializeRecruitment(guild: GuildState, random: RandomSource): GuildState { const purged = purgeExpiredCandidates(guild); if (purged.recruitment.candidates.length) return purged; const candidates = unlockedPool(guild, random); return { ...purged, recruitment: createRecruitmentState(guild.currentDay, candidates) }; }
 export function purgeExpiredCandidates(guild: GuildState): GuildState { const reservationActive = guild.recruitment.reservedCandidateId && (guild.recruitment.reservationExpiresAtDay ?? 0) > guild.currentDay; const candidates = guild.recruitment.candidates.filter((candidate) => candidate.expiresAtDay > guild.currentDay); const reservedStillExists = reservationActive && candidates.some((candidate) => candidate.candidateId === guild.recruitment.reservedCandidateId); return { ...guild, recruitment: { ...withCandidates(guild.recruitment, candidates), reservedCandidateId: reservedStillExists ? guild.recruitment.reservedCandidateId : null, reservationExpiresAtDay: reservedStillExists ? guild.recruitment.reservationExpiresAtDay : null } }; }

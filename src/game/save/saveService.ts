@@ -39,13 +39,15 @@ const saveKey = (slotId: SaveSlotId) => `guildmaster.guild.slot.${slotId}.v2`;
 const backupKey = (slotId: SaveSlotId) => `${saveKey(slotId)}.backup`;
 const metaKey = (slotId: SaveSlotId) => `${saveKey(slotId)}.meta`;
 const SETTLEMENT_FALLBACK: Record<string, string> = { greenveil: "guildhaven", iron_hills: "stonegate", frostmarch: "northwatch", ashlands: "emberfall", shadowfen: "blackwater" };
-type PersistedGuild = Omit<GuildState, "saveVersion" | "uiPreferences" | "tutorial" | "achievementClaims" | "seenUnlockSummaryIds" | "metrics"> & {
+type PersistedGuild = Omit<GuildState, "saveVersion" | "uiPreferences" | "tutorial" | "achievementClaims" | "seenUnlockSummaryIds" | "metrics" | "bountyProgress" | "guildCrestId"> & {
   saveVersion?: number;
   uiPreferences?: Partial<UiPreferences>;
   tutorial?: Partial<TutorialState>;
   achievementClaims?: string[];
   seenUnlockSummaryIds?: string[];
   metrics?: Partial<GuildState["metrics"]>;
+  bountyProgress?: Partial<GuildState["bountyProgress"]>;
+  guildCrestId?: GuildState["guildCrestId"];
 };
 function migrateV1ToV2(saved: PersistedGuild): PersistedGuild {
   return {
@@ -72,6 +74,16 @@ function migrateV2ToV3(saved: PersistedGuild): PersistedGuild {
     metrics: { craftedItemsCount: saved.metrics?.craftedItemsCount ?? 0 },
   };
 }
+function migrateV3ToV4(saved: PersistedGuild): PersistedGuild {
+  return {
+    ...saved,
+    saveVersion: 4,
+    guildCrestId: saved.guildCrestId ?? "crownroad",
+    bountyProgress: { claimedOfferIds: saved.bountyProgress?.claimedOfferIds ?? [] },
+    heroContracts: (saved.heroContracts ?? []).map((contract) => ({ ...contract, renewalIntent: contract.renewalIntent ?? "undecided" })),
+    finance: saved.finance ? { ...saved.finance, tavernUpgrade: saved.finance.tavernUpgrade ?? null } : saved.finance,
+  };
+}
 function migrateSaveVersions(saved: PersistedGuild): PersistedGuild {
   let current = saved;
   let version = saved.saveVersion ?? 1;
@@ -79,6 +91,7 @@ function migrateSaveVersions(saved: PersistedGuild): PersistedGuild {
   while (version < CURRENT_SAVE_VERSION) {
     if (version === 1) { current = migrateV1ToV2(current); version = 2; continue; }
     if (version === 2) { current = migrateV2ToV3(current); version = 3; continue; }
+    if (version === 3) { current = migrateV3ToV4(current); version = 4; continue; }
     throw new Error(`No migration path from save version ${version}.`);
   }
   return { ...current, saveVersion: CURRENT_SAVE_VERSION };
@@ -106,7 +119,7 @@ function deserializeGuildData(value: string): GuildState {
   saved.viewedAdMilestoneDays = saved.viewedAdMilestoneDays ?? [];
   saved.raidProgress = saved.raidProgress ?? createRaidProgressState();
   saved.world = { ...(saved.world ?? createWorldState()), currentSettlementId: saved.world?.currentSettlementId ?? SETTLEMENT_FALLBACK[saved.world?.currentRegionId ?? "greenveil"] ?? null };
-  return { ...saved, saveVersion: CURRENT_SAVE_VERSION, achievementClaims: saved.achievementClaims ?? [], seenUnlockSummaryIds: saved.seenUnlockSummaryIds ?? [], metrics: { craftedItemsCount: saved.metrics?.craftedItemsCount ?? 0 }, guildmaster: saved.guildmaster ?? createGuildmasterProfile(), gems: saved.gems ?? GAME_CONFIG.startingGems, gemTransactions: saved.gemTransactions ?? [], finance: { ...financeDefaults, ...(saved.finance ?? {}), salaryArrearsByHeroId: { ...financeDefaults.salaryArrearsByHeroId, ...(saved.finance?.salaryArrearsByHeroId ?? {}) }, transactions: saved.finance?.transactions ?? [] }, materials: { ...emptyMaterialInventory(), ...(saved.materials ?? {}) }, potions: { ...emptyPotionInventory(), ...(saved.potions ?? {}) }, artisans, trainingGround: { ...createTrainingGroundState(), ...(saved.trainingGround ?? {}), sessions: saved.trainingGround?.sessions ?? [], upgrade: saved.trainingGround?.upgrade ?? null }, gatheringMissions: saved.gatheringMissions ?? [], world: saved.world ?? createWorldState(), recentPartyHeroIds: saved.recentPartyHeroIds ?? [], partyPresets: (saved.partyPresets ?? []).slice(0,3).map((preset,index)=>({id:preset.id??`squad-${index+1}`,name:preset.name??`Squad ${index+1}`,heroIds:(preset.heroIds??[]).filter((id)=>saved.heroes.some((hero)=>hero.id===id))})), equipmentLoadoutsByHeroId:saved.equipmentLoadoutsByHeroId??{},uiPreferences:{reduceCombatEffects:false,reduceMotion:false,strongerCombatContrast:false,tactileFeedback:true,confirmEndTurn:false,defaultCombatZoom:"fit",compactQuestCards:true,enemyTurnSpeed:"normal",...saved.uiPreferences}, discoveredEnemyIds: saved.discoveredEnemyIds ?? [], heroContracts: (saved.heroContracts ?? []).map((contract) => ({ ...contract, status: getContractStatus(contract, currentDay) })), huntRewardProgress: saved.huntRewardProgress ?? {}, tutorial: saved.tutorial ? { ...tutorialDefaults, ...saved.tutorial, contextualSeen: saved.tutorial.contextualSeen ?? {} } : { ...tutorialDefaults, active: false, completed: true, step: "complete" }, rogueliteRotation: migrateRogueliteRotationState(saved.rogueliteRotation), guildOperations: migrateGuildOperationState(saved.guildOperations), activeDungeonRun: saved.activeDungeonRun ?? null, activeRogueliteRun: saved.activeRogueliteRun ?? null, recruitment: { ...recruitment, candidates, candidateIds: candidates.map((candidate) => candidate.candidateId), reservedCandidateId: recruitment.reservedCandidateId ?? null, reservationExpiresAtDay: recruitment.reservationExpiresAtDay ?? null, regionalScoutMission: recruitment.regionalScoutMission ?? null }, heroes: saved.heroes.map((hero) => { const gender = migrateGender(hero.gender); const portraitVariant = hero.portraitVariant ?? 0; return { ...hero, gender, portraitVariant, portraitKey: `${hero.raceId}-${hero.classId}-${gender}-v${portraitVariant}`, learnedSkillIds: hero.learnedSkillIds ?? [], potential: clampPotential(hero.potential), potentialEstimateMin: clampPotential(hero.potentialEstimateMin), potentialEstimateMax: clampPotential(hero.potentialEstimateMax), subclassId: hero.subclassId ?? null, isAvailable: hero.isAvailable ?? true, adventureStamina: hero.adventureStamina ?? GAME_CONFIG.maxAdventureStamina, attributeGrowthProgress: hero.attributeGrowthProgress ?? emptyAttributes(), history: migrateHeroHistory(hero.history, hero.id, currentDay) }; }) };
+  return { ...saved, saveVersion: CURRENT_SAVE_VERSION, achievementClaims: saved.achievementClaims ?? [], seenUnlockSummaryIds: saved.seenUnlockSummaryIds ?? [], metrics: { craftedItemsCount: saved.metrics?.craftedItemsCount ?? 0 }, bountyProgress: { claimedOfferIds: saved.bountyProgress?.claimedOfferIds ?? [] }, guildCrestId: saved.guildCrestId ?? "crownroad", guildmaster: saved.guildmaster ?? createGuildmasterProfile(), gems: saved.gems ?? GAME_CONFIG.startingGems, gemTransactions: saved.gemTransactions ?? [], finance: { ...financeDefaults, ...(saved.finance ?? {}), tavernUpgrade: saved.finance?.tavernUpgrade ?? null, salaryArrearsByHeroId: { ...financeDefaults.salaryArrearsByHeroId, ...(saved.finance?.salaryArrearsByHeroId ?? {}) }, transactions: saved.finance?.transactions ?? [] }, materials: { ...emptyMaterialInventory(), ...(saved.materials ?? {}) }, potions: { ...emptyPotionInventory(), ...(saved.potions ?? {}) }, artisans, trainingGround: { ...createTrainingGroundState(), ...(saved.trainingGround ?? {}), sessions: saved.trainingGround?.sessions ?? [], upgrade: saved.trainingGround?.upgrade ?? null }, gatheringMissions: saved.gatheringMissions ?? [], world: saved.world ?? createWorldState(), recentPartyHeroIds: saved.recentPartyHeroIds ?? [], partyPresets: (saved.partyPresets ?? []).slice(0,3).map((preset,index)=>({id:preset.id??`squad-${index+1}`,name:preset.name??`Squad ${index+1}`,heroIds:(preset.heroIds??[]).filter((id)=>saved.heroes.some((hero)=>hero.id===id))})), equipmentLoadoutsByHeroId:saved.equipmentLoadoutsByHeroId??{},uiPreferences:{reduceCombatEffects:false,reduceMotion:false,strongerCombatContrast:false,tactileFeedback:true,confirmEndTurn:false,defaultCombatZoom:"fit",compactQuestCards:true,enemyTurnSpeed:"normal",...saved.uiPreferences}, discoveredEnemyIds: saved.discoveredEnemyIds ?? [], heroContracts: (saved.heroContracts ?? []).map((contract) => ({ ...contract, renewalIntent: contract.renewalIntent ?? "undecided", status: getContractStatus(contract, currentDay) })), huntRewardProgress: saved.huntRewardProgress ?? {}, tutorial: saved.tutorial ? { ...tutorialDefaults, ...saved.tutorial, contextualSeen: saved.tutorial.contextualSeen ?? {} } : { ...tutorialDefaults, active: false, completed: true, step: "complete" }, rogueliteRotation: migrateRogueliteRotationState(saved.rogueliteRotation), guildOperations: migrateGuildOperationState(saved.guildOperations), activeDungeonRun: saved.activeDungeonRun ?? null, activeRogueliteRun: saved.activeRogueliteRun ?? null, recruitment: { ...recruitment, candidates, candidateIds: candidates.map((candidate) => candidate.candidateId), reservedCandidateId: recruitment.reservedCandidateId ?? null, reservationExpiresAtDay: recruitment.reservationExpiresAtDay ?? null, regionalScoutMission: recruitment.regionalScoutMission ?? null }, heroes: saved.heroes.map((hero) => { const gender = migrateGender(hero.gender); const portraitVariant = hero.portraitVariant ?? 0; return { ...hero, gender, portraitVariant, portraitKey: `${hero.raceId}-${hero.classId}-${gender}-v${portraitVariant}`, learnedSkillIds: hero.learnedSkillIds ?? [], potential: clampPotential(hero.potential), potentialEstimateMin: clampPotential(hero.potentialEstimateMin), potentialEstimateMax: clampPotential(hero.potentialEstimateMax), subclassId: hero.subclassId ?? null, isAvailable: hero.isAvailable ?? true, adventureStamina: hero.adventureStamina ?? GAME_CONFIG.maxAdventureStamina, attributeGrowthProgress: hero.attributeGrowthProgress ?? emptyAttributes(), history: migrateHeroHistory(hero.history, hero.id, currentDay) }; }) };
 }
 export function deserializeGuild(value: string): GuildState { return applyStoryRaceUnlocks(deserializeGuildData(value)); }
 

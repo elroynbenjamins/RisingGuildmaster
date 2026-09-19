@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { ManagementShell } from "./src/components/navigation/ManagementShell"; import { colors } from "./src/components/ui"; import { CAMPAIGN_NODES } from "./src/data/campaign/chapter1"; import { QUESTS } from "./src/data/quests/quests";
-import { resolveCampaignChoice } from "./src/game/campaign/campaignChoiceResolver"; import { completeCampaignNode } from "./src/game/campaign/campaignService";
-import { travelGuildTowardCampaignObjective } from "./src/game/campaign/campaignTravelService"; import type { HeroCombatInstance, QuestCombatSetup } from "./src/game/combat/combatTypes"; import type { Hero } from "./src/game/heroes/types"; import type { Party } from "./src/game/party/partyTypes"; import { resolveQuestDefeat, resolveQuestVictory } from "./src/game/quests/questResolver"; import { startQuest } from "./src/game/quests/questService"; import type { WorldEventDefinition } from "./src/game/world/worldTypes";
+import { resolveCampaignChoice } from "./src/game/campaign/campaignChoiceResolver"; import { completeCampaignNode, getAvailableCampaignNodes } from "./src/game/campaign/campaignService";
+import { travelGuildTowardCampaignObjective } from "./src/game/campaign/campaignTravelService"; import { getCampaignNodeLocationRequirement, isAtCampaignLocation } from "./src/game/campaign/campaignLocationService"; import type { HeroCombatInstance, QuestCombatSetup } from "./src/game/combat/combatTypes"; import type { Hero } from "./src/game/heroes/types"; import type { Party } from "./src/game/party/partyTypes"; import { resolveQuestDefeat, resolveQuestVictory } from "./src/game/quests/questResolver"; import { startQuest } from "./src/game/quests/questService"; import type { WorldEventDefinition } from "./src/game/world/worldTypes";
 import { calculateHero } from "./src/game/heroes/heroCalculator"; import { getAvailableClassSkillPoints } from "./src/game/progression/skills/skillProgressionService";
 import { releaseBankedCampaignXp } from "./src/game/progression/levelSystem";
 import { CampaignScreen } from "./src/screens/Campaign/CampaignScreen"; import { CombatScreen } from "./src/screens/CombatScreen"; import { GuildManagementScreen } from "./src/screens/Guild/GuildManagementScreen"; import { GuildScreen } from "./src/screens/Guild/GuildScreen"; import { ServicePlaceholderScreen } from "./src/screens/Guild/ServicePlaceholderScreen"; import { HeroDetailScreen } from "./src/screens/HeroDetailScreen"; import { HeroesScreen } from "./src/screens/Heroes/HeroesScreen"; import { InventoryScreen } from "./src/screens/Inventory/InventoryScreen"; import { ItemDetailScreen } from "./src/screens/Inventory/ItemDetailScreen"; import { PartySelectionScreen } from "./src/screens/PartySelectionScreen"; import { QuestDetailScreen } from "./src/screens/QuestDetailScreen"; import { QuestSelectionScreen } from "./src/screens/QuestSelectionScreen"; import { CandidateDetailScreen } from "./src/screens/Recruitment/CandidateDetailScreen"; import { RecruitmentScreen } from "./src/screens/RecruitmentScreen"; import { SkillTreeScreen } from "./src/screens/SkillTree/SkillTreeScreen"; import { StoryEventScreen } from "./src/screens/StoryEvent/StoryEventScreen"; import { SubclassSelectionScreen } from "./src/screens/SubclassSelection/SubclassSelectionScreen"; import { WorldMapScreen } from "./src/screens/WorldMap/WorldMapScreen";
@@ -25,9 +25,10 @@ import { FinancesScreen } from "./src/screens/Guild/FinancesScreen";
 import { DungeonScreen } from "./src/screens/Dungeon/DungeonScreen";
 import { TrainingGroundsScreen } from "./src/screens/Training/TrainingGroundsScreen";
 import { getDungeonCombatSetup, resolveDungeonCombat } from "./src/game/dungeons/dungeonRunService";
+import { isChapterOneComplete } from "./src/game/dungeons/rogueliteRotationService";
 import { MainMenuScreen } from "./src/screens/MainMenu/MainMenuScreen";
 import { TutorialScreen } from "./src/screens/Tutorial/TutorialScreen";
-import { beginTutorial, skipTutorial } from "./src/game/onboarding/tutorialService";
+import { beginTutorial, hasSeenContextualTutorial, markContextualTutorialSeen, skipTutorial } from "./src/game/onboarding/tutorialService";
 import { spendPartyAdventureStamina } from "./src/game/heroes/adventureStaminaService";
 import { advanceGuildTime } from "./src/game/economy/guildCalendarService";
 import { applyStoryRaceUnlocks } from "./src/game/monetization/contentUnlockService";
@@ -62,6 +63,7 @@ function Game() {
   const currentGuildRef = useRef(guild); currentGuildRef.current = guild;
   const promptedDayRef = useRef<string | null>(null);
   const threatIntroPromptedRef = useRef(false);
+  const contextualPromptedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (!gameStarted || !isHydrated) return;
     if (!areRegionalThreatsUnlocked(guild.world)) { threatIntroPromptedRef.current = false; return; }
@@ -69,7 +71,7 @@ function Game() {
     const safeBreak = route.name === "main" || route.name === "finances" || route.name === "management";
     if (!safeBreak || isDialogOpen) return;
     threatIntroPromptedRef.current = true;
-    updateGuild({ ...guild, world: { ...guild.world, worldFlags: { ...guild.world.worldFlags, [REGIONAL_THREAT_INTRO_SEEN_FLAG]: true } } });
+    updateGuild(markContextualTutorialSeen({ ...guild, world: { ...guild.world, worldFlags: { ...guild.world.worldFlags, [REGIONAL_THREAT_INTRO_SEEN_FLAG]: true } } }, "regional_threats"));
     showDialog({
       title: "Regional Threats Unlocked",
       eyebrow: "NEW WORLD SYSTEM",
@@ -77,6 +79,39 @@ function Game() {
       tone: "default",
     });
   }, [gameStarted, isHydrated, guild, route.name, isDialogOpen, updateGuild, showDialog]);
+  useEffect(() => {
+    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active) return;
+    let id: "campaign_travel" | "combat_basics" | "idle_missions" | "roguelite_expeditions" | null = null;
+    let title = "";
+    let eyebrow = "QUICK GUIDE";
+    let message = "";
+    if (route.name === "main" && route.tab === "World") {
+      const node = getAvailableCampaignNodes(guild.world)[0];
+      const requirement = node ? getCampaignNodeLocationRequirement(node.id) : null;
+      if (node && requirement && !isAtCampaignLocation(guild.world, requirement)) {
+        id = "campaign_travel";
+        title = "Travel With Purpose";
+        message = "Campaign steps now happen at real places. The World Map highlights the next leg, and you choose up to four heroes as the travel party. Party size determines ration cost; road events remember that party.";
+      }
+    } else if ((route.name === "combat" || route.name === "dungeonCombat")) {
+      id = "combat_basics";
+      title = "Tactical Turn";
+      message = "Select a skill to preview targets. You can then double tap an empty teal tile to move; the skill stays queued and valid targets update from your new position. Enemy turns use the speed selected in Settings.";
+    } else if (route.name === "gathering") {
+      id = "idle_missions";
+      title = "Idle Mission Progress";
+      message = "Idle Missions award their listed XP plus a guaranteed 5% of each assigned hero’s next-level requirement. The mission screen previews that progress before deployment.";
+    } else if (route.name === "dungeon" && guild.heroes.length >= 6 && isChapterOneComplete(guild)) {
+      id = "roguelite_expeditions";
+      title = "Roguelite Expeditions";
+      eyebrow = "MODE UNLOCKED";
+      message = "Draft four heroes, read the branching route map, and choose risk versus recovery room by room. HP, mana and stamina carry through the run; recipes, records and loot are the main rewards.";
+    }
+    if (!id || hasSeenContextualTutorial(guild, id) || contextualPromptedRef.current.has(id)) return;
+    contextualPromptedRef.current.add(id);
+    updateGuild(markContextualTutorialSeen(guild, id));
+    showDialog({ title, eyebrow, message, tone: "default" });
+  }, [gameStarted, isHydrated, isDialogOpen, guild, route, updateGuild, showDialog]);
   useEffect(() => {
     const milestone = pendingDayMilestone(guild);
     if (!gameStarted || milestone === null) { promptedDayRef.current = null; return; }
@@ -117,7 +152,7 @@ function Game() {
   if (route.name === "finances") return <FinancesScreen onBack={() => setRoute({ name: "management" })} />;
   if (route.name === "crafting") return <CraftingScreen onBack={() => main("Inventory")} openCalendar={() => setRoute({ name: "finances" })} />;
   if (route.name === "gathering") return <GatheringScreen onBack={() => main("Inventory")} openCalendar={() => setRoute({ name: "finances" })} />;
-  if (route.name === "regionMap") return <RegionMapScreen regionId={route.regionId} onBack={() => main("World")} openQuest={(questId) => setRoute({ name: "questDetail", questId })} random={worldRandom.current} openEvent={(event) => setRoute({ name: "event", event })} />;
+  if (route.name === "regionMap") return <RegionMapScreen regionId={route.regionId} onBack={() => main("World")} openQuest={(questId) => setRoute({ name: "questDetail", questId })} openService={(serviceId) => { if (serviceId === "temple" || serviceId === "healer") setRoute({ name: "temple" }); else if (serviceId === "training_grounds") setRoute({ name: "training" }); else if (serviceId === "recruitment") setRoute({ name: "recruitment" }); else if (serviceId === "quest_board") main("Quests"); else if (serviceId === "guild_hall" || serviceId === "guild_registry") main("Guild"); }} random={worldRandom.current} openEvent={(event) => setRoute({ name: "event", event })} />;
   if (route.name === "hero") return <HeroDetailScreen hero={route.hero} openSkillTree={() => setRoute({ name: "skills", hero: route.hero })} openSubclass={() => setRoute({ name: "subclass", hero: route.hero })} onBack={() => main("Heroes")} />;
   if (route.name === "skills") return <SkillTreeScreen hero={route.hero} openClassPath={() => setRoute({ name: "subclass", hero: route.hero })} onBack={() => setRoute({ name: "hero", hero: route.hero })} onUpdate={(hero) => { updateGuild({ ...guild, heroes: guild.heroes.map((item) => item.id === hero.id ? hero : item) }); setRoute({ name: "skills", hero }); }} />;
   if (route.name === "subclass") return <SubclassSelectionScreen hero={route.hero} onBack={() => setRoute({ name: "hero", hero: route.hero })} onSelect={(hero) => { updateGuild({ ...guild, heroes: guild.heroes.map((item) => item.id === hero.id ? hero : item) }); setRoute({ name: "hero", hero }); }} />;

@@ -21,6 +21,12 @@ describe("recruitment generation", () => {
   it.each(["prospect","standard","veteran","elite"] as const)("generates level-one %s candidates inside archetype ranges", (archetype) => { const candidate = generateRecruitmentCandidate(createSeededRandom(42), 5, 0, archetype); const balance = RECRUITMENT_ARCHETYPES[archetype]; expect(candidate.archetype).toBe(archetype); expect(candidate.heroPreview.age).toBeGreaterThanOrEqual(balance.ageMin); expect(candidate.heroPreview.age).toBeLessThanOrEqual(balance.ageMax); expect(candidate.heroPreview.level).toBe(1); expect(candidate.heroPreview.xp).toBe(0); expect(candidate.truePotential).toBeGreaterThanOrEqual(Math.max(50,balance.potentialMin)); expect(candidate.truePotential).toBeLessThanOrEqual(balance.potentialMax); expect(candidate.expiresAtDay).toBe(12); });
   it("generates three deterministic, diverse candidates", () => { const first = generateRecruitmentPool(createSeededRandom(77), 1); const second = generateRecruitmentPool(createSeededRandom(77), 1); expect(first).toEqual(second); expect(first).toHaveLength(3); expect(new Set(first.map((item)=>item.candidateId)).size).toBe(3); expect(first.every((item)=>item.truePotential>=50&&item.truePotential<=100)).toBe(true); });
   it("raises elite chance and potential with reputation", () => { expect(reputationPotentialBonus(0)).toBe(0); expect(reputationPotentialBonus(60)).toBe(6); expect(reputationPotentialBonus(999)).toBe(10); expect(getArchetypeWeights(60).elite).toBeCloseTo(.08); expect(getArchetypeWeights(999).elite).toBeCloseTo(.10); expect(Object.values(getArchetypeWeights(60)).reduce((a,b)=>a+b,0)).toBeCloseTo(1); });
+  it("actually generates higher-level board candidates once the guild has progressed", () => {
+    const guild=createGuild(); guild.world.campaignChapter=3; guild.heroes=[7,7,6,6].map((level,index)=>({...testHero(),id:"veteran-core-"+index,level}));
+    const initialized=initializeRecruitment(guild,createSeededRandom(44));
+    expect(initialized.recruitment.candidates.every((candidate)=>candidate.heroPreview.level>=3&&candidate.heroPreview.level<=6)).toBe(true);
+    expect(initialized.recruitment.candidates.some((candidate)=>candidate.heroPreview.level>1)).toBe(true);
+  });
   it("scales later recruitment below the core roster while rare elites may match it", () => {
     const guild=createGuild(); guild.world.campaignChapter=3;
     guild.heroes=[7,7,6,6].map((level,index)=>({...testHero(),id:"core-"+index,level}));

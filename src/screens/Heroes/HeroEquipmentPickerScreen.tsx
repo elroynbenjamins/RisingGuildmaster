@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { EquipmentIcon } from "../../components/equipment/EquipmentIcon";
 import { ActionButton, BackButton, EmptyState, Panel, Portrait, colors } from "../../components/ui";
 import { equipItem } from "../../game/equipment/equipmentService";
-import { resolveEquipmentDefinition } from "../../game/equipment/equipmentResolver";
+import { resolveEquipmentDefinition, type ResolvedEquipmentDefinition } from "../../game/equipment/equipmentResolver";
 import type { EquipmentSlot, Hero } from "../../game/heroes/types";
 import { useGuild } from "../../state/GuildContext";
 import { compareEquipment } from "../../ui/equipmentComparison";
@@ -33,7 +33,7 @@ export function HeroEquipmentPickerScreen({
   const current = currentKey ? resolveEquipmentDefinition(currentKey) : undefined;
   const items = guild.inventory
     .map((key) => resolveEquipmentDefinition(key))
-    .filter((item): item is NonNullable<typeof item> => Boolean(item)
+    .filter((item): item is ResolvedEquipmentDefinition => Boolean(item)
       && item.slot === slot
       && hero.level >= item.levelRequirement
       && (!item.classRestrictions.length || item.classRestrictions.includes(hero.classId)))

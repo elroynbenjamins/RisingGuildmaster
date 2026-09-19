@@ -36,7 +36,7 @@ describe("persistent world and campaign", () => {
     const world = createWorldState();
     expect(isQuestAvailableAtCurrentLocation(QUESTS.highcourt_silent_charter!, world)).toBe(false);
     expect(isQuestAvailableAtCurrentLocation(QUESTS.highcourt_silent_charter!, { ...world, currentSettlementId: "highcourt" })).toBe(true);
-    expect(getCampaignNodeLocationRequirement("council_of_splinters")).toEqual({ regionId: "iron_hills", settlementIds: [] });
+    expect(getCampaignNodeLocationRequirement("council_of_splinters")).toEqual({ regionId: "iron_hills", settlementIds: ["stonegate"] });
     const chapterTwo = { ...world, campaignChapter: 2, completedCampaignNodeIds: ["broken_wardstone"], unlockedRegionIds: [...world.unlockedRegionIds, "iron_hills"] };
     expect(isCampaignNodeAtCurrentLocation("council_of_splinters", chapterTwo)).toBe(false);
     expect(isCampaignNodeAtCurrentLocation("council_of_splinters", { ...chapterTwo, currentRegionId: "iron_hills", currentSettlementId: "stonegate" })).toBe(true);

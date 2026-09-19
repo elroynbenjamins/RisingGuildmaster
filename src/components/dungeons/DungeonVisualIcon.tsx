@@ -28,6 +28,10 @@ export function DungeonPathIcon({ kind, size = 34 }: { kind: RoguelitePathVisual
   return <AtlasSprite source={ROGUELITE_ICON_ATLAS} atlasWidth={ROGUELITE_ICON_ATLAS_SIZE.width} atlasHeight={ROGUELITE_ICON_ATLAS_SIZE.height} rect={ROGUELITE_PATH_RECTS[kind]} size={size} />;
 }
 
+export function DungeonStateIcon({ state, size = 34 }: { state: RogueliteNodeState; size?: number }) {
+  return <AtlasSprite source={ROGUELITE_ICON_ATLAS} atlasWidth={ROGUELITE_ICON_ATLAS_SIZE.width} atlasHeight={ROGUELITE_ICON_ATLAS_SIZE.height} rect={ROGUELITE_STATE_RECTS[state]} size={size} />;
+}
+
 export function DungeonNodeIcon({ type, size = 34, state }: { type: DungeonNodeType; size?: number; state?: RogueliteNodeState }) {
   if (!state) return <AtlasSprite source={ROGUELITE_ICON_ATLAS} atlasWidth={ROGUELITE_ICON_ATLAS_SIZE.width} atlasHeight={ROGUELITE_ICON_ATLAS_SIZE.height} rect={ROGUELITE_NODE_RECTS[type]} size={size} />;
   return <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>

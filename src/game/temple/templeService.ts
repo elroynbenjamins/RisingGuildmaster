@@ -14,6 +14,10 @@ export function hasLocalHealingService(world: WorldState): boolean {
   return Boolean(settlement?.serviceIds.includes("temple") || settlement?.serviceIds.includes("healer"));
 }
 
+function requireLocalHealingService(guild: GuildState): void {
+  if (!hasLocalHealingService(guild.world)) throw new Error("No Temple or healer is available at the guild's current location");
+}
+
 function findHero(guild: GuildState, heroId: string): Hero {
   const hero = guild.heroes.find((item) => item.id === heroId);
   if (!hero) throw new Error("Hero not found");
@@ -55,6 +59,7 @@ function spendGold(guild: GuildState, cost: number): GuildState {
 }
 
 export function healHeroToHalf(guild: GuildState, heroId: string): GuildState {
+  requireLocalHealingService(guild);
   const hero = findHero(guild, heroId);
   if (hero.currentHP <= 0) throw new Error("Fallen heroes must be revived first");
   const paid = spendGold(guild, getHalfHealingCost(hero));
@@ -63,6 +68,7 @@ export function healHeroToHalf(guild: GuildState, heroId: string): GuildState {
 }
 
 export function healHero(guild: GuildState, heroId: string): GuildState {
+  requireLocalHealingService(guild);
   const hero = findHero(guild, heroId);
   if (hero.currentHP <= 0) throw new Error("Fallen heroes must be revived first");
   const paid = spendGold(guild, getHealingCost(hero));
@@ -70,6 +76,7 @@ export function healHero(guild: GuildState, heroId: string): GuildState {
 }
 
 export function treatHeroConditions(guild: GuildState, heroId: string): GuildState {
+  requireLocalHealingService(guild);
   const hero = findHero(guild, heroId);
   if (hero.currentHP <= 0) throw new Error("Fallen heroes must be revived first");
   const paid = spendGold(guild, getConditionTreatmentCost(hero));
@@ -77,6 +84,7 @@ export function treatHeroConditions(guild: GuildState, heroId: string): GuildSta
 }
 
 export function fullyTreatHero(guild: GuildState, heroId: string): GuildState {
+  requireLocalHealingService(guild);
   const hero = findHero(guild, heroId);
   if (hero.currentHP <= 0) throw new Error("Fallen heroes must be revived first");
   const paid = spendGold(guild, getFullTreatmentCost(hero));
@@ -85,6 +93,7 @@ export function fullyTreatHero(guild: GuildState, heroId: string): GuildState {
 }
 
 export function reviveHero(guild: GuildState, heroId: string): GuildState {
+  requireLocalHealingService(guild);
   const hero = findHero(guild, heroId);
   if (hero.currentHP > 0) throw new Error("This hero is not fallen");
   if (guild.gems < TEMPLE_CONFIG.revivalGemCost) throw new Error("Not enough gems");

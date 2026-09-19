@@ -17,7 +17,7 @@ export function craftEquipment(guild: GuildState, recipeId: string): GuildState 
   if (artisan.level < recipe.artisanLevel) throw new Error("Artisan level is too low");
   if (guild.gold < recipe.goldCost) throw new Error("Not enough gold");
   const paid = spendMaterials(guild, recipe.materials);
-  return { ...paid, gold: paid.gold - recipe.goldCost, inventory: [...paid.inventory, recipe.outputEquipmentId] };
+  return { ...paid, gold: paid.gold - recipe.goldCost, inventory: [...paid.inventory, recipe.outputEquipmentId], metrics: { ...paid.metrics, craftedItemsCount: paid.metrics.craftedItemsCount + 1 } };
 }
 
 export function enchantInventoryEquipment(guild: GuildState, inventoryIndex: number, enchantmentId: string): GuildState {

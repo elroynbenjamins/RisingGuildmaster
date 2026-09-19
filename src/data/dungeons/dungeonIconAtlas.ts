@@ -17,7 +17,7 @@ export const ROGUELITE_THEME_VISUALS: Record<DungeonThemeId, RogueliteThemeVisua
   desert: localTheme({ x: 139, y: 17, width: 127, height: 176 }),
   forest: localTheme({ x: 266, y: 18, width: 127, height: 181 }),
   jungle: localTheme({ x: 266, y: 18, width: 127, height: 181 }),
-  arctic: worldTheme(REGION_EMBLEM_RECTS.frostmarch),
+  arctic: worldTheme(REGION_EMBLEM_RECTS.frostmarch!),
 };
 
 export type DungeonUtilityVisual = "entrance" | "camp" | "wardstone";

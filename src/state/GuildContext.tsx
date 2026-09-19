@@ -9,6 +9,7 @@ import { collectRegionalScoutReport as collectScout, dispatchRegionalScout as di
 import type { ClassId, RaceId } from "../game/heroes/types";
 import { recordTutorialRecruit, recordTutorialRefresh } from "../game/onboarding/tutorialService";
 import type { GameDifficultyId } from "../game/difficulty/difficultyTypes";
+import type { GuildCrestId } from "../data/guild/guildCrests";
 import { loadAccountContentEntitlements } from "../game/monetization/accountEntitlementService";
 import { applyContentEntitlements } from "../game/monetization/contentUnlockService";
 
@@ -20,7 +21,7 @@ interface GuildContextValue {
   gameStarted: boolean;
   activeSlotId: SaveSlotId | null;
   saveSlots: SaveSlotSummary[];
-  startNewGame(slotId: SaveSlotId, difficultyId?: GameDifficultyId): void;
+  startNewGame(slotId: SaveSlotId, difficultyId?: GameDifficultyId, guildName?: string, crestId?: GuildCrestId): void;
   continueGame(slotId: SaveSlotId): Promise<string | null>;
   deleteSaveSlot(slotId: SaveSlotId): Promise<void>;
   refreshCandidates(free?: boolean): string | null;
@@ -70,8 +71,8 @@ export function GuildProvider({ children }: React.PropsWithChildren) {
     gameStarted,
     activeSlotId,
     saveSlots,
-    startNewGame: (slotId, difficultyId = "standard") => {
-      const freshGuild = applyContentEntitlements(createGuild("The Wayfarers", difficultyId), guild.entitlements);
+    startNewGame: (slotId, difficultyId = "standard", guildName = "The Wayfarers", crestId = "crownroad") => {
+      const freshGuild = applyContentEntitlements(createGuild(guildName.trim() || "The Wayfarers", difficultyId, crestId), guild.entitlements);
       setActiveSlotId(slotId);
       setGuild(initializeRecruitment(freshGuild, createSeededRandom(randomSeed())));
       setGameStarted(true);

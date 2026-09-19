@@ -8,7 +8,8 @@ export interface DungeonDraftState { round: number; eligibleHeroIds: string[]; o
 
 function drawOffer(eligibleIds: readonly string[], selectedIds: readonly string[], random: RandomSource): string[] {
   const pool = eligibleIds.filter((id) => !selectedIds.includes(id)); const offer: string[] = [];
-  while (offer.length < Math.min(DUNGEON_DRAFT_OFFER_SIZE, pool.length)) { const index = Math.floor(random.next() * pool.length); offer.push(pool.splice(index, 1)[0]!); }
+  const offerSize = Math.min(DUNGEON_DRAFT_OFFER_SIZE, pool.length);
+  while (offer.length < offerSize) { const index = Math.floor(random.next() * pool.length); offer.push(pool.splice(index, 1)[0]!); }
   return offer;
 }
 export function createDungeonDraft(guild: GuildState, random: RandomSource): DungeonDraftState {

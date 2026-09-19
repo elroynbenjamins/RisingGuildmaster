@@ -88,9 +88,6 @@ export interface Hero {
   /** Persistent readiness used to rotate squads between quests. Combat stamina remains encounter-local. */
   adventureStamina: number;
   attributeGrowthProgress: Attributes;
-  /** Development sessions already consumed at focusedTrainingLevel. Legacy saves omit both fields. */
-  focusedTrainingLevel?: number;
-  focusedTrainingSessions?: number;
 }
 
 export interface CalculatedHero { attributes: Attributes; stats: DerivedStats }

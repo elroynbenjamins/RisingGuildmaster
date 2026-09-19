@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BackButton, Panel, colors } from "../../components/ui";
 
@@ -38,7 +38,6 @@ interface GuildManagementScreenProps {
 
 export function GuildManagementScreen(props: GuildManagementScreenProps) {
   const notices = useActionNotifications();
-  const [showFuture, setShowFuture] = useState(false);
   const actions: Record<EntryId, () => void> = {
     gems: props.openGemsSupport, guildmaster: props.openGuildmasterSkills, roster: props.openHeroes, temple: props.openTemple,
     operations: props.openOperations, legacy: props.openLegacy, achievements: props.openAchievements, content: props.openContentUnlocks,

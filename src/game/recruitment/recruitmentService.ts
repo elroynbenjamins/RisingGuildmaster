@@ -50,7 +50,7 @@ export function rehireFormerMember(guild: GuildState, heroId: string): GuildStat
   const fee = formerMemberRehireFee(member);
   if (guild.gold < fee) throw new Error("Insufficient Gold");
   const salary = formerMemberRehireSalary(member);
-  const recovered = appendHeroHistoryEvent({
+  const recoveredBase = {
     ...member.hero,
     equipment: { weapon:null, armor:null, helmet:null, boots:null, accessory1:null, accessory2:null },
     salary,
@@ -58,7 +58,10 @@ export function rehireFormerMember(guild: GuildState, heroId: string): GuildStat
     conditions: [],
     isAvailable: true,
     adventureStamina: GAME_CONFIG.maxAdventureStamina,
-    currentHP: calculateHero(member.hero).stats.maxHP,
+  };
+  const recovered = appendHeroHistoryEvent({
+    ...recoveredBase,
+    currentHP: calculateHero(recoveredBase).stats.maxHP,
   }, {
     day:guild.currentDay,
     type:"recruitment",

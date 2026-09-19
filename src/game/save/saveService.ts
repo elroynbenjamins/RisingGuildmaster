@@ -57,7 +57,12 @@ function migrateV1ToV2(saved: PersistedGuild): PersistedGuild {
 function migrateV2ToV3(saved: PersistedGuild): PersistedGuild {
   const seenUnlockSummaryIds = [
     ...(saved.world?.unlockedRegionIds ?? []).map((id) => `region:${id}`),
-    ...Object.keys(saved.unlockedRecipeIds ?? []).map((id) => `recipe:${id}`),
+    ...(saved.entitlements?.unlockedClassIds ?? []).map((id) => `class:${id}`),
+    ...(saved.entitlements?.unlockedRaceIds ?? []).map((id) => `race:${id}`),
+    ...(saved.unlockedRecipeIds ?? []).map((id) => `recipe:${id}`),
+    ...Object.entries(saved.artisans ?? {}).flatMap(([id,state]) => state?.recruited && state.level > 0 ? [`workshop:${id}:${state.level}`] : []),
+    ...(saved.world?.completedCampaignNodeIds?.includes("broken_wardstone") ? ["system:operations"] : []),
+    ...(saved.world?.completedCampaignNodeIds?.includes("broken_wardstone") && (saved.heroes?.length ?? 0) >= 6 ? ["system:roguelite"] : []),
   ];
   return {
     ...saved,

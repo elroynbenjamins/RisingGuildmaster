@@ -8,7 +8,6 @@ export const THEMES: Record<ThemeId, { name:string; description:string; statusBa
   oled_dark: { name:"OLED Dark", description:"True-black foundations with subdued panels for dark rooms and OLED displays.", statusBar:"light-content", colors:{ background:"#000000",panel:"#0b0d0e",panel2:"#15191a",gold:"#dfb660",text:"#f6f1e7",muted:"#aeb6b2",green:"#7ec18c",danger:"#e47e77",border:"#2c3436",blue:"#78acd0",buttonText:"#17130c",backdrop:"rgba(0, 0, 0, 0.9)" } },
   high_contrast: { name:"High Contrast", description:"Brighter text, stronger borders, and clearer interactive states.", statusBar:"light-content", colors:{ background:"#080b0c",panel:"#151a1c",panel2:"#20282b",gold:"#ffd36b",text:"#ffffff",muted:"#d2d8d5",green:"#92e3a5",danger:"#ff9189",border:"#718084",blue:"#8ed1ff",buttonText:"#080b0c",backdrop:"rgba(0, 0, 0, 0.88)" } },
 };
-type ThemeContextValue = (typeof THEMES)[ThemeId] & { textScale:number };
-const ThemeContext=createContext<ThemeContextValue>({...THEMES.guild_dark,textScale:1});
-export function ThemeProvider({themeId,largeText=false,children}:React.PropsWithChildren<{themeId:ThemeId;largeText?:boolean}>){return <ThemeContext.Provider value={{...THEMES[themeId],textScale:largeText?1.15:1}}>{children}</ThemeContext.Provider>}
+const ThemeContext=createContext(THEMES.guild_dark);
+export function ThemeProvider({themeId,children}:React.PropsWithChildren<{themeId:ThemeId}>){return <ThemeContext.Provider value={THEMES[themeId]}>{children}</ThemeContext.Provider>}
 export function useTheme(){return useContext(ThemeContext)}

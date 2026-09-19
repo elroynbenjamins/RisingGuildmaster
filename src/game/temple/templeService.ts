@@ -1,4 +1,6 @@
 import { TEMPLE_CONFIG } from "../../config/templeConfig";
+import { SETTLEMENTS } from "../../data/world/settlements";
+import type { WorldState } from "../world/worldTypes";
 import { addCondition, hasInjury } from "../conditions/conditionService";
 import type { GuildState } from "../guild/types";
 import { calculateHero } from "../heroes/heroCalculator";
@@ -6,6 +8,11 @@ import type { ConditionId, Hero } from "../heroes/types";
 import type { GemTransaction } from "../monetization/gemTypes";
 
 const TREATABLE_CONDITIONS = new Set<ConditionId>(Object.keys(TEMPLE_CONFIG.conditionTreatmentCosts) as ConditionId[]);
+
+export function hasLocalHealingService(world: WorldState): boolean {
+  const settlement = world.currentSettlementId ? SETTLEMENTS[world.currentSettlementId] : undefined;
+  return Boolean(settlement?.serviceIds.includes("temple") || settlement?.serviceIds.includes("healer"));
+}
 
 function findHero(guild: GuildState, heroId: string): Hero {
   const hero = guild.heroes.find((item) => item.id === heroId);

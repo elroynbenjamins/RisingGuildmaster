@@ -29,6 +29,7 @@ export interface SaveSlotSummary {
   slotId: SaveSlotId;
   exists: boolean;
   guildName?: string;
+  guildCrestId?: GuildState["guildCrestId"];
   currentDay?: number;
   difficultyId?: GuildState["difficultyId"];
   heroCount?: number;
@@ -199,6 +200,7 @@ export async function listSaveSlots(): Promise<SaveSlotSummary[]> {
       slotId,
       exists: true,
       guildName: guild.guildName,
+      guildCrestId: guild.guildCrestId,
       currentDay: guild.currentDay,
       difficultyId: guild.difficultyId,
       heroCount: guild.heroes.length,

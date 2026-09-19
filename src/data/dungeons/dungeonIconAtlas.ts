@@ -63,9 +63,10 @@ export const ROGUELITE_PATH_RECTS: Record<RoguelitePathVisual, AtlasRect> = {
   double: { x: 630, y: 388, width: 94, height: 68 },
 };
 
-export type RogueliteNodeState = "normal" | "current" | "selected" | "completed" | "unavailable" | "locked" | "boss";
+export type RogueliteNodeState = "normal" | "available" | "current" | "selected" | "completed" | "unavailable" | "locked" | "boss";
 export const ROGUELITE_STATE_RECTS: Record<RogueliteNodeState, AtlasRect> = {
   normal: { x: 22, y: 462, width: 67, height: 67 },
+  available: { x: 22, y: 462, width: 67, height: 67 },
   current: { x: 106, y: 458, width: 75, height: 71 },
   selected: { x: 194, y: 452, width: 82, height: 84 },
   completed: { x: 288, y: 458, width: 100, height: 77 },

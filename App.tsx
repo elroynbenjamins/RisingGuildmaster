@@ -148,7 +148,7 @@ function Game() {
   }, [guild, gameStarted, isHydrated, route.name, isDialogOpen, updateGuild, showDialog]);
   if (!isHydrated) return <View style={styles.loading}><Text style={styles.loadingTitle}>GUILDMASTER</Text><Text style={styles.loadingText}>Loading guild save…</Text></View>;
   if (!gameStarted) return showNewGameSetup
-    ? <NewGameSetupScreen onBack={() => setShowNewGameSetup(false)} onStart={(difficultyId) => { startNewGame(newGameSlotId, difficultyId); setShowNewGameSetup(false); }} />
+    ? <NewGameSetupScreen onBack={() => setShowNewGameSetup(false)} onStart={(difficultyId, guildName, crestId) => { startNewGame(newGameSlotId, difficultyId, guildName, crestId); setShowNewGameSetup(false); }} />
     : <MainMenuScreen
         saveSlots={saveSlots}
         onContinue={(slotId) => { void continueGame(slotId).then((error) => { if (error) showDialog({ title: "Could not load guild", message: error, tone: "danger" }); }); }}

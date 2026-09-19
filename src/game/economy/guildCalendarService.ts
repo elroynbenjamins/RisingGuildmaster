@@ -6,7 +6,7 @@ import { advanceConditions } from "../conditions/conditionService";
 import type { GuildState } from "../guild/types";
 import { contractDepartureDay, getContractStatus } from "../recruitment/contractService";
 import { completeTavernUpgrade, getTavernIncomeModifier } from "./tavernService";
-import { FORMER_MEMBER_ARCHIVE_LIMIT, FORMER_MEMBER_RETURN_COOLDOWN_DAYS, purgeExpiredCandidates } from "../recruitment/recruitmentService";
+import { FORMER_MEMBER_RETURN_COOLDOWN_DAYS, purgeExpiredCandidates } from "../recruitment/recruitmentService";
 import { advanceRegionalThreats, areRegionalThreatsUnlocked, canUnlockRegionalThreats, unlockRegionalThreats } from "../world/regionalThreatService";
 import type { GuildDayEvent, GuildDayPreview, GuildDayResolution, GuildTimeAdvanceResult } from "./economyTypes";
 import { resolveTrainingGroundDay } from "../training/trainingService";
@@ -53,7 +53,7 @@ function processContractDepartures(guild: GuildState, day: number): { guild: Gui
     };
   });
   const existingFormer = guild.recruitment.formerMembers.filter((member) => !departing.has(member.hero.id));
-  const formerMembers = [...existingFormer, ...newFormerMembers].sort((a,b)=>b.departedDay-a.departedDay).slice(0,FORMER_MEMBER_ARCHIVE_LIMIT);
+  const formerMembers = [...existingFormer, ...newFormerMembers].sort((a,b)=>b.departedDay-a.departedDay);
   return {
     events,
     guild: {

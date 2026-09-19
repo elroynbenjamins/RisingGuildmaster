@@ -44,10 +44,12 @@ describe("Training Hall", () => {
     expect(progressed.level).toBe(3); expect(progressed.xp).toBe(xpRequiredForNextLevel(3) - 1);
   });
 
-  it("never grants permanent attribute growth", () => {
-    const hero = { ...testHero(), focusedTrainingLevel: 1, focusedTrainingSessions: 3 }; const guild = createGuild(); guild.heroes = [hero];
-    expect(calculateTrainingQuote(hero, "focused_practice", guild).growthReward).toBe(0);
-    const levelled = { ...hero, level: 2 };
-    expect(calculateTrainingQuote(levelled, "focused_practice", { ...guild, heroes: [levelled] }).growthReward).toBe(0);
+  it("keeps Training Hall progression strictly XP-only", () => {
+    const hero = testHero(); const guild = createGuild(); guild.heroes = [hero];
+    const quote = calculateTrainingQuote(hero, "focused_practice", guild);
+    expect(quote).not.toHaveProperty("growthReward");
+    const trained = startHeroTraining(guild, hero.id, "focused_practice");
+    expect(trained.trainingGround.sessions[0]).not.toHaveProperty("growthReward");
+    expect(trained.trainingGround.sessions[0]).not.toHaveProperty("focusedAttribute");
   });
 });

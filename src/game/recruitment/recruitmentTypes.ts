@@ -6,6 +6,8 @@ export type RecruitmentArchetype = "prospect" | "standard" | "veteran" | "elite"
 export type ScoutingLevel = 0 | 1 | 2 | 3;
 export type ContractLengthWeeks = 12 | 24 | 52;
 export type ContractStatus = "active" | "expiring" | "expired";
+export type RenewalLengthWeeks = 4 | 8 | 12;
+export type ContractRenewalIntent = "undecided" | "depart";
 export type RecruitmentCandidateSource = "guild_board" | "regional_scout";
 export interface AttributeEstimate { minimum: number; maximum: number }
 export type AttributeEstimates = Record<AttributeKey, AttributeEstimate>;
@@ -64,4 +66,5 @@ export interface HeroContract {
   endDay: number;
   startLevel: number;
   status: ContractStatus;
+  renewalIntent: ContractRenewalIntent;
 }

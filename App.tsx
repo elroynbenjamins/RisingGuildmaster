@@ -181,7 +181,7 @@ function Game() {
       updateGuild({ ...guild, heroes: releaseBankedCampaignXp(guild.heroes, campaign.worldState), world: campaign.worldState, gold: guild.gold + campaign.goldReward, reputation: guild.reputation + campaign.guildReputationReward, questChronicle: guild.questChronicle.map((entry) => entry.id === chronicle.id ? chronicle : entry) });
       setRoute({ name: "questResult", summary: { ...route.summary, selectedChoiceId: choiceId, chronicle } });
     };
-    return <QuestResultScreen summary={route.summary} choiceIds={choiceIds} onChoice={choose} onContinue={() => main(route.summary.campaignNodeId ? "Quests" : "Guild")} />;
+    return <QuestResultScreen summary={route.summary} choiceIds={choiceIds} onChoice={choose} onOpenHero={(heroId)=>{const hero=guild.heroes.find((entry)=>entry.id===heroId);if(hero)setRoute({name:"hero",hero});}} onOpenTemple={()=>setRoute({name:"temple"})} onContinue={() => main(route.summary.campaignNodeId ? "Quests" : "Guild")} />;
   }
   if (route.name === "combat") {
     const participants = guild.heroes.filter((hero) => route.party.heroIds.includes(hero.id));

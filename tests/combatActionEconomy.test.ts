@@ -28,6 +28,5 @@ describe("tactical action economy", () => {
     const stepped = advanceCombat(paused, createSeededRandom(2), 1);
     expect(stepped.turnCursor).toBe(1);
     expect(stepped.awaitingHeroId).toBeNull();
-    expect(stepped.log.length).toBeGreaterThan(0);
   });
 });

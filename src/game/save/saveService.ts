@@ -22,8 +22,22 @@ import { loadAccountContentEntitlements, saveAccountContentEntitlements } from "
 import { createRaidProgressState } from "../raids/raidService";
 import type { TutorialState } from "../onboarding/onboardingTypes";
 import { CURRENT_SAVE_VERSION } from "./saveVersion";
-const SAVE_KEY = "guildmaster.guild.v1";
-const BACKUP_SAVE_KEY = "guildmaster.guild.v1.backup";
+const LEGACY_SAVE_KEY = "guildmaster.guild.v1";
+const LEGACY_BACKUP_SAVE_KEY = "guildmaster.guild.v1.backup";
+export type SaveSlotId = 1 | 2;
+export interface SaveSlotSummary {
+  slotId: SaveSlotId;
+  exists: boolean;
+  guildName?: string;
+  currentDay?: number;
+  difficultyId?: GuildState["difficultyId"];
+  heroCount?: number;
+  lastPlayedAt?: string;
+}
+const SAVE_SLOT_IDS: SaveSlotId[] = [1, 2];
+const saveKey = (slotId: SaveSlotId) => `guildmaster.guild.slot.${slotId}.v2`;
+const backupKey = (slotId: SaveSlotId) => `${saveKey(slotId)}.backup`;
+const metaKey = (slotId: SaveSlotId) => `${saveKey(slotId)}.meta`;
 const SETTLEMENT_FALLBACK: Record<string, string> = { greenveil: "guildhaven", iron_hills: "stonegate", frostmarch: "northwatch", ashlands: "emberfall", shadowfen: "blackwater" };
 type PersistedGuild = Omit<GuildState, "saveVersion" | "uiPreferences" | "tutorial"> & {
   saveVersion?: number;
@@ -73,25 +87,91 @@ function deserializeGuildData(value: string): GuildState {
   return { ...saved, saveVersion: CURRENT_SAVE_VERSION, guildmaster: saved.guildmaster ?? createGuildmasterProfile(), gems: saved.gems ?? GAME_CONFIG.startingGems, gemTransactions: saved.gemTransactions ?? [], finance: { ...financeDefaults, ...(saved.finance ?? {}), salaryArrearsByHeroId: { ...financeDefaults.salaryArrearsByHeroId, ...(saved.finance?.salaryArrearsByHeroId ?? {}) }, transactions: saved.finance?.transactions ?? [] }, materials: { ...emptyMaterialInventory(), ...(saved.materials ?? {}) }, potions: { ...emptyPotionInventory(), ...(saved.potions ?? {}) }, artisans, trainingGround: { ...createTrainingGroundState(), ...(saved.trainingGround ?? {}), sessions: saved.trainingGround?.sessions ?? [], upgrade: saved.trainingGround?.upgrade ?? null }, gatheringMissions: saved.gatheringMissions ?? [], world: saved.world ?? createWorldState(), recentPartyHeroIds: saved.recentPartyHeroIds ?? [], partyPresets: (saved.partyPresets ?? []).slice(0,3).map((preset,index)=>({id:preset.id??`squad-${index+1}`,name:preset.name??`Squad ${index+1}`,heroIds:(preset.heroIds??[]).filter((id)=>saved.heroes.some((hero)=>hero.id===id))})), equipmentLoadoutsByHeroId:saved.equipmentLoadoutsByHeroId??{},uiPreferences:{reduceCombatEffects:false,reduceMotion:false,strongerCombatContrast:false,tactileFeedback:true,confirmEndTurn:false,defaultCombatZoom:"fit",compactQuestCards:true,enemyTurnSpeed:"normal",...saved.uiPreferences}, discoveredEnemyIds: saved.discoveredEnemyIds ?? [], heroContracts: (saved.heroContracts ?? []).map((contract) => ({ ...contract, status: getContractStatus(contract, currentDay) })), huntRewardProgress: saved.huntRewardProgress ?? {}, tutorial: saved.tutorial ? { ...tutorialDefaults, ...saved.tutorial, contextualSeen: saved.tutorial.contextualSeen ?? {} } : { ...tutorialDefaults, active: false, completed: true, step: "complete" }, rogueliteRotation: migrateRogueliteRotationState(saved.rogueliteRotation), guildOperations: migrateGuildOperationState(saved.guildOperations), activeDungeonRun: saved.activeDungeonRun ?? null, activeRogueliteRun: saved.activeRogueliteRun ?? null, recruitment: { ...recruitment, candidates, candidateIds: candidates.map((candidate) => candidate.candidateId), reservedCandidateId: recruitment.reservedCandidateId ?? null, reservationExpiresAtDay: recruitment.reservationExpiresAtDay ?? null, regionalScoutMission: recruitment.regionalScoutMission ?? null }, heroes: saved.heroes.map((hero) => { const gender = migrateGender(hero.gender); const portraitVariant = hero.portraitVariant ?? 0; return { ...hero, gender, portraitVariant, portraitKey: `${hero.raceId}-${hero.classId}-${gender}-v${portraitVariant}`, learnedSkillIds: hero.learnedSkillIds ?? [], potential: clampPotential(hero.potential), potentialEstimateMin: clampPotential(hero.potentialEstimateMin), potentialEstimateMax: clampPotential(hero.potentialEstimateMax), subclassId: hero.subclassId ?? null, isAvailable: hero.isAvailable ?? true, adventureStamina: hero.adventureStamina ?? GAME_CONFIG.maxAdventureStamina, attributeGrowthProgress: hero.attributeGrowthProgress ?? emptyAttributes(), focusedTrainingLevel: hero.focusedTrainingLevel ?? hero.level, focusedTrainingSessions: hero.focusedTrainingLevel === hero.level ? hero.focusedTrainingSessions ?? 0 : 0, history: migrateHeroHistory(hero.history, hero.id, currentDay) }; }) };
 }
 export function deserializeGuild(value: string): GuildState { return applyStoryRaceUnlocks(deserializeGuildData(value)); }
+
+async function migrateLegacySaveToSlotOne(): Promise<void> {
+  const existing = await AsyncStorage.getItem(saveKey(1));
+  if (existing) return;
+  const legacy = await AsyncStorage.getItem(LEGACY_SAVE_KEY);
+  if (!legacy) return;
+  try {
+    const guild = deserializeGuild(legacy);
+    const backup = await AsyncStorage.getItem(LEGACY_BACKUP_SAVE_KEY);
+    const now = new Date().toISOString();
+    await AsyncStorage.multiSet([
+      [saveKey(1), legacy],
+      ...(backup ? [[backupKey(1), backup] as [string,string]] : []),
+      [metaKey(1), JSON.stringify({ lastPlayedAt: now })],
+    ]);
+    await AsyncStorage.multiRemove([LEGACY_SAVE_KEY, LEGACY_BACKUP_SAVE_KEY]);
+    void guild;
+  } catch {
+    // Leave an unreadable legacy save untouched rather than destroying the player's only copy.
+  }
+}
+
+async function writeSlotMeta(slotId: SaveSlotId, lastPlayedAt = new Date().toISOString()): Promise<void> {
+  await AsyncStorage.setItem(metaKey(slotId), JSON.stringify({ lastPlayedAt }));
+}
+
+async function readSlotGuild(slotId: SaveSlotId): Promise<GuildState | null> {
+  const primary = await AsyncStorage.getItem(saveKey(slotId));
+  if (primary) {
+    try { return deserializeGuild(primary); } catch { /* fall back to recovery snapshot */ }
+  }
+  const backup = await AsyncStorage.getItem(backupKey(slotId));
+  if (!backup) return null;
+  try { return deserializeGuild(backup); } catch { return null; }
+}
+
 /** Keeps the last valid snapshot before replacing the active autosave. */
-export async function saveGuild(guild: GuildState): Promise<void> {
+export async function saveGuild(guild: GuildState, slotId: SaveSlotId = 1): Promise<void> {
+  await migrateLegacySaveToSlotOne();
   const entitlementAwareGuild=applyStoryRaceUnlocks(guild);
   await saveAccountContentEntitlements(entitlementAwareGuild.entitlements);
   const next=serializeGuild(entitlementAwareGuild); deserializeGuild(next);
-  const current=await AsyncStorage.getItem(SAVE_KEY);
-  if(current){try{deserializeGuild(current);await AsyncStorage.setItem(BACKUP_SAVE_KEY,current);}catch{/* Never preserve a corrupt primary over a known backup. */}}
-  await AsyncStorage.setItem(SAVE_KEY,next);
+  const current=await AsyncStorage.getItem(saveKey(slotId));
+  if(current){try{deserializeGuild(current);await AsyncStorage.setItem(backupKey(slotId),current);}catch{/* Never preserve a corrupt primary over a known backup. */}}
+  await AsyncStorage.setItem(saveKey(slotId),next);
+  await writeSlotMeta(slotId);
 }
+
 /** Recovers transparently from an interrupted or corrupt primary write. */
-export async function loadGuild(): Promise<GuildState | null> {
+export async function loadGuild(slotId: SaveSlotId = 1): Promise<GuildState | null> {
+  await migrateLegacySaveToSlotOne();
   const accountEntitlements=await loadAccountContentEntitlements();
-  const primary=await AsyncStorage.getItem(SAVE_KEY);
+  const primary=await AsyncStorage.getItem(saveKey(slotId));
   if(primary){try{const loaded=applyContentEntitlements(deserializeGuild(primary),accountEntitlements);await saveAccountContentEntitlements(loaded.entitlements);return loaded;}catch{/* Attempt the recovery snapshot below. */}}
-  const backup=await AsyncStorage.getItem(BACKUP_SAVE_KEY);
+  const backup=await AsyncStorage.getItem(backupKey(slotId));
   if(!backup)return null;
   const recovered=applyContentEntitlements(deserializeGuild(backup),accountEntitlements);
   await saveAccountContentEntitlements(recovered.entitlements);
-  await AsyncStorage.setItem(SAVE_KEY,serializeGuild(recovered));
+  await AsyncStorage.setItem(saveKey(slotId),serializeGuild(recovered));
+  await writeSlotMeta(slotId);
   return recovered;
 }
-export async function deleteGuildSave(): Promise<void> { await AsyncStorage.multiRemove([SAVE_KEY,BACKUP_SAVE_KEY]); }
+
+export async function listSaveSlots(): Promise<SaveSlotSummary[]> {
+  await migrateLegacySaveToSlotOne();
+  return Promise.all(SAVE_SLOT_IDS.map(async (slotId) => {
+    const guild = await readSlotGuild(slotId);
+    if (!guild) return { slotId, exists: false };
+    let lastPlayedAt: string | undefined;
+    const rawMeta = await AsyncStorage.getItem(metaKey(slotId));
+    if (rawMeta) {
+      try { lastPlayedAt = (JSON.parse(rawMeta) as { lastPlayedAt?: string }).lastPlayedAt; } catch { /* ignore stale metadata */ }
+    }
+    return {
+      slotId,
+      exists: true,
+      guildName: guild.guildName,
+      currentDay: guild.currentDay,
+      difficultyId: guild.difficultyId,
+      heroCount: guild.heroes.length,
+      lastPlayedAt,
+    };
+  }));
+}
+
+export async function deleteGuildSave(slotId: SaveSlotId = 1): Promise<void> {
+  await AsyncStorage.multiRemove([saveKey(slotId),backupKey(slotId),metaKey(slotId)]);
+}

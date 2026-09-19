@@ -216,6 +216,6 @@ function Game() {
   return <ManagementShell onOpenGems={() => setRoute({ name: "gemsSupport" })} guild={guild} active={tab} onSelect={main}>{screen}</ManagementShell>;
 }
 function ThemedFrame(){const theme=useTheme();useEffect(()=>{void initializeAdMobPrivacy().catch(()=>{ /* Ads retry when the player requests one. */ });},[]);return <SafeAreaView style={[styles.safe,{backgroundColor:theme.colors.background}]} edges={["top","right","bottom","left"]}><StatusBar barStyle={theme.statusBar} backgroundColor={theme.colors.background}/><GameDialogProvider><Game/></GameDialogProvider></SafeAreaView>}
-function SavedTheme(){const{guild}=useGuild();return <ThemeProvider themeId={guild.uiPreferences.themeId??"guild_dark"}><ThemedFrame/></ThemeProvider>}
+function SavedTheme(){const{guild}=useGuild();return <ThemeProvider themeId={guild.uiPreferences.themeId??"guild_dark"} largeText={guild.uiPreferences.largeText}><ThemedFrame/></ThemeProvider>}
 export default function App() { return <SafeAreaProvider><GuildProvider><SavedTheme/></GuildProvider></SafeAreaProvider>; }
 const styles = StyleSheet.create({ safe: { flex: 1, backgroundColor: colors.background }, loading: { flex: 1, alignItems: "center", justifyContent: "center" }, loadingTitle: { color: colors.gold, fontSize: 25, fontWeight: "900", letterSpacing: 3 }, loadingText: { color: colors.muted, marginTop: 10 } });

@@ -1,4 +1,5 @@
 import { CAMPAIGN_CHAPTERS, CAMPAIGN_NODES } from "../../data/campaign/chapter1";
+import { CAMPAIGN_NODE_LOCATIONS } from "../../data/campaign/campaignNodeLocations";
 import { QUESTS } from "../../data/quests/quests";
 import type { WorldState } from "../world/worldTypes";
 
@@ -18,6 +19,8 @@ export function getCampaignNodeLocationRequirement(nodeId: string): CampaignLoca
   if (!node) return null;
   const direct = questRequirement(node.questId);
   if (direct) return direct;
+  const authored = CAMPAIGN_NODE_LOCATIONS[nodeId];
+  if (authored) return { regionId: authored.regionId, settlementIds: [...(authored.settlementIds ?? [])] };
   const chapter = Object.values(CAMPAIGN_CHAPTERS).find((entry) => entry.id === node.chapterId);
   if (!chapter) return null;
   const index = chapter.nodeIds.indexOf(nodeId);

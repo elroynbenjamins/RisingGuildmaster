@@ -9,11 +9,13 @@ export interface GuildGoldTransaction {
   note: string;
 }
 
+export interface TavernUpgradeState { targetLevel: number; startDay: number; completionDay: number; goldCost: number }
 export interface GuildFinanceState {
   salaryArrearsByHeroId: Record<string, number>;
   totalSalaryPaid: number;
   transactions: GuildGoldTransaction[];
   tavernLevel: number;
+  tavernUpgrade: TavernUpgradeState | null;
   totalTavernIncome: number;
 }
 
@@ -51,4 +53,4 @@ export interface GuildDayPreview {
   threatIncreaseRegionIds: string[];
 }
 
-export const createGuildFinanceState = (): GuildFinanceState => ({ salaryArrearsByHeroId: {}, totalSalaryPaid: 0, transactions: [], tavernLevel: 1, totalTavernIncome: 0 });
+export const createGuildFinanceState = (): GuildFinanceState => ({ salaryArrearsByHeroId: {}, totalSalaryPaid: 0, transactions: [], tavernLevel: 1, tavernUpgrade: null, totalTavernIncome: 0 });

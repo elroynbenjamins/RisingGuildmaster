@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, Animated, StyleSheet, Text, View } from "react-native";
 import type { CombatVisualEvent } from "../../game/combat/combatTypes";
+import { useGuild } from "../../state/GuildContext";
 
 export type TileCombatEffect = CombatVisualEvent["effects"][number] & { eventId:number; damageType?:CombatVisualEvent["damageType"] };
 
 export function PixelCombatEffect({effect}:{effect:TileCombatEffect}){
-  const progress=useRef(new Animated.Value(0)).current;const [reduced,setReduced]=useState(false);
-  useEffect(()=>{AccessibilityInfo.isReduceMotionEnabled().then(setReduced);const subscription=AccessibilityInfo.addEventListener("reduceMotionChanged",setReduced);return()=>subscription.remove();},[]);
-  useEffect(()=>{progress.setValue(0);Animated.timing(progress,{toValue:1,duration:reduced?220:650,useNativeDriver:true}).start();},[effect.eventId,progress,reduced]);
+  const { guild } = useGuild();
+  const progress=useRef(new Animated.Value(0)).current;const [systemReduced,setSystemReduced]=useState(false);const reduced=systemReduced||guild.uiPreferences.reduceMotion;
+  useEffect(()=>{AccessibilityInfo.isReduceMotionEnabled().then(setSystemReduced);const subscription=AccessibilityInfo.addEventListener("reduceMotionChanged",setSystemReduced);return()=>subscription.remove();},[]);
+  useEffect(()=>{progress.setValue(0);Animated.timing(progress,{toValue:1,duration:reduced?120:650,useNativeDriver:true}).start();},[effect.eventId,progress,reduced]);
   const color=effect.healing>0?"#78f0a5":effect.damageType==="magic"?"#b58cff":effect.damageType==="true"?"#fff2ac":"#ff765f";const label=effect.healing>0?`+${effect.healing}`:effect.hit?`-${effect.damage}`:"MISS";const conditionColor=effect.conditionIds.includes("burning")?"#ff7a3d":effect.conditionIds.includes("poisoned")?"#6bdb66":effect.conditionIds.some((id)=>id.includes("frozen")||id.includes("rooted"))?"#74d8f2":effect.conditionIds.length?"#efb060":null;
   return <View pointerEvents="none" style={StyleSheet.absoluteFill}><Animated.View style={[styles.flash,{borderColor:color,opacity:progress.interpolate({inputRange:[0,.15,.6,1],outputRange:[0,1,.55,0]}),transform:[{scale:progress.interpolate({inputRange:[0,.35,1],outputRange:[.45,1.15,1.35]})}]}]}>{!reduced&&effect.hit&&<><View style={[styles.pixel,{backgroundColor:color,left:"12%",top:"18%"}]}/><View style={[styles.pixel,{backgroundColor:color,right:"10%",top:"36%"}]}/><View style={[styles.pixelSmall,{backgroundColor:color,bottom:"12%",left:"35%"}]}/>{effect.damageType==="physical"&&<View style={[styles.slash,{backgroundColor:color}]}/>}</>}{conditionColor&&<Animated.View style={[styles.conditionRing,{borderColor:conditionColor,opacity:progress.interpolate({inputRange:[0,.35,1],outputRange:[0,1,0]})}]}/>}<Animated.Text style={[styles.number,{color,opacity:progress.interpolate({inputRange:[0,.1,.75,1],outputRange:[0,1,1,0]}),transform:[{translateY:progress.interpolate({inputRange:[0,1],outputRange:[2,reduced?-5:-20]})}]}]}>{effect.critical?`CRIT ${label}`:label}</Animated.Text></Animated.View></View>;
 }

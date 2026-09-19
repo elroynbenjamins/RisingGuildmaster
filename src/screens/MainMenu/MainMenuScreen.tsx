@@ -4,6 +4,7 @@ import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { ActionButton, Panel, SecondaryButton, colors } from "../../components/ui";
 import type { SaveSlotId, SaveSlotSummary } from "../../game/save/saveService";
 import { useTheme } from "../../theme/theme";
+import { GuildCrest } from "../../components/guild/GuildCrest";
 
 function lastPlayedLabel(value?: string): string {
   if (!value) return "Last played unknown";
@@ -41,8 +42,7 @@ export function MainMenuScreen({
       return <Panel key={slotId} style={[styles.slot,slot.exists&&styles.occupiedSlot]}>
         <View style={styles.slotHead}><Text style={styles.slotLabel}>SAVE SLOT {slotId}</Text><Text style={slot.exists?styles.occupied:styles.empty}>{slot.exists?"GUILD FOUND":"EMPTY"}</Text></View>
         {slot.exists ? <>
-          <Text style={styles.guildName}>{slot.guildName}</Text>
-          <Text style={styles.meta}>Day {slot.currentDay} · {String(slot.difficultyId).replace(/_/g," ")} · {slot.heroCount} heroes</Text>
+          <View style={styles.guildRow}><GuildCrest crestId={slot.guildCrestId ?? "crownroad"} size={44}/><View style={styles.flex}><Text style={styles.guildName}>{slot.guildName}</Text><Text style={styles.meta}>Day {slot.currentDay} · {String(slot.difficultyId).replace(/_/g," ")} · {slot.heroCount} heroes</Text></View></View>
           <Text style={styles.lastPlayed}>{lastPlayedLabel(slot.lastPlayedAt)}</Text>
           <ActionButton label="Continue Guild" onPress={()=>onContinue(slotId)}/>
           <View style={styles.slotActions}><View style={styles.flex}><SecondaryButton label="New Guild Here" onPress={()=>start(slot)}/></View><View style={styles.flex}><SecondaryButton label="Delete" onPress={()=>remove(slot)}/></View></View>
@@ -69,7 +69,7 @@ const styles=StyleSheet.create({
   slotLabel:{color:colors.gold,fontSize:9,fontWeight:"900",letterSpacing:1.2},
   occupied:{color:colors.green,fontSize:8,fontWeight:"900"},
   empty:{color:colors.muted,fontSize:8,fontWeight:"900"},
-  guildName:{color:colors.text,fontSize:20,fontWeight:"900"},
+  guildRow:{alignItems:"center",flexDirection:"row",gap:9},guildName:{color:colors.text,fontSize:20,fontWeight:"900"},
   meta:{color:colors.gold,fontSize:10,fontWeight:"800",textTransform:"capitalize"},
   lastPlayed:{color:colors.muted,fontSize:9},
   emptyCopy:{color:colors.muted,fontSize:11,lineHeight:16},

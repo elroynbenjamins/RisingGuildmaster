@@ -4,7 +4,7 @@ import { createGuild } from "../src/game/guild/guildService";
 import { generateRecruitmentCandidate, generateRecruitmentPool, getArchetypeWeights, reputationPotentialBonus } from "../src/game/recruitment/candidateGenerator";
 import { calculateContractCosts, calculateRecruitmentFee, calculateWeeklySalary } from "../src/game/recruitment/recruitmentCostCalculator";
 import { calculateRenewalSalary, createHeroContract, getContractStatus } from "../src/game/recruitment/contractService";
-import { createRecruitmentState, freeRefreshRecruitment, initializeRecruitment, manualRefreshRecruitment, purgeExpiredCandidates, recruitCandidate, rejectCandidate, reserveCandidate, scoutRecruitmentCandidate } from "../src/game/recruitment/recruitmentService";
+import { createRecruitmentState, formerMemberRehireFee, formerMemberRehireSalary, freeRefreshRecruitment, initializeRecruitment, manualRefreshRecruitment, purgeExpiredCandidates, recruitCandidate, rejectCandidate, rehireFormerMember, reserveCandidate, scoutRecruitmentCandidate } from "../src/game/recruitment/recruitmentService";
 import { financialEstimate, potentialEstimate, scoutCandidate } from "../src/game/recruitment/scoutingService";
 import { validateCandidateRecruitment } from "../src/game/recruitment/recruitmentValidator";
 import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
@@ -13,12 +13,28 @@ import { testHero } from "./testHero";
 import { collectRegionalScoutReport, dispatchRegionalScout, focusRegionalScoutClass, regionalScoutDaysRemaining, speedUpRegionalScout } from "../src/game/recruitment/regionalScoutingService";
 import { RACE_HOMELANDS } from "../src/data/recruitment/raceHomelands";
 import type { GuildmasterSkillId } from "../src/game/guildmaster/guildmasterTypes";
+import { getRecruitmentLevelProfile, getRecruitmentLevelRange } from "../src/game/recruitment/recruitmentLevelService";
+import { advanceGuildTime } from "../src/game/economy/guildCalendarService";
 
 describe("recruitment generation", () => {
   it("uses normalized race and class probabilities", () => { expect(Object.values(RECRUITMENT_RACE_WEIGHTS).reduce((a,b)=>a+b,0)).toBeCloseTo(1); expect(Object.values(RECRUITMENT_CLASS_WEIGHTS).reduce((a,b)=>a+b,0)).toBeCloseTo(1); });
   it.each(["prospect","standard","veteran","elite"] as const)("generates level-one %s candidates inside archetype ranges", (archetype) => { const candidate = generateRecruitmentCandidate(createSeededRandom(42), 5, 0, archetype); const balance = RECRUITMENT_ARCHETYPES[archetype]; expect(candidate.archetype).toBe(archetype); expect(candidate.heroPreview.age).toBeGreaterThanOrEqual(balance.ageMin); expect(candidate.heroPreview.age).toBeLessThanOrEqual(balance.ageMax); expect(candidate.heroPreview.level).toBe(1); expect(candidate.heroPreview.xp).toBe(0); expect(candidate.truePotential).toBeGreaterThanOrEqual(Math.max(50,balance.potentialMin)); expect(candidate.truePotential).toBeLessThanOrEqual(balance.potentialMax); expect(candidate.expiresAtDay).toBe(12); });
   it("generates three deterministic, diverse candidates", () => { const first = generateRecruitmentPool(createSeededRandom(77), 1); const second = generateRecruitmentPool(createSeededRandom(77), 1); expect(first).toEqual(second); expect(first).toHaveLength(3); expect(new Set(first.map((item)=>item.candidateId)).size).toBe(3); expect(first.every((item)=>item.truePotential>=50&&item.truePotential<=100)).toBe(true); });
   it("raises elite chance and potential with reputation", () => { expect(reputationPotentialBonus(0)).toBe(0); expect(reputationPotentialBonus(60)).toBe(6); expect(reputationPotentialBonus(999)).toBe(10); expect(getArchetypeWeights(60).elite).toBeCloseTo(.08); expect(getArchetypeWeights(999).elite).toBeCloseTo(.10); expect(Object.values(getArchetypeWeights(60)).reduce((a,b)=>a+b,0)).toBeCloseTo(1); });
+  it("scales later recruitment below the core roster while rare elites may match it", () => {
+    const guild=createGuild(); guild.world.campaignChapter=3;
+    guild.heroes=[7,7,6,6].map((level,index)=>({...testHero(),id:"core-"+index,level}));
+    const profile=getRecruitmentLevelProfile(guild);
+    expect(profile).toMatchObject({campaignCap:6,standardMax:5,eliteMax:6});
+    expect(getRecruitmentLevelRange(guild,"prospect")).toEqual({min:3,max:4});
+    expect(getRecruitmentLevelRange(guild,"standard")).toEqual({min:3,max:5});
+    expect(getRecruitmentLevelRange(guild,"veteran")).toEqual({min:4,max:5});
+    expect(getRecruitmentLevelRange(guild,"elite")).toEqual({min:5,max:6});
+  });
+  it("keeps Chapter 1 tavern recruits at Level 1 even with an unusually strong roster", () => {
+    const guild=createGuild(); guild.world.campaignChapter=1; guild.heroes=[5,5,5,5].map((level,index)=>({...testHero(),id:"strong-"+index,level}));
+    expect(getRecruitmentLevelProfile(guild)).toMatchObject({standardMax:1,eliteMax:1});
+  });
 });
 
 describe("recruitment finances and scouting", () => {
@@ -38,6 +54,35 @@ describe("persistent recruitment state", () => {
   it("scouting spends gold and updates the persisted candidate", () => { const base=readyGuild(); const guild={...base,guildmaster:{...base.guildmaster,unlockedSkillIds:["scouting_basics" as GuildmasterSkillId]}}; const id=guild.recruitment.candidateIds[0]!; const scouted=scoutRecruitmentCandidate(guild,id); expect(scouted.gold).toBe(guild.gold-100); expect(scouted.recruitment.candidates[0]?.scoutingLevel).toBe(1); });
   it("recruits successfully, creates a contract and begins the hero chronicle", () => { const guild=readyGuild(); const candidate=guild.recruitment.candidates[0]!; const recruited=recruitCandidate(guild,candidate.candidateId); expect(recruited.gold).toBe(guild.gold-candidate.recruitmentFee); expect(recruited.heroes.some((hero)=>hero.id===candidate.heroPreview.id)).toBe(true); expect(recruited.heroContracts[0]).toMatchObject({heroId:candidate.heroPreview.id,weeklySalary:candidate.weeklySalary}); expect(recruited.recruitment.candidateIds).not.toContain(candidate.candidateId); expect(recruited.heroes[0]?.history.importantEvents[0]).toContain("Joined the guild"); expect(recruited.heroes[0]?.history.events[0]).toMatchObject({ day: guild.currentDay, type: "recruitment", outcome: "positive", title: "Joined the guild" }); });
   it("rejects unaffordable and over-capacity recruitment", () => { const guild=readyGuild(); const candidate=guild.recruitment.candidates[0]!; expect(validateCandidateRecruitment({...guild,gold:0},candidate)).toContain("Insufficient Gold"); const heroes=Array.from({length:RECRUITMENT_CONFIG.heroCapacity},(_,index)=>({...testHero(),id:`h${index}`})); expect(validateCandidateRecruitment({...guild,heroes},candidate)).toContain("Guild hero capacity reached"); });
+  it("archives departed heroes and allows a reliable return after seven days", () => {
+    const anchor={...testHero(),id:"anchor",name:"Anchor"};
+    const former={...testHero(),id:"returner",name:"Mira",level:5,learnedSkillIds:["warrior_shield_bash"],equipment:{...testHero().equipment,weapon:"worn-sword"}};
+    let guild=createGuild(); guild.heroes=[anchor,former]; guild.relationships=[{heroIdA:anchor.id,heroIdB:former.id,score:42}];
+    guild.heroContracts=[{...createHeroContract(former,120,12,guild.currentDay),endDay:guild.currentDay+1,status:"expiring"}];
+    guild=advanceGuildTime(guild,4).guild;
+    expect(guild.heroes.map((hero)=>hero.id)).toEqual(["anchor"]);
+    expect(guild.inventory).toContain("worn-sword");
+    expect(guild.recruitment.formerMembers).toHaveLength(1);
+    const member=guild.recruitment.formerMembers[0]!;
+    expect(member).toMatchObject({departedDay:5,eligibleReturnDay:12,lastWeeklySalary:120});
+    expect(member.hero).toMatchObject({id:"returner",level:5,learnedSkillIds:["warrior_shield_bash"]});
+    expect(()=>rehireFormerMember(guild,former.id)).toThrow("not ready to return");
+    guild={...guild,currentDay:member.eligibleReturnDay,gold:9999};
+    const fee=formerMemberRehireFee(member); const salary=formerMemberRehireSalary(member);
+    const returned=rehireFormerMember(guild,former.id);
+    expect(returned.gold).toBe(guild.gold-fee);
+    expect(returned.recruitment.formerMembers).toHaveLength(0);
+    expect(returned.heroes.find((hero)=>hero.id===former.id)).toMatchObject({level:5,learnedSkillIds:["warrior_shield_bash"],salary,conditions:[],isAvailable:true});
+    expect(returned.heroes.find((hero)=>hero.id===former.id)?.equipment.weapon).toBeNull();
+    expect(returned.heroContracts.find((contract)=>contract.heroId===former.id)).toMatchObject({weeklySalary:salary,status:"active"});
+    expect(returned.relationships).toContainEqual({heroIdA:anchor.id,heroIdB:former.id,score:42});
+    expect(returned.heroes.find((hero)=>hero.id===former.id)?.history.events.some((event)=>event.tags?.includes("returning_hero"))).toBe(true);
+  });
+  it("preserves Former Members when an empty candidate board is regenerated", () => {
+    const guild=readyGuild(); const former={hero:{...testHero(),id:"old-friend"},departedDay:10,eligibleReturnDay:17,lastWeeklySalary:100,rehireCount:0,relationships:[]};
+    const emptied={...guild,recruitment:{...guild.recruitment,candidates:[],candidateIds:[],formerMembers:[former]}};
+    expect(initializeRecruitment(emptied,createSeededRandom(91)).recruitment.formerMembers).toEqual([former]);
+  });
 });
 
 describe("regional scout expeditions", () => {

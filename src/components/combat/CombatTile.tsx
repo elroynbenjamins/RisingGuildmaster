@@ -34,12 +34,12 @@ function AmbientGround({ tile, nearWall }: { tile: CombatTileState; nearWall: bo
   </View>;
 }
 
-export function CombatTile({ tile, columns, rows, nearWall = false, reachable, movementBoundary, targetable, affected, hazard, safe, objective, selected, children, onPress }: { tile: CombatTileState; columns: number; rows: number; nearWall?: boolean; reachable?: boolean; movementBoundary?: MovementBoundaryEdges; targetable?: boolean; affected?: boolean; hazard?:boolean; safe?:boolean; objective?:boolean; selected?: boolean; children?: React.ReactNode; onPress(): void }) {
+export function CombatTile({ tile, columns, rows, nearWall = false, reachable, movementBoundary, targetable, affected, hazard, safe, objective, selected, strongerContrast = false, children, onPress }: { tile: CombatTileState; columns: number; rows: number; nearWall?: boolean; reachable?: boolean; movementBoundary?: MovementBoundaryEdges; targetable?: boolean; affected?: boolean; hazard?:boolean; safe?:boolean; objective?:boolean; selected?: boolean; strongerContrast?: boolean; children?: React.ReactNode; onPress(): void }) {
   const art = TERRAIN_ART[tile.terrainType];
   return <Pressable accessibilityRole="button" accessibilityLabel={`Tile ${tile.position.x},${tile.position.y}, ${tile.terrainType}, height ${tile.elevation}${reachable ? ", reachable" : ""}${targetable ? ", targetable" : ""}${hazard?", raid hazard":""}${safe?", safe zone":""}${objective?", raid objective":""}`} onPress={onPress} style={[styles.tile, getCombatTileLayout(tile.position, columns, rows)]}>
     <View style={styles.contents}>
       {tile.terrainType === "normal" || tile.terrainType === "shallow_water" ? <AmbientGround tile={tile} nearWall={nearWall}/> : <Image fadeDuration={0} resizeMode="stretch" source={TERRAIN_ATLAS} style={{ position:"absolute",width:"400%",height:"400%",left:`${-art.column*100}%`,top:`${-art.row*100}%`,opacity:.88 }}/>}
-      <View pointerEvents="none" style={[styles.grid,reachable && styles.reachable,safe && styles.safe,affected && styles.affected,hazard && styles.hazard,targetable && styles.targetable,objective && styles.objective,selected && styles.selected]}/>
+      <View pointerEvents="none" style={[styles.grid,reachable && styles.reachable,safe && styles.safe,affected && styles.affected,hazard && styles.hazard,targetable && styles.targetable,objective && styles.objective,selected && styles.selected,strongerContrast&&reachable&&styles.reachableStrong,strongerContrast&&safe&&styles.safeStrong,strongerContrast&&affected&&styles.affectedStrong,strongerContrast&&hazard&&styles.hazardStrong,strongerContrast&&targetable&&styles.targetableStrong,strongerContrast&&objective&&styles.objectiveStrong,strongerContrast&&selected&&styles.selectedStrong]}/>
       {reachable && movementBoundary ? <View pointerEvents="none" style={[styles.movementBoundary, movementBoundary.top&&styles.boundaryTop, movementBoundary.right&&styles.boundaryRight, movementBoundary.bottom&&styles.boundaryBottom, movementBoundary.left&&styles.boundaryLeft]}/> : null}
       {hazard ? <Text style={styles.raidMark}>!</Text> : null}
       {objective ? <Text style={styles.objectiveMark}>◆</Text> : null}
@@ -67,6 +67,13 @@ const styles = StyleSheet.create({
   targetable:{backgroundColor:"rgba(210,71,65,.2)",borderColor:"#ff827a",borderWidth:2,borderStyle:"dashed"},
   objective:{borderColor:"#d7a9ff",borderWidth:2,borderStyle:"dashed"},
   selected:{borderColor:"#ffe18a",borderWidth:2,borderStyle:"solid"},
+  reachableStrong:{backgroundColor:"rgba(38,220,184,.34)",borderColor:"#54f0d1",borderWidth:2},
+  safeStrong:{backgroundColor:"rgba(39,223,157,.40)",borderColor:"#77ffc8",borderWidth:3},
+  affectedStrong:{backgroundColor:"rgba(255,211,92,.34)",borderColor:"#ffe879",borderWidth:2},
+  hazardStrong:{backgroundColor:"rgba(220,35,51,.52)",borderColor:"#ff5c56",borderWidth:3,borderStyle:"solid"},
+  targetableStrong:{backgroundColor:"rgba(244,67,54,.40)",borderColor:"#ff9b94",borderWidth:3,borderStyle:"solid"},
+  objectiveStrong:{backgroundColor:"rgba(161,92,224,.26)",borderColor:"#e7c1ff",borderWidth:3,borderStyle:"solid"},
+  selectedStrong:{borderColor:"#fff3a1",borderWidth:4,borderStyle:"solid"},
   raidMark:{color:"#fff0cf",fontSize:12,fontWeight:"900",position:"absolute",right:2,top:0,zIndex:4},
   objectiveMark:{color:"#e0b9ff",fontSize:12,fontWeight:"900",position:"absolute",bottom:0,right:2,zIndex:4},
 });

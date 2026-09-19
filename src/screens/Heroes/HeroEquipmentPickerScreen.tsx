@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { EquipmentIcon } from "../../components/equipment/EquipmentIcon";
 import { ActionButton, BackButton, EmptyState, Panel, Portrait, colors } from "../../components/ui";
 import { equipItem } from "../../game/equipment/equipmentService";
-import { resolveEquipmentDefinition, type ResolvedEquipmentDefinition } from "../../game/equipment/equipmentResolver";
+import { resolveEquipmentDefinition } from "../../game/equipment/equipmentResolver";
 import type { EquipmentSlot, Hero } from "../../game/heroes/types";
 import { useGuild } from "../../state/GuildContext";
 import { compareEquipment } from "../../ui/equipmentComparison";
@@ -32,12 +32,11 @@ export function HeroEquipmentPickerScreen({
   const currentKey = hero.equipment[slot];
   const current = currentKey ? resolveEquipmentDefinition(currentKey) : undefined;
   const items = guild.inventory
-    .map((key) => resolveEquipmentDefinition(key))
-    .filter((item): item is ResolvedEquipmentDefinition => Boolean(item)
-      && item.slot === slot
-      && hero.level >= item.levelRequirement
-      && (!item.classRestrictions.length || item.classRestrictions.includes(hero.classId)))
-    .map((item) => ({ item, rows: compareEquipment(hero, item.inventoryKey), score: score(hero, item.inventoryKey) }))
+    .flatMap((key) => {
+      const item = resolveEquipmentDefinition(key);
+      if (!item || item.slot !== slot || hero.level < item.levelRequirement || (item.classRestrictions.length && !item.classRestrictions.includes(hero.classId))) return [];
+      return [{ item, rows: compareEquipment(hero, item.inventoryKey), score: score(hero, item.inventoryKey) }];
+    })
     .sort((a,b) => b.score - a.score || b.item.level - a.item.level || b.item.value - a.item.value);
 
   const equip = (inventoryKey: string) => {

@@ -2,6 +2,7 @@ import { REGIONAL_THREATS } from "../../data/world/regionalThreats";
 import type { WorldState } from "./worldTypes";
 
 export const REGIONAL_THREAT_UNLOCK_FLAG = "regional_threats_unlocked";
+export const REGIONAL_THREAT_INTRO_SEEN_FLAG = "regional_threats_intro_seen";
 export const REGIONAL_THREAT_REQUIRED_HERO_COUNT = 6;
 export const REGIONAL_THREAT_MIN_HERO_LEVEL = 2;
 

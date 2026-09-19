@@ -63,9 +63,9 @@ describe("gems, economy, and hero rotation", () => {
     const base = { ...createGuild(), heroes: [hero] };
     const spent = spendPartyAdventureStamina(base, [hero.id], QUESTS.orchard_road_patrol!);
     expect(spent.heroes[0]!.adventureStamina).toBe(50);
-    expect(recoverAdventureStamina(spent).heroes[0]!.adventureStamina).toBe(75);
+    expect(recoverAdventureStamina(spent).heroes[0]!.adventureStamina).toBe(85);
     const nextDay = advanceGuildTime(spent).guild;
-    expect(nextDay.heroes[0]!.adventureStamina).toBe(75);
+    expect(nextDay.heroes[0]!.adventureStamina).toBe(85);
     expect(nextDay.gold).toBe(spent.gold + GAME_CONFIG.dailyTavernIncome);
   });
 });

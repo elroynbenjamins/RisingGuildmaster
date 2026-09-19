@@ -69,7 +69,7 @@ export function RegionMapScreen({ regionId, onBack, openQuest, random, openEvent
                   pressed && styles.pressedMarker,
                 ]}
               >
-                <LocationMarkerIcon type={entry.type} size={18} completed={completed} campaign={campaignTarget} />
+                <LocationMarkerIcon type={entry.type} size={24} completed={completed} campaign={campaignTarget} />
                 <Text numberOfLines={2} style={[styles.markerName, active && styles.activeMarkerName]}>
                   {entry.name}
                 </Text>{campaignTarget ? <Text style={styles.campaignMarkerText}>CAMPAIGN</Text> : null}
@@ -124,7 +124,7 @@ function LocationPanel({ location, campaignTarget, regionUnlocked, discoveredSet
   const questComplete = location.questId ? completedQuestIds.includes(location.questId) : false;
   return (
     <Panel style={styles.panel}>
-      <View style={styles.locationHeader}><LocationMarkerIcon type={location.type} size={34} campaign={campaignTarget} /><View style={styles.flex}><Text style={styles.locationName}>{location.name}</Text><Text style={styles.locationType}>{location.type.toUpperCase()}{location.recommendedLevel ? ` · RECOMMENDED LEVEL ${location.recommendedLevel}` : ""}</Text></View><Text style={discovered ? styles.known : styles.unknown}>{discovered ? "KNOWN" : "UNDISCOVERED"}</Text></View>
+      <View style={styles.locationHeader}><LocationMarkerIcon type={location.type} size={42} campaign={campaignTarget} /><View style={styles.flex}><Text style={styles.locationName}>{location.name}</Text><Text style={styles.locationType}>{location.type.toUpperCase()}{location.recommendedLevel ? ` · RECOMMENDED LEVEL ${location.recommendedLevel}` : ""}</Text></View><Text style={discovered ? styles.known : styles.unknown}>{discovered ? "KNOWN" : "UNDISCOVERED"}</Text></View>
       {campaignTarget ? <Text style={styles.campaignLocationBadge}>NEXT CAMPAIGN LOCATION</Text> : null}<Text style={styles.description}>{location.description}</Text>
       {settlement && <><Text style={styles.label}>SERVICES</Text><Text style={styles.services}>{settlement.serviceIds.map(pretty).join(" · ")}</Text></>}
       {settlement && regionUnlocked && <ActionButton label={currentSettlementId === settlement.id ? "Current Location" : "Walk Here · 1 day"} disabled={currentSettlementId === settlement.id} onPress={() => onVisit(settlement.id)} />}
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   locked: { color: colors.danger, fontSize: 10, fontWeight: "900" },
   mapShade: { backgroundColor: "rgba(3, 9, 14, .08)", bottom: 0, left: 0, position: "absolute", right: 0, top: 0 },
   // The coordinate is the center of the 18px map icon; the label flows below it.
-  marker: { alignItems: "center", backgroundColor: "transparent", marginLeft: -36, marginTop: -9, minHeight: 40, paddingHorizontal: 3, position: "absolute", width: 72 },
+  marker: { alignItems: "center", backgroundColor: "transparent", marginLeft: -36, marginTop: -12, minHeight: 46, paddingHorizontal: 3, position: "absolute", width: 72 },
   unknownMarker: { opacity: .78 },
   completedMarker: { opacity: 1 },
   activeMarker: { transform: [{ scale: 1.08 }] },

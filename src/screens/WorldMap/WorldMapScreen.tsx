@@ -126,7 +126,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
                   pressed && styles.pressedNode,
                 ]}
               >
-                <View style={[styles.marker, isCurrent && styles.currentMarker, boss && styles.bossMarker]}><RegionEmblem regionId={region.id} status={markerStatus} size={30} campaign={campaignTarget} /></View>
+                <View style={[styles.marker, isCurrent && styles.currentMarker, boss && styles.bossMarker]}><RegionEmblem regionId={region.id} status={markerStatus} size={38} campaign={campaignTarget} /></View>
                 <Text numberOfLines={1} style={styles.nodeName}>{region.name}</Text>
                 <Text style={styles.nodeState}>{status}</Text>
                 {campaignTarget && <Text style={styles.campaignBadge}>CAMPAIGN</Text>}{selectedRegion && <Text style={styles.nodeHint}>DOUBLE TAP · OPEN</Text>}
@@ -192,12 +192,12 @@ const styles = StyleSheet.create({
   overviewLabel: { color: colors.gold, fontSize: 7, fontWeight: "900", letterSpacing: .6, marginTop: 2, textAlign: "center" },
   mapShade: { backgroundColor: "rgba(4, 11, 17, 0.10)", bottom: 0, left: 0, position: "absolute", right: 0, top: 0 },
   // mapPosition identifies the center of the flag, not the top-left of its label.
-  node: { alignItems: "center", backgroundColor: "transparent", borderWidth: 0, marginLeft: -50, marginTop: -15, minHeight: 67, paddingHorizontal: 5, position: "absolute", width: 100 },
+  node: { alignItems: "center", backgroundColor: "transparent", borderWidth: 0, marginLeft: -50, marginTop: -19, minHeight: 75, paddingHorizontal: 5, position: "absolute", width: 100 },
   lockedNode: { opacity: 0.78 },
   currentNode: { opacity: 1 },
   selectedNode: { transform: [{ scale: 1.05 }] },
   pressedNode: { opacity: 0.72, transform: [{ scale: 0.96 }] },
-  marker: { alignItems: "center", backgroundColor: "#374449", borderColor: "#d4c59d", borderRadius: 4, borderWidth: 1, height: 30, justifyContent: "center", width: 30 },
+  marker: { alignItems: "center", backgroundColor: "#374449", borderColor: "#d4c59d", borderRadius: 4, borderWidth: 1, height: 38, justifyContent: "center", width: 38 },
   currentMarker: { backgroundColor: "#27633e", borderColor: colors.green },
   bossMarker: { backgroundColor: "#762f29", borderColor: colors.danger },
   markerText: { color: colors.text, fontSize: 11, fontWeight: "900", lineHeight: 14 },

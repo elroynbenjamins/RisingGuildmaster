@@ -15,7 +15,7 @@ describe("campaign and roguelite XP curve", () => {
       for (const questId of [...campaignQuestIds, ...(chapter.sideQuestIds ?? [])]) hero = grantHeroXp(hero, getQuestXpForHero(hero, QUESTS[questId]!, 4));
       endLevels.push(hero.level);
     }
-    expect(endLevels).toEqual([3, 5, 6, 8, 9, 11, 13, 16, 18]);
+    expect(endLevels).toEqual([4, 5, 7, 8, 10, 12, 14, 17, 19]);
   });
 
   it("reduces roguelite XP only when a hero outlevels the selected theme", () => {

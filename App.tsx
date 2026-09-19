@@ -36,6 +36,7 @@ import { AlchemyScreen } from "./src/screens/Alchemy/AlchemyScreen";
 import { createQuestChronicleEntry, recordQuestChronicle } from "./src/game/quests/questChronicleService";
 import { isQuestAtCurrentLocation } from "./src/game/quests/questAvailability";
 import { travelGuildTowardQuest } from "./src/game/quests/questTravelService";
+import { applyBountyReward } from "./src/game/quests/bountyService";
 import { getDefaultTravelPartyHeroIds } from "./src/game/world/travelPartyService";
 import { CAMPAIGN_CHOICE_OUTCOMES } from "./src/data/quests/questOutcomeNarratives";
 import { applyQuestRelationshipConsequences } from "./src/game/relationships/relationshipService";
@@ -224,6 +225,7 @@ function Game() {
       if (status === "victory" && quest.setWorldFlagsOnVictory) updated = { ...updated, world: { ...updated.world, worldFlags: { ...updated.world.worldFlags, ...quest.setWorldFlagsOnVictory } } };
       if (status === "victory") updated = applyStoryRaceUnlocks(updated);
       if (status === "victory") updated = { ...updated, world: resolveRegionalThreatForQuest(updated.world, quest.id) };
+      if (status === "victory") updated = applyBountyReward(updated, quest.id).guild;
       if (status === "victory" && route.campaignNodeId && CAMPAIGN_NODES[route.campaignNodeId]?.type !== "boss") { const campaign = completeCampaignNode(updated.world, route.campaignNodeId); updated = { ...updated, world: campaign.worldState, gold: updated.gold + campaign.goldReward, reputation: updated.reputation + campaign.guildReputationReward }; }
       const beforeById = new Map(participants.map((hero) => [hero.id, hero]));
       const heroOutcomes = updated.heroes.filter((hero) => route.party.heroIds.includes(hero.id)).map((hero) => { const before = beforeById.get(hero.id); const hadInjury = before?.conditions.some((condition) => condition.conditionId === "injured") ?? false; return { heroId: hero.id, name: hero.name, raceId: hero.raceId, classId: hero.classId, gender: hero.gender, portraitVariant: hero.portraitVariant ?? 0, levelBefore: before?.level ?? hero.level, levelAfter: hero.level, currentHP: hero.currentHP, maxHP: calculateHero(hero).stats.maxHP, conditionIds: hero.conditions.map((condition) => condition.conditionId), availableSkillPoints: getAvailableClassSkillPoints(hero), fellInBattle: hero.currentHP <= 0, newlyInjured: !hadInjury && hero.conditions.some((condition) => condition.conditionId === "injured") }; });

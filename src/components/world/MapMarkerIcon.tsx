@@ -18,7 +18,7 @@ function StatusBadge({ id, size }: { id: WorldMapStatusIcon; size: number }) {
 }
 
 export function RegionEmblem({ regionId, status = "open", size = 30, campaign = false }: { regionId: string; status?: RegionStatus; size?: number; campaign?: boolean }) {
-  const rect = REGION_EMBLEM_RECTS[regionId] ?? REGION_EMBLEM_RECTS.greenveil;
+  const rect = REGION_EMBLEM_RECTS[regionId] ?? REGION_EMBLEM_RECTS.greenveil!;
   const statusId: WorldMapStatusIcon | null = status === "current" ? "current" : status === "complete" ? "complete" : status === "boss" ? "boss" : status === "locked" ? "locked" : null;
   const badgeSize = Math.max(11, Math.round(size * .42));
   return (

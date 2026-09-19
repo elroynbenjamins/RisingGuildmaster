@@ -63,7 +63,9 @@ function Game() {
   const promptedDayRef = useRef<string | null>(null);
   const threatIntroPromptedRef = useRef(false);
   useEffect(() => {
-    if (!gameStarted || !isHydrated || !areRegionalThreatsUnlocked(guild.world) || guild.world.worldFlags[REGIONAL_THREAT_INTRO_SEEN_FLAG] || threatIntroPromptedRef.current) return;
+    if (!gameStarted || !isHydrated) return;
+    if (!areRegionalThreatsUnlocked(guild.world)) { threatIntroPromptedRef.current = false; return; }
+    if (guild.world.worldFlags[REGIONAL_THREAT_INTRO_SEEN_FLAG] || threatIntroPromptedRef.current) return;
     const safeBreak = route.name === "main" || route.name === "finances" || route.name === "management";
     if (!safeBreak || isDialogOpen) return;
     threatIntroPromptedRef.current = true;
@@ -100,7 +102,7 @@ function Game() {
   if (route.name === "service") return route.title === "Potions" ? <AlchemyScreen onBack={() => main("Inventory")} /> : <ServicePlaceholderScreen title={route.title} onBack={() => main("Guild")} />;
   if (route.name === "training") return <TrainingGroundsScreen onBack={() => main("Guild")} openCalendar={() => setRoute({ name: "finances" })} />;
   if (route.name === "gemsSupport") return <GemsSupportScreen onBack={() => main("Guild")} />;
-  if (route.name === "temple") return <TempleScreen onBack={() => main("Guild")} />;
+  if (route.name === "temple") return <TempleScreen onBack={() => main("Guild")} openWorld={() => main("World")} />;
   if (route.name === "monsterManual") return <MonsterManualScreen onBack={() => setRoute({ name: "management" })} />;
   if (route.name === "heroCodex") return <HeroCodexScreen onBack={() => setRoute({ name: "management" })} />;
   if (route.name === "skillCodex") return <SkillCodexScreen onBack={() => setRoute({ name: "management" })} />;

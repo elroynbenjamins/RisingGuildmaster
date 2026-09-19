@@ -25,7 +25,7 @@ export function TempleScreen({ onBack, openWorld }: { onBack(): void; openWorld(
 
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} />
-    <Text style={styles.eyebrow}>GUILDHAVEN SANCTUARY</Text><Text style={styles.title}>Temple of Renewal</Text>
+    <Text style={styles.eyebrow}>{(currentSettlement?.name ?? "Local").toUpperCase()} · HEALING SERVICES</Text><Text style={styles.title}>Temple of Renewal</Text>
     <Text style={styles.intro}>Restore wounded adventurers with guild gold. Fallen heroes require rare soul gems before ordinary treatment can continue.</Text>
     <View style={styles.wallet}><Text style={styles.gold}>◆ {guild.gold.toLocaleString()} gold</Text><Text style={styles.gems}>◇ {guild.gems} gems</Text></View>
     {message ? <Panel style={styles.message}><Text style={styles.messageText}>{message}</Text><Pressable onPress={() => setMessage(null)}><Text style={styles.dismiss}>Dismiss</Text></Pressable></Panel> : null}

@@ -63,3 +63,28 @@ export interface GuildOperationResult {
 }
 
 export const createGuildOperationState = (): GuildOperationState => ({ completedCount: 0, nextAvailableDay: 1, lastOperationId: null });
+
+
+export interface GuildOperationCheckPreview {
+  phaseId: string;
+  phaseTitle: string;
+  team: "vanguard" | "support";
+  title: string;
+  difficultyClass: number;
+  bestHeroId: string | null;
+  bestHeroName: string | null;
+  modifier: number;
+  expectedMargin: number;
+  rating: "strong" | "tense" | "weak";
+}
+
+export interface GuildOperationTeamPreview {
+  checks: GuildOperationCheckPreview[];
+  warnings: string[];
+}
+
+export interface GuildOperationSuggestedTeams {
+  vanguardHeroIds: string[];
+  supportHeroIds: string[];
+  score: number;
+}

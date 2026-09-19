@@ -26,7 +26,6 @@ export function AtlasSprite({
   return (
     <View style={[{ width: size, height: size, overflow: "hidden", position: "relative" }, style]}>
       <Image
-        pointerEvents="none"
         source={source}
         resizeMode="stretch"
         style={{

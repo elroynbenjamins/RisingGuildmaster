@@ -7,6 +7,7 @@ import { createGuildOperationState } from "../src/game/operations/guildOperation
 import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
 import { sequenceRandom } from "./combatTestUtils";
 import { testHero } from "./testHero";
+import { unlockRegionalThreats } from "../src/game/world/regionalThreatService";
 
 const sixHeroes = () => Array.from({ length: 6 }, (_, index) => ({ ...testHero(), id: `hero-${index}`, name: `Hero ${index}` }));
 const unlockedGuild = () => {
@@ -33,7 +34,7 @@ describe("Crisis Operations", () => {
     expect(result.result).toMatchObject({ rank: "decisive_victory", successes: 6, totalChecks: 6, goldReward: 930, xpRewardPerHero: 390, reputationReward: 8 });
     expect(result.guild.currentDay).toBe(2);
     expect(result.guild.guildOperations).toMatchObject({ completedCount: 1, nextAvailableDay: 5, lastOperationId: "night_of_three_bells" });
-    expect(result.guild.heroes.every((hero) => hero.adventureStamina === 75)).toBe(true);
+    expect(result.guild.heroes.every((hero) => hero.adventureStamina === 85)).toBe(true);
     expect(result.guild.heroes.every((hero) => hero.history.events.some((event) => event.tags?.includes("guild_operation")))).toBe(true);
     expect(result.guild.materials.oak_timber).toBe(7);
   });
@@ -42,6 +43,7 @@ describe("Crisis Operations", () => {
     const guild = unlockedGuild();
     guild.world.unlockedRegionIds.push("frostmarch");
     guild.world.worldFlags.frostmarch_aurora_crisis = true;
+    guild.world = unlockRegionalThreats(guild.world);
     guild.world.regionThreat = { frostmarch: 2 };
     const result = resolveGuildOperation(guild, "northern_hearthline", ["hero-0", "hero-1", "hero-2"], ["hero-3", "hero-4", "hero-5"], sequenceRandom(Array(12).fill(0)));
     expect(result.result).toMatchObject({ rank: "setback", successes: 0, threatDelta: 1 });

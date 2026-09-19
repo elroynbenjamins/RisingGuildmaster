@@ -41,7 +41,7 @@ import { LoreJournalScreen } from "./src/screens/LoreJournal/LoreJournalScreen";
 import { GameDialogProvider, useGameDialog } from "./src/components/dialogs/GameDialog";
 import { NewGameSetupScreen } from "./src/screens/MainMenu/NewGameSetupScreen";
 import { QuestBriefingScreen } from "./src/screens/QuestDialogue/QuestBriefingScreen";
-import { resolveRegionalThreatForQuest } from "./src/game/world/regionalThreatService";
+import { areRegionalThreatsUnlocked, REGIONAL_THREAT_INTRO_SEEN_FLAG, resolveRegionalThreatForQuest } from "./src/game/world/regionalThreatService";
 import { GuildOperationsScreen } from "./src/screens/GuildOperations/GuildOperationsScreen";
 import { GuildLegacyScreen } from "./src/screens/GuildLegacy/GuildLegacyScreen";
 import { ContentUnlockScreen } from "./src/screens/ContentUnlock/ContentUnlockScreen";
@@ -60,6 +60,20 @@ function Game() {
   const { showDialog, isDialogOpen } = useGameDialog();
   const currentGuildRef = useRef(guild); currentGuildRef.current = guild;
   const promptedDayRef = useRef<string | null>(null);
+  const threatIntroPromptedRef = useRef(false);
+  useEffect(() => {
+    if (!gameStarted || !isHydrated || !areRegionalThreatsUnlocked(guild.world) || guild.world.worldFlags[REGIONAL_THREAT_INTRO_SEEN_FLAG] || threatIntroPromptedRef.current) return;
+    const safeBreak = route.name === "main" || route.name === "finances" || route.name === "management";
+    if (!safeBreak || isDialogOpen) return;
+    threatIntroPromptedRef.current = true;
+    updateGuild({ ...guild, world: { ...guild.world, worldFlags: { ...guild.world.worldFlags, [REGIONAL_THREAT_INTRO_SEEN_FLAG]: true } } });
+    showDialog({
+      title: "Regional Threats Unlocked",
+      eyebrow: "NEW WORLD SYSTEM",
+      message: "Your guild is now established enough for regional crises to react to it. Ignored threats can escalate, strengthen enemies, improve some crisis rewards, and eventually endanger settlements. Resolve crisis quests and operations to push Threat back down.",
+      tone: "default",
+    });
+  }, [gameStarted, isHydrated, guild, route.name, isDialogOpen, updateGuild, showDialog]);
   useEffect(() => {
     const milestone = pendingDayMilestone(guild);
     if (!gameStarted || milestone === null) { promptedDayRef.current = null; return; }

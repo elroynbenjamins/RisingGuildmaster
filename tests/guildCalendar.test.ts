@@ -73,6 +73,6 @@ describe("central guild calendar and economy", () => {
   it("migrates legacy saves without finance state", () => {
     const legacy = JSON.parse(serializeGuild(createGuild())) as Record<string, unknown>; delete legacy.finance;
     const loaded = deserializeGuild(JSON.stringify(legacy));
-    expect(loaded.finance).toEqual({ salaryArrearsByHeroId: {}, totalSalaryPaid: 0, transactions: [], tavernLevel: 1, totalTavernIncome: 0 });
+    expect(loaded.finance).toEqual({ salaryArrearsByHeroId: {}, totalSalaryPaid: 0, transactions: [], tavernLevel: 1, tavernUpgrade: null, totalTavernIncome: 0 });
   });
 });

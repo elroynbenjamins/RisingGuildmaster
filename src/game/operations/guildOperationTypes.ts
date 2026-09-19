@@ -37,6 +37,7 @@ export interface GuildOperationState {
   completedCount: number;
   nextAvailableDay: number;
   lastOperationId: string | null;
+  bestSuccessesByOperationId: Record<string, number>;
 }
 
 export type GuildOperationRank = "decisive_victory" | "hard_won_victory" | "setback";
@@ -62,7 +63,7 @@ export interface GuildOperationResult {
   dialogue: string;
 }
 
-export const createGuildOperationState = (): GuildOperationState => ({ completedCount: 0, nextAvailableDay: 1, lastOperationId: null });
+export const createGuildOperationState = (): GuildOperationState => ({ completedCount: 0, nextAvailableDay: 1, lastOperationId: null, bestSuccessesByOperationId: {} });
 
 
 export interface GuildOperationCheckPreview {

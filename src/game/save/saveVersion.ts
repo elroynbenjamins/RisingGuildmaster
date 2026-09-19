@@ -1,1 +1,1 @@
-export const CURRENT_SAVE_VERSION = 2;
+export const CURRENT_SAVE_VERSION = 4;

@@ -41,7 +41,7 @@ describe("quest, roster, and equipment polish", () => {
     const guild = createGuild();
     const hero = { ...testHero(), id: "attention-hero", adventureStamina: 20, currentHP: 100, equipment: { weapon: null, armor: null, helmet: null, boots: null, accessory1: null, accessory2: null } };
     guild.heroes = [hero];
-    guild.heroContracts = [{ heroId: hero.id, weeklySalary: 50, startDay: 1, endDay: 5, startLevel: 1, status: "expiring" }];
+    guild.heroContracts = [{ heroId: hero.id, weeklySalary: 50, startDay: 1, endDay: 5, startLevel: 1, status: "expiring", renewalIntent: "undecided" }];
     const attention = getHeroAttention(guild, hero);
     expect(attention.issues.some((issue) => issue.kind === "gear_empty")).toBe(true);
     expect(attention.issues.some((issue) => issue.kind === "readiness")).toBe(true);

@@ -4,7 +4,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { ManagementShell } from "./src/components/navigation/ManagementShell"; import { colors } from "./src/components/ui"; import { CAMPAIGN_NODES } from "./src/data/campaign/chapter1"; import { QUESTS } from "./src/data/quests/quests";
 import { resolveCampaignChoice } from "./src/game/campaign/campaignChoiceResolver"; import { completeCampaignNode, getAvailableCampaignNodes } from "./src/game/campaign/campaignService";
 import { travelGuildTowardCampaignObjective } from "./src/game/campaign/campaignTravelService"; import { getCampaignNodeLocationRequirement, isAtCampaignLocation } from "./src/game/campaign/campaignLocationService"; import type { HeroCombatInstance, QuestCombatSetup } from "./src/game/combat/combatTypes"; import type { Hero } from "./src/game/heroes/types"; import type { Party } from "./src/game/party/partyTypes"; import { resolveQuestDefeat, resolveQuestVictory } from "./src/game/quests/questResolver"; import { startQuest } from "./src/game/quests/questService"; import type { WorldEventDefinition } from "./src/game/world/worldTypes";
-import { calculateHero } from "./src/game/heroes/heroCalculator"; import { getAvailableClassSkillPoints } from "./src/game/progression/skills/skillProgressionService"; import type { EquipmentSlot } from "./src/game/heroes/types";
+import { calculateHero } from "./src/game/heroes/heroCalculator"; import { getAvailableClassSkillPoints } from "./src/game/progression/skills/skillProgressionService"; import type { EquipmentSlot } from "./src/game/heroes/types"; import type { MaterialId } from "./src/game/crafting/craftingTypes";
 import { releaseBankedCampaignXp } from "./src/game/progression/levelSystem";
 import { CampaignScreen } from "./src/screens/Campaign/CampaignScreen"; import { CombatScreen } from "./src/screens/CombatScreen"; import { GuildManagementScreen } from "./src/screens/Guild/GuildManagementScreen"; import { GuildScreen } from "./src/screens/Guild/GuildScreen"; import { ServicePlaceholderScreen } from "./src/screens/Guild/ServicePlaceholderScreen"; import { HeroDetailScreen } from "./src/screens/HeroDetailScreen"; import { HeroesScreen } from "./src/screens/Heroes/HeroesScreen"; import { HeroEquipmentPickerScreen } from "./src/screens/Heroes/HeroEquipmentPickerScreen"; import { InventoryScreen } from "./src/screens/Inventory/InventoryScreen"; import { ItemDetailScreen } from "./src/screens/Inventory/ItemDetailScreen"; import { PartySelectionScreen } from "./src/screens/PartySelectionScreen"; import { QuestDetailScreen } from "./src/screens/QuestDetailScreen"; import { QuestSelectionScreen } from "./src/screens/QuestSelectionScreen"; import { CandidateDetailScreen } from "./src/screens/Recruitment/CandidateDetailScreen"; import { RecruitmentScreen } from "./src/screens/RecruitmentScreen"; import { SkillTreeScreen } from "./src/screens/SkillTree/SkillTreeScreen"; import { StoryEventScreen } from "./src/screens/StoryEvent/StoryEventScreen"; import { SubclassSelectionScreen } from "./src/screens/SubclassSelection/SubclassSelectionScreen"; import { WorldMapScreen } from "./src/screens/WorldMap/WorldMapScreen";
 import { GuildProvider, useGuild } from "./src/state/GuildContext"; import type { MainTab } from "./src/ui/navigation"; import { createSeededRandom, randomSeed } from "./src/utils/random";
@@ -36,6 +36,7 @@ import { AlchemyScreen } from "./src/screens/Alchemy/AlchemyScreen";
 import { createQuestChronicleEntry, recordQuestChronicle } from "./src/game/quests/questChronicleService";
 import { isQuestAtCurrentLocation } from "./src/game/quests/questAvailability";
 import { travelGuildTowardQuest } from "./src/game/quests/questTravelService";
+import { applyBountyReward } from "./src/game/quests/bountyService";
 import { getDefaultTravelPartyHeroIds } from "./src/game/world/travelPartyService";
 import { CAMPAIGN_CHOICE_OUTCOMES } from "./src/data/quests/questOutcomeNarratives";
 import { applyQuestRelationshipConsequences } from "./src/game/relationships/relationshipService";
@@ -52,15 +53,23 @@ import { ContentUnlockScreen } from "./src/screens/ContentUnlock/ContentUnlockSc
 import { RaidScreen } from "./src/screens/Raids/RaidScreen";
 import { findRaidByQuestId, recordRaidOutcome } from "./src/game/raids/raidService";
 import { SettingsScreen } from "./src/screens/Settings/SettingsScreen";
+import { AchievementsScreen } from "./src/screens/Achievements/AchievementsScreen";
+import { acknowledgeUnlockNotices, getNewUnlockNotices } from "./src/game/progression/unlockSummaryService";
 import { ThemeProvider, useTheme } from "./src/theme/theme";
 import { initializeAdMobPrivacy } from "./src/game/monetization/admobRewardedAdProvider";
 
 import { pendingDayMilestone } from "./src/game/monetization/dayMilestoneAdService";
+import type { SaveSlotId } from "./src/game/save/saveService";
 import { presentPendingDayMilestoneAd } from "./src/game/monetization/dayMilestoneAdPresenter";
-type Route = { name: "gemsSupport" } | { name: "main"; tab: MainTab } | { name: "settings" } | { name: "contentUnlock" } | { name: "training" } | { name: "operations" } | { name: "raids" } | { name: "legacy" } | { name: "dungeon" } | { name: "dungeonCombat" } | { name: "regionMap"; regionId: string } | { name: "guildmasterSkills" } | { name: "finances" } | { name: "recruitment" } | { name: "candidate"; candidateId: string } | { name: "service"; title: string } | { name: "temple" } | { name: "monsterManual" } | { name: "heroCodex" } | { name: "skillCodex" } | { name: "loreJournal" } | { name: "management" } | { name: "crafting" } | { name: "gathering" } | { name: "hero"; hero: Hero } | { name: "heroEquipmentPicker"; heroId: string; slot: EquipmentSlot } | { name: "skills"; hero: Hero } | { name: "subclass"; hero: Hero } | { name: "questDetail"; questId: string } | { name: "questBriefing"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "party"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "exploration"; questId: string; party: Party; campaignNodeId?: string } | { name: "decision"; questId: string; party: Party; campaignNodeId?: string } | { name: "combat"; questId: string; party: Party; campaignNodeId?: string; combatSetup?: QuestCombatSetup } | { name: "questResult"; summary: QuestResultSummary } | { name: "campaign" } | { name: "event"; event: WorldEventDefinition; back?: "world" | "campaign" | "quest"; questId?: string } | { name: "item"; itemId: string };
+type Route = { name: "gemsSupport" } | { name: "main"; tab: MainTab } | { name: "settings" } | { name: "achievements" } | { name: "contentUnlock" } | { name: "training" } | { name: "operations" } | { name: "raids" } | { name: "legacy" } | { name: "dungeon" } | { name: "dungeonCombat" } | { name: "regionMap"; regionId: string } | { name: "guildmasterSkills" } | { name: "finances" } | { name: "recruitment" } | { name: "candidate"; candidateId: string } | { name: "service"; title: string } | { name: "temple" } | { name: "monsterManual" } | { name: "heroCodex" } | { name: "skillCodex" } | { name: "loreJournal" } | { name: "management" } | { name: "crafting"; targetHeroId?: string; initialSlot?: EquipmentSlot; materialFilter?: MaterialId } | { name: "gathering"; targetMaterialId?: MaterialId } | { name: "hero"; hero: Hero } | { name: "heroEquipmentPicker"; heroId: string; slot: EquipmentSlot } | { name: "skills"; hero: Hero } | { name: "subclass"; hero: Hero } | { name: "questDetail"; questId: string } | { name: "questBriefing"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "party"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "exploration"; questId: string; party: Party; campaignNodeId?: string } | { name: "decision"; questId: string; party: Party; campaignNodeId?: string } | { name: "combat"; questId: string; party: Party; campaignNodeId?: string; combatSetup?: QuestCombatSetup } | { name: "questResult"; summary: QuestResultSummary } | { name: "campaign" } | { name: "event"; event: WorldEventDefinition; back?: "world" | "campaign" | "quest"; questId?: string } | { name: "item"; itemId: string };
 
 function Game() {
-  const [route, setRoute] = useState<Route>({ name: "main", tab: "Guild" }); const [showNewGameSetup, setShowNewGameSetup] = useState(false); const worldRandom = useRef(createSeededRandom(randomSeed())); const { guild, updateGuild, isHydrated, hasSave, gameStarted, startNewGame, continueGame } = useGuild(); const main = (tab: MainTab) => setRoute({ name: "main", tab });
+  const [route, setRoute] = useState<Route>({ name: "main", tab: "Guild" });
+  const [showNewGameSetup, setShowNewGameSetup] = useState(false);
+  const [newGameSlotId, setNewGameSlotId] = useState<SaveSlotId>(1);
+  const worldRandom = useRef(createSeededRandom(randomSeed()));
+  const { guild, updateGuild, isHydrated, gameStarted, startNewGame, continueGame, deleteSaveSlot, saveSlots } = useGuild();
+  const main = (tab: MainTab) => setRoute({ name: "main", tab });
   const { showDialog, isDialogOpen } = useGameDialog();
   const currentGuildRef = useRef(guild); currentGuildRef.current = guild;
   const promptedDayRef = useRef<string | null>(null);
@@ -115,6 +124,21 @@ function Game() {
     showDialog({ title, eyebrow, message, tone: "default" });
   }, [gameStarted, isHydrated, isDialogOpen, guild, route, updateGuild, showDialog]);
   useEffect(() => {
+    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active) return;
+    const safeBreak = route.name === "main" || route.name === "management" || route.name === "finances";
+    if (!safeBreak) return;
+    const notices = getNewUnlockNotices(guild);
+    if (!notices.length) return;
+    updateGuild(acknowledgeUnlockNotices(guild, notices.map((notice) => notice.id)));
+    showDialog({
+      title: notices.length === 1 ? "New Guild Unlock" : `${notices.length} New Guild Unlocks`,
+      eyebrow: "PROGRESSION",
+      message: notices.map((notice) => `• ${notice.title}\n  ${notice.detail}`).join("\n\n"),
+      tone: "success",
+    });
+  }, [gameStarted, isHydrated, isDialogOpen, guild, route.name, updateGuild, showDialog]);
+
+  useEffect(() => {
     const milestone = pendingDayMilestone(guild);
     if (!gameStarted || milestone === null) { promptedDayRef.current = null; return; }
     const safeBreak = route.name === "main" || route.name === "finances" || route.name === "management";
@@ -124,7 +148,14 @@ function Game() {
     presentPendingDayMilestoneAd(guild, updateGuild, showDialog, () => currentGuildRef.current);
   }, [guild, gameStarted, isHydrated, route.name, isDialogOpen, updateGuild, showDialog]);
   if (!isHydrated) return <View style={styles.loading}><Text style={styles.loadingTitle}>GUILDMASTER</Text><Text style={styles.loadingText}>Loading guild save…</Text></View>;
-  if (!gameStarted) return showNewGameSetup ? <NewGameSetupScreen onBack={() => setShowNewGameSetup(false)} onStart={(difficultyId) => { startNewGame(difficultyId); setShowNewGameSetup(false); }} /> : <MainMenuScreen hasSave={hasSave} onContinue={continueGame} onNewGame={() => setShowNewGameSetup(true)} />;
+  if (!gameStarted) return showNewGameSetup
+    ? <NewGameSetupScreen onBack={() => setShowNewGameSetup(false)} onStart={(difficultyId, guildName, crestId) => { startNewGame(newGameSlotId, difficultyId, guildName, crestId); setShowNewGameSetup(false); }} />
+    : <MainMenuScreen
+        saveSlots={saveSlots}
+        onContinue={(slotId) => { void continueGame(slotId).then((error) => { if (error) showDialog({ title: "Could not load guild", message: error, tone: "danger" }); }); }}
+        onNewGame={(slotId) => { setNewGameSlotId(slotId); setShowNewGameSetup(true); }}
+        onDelete={(slotId) => { void deleteSaveSlot(slotId).catch((error) => showDialog({ title: "Could not delete save", message: error instanceof Error ? error.message : "Delete failed", tone: "danger" })); }}
+      />;
   if (guild.tutorial.active && guild.tutorial.step === "welcome") return <TutorialScreen onBegin={() => { updateGuild(beginTutorial(guild)); setRoute({ name: "recruitment" }); }} onSkip={() => updateGuild(skipTutorial(guild))} />;
   if (isHydrated && route.name === "dungeon") return <DungeonScreen guild={guild} random={worldRandom.current} updateGuild={updateGuild} onBack={() => main("Quests")} startCombat={() => setRoute({ name: "dungeonCombat" })}/>;
   if (isHydrated && route.name === "dungeonCombat") {
@@ -146,17 +177,18 @@ function Game() {
   if (route.name === "loreJournal") return <LoreJournalScreen onBack={() => setRoute({ name: "management" })} />;
   if (route.name === "contentUnlock") return <ContentUnlockScreen onBack={() => setRoute({ name: "management" })} />;
   if (route.name === "settings") return <SettingsScreen onBack={() => setRoute({name:"management"})}/>;
-  if (route.name === "management") return <GuildManagementScreen openGemsSupport={() => setRoute({ name: "gemsSupport" })} onBack={() => main("Guild")} openGuildmasterSkills={() => setRoute({ name: "guildmasterSkills" })} openHeroes={() => main("Heroes")} openTemple={() => setRoute({ name: "temple" })} openMonsterManual={() => setRoute({ name: "monsterManual" })} openHeroCodex={() => setRoute({ name: "heroCodex" })} openSkillCodex={() => setRoute({ name: "skillCodex" })} openLoreJournal={() => setRoute({ name: "loreJournal" })} openFinances={() => setRoute({ name: "finances" })} openOperations={() => setRoute({ name: "operations" })} openLegacy={() => setRoute({ name: "legacy" })} openContentUnlocks={() => setRoute({ name: "contentUnlock" })} openSettings={()=>setRoute({name:"settings"})} />;
+  if (route.name === "achievements") return <AchievementsScreen onBack={() => setRoute({name:"management"})}/>;
+  if (route.name === "management") return <GuildManagementScreen openGemsSupport={() => setRoute({ name: "gemsSupport" })} onBack={() => main("Guild")} openGuildmasterSkills={() => setRoute({ name: "guildmasterSkills" })} openHeroes={() => main("Heroes")} openTemple={() => setRoute({ name: "temple" })} openMonsterManual={() => setRoute({ name: "monsterManual" })} openHeroCodex={() => setRoute({ name: "heroCodex" })} openSkillCodex={() => setRoute({ name: "skillCodex" })} openLoreJournal={() => setRoute({ name: "loreJournal" })} openFinances={() => setRoute({ name: "finances" })} openOperations={() => setRoute({ name: "operations" })} openLegacy={() => setRoute({ name: "legacy" })} openAchievements={() => setRoute({ name: "achievements" })} openContentUnlocks={() => setRoute({ name: "contentUnlock" })} openSettings={()=>setRoute({name:"settings"})} />;
   if (route.name === "legacy") return <GuildLegacyScreen onBack={() => setRoute({ name: "management" })} />;
   if (route.name === "operations") return <GuildOperationsScreen onBack={() => main("Quests")} />;
   if (route.name === "raids") return <RaidScreen onBack={() => main("Quests")} inspectRaid={(questId) => setRoute({ name: "questDetail", questId })} />;
   if (route.name === "guildmasterSkills") return <GuildmasterSkillTreeScreen onBack={() => setRoute({ name: "management" })} />;
   if (route.name === "finances") return <FinancesScreen onBack={() => setRoute({ name: "management" })} />;
-  if (route.name === "crafting") return <CraftingScreen onBack={() => main("Inventory")} openCalendar={() => setRoute({ name: "finances" })} />;
-  if (route.name === "gathering") return <GatheringScreen onBack={() => main("Inventory")} openCalendar={() => setRoute({ name: "finances" })} />;
+  if (route.name === "crafting") return <CraftingScreen targetHeroId={route.targetHeroId} initialSlot={route.initialSlot} materialFilter={route.materialFilter} onBack={() => route.targetHeroId && route.initialSlot ? setRoute({name:"heroEquipmentPicker",heroId:route.targetHeroId,slot:route.initialSlot}) : main("Inventory")} openCalendar={() => setRoute({ name: "finances" })} openGatheringForMaterial={(materialId)=>setRoute({name:"gathering",targetMaterialId:materialId})} />;
+  if (route.name === "gathering") return <GatheringScreen targetMaterialId={route.targetMaterialId} onBack={() => main("Inventory")} openCalendar={() => setRoute({ name: "finances" })} />;
   if (route.name === "regionMap") return <RegionMapScreen regionId={route.regionId} onBack={() => main("World")} openQuest={(questId) => setRoute({ name: "questDetail", questId })} openService={(serviceId) => { if (serviceId === "temple" || serviceId === "healer") setRoute({ name: "temple" }); else if (serviceId === "training_grounds") setRoute({ name: "training" }); else if (serviceId === "recruitment") setRoute({ name: "recruitment" }); else if (serviceId === "quest_board") main("Quests"); else if (serviceId === "guild_hall" || serviceId === "guild_registry") main("Guild"); }} random={worldRandom.current} openEvent={(event) => setRoute({ name: "event", event })} />;
   if (route.name === "hero") return <HeroDetailScreen hero={guild.heroes.find((entry)=>entry.id===route.hero.id)??route.hero} openSkillTree={() => { const current=guild.heroes.find((entry)=>entry.id===route.hero.id)??route.hero; setRoute({ name: "skills", hero: current }); }} openSubclass={() => { const current=guild.heroes.find((entry)=>entry.id===route.hero.id)??route.hero; setRoute({ name: "subclass", hero: current }); }} openEquipmentSlot={(slot)=>setRoute({name:"heroEquipmentPicker",heroId:route.hero.id,slot})} onBack={() => main("Heroes")} />;
-  if (route.name === "heroEquipmentPicker") return <HeroEquipmentPickerScreen heroId={route.heroId} slot={route.slot} onBack={() => { const hero=guild.heroes.find((entry)=>entry.id===route.heroId); hero?setRoute({name:"hero",hero}):main("Heroes"); }} onEquipped={(hero)=>setRoute({name:"hero",hero})}/>;
+  if (route.name === "heroEquipmentPicker") return <HeroEquipmentPickerScreen heroId={route.heroId} slot={route.slot} onBack={() => { const hero=guild.heroes.find((entry)=>entry.id===route.heroId); hero?setRoute({name:"hero",hero}):main("Heroes"); }} onEquipped={(hero)=>setRoute({name:"hero",hero})} onCraft={()=>setRoute({name:"crafting",targetHeroId:route.heroId,initialSlot:route.slot})}/>;
   if (route.name === "skills") return <SkillTreeScreen hero={route.hero} openClassPath={() => setRoute({ name: "subclass", hero: route.hero })} onBack={() => setRoute({ name: "hero", hero: route.hero })} onUpdate={(hero) => { updateGuild({ ...guild, heroes: guild.heroes.map((item) => item.id === hero.id ? hero : item) }); setRoute({ name: "skills", hero }); }} />;
   if (route.name === "subclass") return <SubclassSelectionScreen hero={route.hero} onBack={() => setRoute({ name: "hero", hero: route.hero })} onSelect={(hero) => { updateGuild({ ...guild, heroes: guild.heroes.map((item) => item.id === hero.id ? hero : item) }); setRoute({ name: "hero", hero }); }} />;
   if (route.name === "questDetail") return <QuestDetailScreen questId={route.questId} onBack={() => main("Quests")} openWorld={() => main("World")} travelTowardQuest={() => { try { const partyIds = getDefaultTravelPartyHeroIds(guild); const result = travelGuildTowardQuest(guild, route.questId, partyIds, worldRandom.current); updateGuild(result.guild); if (result.event) setRoute({ name: "event", event: result.event, back: "quest", questId: route.questId }); } catch (error) { showDialog({ title: "Cannot travel", message: error instanceof Error ? error.message : "The route is not currently available.", tone: "danger" }); } }} assemble={() => setRoute({ name: "questBriefing", questId: route.questId, back: "quest" })} />;
@@ -193,6 +225,7 @@ function Game() {
       if (status === "victory" && quest.setWorldFlagsOnVictory) updated = { ...updated, world: { ...updated.world, worldFlags: { ...updated.world.worldFlags, ...quest.setWorldFlagsOnVictory } } };
       if (status === "victory") updated = applyStoryRaceUnlocks(updated);
       if (status === "victory") updated = { ...updated, world: resolveRegionalThreatForQuest(updated.world, quest.id) };
+      if (status === "victory") updated = applyBountyReward(updated, quest.id).guild;
       if (status === "victory" && route.campaignNodeId && CAMPAIGN_NODES[route.campaignNodeId]?.type !== "boss") { const campaign = completeCampaignNode(updated.world, route.campaignNodeId); updated = { ...updated, world: campaign.worldState, gold: updated.gold + campaign.goldReward, reputation: updated.reputation + campaign.guildReputationReward }; }
       const beforeById = new Map(participants.map((hero) => [hero.id, hero]));
       const heroOutcomes = updated.heroes.filter((hero) => route.party.heroIds.includes(hero.id)).map((hero) => { const before = beforeById.get(hero.id); const hadInjury = before?.conditions.some((condition) => condition.conditionId === "injured") ?? false; return { heroId: hero.id, name: hero.name, raceId: hero.raceId, classId: hero.classId, gender: hero.gender, portraitVariant: hero.portraitVariant ?? 0, levelBefore: before?.level ?? hero.level, levelAfter: hero.level, currentHP: hero.currentHP, maxHP: calculateHero(hero).stats.maxHP, conditionIds: hero.conditions.map((condition) => condition.conditionId), availableSkillPoints: getAvailableClassSkillPoints(hero), fellInBattle: hero.currentHP <= 0, newlyInjured: !hadInjury && hero.conditions.some((condition) => condition.conditionId === "injured") }; });
@@ -212,7 +245,7 @@ function Game() {
   else if (tab === "Quests") screen = <QuestSelectionScreen selectQuest={(questId) => setRoute({ name: "questDetail", questId })} openCampaign={() => setRoute({ name: "campaign" })} openDungeons={() => setRoute({ name: "dungeon" })} openOperations={() => setRoute({ name: "operations" })} openRaids={() => setRoute({ name: "raids" })} />;
   else if (tab === "World") screen = <WorldMapScreen guild={guild} random={worldRandom.current} updateGuild={updateGuild} openQuest={(questId) => setRoute({ name: "questDetail", questId })} openRegion={(regionId) => setRoute({ name: "regionMap", regionId })} openCampaign={() => setRoute({ name: "campaign" })} openEvent={(event) => setRoute({ name: "event", event })} />;
   else if (tab === "Heroes") screen = <HeroesScreen openHero={(hero) => setRoute({ name: "hero", hero })} recruit={() => setRoute({ name: "recruitment" })} />;
-  else screen = <InventoryScreen openItem={(item) => setRoute({ name: "item", itemId: item.inventoryKey })} openCrafting={() => setRoute({ name: "crafting" })} openGathering={() => setRoute({ name: "gathering" })} openPotions={() => setRoute({ name: "service", title: "Potions" })} />;
+  else screen = <InventoryScreen openItem={(item) => setRoute({ name: "item", itemId: item.inventoryKey })} openCrafting={() => setRoute({ name: "crafting" })} openGathering={() => setRoute({ name: "gathering" })} openCraftingForMaterial={(materialId)=>setRoute({name:"crafting",materialFilter:materialId})} openGatheringForMaterial={(materialId)=>setRoute({name:"gathering",targetMaterialId:materialId})} openPotions={() => setRoute({ name: "service", title: "Potions" })} />;
   return <ManagementShell onOpenGems={() => setRoute({ name: "gemsSupport" })} guild={guild} active={tab} onSelect={main}>{screen}</ManagementShell>;
 }
 function ThemedFrame(){const theme=useTheme();useEffect(()=>{void initializeAdMobPrivacy().catch(()=>{ /* Ads retry when the player requests one. */ });},[]);return <SafeAreaView style={[styles.safe,{backgroundColor:theme.colors.background}]} edges={["top","right","bottom","left"]}><StatusBar barStyle={theme.statusBar} backgroundColor={theme.colors.background}/><GameDialogProvider><Game/></GameDialogProvider></SafeAreaView>}

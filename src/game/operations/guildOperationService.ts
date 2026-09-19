@@ -170,6 +170,10 @@ export function resolveGuildOperation(guild: GuildState, operationId: string, va
       completedCount: guild.guildOperations.completedCount + 1,
       nextAvailableDay: updated.currentDay + GUILD_OPERATION_COOLDOWN_DAYS,
       lastOperationId: operation.id,
+      bestSuccessesByOperationId: {
+        ...(guild.guildOperations.bestSuccessesByOperationId ?? {}),
+        [operation.id]: Math.max(guild.guildOperations.bestSuccessesByOperationId?.[operation.id] ?? 0, successes),
+      },
     },
   };
   return {
@@ -190,5 +194,5 @@ export function resolveGuildOperation(guild: GuildState, operationId: string, va
 }
 
 export function migrateGuildOperationState(state: GuildOperationState | undefined): GuildOperationState {
-  return { completedCount: state?.completedCount ?? 0, nextAvailableDay: state?.nextAvailableDay ?? 1, lastOperationId: state?.lastOperationId ?? null };
+  return { completedCount: state?.completedCount ?? 0, nextAvailableDay: state?.nextAvailableDay ?? 1, lastOperationId: state?.lastOperationId ?? null, bestSuccessesByOperationId: state?.bestSuccessesByOperationId ?? {} };
 }

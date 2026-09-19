@@ -19,11 +19,13 @@ export function HeroEquipmentPickerScreen({
   slot,
   onBack,
   onEquipped,
+  onCraft,
 }: {
   heroId: string;
   slot: EquipmentSlot;
   onBack(): void;
   onEquipped(hero: Hero): void;
+  onCraft?(): void;
 }) {
   const { guild, updateGuild } = useGuild();
   const hero = guild.heroes.find((entry) => entry.id === heroId);
@@ -71,10 +73,10 @@ export function HeroEquipmentPickerScreen({
         <ActionButton label={currentKey ? `Replace ${current?.name ?? "Current Gear"}` : "Equip Item"} onPress={()=>equip(item.inventoryKey)}/>
       </Panel>;
     })}
-    {!items.length && <EmptyState title="No compatible gear in inventory" message="Craft, buy, or earn equipment for this slot. Items will appear here automatically when this hero meets their requirements."/>}
+    {!items.length && <EmptyState title="No compatible gear in inventory" message="Craft, buy, or earn equipment for this slot. Items will appear here automatically when this hero meets their requirements." actionLabel={onCraft ? "Craft Upgrade" : undefined} onAction={onCraft}/>} {items.length > 0 && onCraft ? <View style={styles.craftMore}><ActionButton label="Craft a Better Upgrade" onPress={onCraft}/></View> : null}
   </ScrollView>;
 }
 
 const styles=StyleSheet.create({
-  content:{padding:16,paddingBottom:46},heroHeader:{alignItems:"center",flexDirection:"row",gap:10,marginBottom:12,marginTop:8},flex:{flex:1},heroName:{fontSize:23,fontWeight:"900"},subtitle:{color:colors.gold,fontSize:9,fontWeight:"900",letterSpacing:.8,marginTop:3},current:{borderColor:colors.gold,marginBottom:14},sectionLabel:{color:colors.gold,fontSize:9,fontWeight:"900",letterSpacing:1,marginBottom:7},itemRow:{alignItems:"center",flexDirection:"row",gap:10},itemCard:{gap:9,marginBottom:9},bestCard:{borderWidth:2},titleRow:{alignItems:"center",flexDirection:"row",gap:7,justifyContent:"space-between"},itemName:{color:colors.text,fontSize:15,fontWeight:"900",flex:1},meta:{color:colors.muted,fontSize:10,lineHeight:15,marginTop:2},best:{backgroundColor:"#4d3a16",borderRadius:4,color:colors.gold,fontSize:7,fontWeight:"900",overflow:"hidden",paddingHorizontal:5,paddingVertical:3},upgrade:{backgroundColor:"#173d2b",borderRadius:4,color:colors.green,fontSize:7,fontWeight:"900",overflow:"hidden",paddingHorizontal:5,paddingVertical:3},verdict:{backgroundColor:colors.panel2,borderRadius:4,color:colors.muted,fontSize:7,fontWeight:"900",overflow:"hidden",paddingHorizontal:5,paddingVertical:3},comparison:{borderTopColor:colors.border,borderTopWidth:1,paddingTop:7},compareRow:{flexDirection:"row",justifyContent:"space-between",paddingVertical:2},compareLabel:{color:colors.muted,fontSize:10},positive:{color:colors.green,fontSize:10,fontWeight:"900"},negative:{color:colors.danger,fontSize:10,fontWeight:"900"}
+  content:{padding:16,paddingBottom:46},heroHeader:{alignItems:"center",flexDirection:"row",gap:10,marginBottom:12,marginTop:8},flex:{flex:1},heroName:{fontSize:23,fontWeight:"900"},subtitle:{color:colors.gold,fontSize:9,fontWeight:"900",letterSpacing:.8,marginTop:3},current:{borderColor:colors.gold,marginBottom:14},sectionLabel:{color:colors.gold,fontSize:9,fontWeight:"900",letterSpacing:1,marginBottom:7},itemRow:{alignItems:"center",flexDirection:"row",gap:10},itemCard:{gap:9,marginBottom:9},bestCard:{borderWidth:2},titleRow:{alignItems:"center",flexDirection:"row",gap:7,justifyContent:"space-between"},itemName:{color:colors.text,fontSize:15,fontWeight:"900",flex:1},meta:{color:colors.muted,fontSize:10,lineHeight:15,marginTop:2},best:{backgroundColor:"#4d3a16",borderRadius:4,color:colors.gold,fontSize:7,fontWeight:"900",overflow:"hidden",paddingHorizontal:5,paddingVertical:3},upgrade:{backgroundColor:"#173d2b",borderRadius:4,color:colors.green,fontSize:7,fontWeight:"900",overflow:"hidden",paddingHorizontal:5,paddingVertical:3},verdict:{backgroundColor:colors.panel2,borderRadius:4,color:colors.muted,fontSize:7,fontWeight:"900",overflow:"hidden",paddingHorizontal:5,paddingVertical:3},comparison:{borderTopColor:colors.border,borderTopWidth:1,paddingTop:7},craftMore:{marginTop:8},compareRow:{flexDirection:"row",justifyContent:"space-between",paddingVertical:2},compareLabel:{color:colors.muted,fontSize:10},positive:{color:colors.green,fontSize:10,fontWeight:"900"},negative:{color:colors.danger,fontSize:10,fontWeight:"900"}
 });

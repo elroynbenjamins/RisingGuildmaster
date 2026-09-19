@@ -1,15 +1,80 @@
 import React from "react";
-import { Linking, StyleSheet, Text, View } from "react-native";
+import { Linking, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { ActionButton, Panel, SecondaryButton, colors } from "../../components/ui";
+import type { SaveSlotId, SaveSlotSummary } from "../../game/save/saveService";
 import { useTheme } from "../../theme/theme";
+import { GuildCrest } from "../../components/guild/GuildCrest";
 
-export function MainMenuScreen({ hasSave, onContinue, onNewGame }: { hasSave: boolean; onContinue(): void; onNewGame(): void }) {
-  const { showDialog } = useGameDialog();
-  const {colors:themeColors}=useTheme();
-  const start = () => hasSave ? showDialog({ title: "Start a new guild?", message: "This replaces the current local save when the new game begins.", eyebrow: "IRREVERSIBLE ORDER", tone: "danger", actions: [{ label: "Keep Save", tone: "secondary" }, { label: "New Game", tone: "danger", onPress: onNewGame }] }) : onNewGame();
-  const joinDiscord=()=>void Linking.openURL("https://discord.gg/7BWHFyFzzP").catch(()=>showDialog({title:"Could not open Discord",message:"Please visit discord.gg/7BWHFyFzzP in your browser.",eyebrow:"COMMUNITY NOTICE",tone:"danger"}));
-  return <View style={[styles.screen,{backgroundColor:themeColors.background}]}><Text style={[styles.eyebrow,{color:themeColors.gold}]}>A GUILD MANAGEMENT ROGUELITE</Text><Text style={[styles.title,{color:themeColors.text}]}>GUILDMASTER</Text><Text style={[styles.subtitle,{color:themeColors.muted}]}>Raise a banner. Build a company. Restore the Wardstones.</Text><Panel style={[styles.menu,{borderColor:themeColors.gold}]}>{hasSave ? <ActionButton label="Continue Guild" onPress={onContinue} /> : null}<SecondaryButton label="New Game" onPress={start} /><Text style={[styles.save,{color:themeColors.muted}]}>{hasSave ? "Local save found · progress autosaves" : "No local save found"}</Text></Panel><View style={styles.community}><Text style={[styles.communityText,{color:themeColors.muted}]}>Share feedback, report bugs, and follow development.</Text><SecondaryButton label="Join the Guildmaster Discord" onPress={joinDiscord}/></View></View>;
+function lastPlayedLabel(value?: string): string {
+  if (!value) return "Last played unknown";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Last played unknown";
+  return `Last played ${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
 }
 
-const styles = StyleSheet.create({ screen: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.background, padding: 24 }, eyebrow: { color: colors.gold, fontSize: 10, fontWeight: "900", letterSpacing: 2 }, title: { color: colors.text, fontSize: 42, fontWeight: "900", letterSpacing: 3, marginTop: 8 }, subtitle: { color: colors.muted, textAlign: "center", lineHeight: 20, marginTop: 8, maxWidth: 360 }, menu: { gap: 12, marginTop: 32, width: "100%", maxWidth: 380, borderColor: colors.gold }, save: { color: colors.muted, fontSize: 11, textAlign: "center" },community:{gap:8,marginTop:18,maxWidth:380,width:"100%"},communityText:{color:colors.muted,fontSize:11,textAlign:"center"} });
+export function MainMenuScreen({
+  saveSlots,
+  onContinue,
+  onNewGame,
+  onDelete,
+}: {
+  saveSlots: SaveSlotSummary[];
+  onContinue(slotId: SaveSlotId): void;
+  onNewGame(slotId: SaveSlotId): void;
+  onDelete(slotId: SaveSlotId): void;
+}) {
+  const { showDialog } = useGameDialog();
+  const {colors:themeColors}=useTheme();
+  const start=(slot:SaveSlotSummary)=>slot.exists
+    ? showDialog({title:`Overwrite Save Slot ${slot.slotId}?`,message:`${slot.guildName ?? "This guild"} will be permanently replaced in Slot ${slot.slotId}. The other slot is unaffected.`,eyebrow:"IRREVERSIBLE ORDER",tone:"danger",actions:[{label:"Keep Save",tone:"secondary"},{label:"Overwrite Slot",tone:"danger",onPress:()=>onNewGame(slot.slotId)}]})
+    : onNewGame(slot.slotId);
+  const remove=(slot:SaveSlotSummary)=>showDialog({title:`Delete Save Slot ${slot.slotId}?`,message:`${slot.guildName ?? "This guild"} and its recovery snapshot will be permanently deleted. The other slot is unaffected.`,eyebrow:"DELETE SAVE",tone:"danger",actions:[{label:"Cancel",tone:"secondary"},{label:"Delete Slot",tone:"danger",onPress:()=>onDelete(slot.slotId)}]});
+  const joinDiscord=()=>void Linking.openURL("https://discord.gg/7BWHFyFzzP").catch(()=>showDialog({title:"Could not open Discord",message:"Please visit discord.gg/7BWHFyFzzP in your browser.",eyebrow:"COMMUNITY NOTICE",tone:"danger"}));
+
+  return <ScrollView style={{backgroundColor:themeColors.background}} contentContainerStyle={styles.screen}>
+    <Text style={[styles.eyebrow,{color:themeColors.gold}]}>A GUILD MANAGEMENT ROGUELITE</Text>
+    <Text style={[styles.title,{color:themeColors.text}]}>GUILDMASTER</Text>
+    <Text style={[styles.subtitle,{color:themeColors.muted}]}>Raise a banner. Build a company. Restore the Wardstones.</Text>
+
+    <View style={styles.slots}>{([1,2] as SaveSlotId[]).map((slotId)=>{
+      const slot=saveSlots.find((entry)=>entry.slotId===slotId)??{slotId,exists:false};
+      return <Panel key={slotId} style={[styles.slot,slot.exists&&styles.occupiedSlot]}>
+        <View style={styles.slotHead}><Text style={styles.slotLabel}>SAVE SLOT {slotId}</Text><Text style={slot.exists?styles.occupied:styles.empty}>{slot.exists?"GUILD FOUND":"EMPTY"}</Text></View>
+        {slot.exists ? <>
+          <View style={styles.guildRow}><GuildCrest crestId={slot.guildCrestId ?? "crownroad"} size={44}/><View style={styles.flex}><Text style={styles.guildName}>{slot.guildName}</Text><Text style={styles.meta}>Day {slot.currentDay} · {String(slot.difficultyId).replace(/_/g," ")} · {slot.heroCount} heroes</Text></View></View>
+          <Text style={styles.lastPlayed}>{lastPlayedLabel(slot.lastPlayedAt)}</Text>
+          <ActionButton label="Continue Guild" onPress={()=>onContinue(slotId)}/>
+          <View style={styles.slotActions}><View style={styles.flex}><SecondaryButton label="New Guild Here" onPress={()=>start(slot)}/></View><View style={styles.flex}><SecondaryButton label="Delete" onPress={()=>remove(slot)}/></View></View>
+        </> : <>
+          <Text style={styles.emptyCopy}>Start a separate guild without replacing the other save slot.</Text>
+          <ActionButton label="Found New Guild" onPress={()=>start(slot)}/>
+        </>}
+      </Panel>;
+    })}</View>
+
+    <View style={styles.community}><Text style={[styles.communityText,{color:themeColors.muted}]}>Both guilds autosave independently and each keeps its own recovery snapshot.</Text><SecondaryButton label="Join the Guildmaster Discord" onPress={joinDiscord}/></View>
+  </ScrollView>;
+}
+
+const styles=StyleSheet.create({
+  screen:{alignItems:"center",backgroundColor:colors.background,flexGrow:1,padding:20,paddingBottom:40,paddingTop:44},
+  eyebrow:{color:colors.gold,fontSize:10,fontWeight:"900",letterSpacing:2},
+  title:{color:colors.text,fontSize:40,fontWeight:"900",letterSpacing:3,marginTop:8},
+  subtitle:{color:colors.muted,lineHeight:20,marginTop:8,maxWidth:360,textAlign:"center"},
+  slots:{gap:10,marginTop:26,maxWidth:430,width:"100%"},
+  slot:{gap:9},
+  occupiedSlot:{borderColor:colors.gold},
+  slotHead:{alignItems:"center",flexDirection:"row",justifyContent:"space-between"},
+  slotLabel:{color:colors.gold,fontSize:9,fontWeight:"900",letterSpacing:1.2},
+  occupied:{color:colors.green,fontSize:8,fontWeight:"900"},
+  empty:{color:colors.muted,fontSize:8,fontWeight:"900"},
+  guildRow:{alignItems:"center",flexDirection:"row",gap:9},guildName:{color:colors.text,fontSize:20,fontWeight:"900"},
+  meta:{color:colors.gold,fontSize:10,fontWeight:"800",textTransform:"capitalize"},
+  lastPlayed:{color:colors.muted,fontSize:9},
+  emptyCopy:{color:colors.muted,fontSize:11,lineHeight:16},
+  slotActions:{flexDirection:"row",gap:7},
+  flex:{flex:1},
+  community:{gap:8,marginTop:18,maxWidth:430,width:"100%"},
+  communityText:{color:colors.muted,fontSize:10,lineHeight:15,textAlign:"center"},
+});

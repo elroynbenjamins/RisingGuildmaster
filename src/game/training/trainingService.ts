@@ -1,6 +1,5 @@
 import { TRAINING_PROGRAMS } from "../../data/training/trainingPrograms";
 import { TRAINING_GROUND_CONFIG } from "../../config/trainingConfig";
-import type { AttributeKey } from "../attributes/types";
 import type { GuildState } from "../guild/types";
 import { collectHeroModifiers } from "../heroes/heroCalculator";
 import type { Hero } from "../heroes/types";
@@ -13,7 +12,7 @@ import { appendHeroHistoryEvent } from "../heroes/heroHistoryService";
 
 export function trainingCapacity(guild: GuildState): number { return TRAINING_GROUND_CONFIG.capacityByLevel[guild.trainingGround.level] ?? 1; }
 
-export interface TrainingProgressionLimit { campaignCap: number; rosterCap: number; levelCap: number; developmentSessionsUsed: number; developmentSessionsMax: number }
+export interface TrainingProgressionLimit { campaignCap: number; rosterCap: number; levelCap: number }
 
 export function getCampaignTrainingLevelCap(guild: GuildState): number {
   const completed = new Set(guild.world.completedCampaignNodeIds);
@@ -27,8 +26,7 @@ export function getTrainingProgressionLimit(guild: GuildState, hero: Hero): Trai
   const peers = guild.heroes.filter((entry) => entry.id !== hero.id && entry.isAvailable && entry.currentHP > 0).sort((a, b) => b.level - a.level).slice(0, 4);
   const rosterCap = peers.length ? Math.max(hero.level, Math.floor(peers.reduce((sum, entry) => sum + entry.level, 0) / peers.length) - 1) : hero.level;
   const campaignCap = getCampaignTrainingLevelCap(guild);
-  const developmentSessionsUsed = hero.focusedTrainingLevel === hero.level ? hero.focusedTrainingSessions ?? 0 : 0;
-  return { campaignCap, rosterCap, levelCap: Math.max(hero.level, Math.min(campaignCap, rosterCap)), developmentSessionsUsed, developmentSessionsMax: TRAINING_GROUND_CONFIG.maxDevelopmentSessionsPerHeroLevel };
+  return { campaignCap, rosterCap, levelCap: Math.max(hero.level, Math.min(campaignCap, rosterCap)) };
 }
 
 function maxXpBeforeLevelCap(hero: Hero, levelCap: number): number {
@@ -42,15 +40,15 @@ export function grantTrainingXp(hero: Hero, amount: number, levelCap: number): H
   return grantHeroXp(hero, Math.min(Math.max(0, Math.round(amount)), maxXpBeforeLevelCap(hero, levelCap)));
 }
 
-export function calculateTrainingQuote(hero: Hero, programId: TrainingProgramId, guild?: GuildState): { goldCost: number; xpReward: number; growthReward: number; levelCap?: number; developmentSessionsUsed?: number } {
+export function calculateTrainingQuote(hero: Hero, programId: TrainingProgramId, guild?: GuildState): { goldCost: number; xpReward: number; levelCap?: number } {
   const program = TRAINING_PROGRAMS[programId]; const modifiers = collectHeroModifiers(hero); const context = { currentHP: hero.currentHP, maxHP: hero.currentHP };
   const costMultiplier = Math.max(.25, applyModifiers(1, "trainingCost", modifiers, context));
   const xpMultiplier = Math.max(.1, applyModifiers(1, "trainingXp", modifiers, context));
   const rawXp = Math.max(1, Math.round(program.baseXp * potentialMultiplier(hero.potential) * xpMultiplier));
   const limit = guild ? getTrainingProgressionLimit(guild, hero) : undefined;
-  return { goldCost: Math.max(1, Math.round(program.baseGoldCost * costMultiplier)), xpReward: limit ? Math.min(rawXp, maxXpBeforeLevelCap(hero, limit.levelCap)) : rawXp, growthReward: 0, levelCap: limit?.levelCap, developmentSessionsUsed: limit?.developmentSessionsUsed };
+  return { goldCost: Math.max(1, Math.round(program.baseGoldCost * costMultiplier)), xpReward: limit ? Math.min(rawXp, maxXpBeforeLevelCap(hero, limit.levelCap)) : rawXp, levelCap: limit?.levelCap };
 }
-export function startHeroTraining(guild: GuildState, heroId: string, programId: TrainingProgramId, focusedAttribute?: AttributeKey): GuildState {
+export function startHeroTraining(guild: GuildState, heroId: string, programId: TrainingProgramId): GuildState {
   const hero = guild.heroes.find((item) => item.id === heroId); const program = TRAINING_PROGRAMS[programId];
   if (!hero || !program) throw new Error("Training selection is unavailable");
   if (guild.trainingGround.sessions.length >= trainingCapacity(guild)) throw new Error("Every training slot is occupied");
@@ -58,10 +56,9 @@ export function startHeroTraining(guild: GuildState, heroId: string, programId: 
   if (!hero.isAvailable || hero.currentHP <= 0) throw new Error("Hero is not available for training");
   if (guild.trainingGround.sessions.some((session) => session.heroId === heroId)) throw new Error("Hero is already training");
   const quote = calculateTrainingQuote(hero, programId, guild); if (guild.gold < quote.goldCost) throw new Error("Not enough gold");
-  if (quote.xpReward <= 0 && quote.growthReward <= 0) throw new Error(`Training cannot advance this hero beyond Level ${quote.levelCap}`);
-  const consumesDevelopment = quote.growthReward > 0;
-  const session: TrainingSession = { id: `training-${guild.currentDay}-${heroId}-${guild.trainingGround.completedTrainingCount}`, heroId, programId, startDay: guild.currentDay, completionDay: guild.currentDay + program.durationDays, goldCost: quote.goldCost, xpReward: quote.xpReward, focusedAttribute, growthReward: quote.growthReward, levelCap: quote.levelCap, developmentLevel: consumesDevelopment ? hero.level : undefined };
-  return { ...guild, gold: guild.gold - quote.goldCost, heroes: guild.heroes.map((item) => item.id === heroId ? { ...item, isAvailable: false, focusedTrainingLevel: consumesDevelopment ? hero.level : item.focusedTrainingLevel, focusedTrainingSessions: consumesDevelopment ? (hero.focusedTrainingLevel === hero.level ? hero.focusedTrainingSessions ?? 0 : 0) + 1 : item.focusedTrainingSessions } : item), trainingGround: { ...guild.trainingGround, sessions: [...guild.trainingGround.sessions, session] } };
+  if (quote.xpReward <= 0) throw new Error(`Training cannot advance this hero beyond Level ${quote.levelCap}`);
+  const session: TrainingSession = { id: `training-${guild.currentDay}-${heroId}-${guild.trainingGround.completedTrainingCount}`, heroId, programId, startDay: guild.currentDay, completionDay: guild.currentDay + program.durationDays, goldCost: quote.goldCost, xpReward: quote.xpReward, levelCap: quote.levelCap };
+  return { ...guild, gold: guild.gold - quote.goldCost, heroes: guild.heroes.map((item) => item.id === heroId ? { ...item, isAvailable: false } : item), trainingGround: { ...guild.trainingGround, sessions: [...guild.trainingGround.sessions, session] } };
 }
 
 export function resolveTrainingGroundDay(guild: GuildState): { guild: GuildState; completedHeroNames: string[]; upgraded: boolean } {

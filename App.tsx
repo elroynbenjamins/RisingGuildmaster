@@ -56,11 +56,17 @@ import { ThemeProvider, useTheme } from "./src/theme/theme";
 import { initializeAdMobPrivacy } from "./src/game/monetization/admobRewardedAdProvider";
 
 import { pendingDayMilestone } from "./src/game/monetization/dayMilestoneAdService";
+import type { SaveSlotId } from "./src/game/save/saveService";
 import { presentPendingDayMilestoneAd } from "./src/game/monetization/dayMilestoneAdPresenter";
 type Route = { name: "gemsSupport" } | { name: "main"; tab: MainTab } | { name: "settings" } | { name: "contentUnlock" } | { name: "training" } | { name: "operations" } | { name: "raids" } | { name: "legacy" } | { name: "dungeon" } | { name: "dungeonCombat" } | { name: "regionMap"; regionId: string } | { name: "guildmasterSkills" } | { name: "finances" } | { name: "recruitment" } | { name: "candidate"; candidateId: string } | { name: "service"; title: string } | { name: "temple" } | { name: "monsterManual" } | { name: "heroCodex" } | { name: "skillCodex" } | { name: "loreJournal" } | { name: "management" } | { name: "crafting" } | { name: "gathering" } | { name: "hero"; hero: Hero } | { name: "heroEquipmentPicker"; heroId: string; slot: EquipmentSlot } | { name: "skills"; hero: Hero } | { name: "subclass"; hero: Hero } | { name: "questDetail"; questId: string } | { name: "questBriefing"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "party"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "exploration"; questId: string; party: Party; campaignNodeId?: string } | { name: "decision"; questId: string; party: Party; campaignNodeId?: string } | { name: "combat"; questId: string; party: Party; campaignNodeId?: string; combatSetup?: QuestCombatSetup } | { name: "questResult"; summary: QuestResultSummary } | { name: "campaign" } | { name: "event"; event: WorldEventDefinition; back?: "world" | "campaign" | "quest"; questId?: string } | { name: "item"; itemId: string };
 
 function Game() {
-  const [route, setRoute] = useState<Route>({ name: "main", tab: "Guild" }); const [showNewGameSetup, setShowNewGameSetup] = useState(false); const worldRandom = useRef(createSeededRandom(randomSeed())); const { guild, updateGuild, isHydrated, hasSave, gameStarted, startNewGame, continueGame } = useGuild(); const main = (tab: MainTab) => setRoute({ name: "main", tab });
+  const [route, setRoute] = useState<Route>({ name: "main", tab: "Guild" });
+  const [showNewGameSetup, setShowNewGameSetup] = useState(false);
+  const [newGameSlotId, setNewGameSlotId] = useState<SaveSlotId>(1);
+  const worldRandom = useRef(createSeededRandom(randomSeed()));
+  const { guild, updateGuild, isHydrated, gameStarted, startNewGame, continueGame, deleteSaveSlot, saveSlots } = useGuild();
+  const main = (tab: MainTab) => setRoute({ name: "main", tab });
   const { showDialog, isDialogOpen } = useGameDialog();
   const currentGuildRef = useRef(guild); currentGuildRef.current = guild;
   const promptedDayRef = useRef<string | null>(null);
@@ -124,7 +130,14 @@ function Game() {
     presentPendingDayMilestoneAd(guild, updateGuild, showDialog, () => currentGuildRef.current);
   }, [guild, gameStarted, isHydrated, route.name, isDialogOpen, updateGuild, showDialog]);
   if (!isHydrated) return <View style={styles.loading}><Text style={styles.loadingTitle}>GUILDMASTER</Text><Text style={styles.loadingText}>Loading guild save…</Text></View>;
-  if (!gameStarted) return showNewGameSetup ? <NewGameSetupScreen onBack={() => setShowNewGameSetup(false)} onStart={(difficultyId) => { startNewGame(difficultyId); setShowNewGameSetup(false); }} /> : <MainMenuScreen hasSave={hasSave} onContinue={continueGame} onNewGame={() => setShowNewGameSetup(true)} />;
+  if (!gameStarted) return showNewGameSetup
+    ? <NewGameSetupScreen onBack={() => setShowNewGameSetup(false)} onStart={(difficultyId) => { startNewGame(newGameSlotId, difficultyId); setShowNewGameSetup(false); }} />
+    : <MainMenuScreen
+        saveSlots={saveSlots}
+        onContinue={(slotId) => { void continueGame(slotId).then((error) => { if (error) showDialog({ title: "Could not load guild", message: error, tone: "danger" }); }); }}
+        onNewGame={(slotId) => { setNewGameSlotId(slotId); setShowNewGameSetup(true); }}
+        onDelete={(slotId) => { void deleteSaveSlot(slotId).catch((error) => showDialog({ title: "Could not delete save", message: error instanceof Error ? error.message : "Delete failed", tone: "danger" })); }}
+      />;
   if (guild.tutorial.active && guild.tutorial.step === "welcome") return <TutorialScreen onBegin={() => { updateGuild(beginTutorial(guild)); setRoute({ name: "recruitment" }); }} onSkip={() => updateGuild(skipTutorial(guild))} />;
   if (isHydrated && route.name === "dungeon") return <DungeonScreen guild={guild} random={worldRandom.current} updateGuild={updateGuild} onBack={() => main("Quests")} startCombat={() => setRoute({ name: "dungeonCombat" })}/>;
   if (isHydrated && route.name === "dungeonCombat") {

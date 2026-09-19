@@ -24,27 +24,55 @@ import { potentialMultiplier } from "../progression/potential";
 import { applyCombatEquipmentWear } from "../equipment/equipmentDurabilityService";
 import { getGuildRank, getQuestReputationReward } from "../renown/guildLegacyService";
 
-export function getLevelAppropriateQuestLootIds(itemIds: readonly string[], heroes: readonly Hero[]): string[] {
+export function getLevelAppropriateQuestLootIds(itemIds: readonly string[], heroes: readonly Hero[], ownedInventoryIds: readonly string[] = []): string[] {
   if (!itemIds.length) return [];
   const highestHeroLevel = Math.max(1, ...heroes.map((hero) => hero.level));
   const preferredFloor = highestHeroLevel >= 2 && highestHeroLevel <= 4 ? 2 : Math.max(1, highestHeroLevel - 2);
+  const classIds = new Set(heroes.map((hero) => hero.classId));
+  const ownedIds = new Set([...ownedInventoryIds, ...heroes.flatMap((hero) => Object.values(hero.equipment).filter((id): id is string => Boolean(id)))]);
+  const rarityRank = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4 } as const;
   const isEligible = (itemId: string, minimumLevel: number) => {
     const item = EQUIPMENT[itemId];
     return !item || (item.levelRequirement >= minimumLevel && item.levelRequirement <= highestHeroLevel);
   };
+  const isUsable = (itemId: string) => {
+    const item = EQUIPMENT[itemId];
+    return !item || !item.classRestrictions.length || item.classRestrictions.some((classId) => classIds.has(classId));
+  };
+  const score = (itemId: string): number => {
+    const item = EQUIPMENT[itemId]; if (!item) return 0;
+    const usableHeroes = heroes.filter((hero) => !item.classRestrictions.length || item.classRestrictions.includes(hero.classId));
+    if (!usableHeroes.length) return -100;
+    let value = ownedIds.has(itemId) ? -3 : 1;
+    for (const hero of usableHeroes) {
+      const equippedId = hero.equipment[item.slot];
+      if (!equippedId) { value += 4; continue; }
+      const equipped = EQUIPMENT[equippedId];
+      if (!equipped) { value += 2; continue; }
+      if (equipped.levelRequirement < item.levelRequirement) value += 3;
+      else if (equipped.levelRequirement === item.levelRequirement && rarityRank[equipped.rarity] < rarityRank[item.rarity]) value += 2;
+    }
+    return value;
+  };
+  const bestFit = (ids: readonly string[]): string[] => {
+    const usable = ids.filter(isUsable); if (!usable.length) return [];
+    const scored = usable.map((id) => ({ id, score: score(id) }));
+    const best = Math.max(...scored.map((entry) => entry.score));
+    return scored.filter((entry) => entry.score >= best - 1).map((entry) => entry.id);
+  };
+
   const preferred = itemIds.filter((itemId) => isEligible(itemId, preferredFloor));
-  if (preferred.length) return preferred;
-  const classIds = new Set(heroes.map((hero) => hero.classId));
+  const preferredFit = bestFit(preferred); if (preferredFit.length) return preferredFit;
   const isSafeGenericFallback = (item: (typeof EQUIPMENT)[string]) => (item.rarity === "common" || item.rarity === "uncommon") && item.specialEffectIds.length === 0 && (!item.classRestrictions.length || item.classRestrictions.some((classId) => classIds.has(classId)));
   const levelMatchedFallback = Object.values(EQUIPMENT)
     .filter((item) => item.levelRequirement >= preferredFloor && item.levelRequirement <= highestHeroLevel && isSafeGenericFallback(item))
     .map((item) => item.id);
-  if (levelMatchedFallback.length) return levelMatchedFallback;
+  const fallbackFit = bestFit(levelMatchedFallback); if (fallbackFit.length) return fallbackFit;
   const eligible = itemIds.filter((itemId) => isEligible(itemId, 1));
-  if (eligible.length) return eligible;
-  return Object.values(EQUIPMENT)
+  const eligibleFit = bestFit(eligible); if (eligibleFit.length) return eligibleFit;
+  return bestFit(Object.values(EQUIPMENT)
     .filter((item) => item.levelRequirement <= highestHeroLevel && isSafeGenericFallback(item))
-    .map((item) => item.id);
+    .map((item) => item.id));
 }
 
 export function isCombatVictory(enemies: readonly { isAlive: boolean }[]): boolean { return enemies.every((enemy) => !enemy.isAlive); }
@@ -111,7 +139,7 @@ export function resolveQuestVictory(activeQuest: ActiveQuest, party: Party, guil
     const persisted = persistHeroOutcome(hero, instance, xp, random, guild); const newInjury = persisted.conditions.find((condition) => isInjuryCondition(condition.conditionId) && !hero.conditions.some((old) => old.conditionId === condition.conditionId)); const newlyInjured = Boolean(newInjury);
     return recordQuestHistory(persisted, { day: guild.currentDay, questId: quest.id, questName: quest.name, victory: true, xpEarned: instance.isAlive && instance.currentHP > 0 ? xp : Math.round(xp * .5), fellInBattle: !instance.isAlive || instance.currentHP <= 0, newlyInjured, injuryConditionId: newInjury?.conditionId, previousLevel: hero.level });
   });
-  const lootTable = QUEST_LOOT_TABLES[quest.lootTableId]; const lootCandidates = lootTable ? getLevelAppropriateQuestLootIds(lootTable.itemIds, guild.heroes) : []; const lootId = lootCandidates.length ? random.pick(lootCandidates) : null; const collectedMaterials: Partial<Record<MaterialId, number>> = {};
+  const lootTable = QUEST_LOOT_TABLES[quest.lootTableId]; const lootCandidates = lootTable ? getLevelAppropriateQuestLootIds(lootTable.itemIds, partyHeroes, guild.inventory) : []; const lootId = lootCandidates.length ? random.pick(lootCandidates) : null; const collectedMaterials: Partial<Record<MaterialId, number>> = {};
   for (const drop of lootTable?.materialDrops ?? []) { const amount = random.int(drop.quantityMin, drop.quantityMax); if (amount > 0) collectedMaterials[drop.materialId] = amount; }
   const huntRewardProgress = { ...guild.huntRewardProgress };
   if (quest.huntReward) {

@@ -6,6 +6,8 @@ import type { ClassId, RaceId } from "../heroes/types";
 import { hasGuildmasterSkill } from "../guildmaster/guildmasterProgression";
 import { generateRecruitmentCandidate } from "./candidateGenerator";
 import { scoutCandidate } from "./scoutingService";
+import { getRecruitmentLevelRange } from "./recruitmentLevelService";
+import type { RecruitmentArchetype } from "./recruitmentTypes";
 
 export function regionalScoutDaysRemaining(guild: GuildState): number {
   const mission = guild.recruitment.regionalScoutMission;
@@ -108,8 +110,10 @@ export function collectRegionalScoutReport(guild: GuildState): GuildState {
   const remaining = regionalScoutDaysRemaining(guild);
   if (remaining > 0) throw new Error(`Scout returns in ${remaining} day(s)`);
   const random = createSeededRandom(mission.resolutionSeed);
+  const archetypes:RecruitmentArchetype[]=["prospect","standard","veteran","elite"];
+  const levelRanges=Object.fromEntries(archetypes.map((archetype)=>[archetype,getRecruitmentLevelRange(guild,archetype)]));
   const report = Array.from({ length: RECRUITMENT_CONFIG.regionalScoutCandidateCount }, () => {
-    const generated = generateRecruitmentCandidate(random, guild.currentDay, guild.reputation, undefined, mission.raceId, mission.classId ?? undefined);
+    const generated = generateRecruitmentCandidate(random, guild.currentDay, guild.reputation, undefined, mission.raceId, mission.classId ?? undefined, undefined, undefined, levelRanges);
     return scoutCandidate({
       ...generated,
       source: "regional_scout",

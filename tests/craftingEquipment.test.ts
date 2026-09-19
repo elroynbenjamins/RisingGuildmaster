@@ -15,6 +15,7 @@ describe("artisan equipment production", () => {
     expect(crafted.inventory).toContain("iron-longsword");
     expect(crafted.gold).toBe(guild.gold - 80);
     expect(crafted.materials).toMatchObject({ iron_ore: 0, coal: 0, oak_timber: 0 });
+    expect(crafted.metrics.craftedItemsCount).toBe(1);
     expect(guild.inventory).toEqual([]);
   });
 

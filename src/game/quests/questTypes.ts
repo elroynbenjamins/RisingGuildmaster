@@ -21,9 +21,9 @@ export interface EncounterEnemyGroup {
 
 export type EncounterObjectiveDefinition =
   | { type: "eliminate_all"; label?: string }
-  | { type: "eliminate_targets"; enemyDefinitionIds: string[]; label?: string }
+  | { type: "eliminate_targets"; enemyDefinitionIds: readonly string[]; label?: string }
   | { type: "survive_rounds"; rounds: number; label?: string; allowEliminationVictory?: boolean }
-  | { type: "reach_zone"; positions: GridPosition[]; requiredHeroes?: number; label?: string };
+  | { type: "reach_zone"; positions: readonly GridPosition[]; requiredHeroes?: number; label?: string };
 
 export interface EncounterDefinition {
   id: string;

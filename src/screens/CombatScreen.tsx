@@ -23,6 +23,7 @@ import { getAreaPositions } from "../game/combat/grid/areaCalculator";
 import type { GridPosition } from "../game/combat/grid/gridTypes";
 import { positionKey } from "../game/combat/grid/gridTypes";
 import { findShortestPath, getReachablePositions } from "../game/combat/grid/pathfinding";
+import { getElevationAttackRollModifier } from "../game/combat/grid/elevationService";
 import { getHeroSkillAvailability } from "../game/combat/heroActionService";
 import { recoverBetweenEncounters } from "../game/combat/resourceService";
 import { isPositionInSkillRange } from "../game/combat/skillRangeService";
@@ -75,6 +76,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
   const inspectedUnit = inspectedCombatantId ? units.find((unit) => unit.combatantId === inspectedCombatantId) : undefined;
   const selectedTarget = selectedTargetId ? units.find((unit) => unit.combatantId === selectedTargetId) : undefined;
   const attackPreview = current && selectedTarget && selectedSkill ? getCombatAttackPreview(current.unit, selectedTarget, selectedSkill) : null;
+  const elevationPreview = current && selectedTarget && selectedSkill ? getElevationAttackRollModifier(state.board, current.unit.position, selectedTarget.position, getHeroSkillRange(current.hero, selectedSkill)) : 0;
   const encounteredEnemyKey = encounteredEnemyIds.join("|");
   const raid = findRaidByQuestId(questId); const raidBoss = raid ? state.enemies.find((entry) => entry.instance.enemyDefinitionId === raid.bossEnemyDefinitionId && entry.instance.isAlive) : undefined; const raidPhase = raid && raidBoss ? getActiveRaidPhase(raid,raidBoss.instance.currentHP,raidBoss.instance.maxHP) : undefined;
   const objectiveDescription = describeEncounterObjective(state.objective);
@@ -163,7 +165,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
       <SectionTitle>SKILL DETAILS</SectionTitle><SkillBar items={skillItems} selectedId={selectedSkillId} onInspect={setInspectedSkillId} onSelect={selectSkill} />
       {inspectedSkill && <SkillInfoPanel skill={inspectedSkill} />}
       <SectionTitle>POTIONS</SectionTitle><View style={styles.potionRow}>{Object.values(POTIONS).map((potion) => <View key={potion.id} style={[styles.potion, { alignItems: "center", flexDirection: "row", gap: 7 }]}><PotionIcon potionId={potion.id} size={42}/><View style={{ flex: 1 }}><ActionButton label={`${potion.name} (${guild.potions[potion.id]})`} disabled={guild.potions[potion.id] < 1 || state.actions.combatActionUsed} onPress={() => usePotion(potion.id)} /></View></View>)}</View>
-      {attackPreview&&selectedTarget&&selectedSkill?.damageType&&<Panel style={styles.previewPanel}><Text style={styles.previewTitle}>TARGET PREVIEW · {labels[selectedTarget.combatantId]}</Text><View style={styles.previewRow}><DamageTypeBadge type={selectedSkill.damageType}/><Text style={styles.previewText}>{Math.round(attackPreview.hitChance*100)}% HIT · {attackPreview.normalDamage} DMG · {attackPreview.criticalDamage} CRIT</Text></View><Text style={styles.previewDetail}>Attack +{attackPreview.attackBonus} vs {selectedSkill.damageType==="magic"?"MDS":"AC"} {attackPreview.targetDefense} · Best pressure: {attackPreview.favoredDamageType.toUpperCase()}</Text></Panel>}
+      {attackPreview&&selectedTarget&&selectedSkill?.damageType&&<Panel style={styles.previewPanel}><Text style={styles.previewTitle}>TARGET PREVIEW · {labels[selectedTarget.combatantId]}</Text><View style={styles.previewRow}><DamageTypeBadge type={selectedSkill.damageType}/><Text style={styles.previewText}>{Math.round(attackPreview.hitChance*100)}% HIT · {attackPreview.normalDamage} DMG · {attackPreview.criticalDamage} CRIT</Text></View><Text style={styles.previewDetail}>Attack +{attackPreview.attackBonus} vs {selectedSkill.damageType==="magic"?"MDS":"AC"} {attackPreview.targetDefense} · Best pressure: {attackPreview.favoredDamageType.toUpperCase()}{elevationPreview ? ` · Elevation ${elevationPreview > 0 ? "+" : ""}${elevationPreview}` : ""}</Text></Panel>}
       {selectedPosition && selectedSkillId && <ActionButton label={`Confirm ${HERO_SKILLS[selectedSkillId]!.name}`} onPress={confirmSkill} />}
       <Text style={styles.hint}>{mode === "skill" ? "Your selected skill stays queued after movement. Double tap an empty teal tile to move, then choose a highlighted target." : state.actions.movementUsed ? "Movement used. Choose a skill or end the turn." : "Teal tiles are always reachable. Double tap one to move, or choose a skill."}</Text></>}
     {error && <Text style={styles.error}>{error}</Text>}

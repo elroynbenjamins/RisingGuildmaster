@@ -38,6 +38,7 @@ export interface RecruitmentCandidate {
   sourceLocationName: string | null;
 }
 
+export type FormerMemberDepartureKind = "contract_end" | "retired";
 export interface FormerGuildMember {
   hero: Hero;
   departedDay: number;
@@ -45,6 +46,7 @@ export interface FormerGuildMember {
   lastWeeklySalary: number;
   rehireCount: number;
   relationships: HeroRelationship[];
+  departureKind: FormerMemberDepartureKind;
 }
 export interface RecruitmentState {
   candidateIds: string[];

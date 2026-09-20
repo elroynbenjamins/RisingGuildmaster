@@ -50,6 +50,7 @@ function processContractDepartures(guild: GuildState, day: number): { guild: Gui
       lastWeeklySalary: contract.weeklySalary,
       rehireCount: hero.history.events.filter((event) => event.tags?.includes("returning_hero")).length,
       relationships: guild.relationships.filter((relationship) => relationship.heroIdA === hero.id || relationship.heroIdB === hero.id),
+      departureKind: "contract_end" as const,
     };
   });
   const existingFormer = guild.recruitment.formerMembers.filter((member) => !departing.has(member.hero.id));
@@ -115,6 +116,11 @@ function resolveSingleDay(guild: GuildState): { guild: GuildState; resolution: G
   updated = purgeExpiredCandidates(updated);
   const payroll = processPayroll(updated, day); updated = payroll.guild; events.push(...payroll.events);
   const departures = processContractDepartures(updated, day); updated = departures.guild; events.push(...departures.events);
+  for (const member of updated.recruitment.formerMembers) {
+    if (member.departureKind !== "retired" && member.eligibleReturnDay === day) {
+      events.push({ type: "former_member_return", text: `${member.hero.name} sent word that they would consider returning to the guild.` });
+    }
+  }
 
   for (const hero of updated.heroes) {
     const before = priorConditions.get(hero.id) ?? [];

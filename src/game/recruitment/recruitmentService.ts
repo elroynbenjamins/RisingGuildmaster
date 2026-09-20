@@ -14,6 +14,7 @@ import { getDifficulty } from "../../data/difficulty/difficulties";
 import { getTavernRecruitmentBonuses } from "../economy/tavernService";
 import { getRecruitmentLevelRange } from "./recruitmentLevelService";
 import type { RecruitmentArchetype } from "./recruitmentTypes";
+import { getRecruitmentRecommendation } from "./recruitmentRecommendationService";
 
 function withCandidates(state: RecruitmentState, candidates: RecruitmentCandidate[]): RecruitmentState { return { ...state, candidates, candidateIds: candidates.map((candidate) => candidate.candidateId) }; }
 const unlockedPool = (guild: GuildState, random: RandomSource) => {
@@ -29,7 +30,34 @@ export function freeRefreshRecruitment(guild: GuildState, random: RandomSource):
 export function tutorialRefreshRecruitment(guild: GuildState, random: RandomSource): GuildState { const reserved = guild.recruitment.candidates.filter((candidate) => candidate.candidateId === guild.recruitment.reservedCandidateId); const generated = unlockedPool(guild, random); return { ...guild, recruitment: withCandidates(guild.recruitment, [...reserved, ...generated]) }; }
 export function reserveCandidate(guild: GuildState, candidateId: string): GuildState { if (guild.recruitment.reservedCandidateId && (guild.recruitment.reservationExpiresAtDay ?? 0) > guild.currentDay) throw new Error("Only one candidate may be reserved"); if (!guild.recruitment.candidateIds.includes(candidateId)) throw new Error("Candidate is no longer available"); if (guild.gold < RECRUITMENT_CONFIG.reservationCost) throw new Error("Insufficient Gold"); return { ...guild, gold: guild.gold - RECRUITMENT_CONFIG.reservationCost, recruitment: { ...guild.recruitment, reservedCandidateId: candidateId, reservationExpiresAtDay: guild.currentDay + RECRUITMENT_CONFIG.reservationDays } }; }
 export function scoutRecruitmentCandidate(guild: GuildState, candidateId: string): GuildState { if (!guild.guildmaster.unlockedSkillIds.includes("scouting_basics")) throw new Error("Unlock Scouting Desk in the Guildmaster skill tree"); const candidate = guild.recruitment.candidates.find((item) => item.candidateId === candidateId); if (!candidate) throw new Error("Candidate is no longer available"); const nextLevel = (candidate.scoutingLevel + 1) as ScoutingLevel; const cost = scoutingCost(nextLevel); if (guild.gold < cost) throw new Error("Insufficient Gold"); const updated = scoutCandidate(candidate); return { ...guild, gold: guild.gold - cost, recruitment: withCandidates(guild.recruitment, guild.recruitment.candidates.map((item) => item.candidateId === candidateId ? updated : item)) }; }
-export function recruitCandidate(guild: GuildState, candidateId: string): GuildState { const candidate = guild.recruitment.candidates.find((item) => item.candidateId === candidateId); if (!candidate) throw new Error("Candidate is no longer available"); const errors = validateCandidateRecruitment(guild, candidate); if (errors.length) throw new Error(errors.join(". ")); const baseHero = { ...candidate.heroPreview, potential: candidate.truePotential, recruitmentCost: candidate.recruitmentFee, salary: candidate.weeklySalary, isAvailable: true, history: { ...candidate.heroPreview.history, importantEvents: [...candidate.heroPreview.history.importantEvents, `Joined the guild on Day ${guild.currentDay}.`] } }; const hero = appendHeroHistoryEvent(baseHero, { day: guild.currentDay, type: "recruitment", outcome: "positive", title: "Joined the guild", description: `${baseHero.name} signed a ${candidate.contractLengthWeeks}-week contract for ${candidate.recruitmentFee} gold.`, tags: [candidate.source, candidate.archetype] }); const candidates = guild.recruitment.candidates.filter((item) => item.candidateId !== candidateId); return { ...guild, gold: guild.gold - candidate.recruitmentFee, heroes: [...guild.heroes, hero], heroContracts: [...guild.heroContracts, createHeroContract(hero, candidate.weeklySalary, candidate.contractLengthWeeks, guild.currentDay)], recruitment: { ...withCandidates(guild.recruitment, candidates), reservedCandidateId: guild.recruitment.reservedCandidateId === candidateId ? null : guild.recruitment.reservedCandidateId, reservationExpiresAtDay: guild.recruitment.reservedCandidateId === candidateId ? null : guild.recruitment.reservationExpiresAtDay } }; }
+export function recruitCandidate(guild: GuildState, candidateId: string): GuildState {
+  const candidate = guild.recruitment.candidates.find((item) => item.candidateId === candidateId);
+  if (!candidate) throw new Error("Candidate is no longer available");
+  const errors = validateCandidateRecruitment(guild, candidate);
+  if (errors.length) throw new Error(errors.join(". "));
+  const recommendation = getRecruitmentRecommendation(guild, candidate);
+  const baseHero = { ...candidate.heroPreview, potential: candidate.truePotential, recruitmentCost: candidate.recruitmentFee, salary: candidate.weeklySalary, isAvailable: true, history: { ...candidate.heroPreview.history, importantEvents: [...candidate.heroPreview.history.importantEvents, `Joined the guild on Day ${guild.currentDay}.`] } };
+  const hero = appendHeroHistoryEvent(baseHero, {
+    day: guild.currentDay,
+    type: "recruitment",
+    outcome: "positive",
+    title: "Joined the guild",
+    description: `${baseHero.name} signed a ${candidate.contractLengthWeeks}-week contract for ${candidate.recruitmentFee} gold.${recommendation ? ` ${recommendation.heroName} recommended the recruit after recognizing ${recommendation.reason}.` : ""}`,
+    relatedHeroIds: recommendation ? [recommendation.heroId] : undefined,
+    tags: [candidate.source, candidate.archetype, ...(recommendation ? ["hero_recommendation"] : [])],
+  });
+  const heroes = recommendation ? guild.heroes.map((entry) => entry.id === recommendation.heroId ? appendHeroHistoryEvent(entry, {
+    day: guild.currentDay,
+    type: "recruitment",
+    outcome: "positive",
+    title: `Recommended ${hero.name}`,
+    description: `${entry.name} vouched for ${hero.name} because of ${recommendation.reason}.`,
+    relatedHeroIds: [hero.id],
+    tags: ["recruitment", "recommendation"],
+  }) : entry) : guild.heroes;
+  const candidates = guild.recruitment.candidates.filter((item) => item.candidateId !== candidateId);
+  return { ...guild, gold: guild.gold - candidate.recruitmentFee, heroes: [...heroes, hero], heroContracts: [...guild.heroContracts, createHeroContract(hero, candidate.weeklySalary, candidate.contractLengthWeeks, guild.currentDay)], recruitment: { ...withCandidates(guild.recruitment, candidates), reservedCandidateId: guild.recruitment.reservedCandidateId === candidateId ? null : guild.recruitment.reservedCandidateId, reservationExpiresAtDay: guild.recruitment.reservedCandidateId === candidateId ? null : guild.recruitment.reservationExpiresAtDay } };
+}
 export function rejectCandidate(guild: GuildState, candidateId: string, random: RandomSource): GuildState { let candidates = guild.recruitment.candidates.filter((item) => item.candidateId !== candidateId); if (!candidates.length) candidates = unlockedPool(guild, random); return { ...guild, recruitment: withCandidates(guild.recruitment, candidates) }; }
 
 
@@ -44,6 +72,7 @@ export function formerMemberRehireFee(member: RecruitmentState["formerMembers"][
 export function rehireFormerMember(guild: GuildState, heroId: string): GuildState {
   const member = guild.recruitment.formerMembers.find((entry) => entry.hero.id === heroId);
   if (!member) throw new Error("Former guild member is unavailable");
+  if (member.departureKind === "retired") throw new Error("Retired veterans remain alumni and cannot be rehired");
   if (guild.currentDay < member.eligibleReturnDay) throw new Error("This hero is not ready to return yet");
   if (guild.heroes.length >= RECRUITMENT_CONFIG.heroCapacity) throw new Error("Hero roster is full");
   const fee = formerMemberRehireFee(member);

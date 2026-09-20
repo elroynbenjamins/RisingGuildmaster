@@ -5,6 +5,7 @@ import { appendHeroHistoryEvent } from "../heroes/heroHistoryService";
 import type { QuestHeroOutcomeRecord, QuestRelationshipChange } from "../quests/questChronicleTypes";
 import type { Hero } from "../heroes/types";
 import { defaultRoleplayProfile, getRoleplayPillar } from "../../data/heroes/heroRoleplay";
+import { getMentorshipBetween } from "../heroes/heroIdentityService";
 export function clampRelationshipScore(score: number): number { return Math.max(-100, Math.min(100, Math.round(score))); }
 export function relationshipBand(score: number): RelationshipBand { const value = clampRelationshipScore(score); return value <= -51 ? "rival" : value <= -21 ? "dislike" : value <= 20 ? "neutral" : value <= 50 ? "friend" : "close_friend"; }
 export function relationshipScore(relationships: readonly HeroRelationship[], a: string, b: string): number { return relationships.find((item) => (item.heroIdA === a && item.heroIdB === b) || (item.heroIdA === b && item.heroIdB === a))?.score ?? 0; }
@@ -26,16 +27,20 @@ export function getHeroCompatibility(a: Hero | undefined, b: Hero | undefined): 
   return { modifier: 0 };
 }
 
-function questRelationshipDelta(status: "victory" | "defeat", a: QuestHeroOutcomeRecord, b: QuestHeroOutcomeRecord, heroA?: Hero, heroB?: Hero): { delta: number; reason: string } {
-  const compatibility = getHeroCompatibility(heroA, heroB); const base = status === "defeat" ? -2 : a.fellInBattle || b.fellInBattle ? 2 : 4;
+function questRelationshipDelta(status: "victory" | "defeat", a: QuestHeroOutcomeRecord, b: QuestHeroOutcomeRecord, currentScore: number, heroA?: Hero, heroB?: Hero): { delta: number; reason: string } {
+  const compatibility = getHeroCompatibility(heroA, heroB);
+  const mentorship = heroA && heroB ? getMentorshipBetween(heroA, heroB, currentScore) : null;
+  const base = status === "defeat" ? -2 : a.fellInBattle || b.fellInBattle ? 2 : 4;
+  const mentorshipBonus = status === "victory" && mentorship ? 1 : 0;
   const reason = status === "defeat" ? "The failed mission strained their trust." : a.fellInBattle || b.fellInBattle ? "Shared danger strengthened their bond." : "Returning victorious together strengthened their bond.";
-  return { delta: base + compatibility.modifier, reason: [reason, compatibility.reason].filter(Boolean).join(" ") };
+  const mentorReason = mentorship && mentorshipBonus ? `${mentorship.mentorName}'s guidance gave ${mentorship.menteeName} another reason to trust them.` : undefined;
+  return { delta: base + compatibility.modifier + mentorshipBonus, reason: [reason, compatibility.reason, mentorReason].filter(Boolean).join(" ") };
 }
 
 export function applyQuestRelationshipConsequences(guild: GuildState, status: "victory" | "defeat", outcomes: readonly QuestHeroOutcomeRecord[], questId: string, questName: string): { guild: GuildState; changes: QuestRelationshipChange[] } {
   let relationships = [...guild.relationships]; const changes: QuestRelationshipChange[] = [];
   for (let aIndex = 0; aIndex < outcomes.length; aIndex += 1) for (let bIndex = aIndex + 1; bIndex < outcomes.length; bIndex += 1) {
-    const a = outcomes[aIndex]!; const b = outcomes[bIndex]!; const previousScore = relationshipScore(relationships, a.heroId, b.heroId); const consequence = questRelationshipDelta(status, a, b, guild.heroes.find((hero) => hero.id === a.heroId), guild.heroes.find((hero) => hero.id === b.heroId)); const newScore = clampRelationshipScore(previousScore + consequence.delta); const previousBand = relationshipBand(previousScore); const newBand = relationshipBand(newScore);
+    const a = outcomes[aIndex]!; const b = outcomes[bIndex]!; const previousScore = relationshipScore(relationships, a.heroId, b.heroId); const consequence = questRelationshipDelta(status, a, b, previousScore, guild.heroes.find((hero) => hero.id === a.heroId), guild.heroes.find((hero) => hero.id === b.heroId)); const newScore = clampRelationshipScore(previousScore + consequence.delta); const previousBand = relationshipBand(previousScore); const newBand = relationshipBand(newScore);
     relationships = setRelationship(relationships, a.heroId, b.heroId, newScore);
     changes.push({ heroIdA: a.heroId, heroNameA: a.name, heroIdB: b.heroId, heroNameB: b.name, previousScore, newScore, delta: newScore - previousScore, previousBand, newBand, reason: consequence.reason });
   }

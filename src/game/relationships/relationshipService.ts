@@ -27,9 +27,9 @@ export function getHeroCompatibility(a: Hero | undefined, b: Hero | undefined): 
   return { modifier: 0 };
 }
 
-function questRelationshipDelta(status: "victory" | "defeat", a: QuestHeroOutcomeRecord, b: QuestHeroOutcomeRecord, heroA?: Hero, heroB?: Hero): { delta: number; reason: string } {
+function questRelationshipDelta(status: "victory" | "defeat", a: QuestHeroOutcomeRecord, b: QuestHeroOutcomeRecord, currentScore: number, heroA?: Hero, heroB?: Hero): { delta: number; reason: string } {
   const compatibility = getHeroCompatibility(heroA, heroB);
-  const mentorship = heroA && heroB ? getMentorshipBetween(heroA, heroB, 21) : null;
+  const mentorship = heroA && heroB ? getMentorshipBetween(heroA, heroB, currentScore) : null;
   const base = status === "defeat" ? -2 : a.fellInBattle || b.fellInBattle ? 2 : 4;
   const mentorshipBonus = status === "victory" && mentorship ? 1 : 0;
   const reason = status === "defeat" ? "The failed mission strained their trust." : a.fellInBattle || b.fellInBattle ? "Shared danger strengthened their bond." : "Returning victorious together strengthened their bond.";
@@ -40,7 +40,7 @@ function questRelationshipDelta(status: "victory" | "defeat", a: QuestHeroOutcom
 export function applyQuestRelationshipConsequences(guild: GuildState, status: "victory" | "defeat", outcomes: readonly QuestHeroOutcomeRecord[], questId: string, questName: string): { guild: GuildState; changes: QuestRelationshipChange[] } {
   let relationships = [...guild.relationships]; const changes: QuestRelationshipChange[] = [];
   for (let aIndex = 0; aIndex < outcomes.length; aIndex += 1) for (let bIndex = aIndex + 1; bIndex < outcomes.length; bIndex += 1) {
-    const a = outcomes[aIndex]!; const b = outcomes[bIndex]!; const previousScore = relationshipScore(relationships, a.heroId, b.heroId); const consequence = questRelationshipDelta(status, a, b, guild.heroes.find((hero) => hero.id === a.heroId), guild.heroes.find((hero) => hero.id === b.heroId)); const newScore = clampRelationshipScore(previousScore + consequence.delta); const previousBand = relationshipBand(previousScore); const newBand = relationshipBand(newScore);
+    const a = outcomes[aIndex]!; const b = outcomes[bIndex]!; const previousScore = relationshipScore(relationships, a.heroId, b.heroId); const consequence = questRelationshipDelta(status, a, b, previousScore, guild.heroes.find((hero) => hero.id === a.heroId), guild.heroes.find((hero) => hero.id === b.heroId)); const newScore = clampRelationshipScore(previousScore + consequence.delta); const previousBand = relationshipBand(previousScore); const newBand = relationshipBand(newScore);
     relationships = setRelationship(relationships, a.heroId, b.heroId, newScore);
     changes.push({ heroIdA: a.heroId, heroNameA: a.name, heroIdB: b.heroId, heroNameB: b.name, previousScore, newScore, delta: newScore - previousScore, previousBand, newBand, reason: consequence.reason });
   }

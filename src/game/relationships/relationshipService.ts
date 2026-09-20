@@ -5,6 +5,7 @@ import { appendHeroHistoryEvent } from "../heroes/heroHistoryService";
 import type { QuestHeroOutcomeRecord, QuestRelationshipChange } from "../quests/questChronicleTypes";
 import type { Hero } from "../heroes/types";
 import { defaultRoleplayProfile, getRoleplayPillar } from "../../data/heroes/heroRoleplay";
+import { getMentorshipBetween } from "../heroes/heroIdentityService";
 export function clampRelationshipScore(score: number): number { return Math.max(-100, Math.min(100, Math.round(score))); }
 export function relationshipBand(score: number): RelationshipBand { const value = clampRelationshipScore(score); return value <= -51 ? "rival" : value <= -21 ? "dislike" : value <= 20 ? "neutral" : value <= 50 ? "friend" : "close_friend"; }
 export function relationshipScore(relationships: readonly HeroRelationship[], a: string, b: string): number { return relationships.find((item) => (item.heroIdA === a && item.heroIdB === b) || (item.heroIdA === b && item.heroIdB === a))?.score ?? 0; }
@@ -27,9 +28,13 @@ export function getHeroCompatibility(a: Hero | undefined, b: Hero | undefined): 
 }
 
 function questRelationshipDelta(status: "victory" | "defeat", a: QuestHeroOutcomeRecord, b: QuestHeroOutcomeRecord, heroA?: Hero, heroB?: Hero): { delta: number; reason: string } {
-  const compatibility = getHeroCompatibility(heroA, heroB); const base = status === "defeat" ? -2 : a.fellInBattle || b.fellInBattle ? 2 : 4;
+  const compatibility = getHeroCompatibility(heroA, heroB);
+  const mentorship = heroA && heroB ? getMentorshipBetween(heroA, heroB, 21) : null;
+  const base = status === "defeat" ? -2 : a.fellInBattle || b.fellInBattle ? 2 : 4;
+  const mentorshipBonus = status === "victory" && mentorship ? 1 : 0;
   const reason = status === "defeat" ? "The failed mission strained their trust." : a.fellInBattle || b.fellInBattle ? "Shared danger strengthened their bond." : "Returning victorious together strengthened their bond.";
-  return { delta: base + compatibility.modifier, reason: [reason, compatibility.reason].filter(Boolean).join(" ") };
+  const mentorReason = mentorshipBonus ? `${mentorship.mentorName}'s guidance gave ${mentorship.menteeName} another reason to trust them.` : undefined;
+  return { delta: base + compatibility.modifier + mentorshipBonus, reason: [reason, compatibility.reason, mentorReason].filter(Boolean).join(" ") };
 }
 
 export function applyQuestRelationshipConsequences(guild: GuildState, status: "victory" | "defeat", outcomes: readonly QuestHeroOutcomeRecord[], questId: string, questName: string): { guild: GuildState; changes: QuestRelationshipChange[] } {

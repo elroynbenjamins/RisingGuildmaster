@@ -80,7 +80,7 @@ export function chooseEnemyDestination(board: CombatBoardState, actor: CombatUni
     const reactions = countPathReactionRisks(path, reactionThreats);
     const awareness = aiLevel === "trained" ? .45 : aiLevel === "ruthless" ? 1.35 : 1;
     const reactionPenalty = reactions * ((behavior.reactionRiskWeight ?? 35) + lowHealthCaution) * awareness;
-    const rangePenalty = retreating && distance < (behavior.retreatRange ?? 0)
+     const rangePenalty = retreating && distance < (behavior.retreatRange ?? 0)
       ? ((behavior.retreatRange ?? 0) - distance) * 24
       : Math.abs(distance - behavior.preferredRange) * 12;
     const lineOfSightPenalty = behavior.preferredRange > 1 && !hasLineOfSight(position, target.position, board) ? 24 : 0;

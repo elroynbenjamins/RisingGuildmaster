@@ -42,6 +42,9 @@ import { getDifficulty } from "../../data/difficulty/difficulties";
 import type { RaidCombatMechanicState } from "../raids/raidTypes";
 import { initializeRaidMechanics, resolveRaidRoundStart } from "../raids/raidCombatMechanicService";
 import { getEncounterObjective, isEncounterObjectiveComplete } from "./combatObjectiveService";
+import type { BattlefieldInteractiveState } from "./battlefieldMechanicTypes";
+import { initializeBattlefieldInteractives } from "./battlefieldMechanicService";
+import { resolveMovementTerrainHazards } from "./grid/terrainHazardService";
 
 export interface HeroCombatant { hero: Hero; instance: HeroCombatInstance; unit: CombatUnit }
 export interface EnemyCombatant { instance: EnemyInstance; unit: CombatUnit }
@@ -59,6 +62,7 @@ export interface CombatState {
   enemyAiLevel: EnemyAiLevel;
   raidMechanic: RaidCombatMechanicState | null;
   objective: EncounterObjectiveDefinition;
+  battlefieldInteractives: BattlefieldInteractiveState[];
 }
 
 export function createCombatState(questId: string, encounterIndex: number, heroes: readonly Hero[], random: RandomSource, carried?: readonly HeroCombatInstance[], setup?: QuestCombatSetup, relationships: readonly HeroRelationship[] = [], difficultyId: GameDifficultyId = "standard", enemyLevelModifier = 0): CombatState {
@@ -91,7 +95,7 @@ export function createCombatState(questId: string, encounterIndex: number, heroe
   board = spawnOccupants(board, [...heroCombatants.map((item) => ({ occupantId: item.unit.combatantId, position: item.unit.position })), ...enemies.map((item) => ({ occupantId: item.unit.combatantId, position: item.unit.position }))]);
   const units = [...heroCombatants.map((item) => item.unit), ...enemies.map((item) => item.unit)];
   const initiative = rollInitiative(units, random);
-  return { questId, encounterIndex, encounterIds, ...(setup?.label ? { setupLabel: setup.label } : {}), round: 1, turn: 1, heroes: heroCombatants, enemies, board, initiativeRolls: initiative.map(({ combatantId, d20, modifier, total }) => ({ combatantId, d20, modifier, total })), combatStarted: false, turnOrderIds: initiative.map((entry) => entry.combatantId), turnCursor: 0, awaitingHeroId: null, actions: { movementUsed: false, combatActionUsed: false }, status: "active", log: [], lastRoll: null, lastVisualEvent:null, relationships: [...relationships], spentReactionIds: [], enemyAiLevel: difficulty.enemyAiLevel, raidMechanic: null, objective };
+  return { questId, encounterIndex, encounterIds, ...(setup?.label ? { setupLabel: setup.label } : {}), round: 1, turn: 1, heroes: heroCombatants, enemies, board, initiativeRolls: initiative.map(({ combatantId, d20, modifier, total }) => ({ combatantId, d20, modifier, total })), combatStarted: false, turnOrderIds: initiative.map((entry) => entry.combatantId), turnCursor: 0, awaitingHeroId: null, actions: { movementUsed: false, combatActionUsed: false }, status: "active", log: [], lastRoll: null, lastVisualEvent:null, relationships: [...relationships], spentReactionIds: [], enemyAiLevel: difficulty.enemyAiLevel, raidMechanic: null, objective, battlefieldInteractives: initializeBattlefieldInteractives(battlefield.interactives) };
 }
 
 export function beginCombat(state: CombatState, random: RandomSource, automaticTurnLimit = Number.POSITIVE_INFINITY): CombatState {
@@ -161,18 +165,24 @@ function applyOpportunityMovement(state: CombatState, moverId: string, path: rea
   if (!mover) throw new Error("Moving combatant was not found");
   const sources = allUnits.filter((unit) => unit.side !== mover.side).map((unit) => opportunitySource(state, unit)).filter((source): source is OpportunityAttackSource => Boolean(source));
   const resolution = resolveOpportunityMovement(mover, sources, path, state.spentReactionIds, random);
-  const updates = [resolution.mover, ...resolution.reactors];
+  const traversedPath = path.slice(0, resolution.travelledTiles + 1);
+  const hazard = resolveMovementTerrainHazards(state.board, resolution.mover, traversedPath);
+  const updates = [hazard.unit, ...resolution.reactors];
   const heroes = replaceUnits(state.heroes, updates).map((item) => ({ ...item, instance: { ...item.instance, currentHP: item.unit.currentHP, isAlive: item.unit.isAlive, position: item.unit.position, activeConditions: item.unit.activeConditions } }));
   const enemies = replaceUnits(state.enemies, updates).map((item) => ({ ...item, instance: { ...item.instance, currentHP: item.unit.currentHP, isAlive: item.unit.isAlive, position: item.unit.position, activeConditions: item.unit.activeConditions, activeConditionIds: item.unit.activeConditions.map((condition) => condition.conditionId) } }));
-  let board = setOccupant(state.board, path[0] ?? mover.position, null);
-  if (resolution.mover.isAlive) board = setOccupant(board, resolution.finalPosition, moverId);
+  let board = setOccupant(hazard.board, path[0] ?? mover.position, null);
+  if (hazard.unit.isAlive) board = setOccupant(board, hazard.unit.position, moverId);
   let next = withOutcome({ ...state, heroes, enemies, board, spentReactionIds: resolution.spentReactionIds });
+  if (hazard.triggeredPositions.length) {
+    const name = combatantName(next, moverId);
+    next = { ...next, log: [...next.log, { turn: next.turn, actorId: moverId, actionId: "terrain_trap", targetIds: [moverId], message: `${name} triggers ${hazard.triggeredPositions.length} battlefield trap${hazard.triggeredPositions.length === 1 ? "" : "s"} for ${hazard.damage} damage.` }] };
+  }
   for (const event of resolution.events) {
     next = addResolutionLog(next, event.attackerId, combatantName(next, event.attackerId), event.skillId, [resolution.mover], [event.hit]);
     const index = next.log.length - 1;
     next = { ...next, log: next.log.map((entry, entryIndex) => entryIndex === index ? { ...entry, actionId: "opportunity_attack", message: `REACTION · Opportunity Attack — ${entry.message}` } : entry) };
   }
-  return { state: next, travelledTiles: resolution.travelledTiles };
+  return { state: next, travelledTiles: hazard.travelledTiles };
 }
 
 /** Advances automatic turns until player input is needed, combat ends, or the optional automatic-turn budget is spent. */

@@ -12,7 +12,7 @@ import { getEffectiveMovementRange } from "./conditionResolver";
 import { hasLineOfSight } from "./grid/lineOfSight";
 import { leavesMeleeReach } from "./opportunityAttackService";
 import type { EnemyAiLevel } from "../difficulty/difficultyTypes";
-import { getTile, positionKey } from "./grid/gridTypes";
+import { getTile } from "./grid/gridTypes";
 import { orthogonalNeighbors } from "./grid/distanceCalculator";
 
 function targetPriorityScore(actor: CombatUnit, target: CombatUnit, behavior: TacticalBehavior): number {
@@ -72,7 +72,6 @@ export function countPathReactionRisks(path: readonly GridPosition[], reactionTh
 export function chooseEnemyDestination(board: CombatBoardState, actor: CombatUnit, target: CombatUnit, behavior: TacticalBehavior, reactionThreats: readonly CombatUnit[] = [], aiLevel: EnemyAiLevel = "tactical"): GridPosition {
   const currentDistance = manhattanDistance(actor.position, target.position);
   const candidates = [actor.position, ...getReachablePositions(board, actor.position, getEffectiveMovementRange(actor), actor.ignoredTerrainMovementCosts)];
-  const trapKeys = new Set(board.tiles.filter((tile) => tile.terrainType === "trap").map((tile) => positionKey(tile.position)));
   const retreating = behavior.retreatRange !== undefined && currentDistance < behavior.retreatRange;
   const lowHealthCaution = (1 - actor.currentHP / Math.max(1, actor.maxHP)) * 20;
   const score = (position: GridPosition): number => {
@@ -81,15 +80,13 @@ export function chooseEnemyDestination(board: CombatBoardState, actor: CombatUni
     const reactions = countPathReactionRisks(path, reactionThreats);
     const awareness = aiLevel === "trained" ? .45 : aiLevel === "ruthless" ? 1.35 : 1;
     const reactionPenalty = reactions * ((behavior.reactionRiskWeight ?? 35) + lowHealthCaution) * awareness;
-    const trapCount = trapKeys.size ? path.slice(1).filter((step) => trapKeys.has(positionKey(step))).length : 0;
-    const trapPenalty = trapCount * (aiLevel === "trained" ? 12 : aiLevel === "ruthless" ? 52 : 38);
-    const rangePenalty = retreating && distance < (behavior.retreatRange ?? 0)
+     const rangePenalty = retreating && distance < (behavior.retreatRange ?? 0)
       ? ((behavior.retreatRange ?? 0) - distance) * 24
       : Math.abs(distance - behavior.preferredRange) * 12;
     const lineOfSightPenalty = behavior.preferredRange > 1 && !hasLineOfSight(position, target.position, board) ? 24 : 0;
     const adjacentHeroPenalty = behavior.retreatRange !== undefined ? reactionThreats.filter((hero) => manhattanDistance(position, hero.position) <= 1).length * 8 : 0;
     const elevationReward = behavior.preferredRange > 1 && aiLevel !== "trained" ? (getTile(board, position)?.elevation ?? 0) * (aiLevel === "ruthless" ? 8 : 5) : 0;
-    return rangePenalty + reactionPenalty + trapPenalty + lineOfSightPenalty + adjacentHeroPenalty - elevationReward;
+    return rangePenalty + reactionPenalty + lineOfSightPenalty + adjacentHeroPenalty - elevationReward;
   };
   return candidates.sort((a, b) => score(a) - score(b) || manhattanDistance(a, target.position) - manhattanDistance(b, target.position))[0]!;
 }

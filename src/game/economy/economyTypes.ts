@@ -20,7 +20,7 @@ export interface GuildFinanceState {
 }
 
 export interface GuildDayEvent {
-  type: "salary_paid" | "salary_arrears" | "tavern_income" | "stamina_recovered" | "workshop_complete" | "training_complete" | "training_upgrade_complete" | "gathering_ready" | "scout_ready" | "condition_recovered" | "candidate_expired" | "contract_status" | "contract_departure" | "tavern_upgrade_complete" | "regional_threat";
+  type: "salary_paid" | "salary_arrears" | "tavern_income" | "stamina_recovered" | "workshop_complete" | "training_complete" | "training_upgrade_complete" | "gathering_ready" | "scout_ready" | "condition_recovered" | "candidate_expired" | "contract_status" | "contract_departure" | "former_member_return" | "tavern_upgrade_complete" | "regional_threat";
   text: string;
   amount?: number;
 }

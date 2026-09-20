@@ -63,6 +63,7 @@ export interface CombatState {
   raidMechanic: RaidCombatMechanicState | null;
   objective: EncounterObjectiveDefinition;
   battlefieldInteractives: BattlefieldInteractiveState[];
+  activeTrapKeys: string[];
 }
 
 export function createCombatState(questId: string, encounterIndex: number, heroes: readonly Hero[], random: RandomSource, carried?: readonly HeroCombatInstance[], setup?: QuestCombatSetup, relationships: readonly HeroRelationship[] = [], difficultyId: GameDifficultyId = "standard", enemyLevelModifier = 0): CombatState {
@@ -96,7 +97,8 @@ export function createCombatState(questId: string, encounterIndex: number, heroe
   board = spawnOccupants(board, [...heroCombatants.map((item) => ({ occupantId: item.unit.combatantId, position: item.unit.position })), ...enemies.map((item) => ({ occupantId: item.unit.combatantId, position: item.unit.position }))]);
   const units = [...heroCombatants.map((item) => item.unit), ...enemies.map((item) => item.unit)];
   const initiative = rollInitiative(units, random);
-  return { questId, encounterIndex, encounterIds, ...(setup?.label ? { setupLabel: setup.label } : {}), round: 1, turn: 1, heroes: heroCombatants, enemies, board, initiativeRolls: initiative.map(({ combatantId, d20, modifier, total }) => ({ combatantId, d20, modifier, total })), combatStarted: false, turnOrderIds: initiative.map((entry) => entry.combatantId), turnCursor: 0, awaitingHeroId: null, actions: { movementUsed: false, combatActionUsed: false }, status: "active", log: [], lastRoll: null, lastVisualEvent:null, relationships: [...relationships], spentReactionIds: [], enemyAiLevel: difficulty.enemyAiLevel, raidMechanic: null, objective, battlefieldInteractives: initializeBattlefieldInteractives(battlefield.interactives) };
+  const activeTrapKeys = board.tiles.filter((tile) => tile.terrainType === "trap").map((tile) => positionKey(tile.position));
+  return { questId, encounterIndex, encounterIds, ...(setup?.label ? { setupLabel: setup.label } : {}), round: 1, turn: 1, heroes: heroCombatants, enemies, board, initiativeRolls: initiative.map(({ combatantId, d20, modifier, total }) => ({ combatantId, d20, modifier, total })), combatStarted: false, turnOrderIds: initiative.map((entry) => entry.combatantId), turnCursor: 0, awaitingHeroId: null, actions: { movementUsed: false, combatActionUsed: false }, status: "active", log: [], lastRoll: null, lastVisualEvent:null, relationships: [...relationships], spentReactionIds: [], enemyAiLevel: difficulty.enemyAiLevel, raidMechanic: null, objective, battlefieldInteractives: initializeBattlefieldInteractives(battlefield.interactives), activeTrapKeys };
 }
 
 export function beginCombat(state: CombatState, random: RandomSource, automaticTurnLimit = Number.POSITIVE_INFINITY): CombatState {
@@ -167,13 +169,17 @@ function applyOpportunityMovement(state: CombatState, moverId: string, path: rea
   const sources = allUnits.filter((unit) => unit.side !== mover.side).map((unit) => opportunitySource(state, unit)).filter((source): source is OpportunityAttackSource => Boolean(source));
   const resolution = resolveOpportunityMovement(mover, sources, path, state.spentReactionIds, random);
   const traversedPath = path.slice(0, resolution.travelledTiles + 1);
-  const hazard = resolveMovementTerrainHazards(state.board, resolution.mover, traversedPath);
+  const hazard = state.activeTrapKeys.length
+    ? resolveMovementTerrainHazards(state.board, resolution.mover, traversedPath)
+    : { board: state.board, unit: resolution.mover, triggeredPositions: [], damage: 0, travelledTiles: resolution.travelledTiles };
+  const triggeredTrapKeys = new Set(hazard.triggeredPositions.map(positionKey));
+  const activeTrapKeys = triggeredTrapKeys.size ? state.activeTrapKeys.filter((key) => !triggeredTrapKeys.has(key)) : state.activeTrapKeys;
   const updates = [hazard.unit, ...resolution.reactors];
   const heroes = replaceUnits(state.heroes, updates).map((item) => ({ ...item, instance: { ...item.instance, currentHP: item.unit.currentHP, isAlive: item.unit.isAlive, position: item.unit.position, activeConditions: item.unit.activeConditions } }));
   const enemies = replaceUnits(state.enemies, updates).map((item) => ({ ...item, instance: { ...item.instance, currentHP: item.unit.currentHP, isAlive: item.unit.isAlive, position: item.unit.position, activeConditions: item.unit.activeConditions, activeConditionIds: item.unit.activeConditions.map((condition) => condition.conditionId) } }));
   let board = setOccupant(hazard.board, path[0] ?? mover.position, null);
   if (hazard.unit.isAlive) board = setOccupant(board, hazard.unit.position, moverId);
-  let next = withOutcome({ ...state, heroes, enemies, board, spentReactionIds: resolution.spentReactionIds });
+  let next = withOutcome({ ...state, heroes, enemies, board, spentReactionIds: resolution.spentReactionIds, activeTrapKeys });
   if (hazard.triggeredPositions.length) {
     const name = combatantName(next, moverId);
     next = { ...next, log: [...next.log, { turn: next.turn, actorId: moverId, actionId: "terrain_trap", targetIds: [moverId], message: `${name} triggers ${hazard.triggeredPositions.length} battlefield trap${hazard.triggeredPositions.length === 1 ? "" : "s"} for ${hazard.damage} damage.` }] };

@@ -33,7 +33,7 @@ function questRelationshipDelta(status: "victory" | "defeat", a: QuestHeroOutcom
   const base = status === "defeat" ? -2 : a.fellInBattle || b.fellInBattle ? 2 : 4;
   const mentorshipBonus = status === "victory" && mentorship ? 1 : 0;
   const reason = status === "defeat" ? "The failed mission strained their trust." : a.fellInBattle || b.fellInBattle ? "Shared danger strengthened their bond." : "Returning victorious together strengthened their bond.";
-  const mentorReason = mentorshipBonus ? `${mentorship.mentorName}'s guidance gave ${mentorship.menteeName} another reason to trust them.` : undefined;
+  const mentorReason = mentorship && mentorshipBonus ? `${mentorship.mentorName}'s guidance gave ${mentorship.menteeName} another reason to trust them.` : undefined;
   return { delta: base + compatibility.modifier + mentorshipBonus, reason: [reason, compatibility.reason, mentorReason].filter(Boolean).join(" ") };
 }
 

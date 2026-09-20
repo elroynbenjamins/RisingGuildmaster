@@ -3,6 +3,7 @@ import type { WorldState } from "../world/worldTypes";
 import type { QuestType } from "./questTypes";
 import { isCampaignQuestUnlocked } from "../campaign/campaignService";
 import type { Hero } from "../heroes/types";
+import { isSettlementAvailable } from "../world/regionalThreatService";
 
 export function isQuestBoardCategoryUnlocked(type: QuestType, world: WorldState, highestHeroLevel = 1): boolean {
   if (type === "campaign") return true;
@@ -42,6 +43,7 @@ export function getQuestStartBlocker(quest: QuestDefinition, world: WorldState, 
   }
   if (!isQuestAvailable(quest, world)) return "Quest prerequisites are not complete yet.";
   if (quest.personalHeroRequirement && !getEligiblePersonalQuestHeroes(quest, heroes).length) return "No active guild hero currently meets this personal quest's requirements.";
+  if (quest.settlementIds?.length && world.currentSettlementId && quest.settlementIds.includes(world.currentSettlementId) && !isSettlementAvailable(world, world.currentSettlementId)) return "This quest's settlement is closed by an unresolved regional crisis.";
   if (!isQuestAtCurrentLocation(quest, world)) return "Travel to the quest's region and required settlement before starting.";
   return null;
 }

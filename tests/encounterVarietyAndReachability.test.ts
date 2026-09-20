@@ -44,6 +44,9 @@ describe("varied encounter objectives", () => {
     ];
     expect(isEncounterObjectiveComplete(objective, 1, extracted, enemies)).toBe(true);
     expect(getEncounterObjectiveProgress(objective, 1, extracted, enemies)).toBe("2 / 2 heroes in the zone");
+    const solo = [{ isAlive: true, position: { x: 4, y: 4 } }];
+    expect(isEncounterObjectiveComplete(objective, 1, solo, enemies)).toBe(true);
+    expect(getEncounterObjectiveProgress(objective, 1, solo, enemies)).toBe("1 / 1 heroes in the zone");
   });
 });
 

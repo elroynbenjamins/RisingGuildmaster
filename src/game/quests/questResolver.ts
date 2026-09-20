@@ -23,6 +23,7 @@ import { getEnemyDefinition } from "../../data/enemies";
 import { potentialMultiplier } from "../progression/potential";
 import { applyCombatEquipmentWear } from "../equipment/equipmentDurabilityService";
 import { getGuildRank, getQuestReputationReward } from "../renown/guildLegacyService";
+import { getRegionThreatEffects } from "../world/regionalThreatService";
 
 export function getLevelAppropriateQuestLootIds(itemIds: readonly string[], heroes: readonly Hero[], ownedInventoryIds: readonly string[] = []): string[] {
   if (!itemIds.length) return [];
@@ -73,6 +74,13 @@ export function getLevelAppropriateQuestLootIds(itemIds: readonly string[], hero
   return bestFit(Object.values(EQUIPMENT)
     .filter((item) => item.levelRequirement <= highestHeroLevel && isSafeGenericFallback(item))
     .map((item) => item.id));
+}
+
+export function getQuestEquipmentDropChance(quest: ReturnType<typeof getQuestDefinition>): number {
+  if (!quest.repeatable) return 1;
+  if (quest.questType === "contract") return .55;
+  if (quest.huntReward) return .65;
+  return .60;
 }
 
 export function isCombatVictory(enemies: readonly { isAlive: boolean }[]): boolean { return enemies.every((enemy) => !enemy.isAlive); }
@@ -131,7 +139,10 @@ function persistHeroOutcome(hero: Hero, instance: HeroCombatInstance, xp: number
 }
 
 export function resolveQuestVictory(activeQuest: ActiveQuest, party: Party, guild: GuildState, instances: readonly HeroCombatInstance[], random: RandomSource): { activeQuest: ActiveQuest; guild: GuildState } {
-  const quest = getQuestDefinition(activeQuest.questDefinitionId); const partyHeroes = guild.heroes.filter((hero) => party.heroIds.includes(hero.id)); const goldModifier = partyHeroes.reduce((sum, hero) => sum + getTraitPercentage(hero, "questGold"), 0) + (quest.questType === "contract" ? getGuildRank(guild.reputation).benefits.contractGoldModifier : 0); const gold = Math.max(0, Math.round(rollQuestGold(quest, random) * (1 + goldModifier) * getDifficulty(guild.difficultyId).questGoldMultiplier));
+  const quest = getQuestDefinition(activeQuest.questDefinitionId); const partyHeroes = guild.heroes.filter((hero) => party.heroIds.includes(hero.id));
+  const regionalThreatBonus = quest.questType === "contract" ? getRegionThreatEffects(guild.world, quest.regionId).contractGoldModifier : 0;
+  const goldModifier = partyHeroes.reduce((sum, hero) => sum + getTraitPercentage(hero, "questGold"), 0) + (quest.questType === "contract" ? getGuildRank(guild.reputation).benefits.contractGoldModifier : 0) + regionalThreatBonus;
+  const gold = Math.max(0, Math.round(rollQuestGold(quest, random) * (1 + goldModifier) * getDifficulty(guild.difficultyId).questGoldMultiplier));
   const byId = new Map(instances.map((instance) => [instance.heroId, instance]));
   const heroes = guild.heroes.map((hero) => {
     if (!party.heroIds.includes(hero.id) || !byId.has(hero.id)) return hero;
@@ -139,7 +150,12 @@ export function resolveQuestVictory(activeQuest: ActiveQuest, party: Party, guil
     const persisted = persistHeroOutcome(hero, instance, xp, random, guild); const newInjury = persisted.conditions.find((condition) => isInjuryCondition(condition.conditionId) && !hero.conditions.some((old) => old.conditionId === condition.conditionId)); const newlyInjured = Boolean(newInjury);
     return recordQuestHistory(persisted, { day: guild.currentDay, questId: quest.id, questName: quest.name, victory: true, xpEarned: instance.isAlive && instance.currentHP > 0 ? xp : Math.round(xp * .5), fellInBattle: !instance.isAlive || instance.currentHP <= 0, newlyInjured, injuryConditionId: newInjury?.conditionId, previousLevel: hero.level });
   });
-  const lootTable = QUEST_LOOT_TABLES[quest.lootTableId]; const lootCandidates = lootTable ? getLevelAppropriateQuestLootIds(lootTable.itemIds, partyHeroes, guild.inventory) : []; const lootId = lootCandidates.length ? random.pick(lootCandidates) : null; const collectedMaterials: Partial<Record<MaterialId, number>> = {};
+  const lootTable = QUEST_LOOT_TABLES[quest.lootTableId];
+  const lootCandidates = lootTable ? getLevelAppropriateQuestLootIds(lootTable.itemIds, partyHeroes, guild.inventory) : [];
+  const equipmentDropChance = getQuestEquipmentDropChance(quest);
+  const equipmentDropped = lootCandidates.length > 0 && (equipmentDropChance >= 1 || random.next() < equipmentDropChance);
+  const lootId = equipmentDropped ? random.pick(lootCandidates) : null;
+  const collectedMaterials: Partial<Record<MaterialId, number>> = {};
   for (const drop of lootTable?.materialDrops ?? []) { const amount = random.int(drop.quantityMin, drop.quantityMax); if (amount > 0) collectedMaterials[drop.materialId] = amount; }
   const huntRewardProgress = { ...guild.huntRewardProgress };
   if (quest.huntReward) {

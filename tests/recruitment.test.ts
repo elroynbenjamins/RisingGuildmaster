@@ -85,7 +85,7 @@ describe("persistent recruitment state", () => {
     expect(returned.heroes.find((hero)=>hero.id===former.id)?.history.events.some((event)=>event.tags?.includes("returning_hero"))).toBe(true);
   });
   it("preserves Former Members when an empty candidate board is regenerated", () => {
-    const guild=readyGuild(); const former={hero:{...testHero(),id:"old-friend"},departedDay:10,eligibleReturnDay:17,lastWeeklySalary:100,rehireCount:0,relationships:[]};
+    const guild=readyGuild(); const former={hero:{...testHero(),id:"old-friend"},departedDay:10,eligibleReturnDay:17,lastWeeklySalary:100,rehireCount:0,relationships:[],departureKind:"contract_end" as const};
     const emptied={...guild,recruitment:{...guild.recruitment,candidates:[],candidateIds:[],formerMembers:[former]}};
     expect(initializeRecruitment(emptied,createSeededRandom(91)).recruitment.formerMembers).toEqual([former]);
   });

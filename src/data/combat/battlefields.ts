@@ -1,4 +1,5 @@
 import type { CombatBoardSizeId, TerrainPlacement, TerrainType } from "../../game/combat/grid/gridTypes";
+import type { BattlefieldInteractiveDefinition } from "../../game/combat/battlefieldMechanicTypes";
 import { BLACKBRIDGE_BATTLEFIELDS } from "./blackbridgeBattlefields";
 import { ASH_BENEATH_GREENVEIL_BATTLEFIELDS } from "./ashBeneathGreenveilBattlefields";
 import { STONEGATE_ASSASSIN_BATTLEFIELDS } from "./stonegateAssassinBattlefields";
@@ -12,7 +13,7 @@ import { CHAPTER_8_WESTERN_SEA_BATTLEFIELDS } from "./chapter8WesternSeaBattlefi
 import { CHAPTER_9_DROWNED_SEVENTH_BATTLEFIELDS } from "./chapter9DrownedSeventhBattlefields";
 import { RAID_BATTLEFIELDS } from "./raidBattlefields";
 export interface BattlefieldCombatModifiers { heroInitiativeModifier?: number; heroMovementRangeModifier?: number; enemyInitiativeModifier?: number; enemyMovementRangeModifier?: number }
-export interface BattlefieldDefinition { id: string; name: string; boardSizeId: CombatBoardSizeId; terrainPlacements: TerrainPlacement[]; legend: Partial<Record<TerrainType, string>>; combatModifiers?: BattlefieldCombatModifiers }
+export interface BattlefieldDefinition { id: string; name: string; boardSizeId: CombatBoardSizeId; terrainPlacements: TerrainPlacement[]; legend: Partial<Record<TerrainType, string>>; combatModifiers?: BattlefieldCombatModifiers; interactives?: readonly BattlefieldInteractiveDefinition[] }
 const placements = (terrainType: TerrainType, positions: [number, number][]): TerrainPlacement[] => positions.map(([x, y]) => ({ position: { x, y }, terrainType }));
 const elevated = (elevation: number, positions: [number, number][], terrainType: TerrainType = "normal"): TerrainPlacement[] => positions.map(([x, y]) => ({ position: { x, y }, terrainType, elevation }));
 export const BATTLEFIELDS: Record<string, BattlefieldDefinition> = {

@@ -47,7 +47,11 @@ export function advanceRegionalThreats(state: WorldState, days: number): WorldSt
     regionThreat = { ...regionThreat, [crisis.regionId]: Math.max(regionThreat[crisis.regionId] ?? 0, threat) };
   }
 
-  return changed ? { ...state, regionCrisisDays, regionThreat } : state;
+  if (!changed) return state;
+  const updated = { ...state, regionCrisisDays, regionThreat };
+  return updated.currentSettlementId && !isSettlementAvailable(updated, updated.currentSettlementId)
+    ? { ...updated, currentSettlementId: null }
+    : updated;
 }
 
 export function resolveRegionalThreatForQuest(state: WorldState, questId: string): WorldState {

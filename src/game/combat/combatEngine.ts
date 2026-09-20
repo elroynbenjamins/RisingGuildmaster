@@ -43,7 +43,7 @@ import type { RaidCombatMechanicState } from "../raids/raidTypes";
 import { initializeRaidMechanics, resolveRaidRoundStart } from "../raids/raidCombatMechanicService";
 import { getEncounterObjective, isEncounterObjectiveComplete } from "./combatObjectiveService";
 import type { BattlefieldInteractiveState } from "./battlefieldMechanicTypes";
-import { initializeBattlefieldInteractives } from "./battlefieldMechanicService";
+import { initializeBattlefieldInteractives, validateBattlefieldInteractives } from "./battlefieldMechanicService";
 import { resolveMovementTerrainHazards } from "./grid/terrainHazardService";
 
 export interface HeroCombatant { hero: Hero; instance: HeroCombatInstance; unit: CombatUnit }
@@ -92,6 +92,7 @@ export function createCombatState(questId: string, encounterIndex: number, heroe
   });
   let board = ensureConnectedBattlefield(createCombatBoard(encounter.obstaclePositions, battlefield.boardSizeId, battlefield.terrainPlacements, battlefield.id));
   validateEncounterReachability(board, encounter);
+  validateBattlefieldInteractives(board, battlefield.interactives);
   board = spawnOccupants(board, [...heroCombatants.map((item) => ({ occupantId: item.unit.combatantId, position: item.unit.position })), ...enemies.map((item) => ({ occupantId: item.unit.combatantId, position: item.unit.position }))]);
   const units = [...heroCombatants.map((item) => item.unit), ...enemies.map((item) => item.unit)];
   const initiative = rollInitiative(units, random);

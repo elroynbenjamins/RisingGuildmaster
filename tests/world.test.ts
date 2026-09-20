@@ -27,7 +27,8 @@ describe("persistent world and campaign", () => {
   it("rejects locked travel, then permits direct travel after Chapter 1", () => { let world = createWorldState(); expect(canTravel(world, "iron_hills")).toBe(false); expect(() => travelToRegion(world, "iron_hills", sequenceRandom([.9]))).toThrow(); for (const id of CHAPTER_1.nodeIds) world = completeCampaignNode(world, id).worldState; expect(world.unlockedRegionIds).toEqual(expect.arrayContaining(["greenveil", "iron_hills", "shadowfen"])); expect(travelToRegion(world, "iron_hills", sequenceRandom([.9])).state.currentRegionId).toBe("iron_hills"); expect(() => travelToRegion(world, "ashlands", sequenceRandom([.9]))).toThrow(); });
   it("preserves day-based world changes during regional travel", () => {
     const guild = createGuild();
-    guild.world = unlockRegionalThreats({ ...guild.world, unlockedRegionIds: [...guild.world.unlockedRegionIds, "shadowfen"], regionCrisisDays: { shadowfen: 19 }, regionThreat: { shadowfen: 0 } });
+    guild.world = unlockRegionalThreats({ ...guild.world, unlockedRegionIds: [...guild.world.unlockedRegionIds, "shadowfen"] });
+    guild.world = { ...guild.world, regionCrisisDays: { shadowfen: 19 }, regionThreat: { shadowfen: 0 } };
     const days = getRegionalTravelDays("greenveil", "shadowfen");
     const result = travelGuildToRegion(guild, "shadowfen", 2, sequenceRandom([.4, .9, .9, .9]));
     expect(result.guild.currentDay).toBe(guild.currentDay + days);

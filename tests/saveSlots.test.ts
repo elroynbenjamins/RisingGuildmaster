@@ -35,6 +35,23 @@ describe("two save slots", () => {
     expect((await loadGuild(2))?.guildName).toBe("Second Banner");
   });
 
+  it("recovers a corrupt primary save from its last valid backup without touching the other slot", async () => {
+    const first = createGuild("Backup Banner");
+    first.currentDay = 4;
+    await saveGuild(first, 1);
+
+    const newer = { ...first, currentDay: 9, gold: first.gold + 777 };
+    await saveGuild(newer, 1);
+    await saveGuild(createGuild("Other Slot"), 2);
+
+    store.set("guildmaster.guild.slot.1.v2", "{corrupt-json");
+    const recovered = await loadGuild(1);
+
+    expect(recovered).toMatchObject({ guildName: "Backup Banner", currentDay: 4 });
+    expect(() => JSON.parse(store.get("guildmaster.guild.slot.1.v2")!)).not.toThrow();
+    expect((await loadGuild(2))?.guildName).toBe("Other Slot");
+  });
+
   it("deletes only the selected slot", async () => {
     await saveGuild(createGuild("Keep Me"),1);
     await saveGuild(createGuild("Delete Me"),2);

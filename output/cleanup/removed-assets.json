@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/materials/arcane-dust.png",
+    "bytes": 96751,
+    "replacement": "assets/images/materials/complete/arcane_dust.png"
+  },
+  {
+    "file": "assets/materials/coal.png",
+    "bytes": 84918,
+    "replacement": "assets/images/materials/complete/coal.png"
+  },
+  {
+    "file": "assets/materials/iron-ore.png",
+    "bytes": 97699,
+    "replacement": "assets/images/materials/complete/iron_ore.png"
+  },
+  {
+    "file": "assets/materials/oak-timber.png",
+    "bytes": 100893,
+    "replacement": "assets/images/materials/complete/oak_timber.png"
+  },
+  {
+    "file": "assets/materials/rough-ruby.png",
+    "bytes": 97902,
+    "replacement": "assets/images/materials/complete/rough_ruby.png"
+  },
+  {
+    "file": "assets/materials/rough-sapphire.png",
+    "bytes": 93464,
+    "replacement": "assets/images/materials/complete/rough_sapphire.png"
+  },
+  {
+    "file": "assets/materials/rough-topaz.png",
+    "bytes": 98954,
+    "replacement": "assets/images/materials/complete/rough_topaz.png"
+  },
+  {
+    "file": "assets/materials/silver-ore.png",
+    "bytes": 95068,
+    "replacement": "assets/images/materials/complete/silver_ore.png"
+  },
+  {
+    "file": "assets/materials/spider-silk.png",
+    "bytes": 116527,
+    "replacement": "assets/images/materials/complete/spider_silk.png"
+  },
+  {
+    "file": "assets/materials/wolf-pelt.png",
+    "bytes": 97745,
+    "replacement": "assets/images/materials/complete/wolf_pelt.png"
+  }
+]

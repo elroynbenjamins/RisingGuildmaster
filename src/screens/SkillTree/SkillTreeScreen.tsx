@@ -1,0 +1,65 @@
+import React, { useState } from "react";
+import { SkillDetailsModal } from "../../components/skills/SkillDetailsModal";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SkillIcon } from "../../components/skills/SkillIcon";
+import { SkillInfoPanel } from "../../components/skills/SkillInfoPanel";
+import { ActionButton, BackButton, Panel, colors } from "../../components/ui";
+import { CLASSES } from "../../data/classes/classes";
+import { CLASS_SKILL_TREES } from "../../data/skills/classSkillTrees";
+import { HERO_SKILLS } from "../../data/skills/heroSkills";
+import type { Hero } from "../../game/heroes/types";
+import { getAvailableClassSkillPoints, getHeroSkillTree, learnClassSkill, type HeroSkillNode } from "../../game/progression/skills/skillProgressionService";
+import { getAdvancedClassName } from "../../game/progression/masteries/masteryService";
+import { getRaceNameColor } from "../../ui/raceColors";
+
+const TIER_LABELS = ["FOUNDATION", "FIRST TECHNIQUE", "SPECIALIZATION", "VETERAN TECHNIQUE", "CLASS MASTERY"] as const;
+const stateLabel = { learned: "LEARNED", available: "AVAILABLE", locked_level: "LEVEL LOCKED", locked_prerequisite: "PATH LOCKED", no_points: "NO SKILL POINT" } as const;
+
+export function SkillTreeScreen({ hero, onBack, onUpdate, openClassPath }: { hero: Hero; onBack(): void; onUpdate(hero: Hero): void; openClassPath?(): void }) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [confirmLearning, setConfirmLearning] = useState(false);
+  const tree = CLASS_SKILL_TREES[hero.classId];
+  const nodes = getHeroSkillTree(hero);
+  const points = getAvailableClassSkillPoints(hero);
+  const [selectedId, setSelectedId] = useState(tree.basicSkillId);
+  const [error, setError] = useState<string>();
+  const selectedSkill = HERO_SKILLS[selectedId] ?? HERO_SKILLS[tree.basicSkillId]!;
+  const selectedNode = nodes.find((node) => node.skillId === selectedId);
+  const inspect = (id: string) => { setSelectedId(id); setError(undefined); setConfirmLearning(false); setDetailsOpen(true); };
+  const learn = (skillId: string) => {
+    if (!confirmLearning) { setConfirmLearning(true); return; }
+    try { setError(undefined); onUpdate(learnClassSkill(hero, skillId)); setConfirmLearning(false); }
+    catch (caught) { setError(caught instanceof Error ? caught.message : "Could not learn skill"); }
+  };
+
+  return <ScrollView contentContainerStyle={styles.content}>
+    <BackButton onPress={onBack} />
+    <Text style={styles.title}>{getAdvancedClassName(hero) ?? CLASSES[hero.classId].name} Skills</Text>
+    <Text style={[styles.subtitle, { color: getRaceNameColor(hero.raceId) }]}>{hero.name} · Level {hero.level}</Text>
+    <Panel style={styles.points}><Text style={styles.pointsValue}>{points}</Text><View style={styles.flex}><Text style={styles.pointsTitle}>AVAILABLE SKILL POINT{points === 1 ? "" : "S"}</Text><Text style={styles.help}>Tap an icon to inspect it. Gold means available; green means learned.</Text></View></Panel>
+    <View style={styles.treePanel}>
+      <Text style={styles.treeEyebrow}>CLASS DEVELOPMENT</Text><Text style={styles.treeHint}>LEVEL 1 → LEVEL 10</Text>
+      <TreeNode skillId={tree.basicSkillId} state="learned" selected={selectedId === tree.basicSkillId} onPress={inspect} />
+      {[1, 2, 3, 4].map((tier) => { const tierNodes = nodes.filter((node) => node.tier === tier); return <React.Fragment key={tier}><TreeConnector branches={tierNodes.length} /><Text style={styles.tierLabel}>LEVEL {tierNodes[0]?.requiredLevel} · {TIER_LABELS[tier]}</Text><View style={styles.nodeRow}>{tierNodes.map((node) => <TreeNode key={node.skillId} skillId={node.skillId} state={node.state} selected={selectedId === node.skillId} onPress={inspect} />)}</View></React.Fragment>; })}
+      <TreeConnector branches={2} muted={hero.level < 5} /><Text style={styles.tierLabel}>LEVEL 5 & 10 · PERMANENT CLASS PATHS</Text>
+      <View style={styles.milestoneRow}><MilestoneNode label={hero.subclassId ? "SUBCLASS CHOSEN" : "SUBCLASS"} icon="◆" active={Boolean(hero.subclassId)} locked={hero.level < 5} onPress={openClassPath} /><MilestoneNode label={hero.masteryId ? "MASTERY CHOSEN" : "MASTERY"} icon="✦" active={Boolean(hero.masteryId)} locked={hero.level < 10 || !hero.subclassId} onPress={openClassPath} /></View>
+    </View>
+    <SkillDetailsModal visible={detailsOpen} onClose={() => setDetailsOpen(false)}>
+    <Panel style={styles.details}><View style={styles.detailHeading}><SkillIcon skillId={selectedSkill.id} size={58} /><View style={styles.flex}><Text style={styles.selectedName}>{selectedSkill.name}</Text><Text style={styles.selectedState}>{selectedNode ? stateLabel[selectedNode.state] : "STARTING SKILL"}</Text></View></View><SkillInfoPanel skill={selectedSkill} />{selectedNode?.state === "available" && <View style={styles.learnAction}><ActionButton label={confirmLearning ? "Confirm Permanent Choice" : `Learn ${selectedSkill.name}`} onPress={() => learn(selectedNode.skillId)} /></View>}{selectedNode?.state === "locked_level" && <Text style={styles.lockReason}>Reach Level {selectedNode.requiredLevel} to unlock this choice.</Text>}{selectedNode?.state === "locked_prerequisite" && <Text style={styles.lockReason}>Learn the preceding skill on this path first.</Text>}{selectedNode?.state === "no_points" && <Text style={styles.lockReason}>Earn another class skill point at the next milestone.</Text>}</Panel>
+      {confirmLearning && <Text style={styles.lockReason}>This skill choice is permanent. Confirm to spend one class skill point.</Text>}
+      {error && <Text accessibilityLiveRegion="polite" style={styles.error}>{error}</Text>}
+    </SkillDetailsModal>
+    <Panel style={styles.guidance}><Text style={styles.guidanceTitle}>RECOMMENDED BUILDS</Text><Text style={styles.help}>Recommendations only—you can combine skills freely.</Text>{tree.recommendedPaths.map((path) => <View key={path.id} style={styles.pathRow}><Text style={styles.pathName}>{path.name}</Text><View style={styles.pathIcons}>{path.skillIds.map((id) => <Pressable key={id} accessibilityLabel={`Inspect ${HERO_SKILLS[id]?.name}`} onPress={() => inspect(id)}><SkillIcon skillId={id} size={34} /></Pressable>)}</View></View>)}</Panel>
+  </ScrollView>;
+}
+
+function TreeNode({ skillId, state, selected, onPress }: { skillId: string; state: HeroSkillNode["state"] | "learned"; selected: boolean; onPress(id: string): void }) { const skill = HERO_SKILLS[skillId]!; return <View style={styles.nodeGroup}><Pressable accessibilityLabel={`${skill.name}, ${stateLabel[state]}`} accessibilityRole="button" accessibilityState={{ selected }} onPress={() => onPress(skillId)} style={[styles.nodeTouch, state === "learned" && styles.nodeLearned, state === "available" && styles.nodeAvailable, state !== "learned" && state !== "available" && styles.nodeLocked, selected && styles.nodeSelected]}><SkillIcon skillId={skillId} size={50} />{state === "learned" && <Text style={styles.check}>✓</Text>}{state !== "learned" && state !== "available" && <View style={styles.lockOverlay}><Text style={styles.lock}>◆</Text></View>}</Pressable><Text style={styles.nodeName}>{skill.name}</Text><Text style={styles.nodeState}>{stateLabel[state]}</Text></View>; }
+function TreeConnector({ branches, muted = false }: { branches: number; muted?: boolean }) { return <View pointerEvents="none" style={[styles.connector, muted && styles.connectorMuted]}><View style={styles.stem} />{branches > 1 && <View style={[styles.rail, { width: `${Math.min(78, 26 * branches)}%` }]} />}</View>; }
+function MilestoneNode({ label, icon, active, locked, onPress }: { label: string; icon: string; active: boolean; locked: boolean; onPress?(): void }) { return <Pressable accessibilityRole="button" disabled={!onPress} onPress={onPress} style={[styles.milestone, active && styles.nodeLearned, locked && styles.nodeLocked]}><Text style={styles.milestoneIcon}>{locked ? "◆" : icon}</Text><Text style={styles.milestoneLabel}>{label}</Text></Pressable>; }
+
+const styles = StyleSheet.create({
+  nodeGroup: { alignItems: "center", width: 80 }, nodeName: { color: colors.text, fontSize: 11, fontWeight: "800", lineHeight: 14, textAlign: "center", marginTop: 6 }, nodeState: { color: colors.muted, fontSize: 9, lineHeight: 12, textAlign: "center", marginTop: 2 },
+  content: { padding: 18, paddingBottom: 65 }, title: { color: colors.text, fontSize: 29, fontWeight: "900", marginTop: 9 }, subtitle: { marginBottom: 13, marginTop: 4 }, flex: { flex: 1 }, points: { alignItems: "center", flexDirection: "row", gap: 13 }, pointsValue: { color: colors.gold, fontSize: 35, fontWeight: "900" }, pointsTitle: { color: colors.text, fontWeight: "900" }, help: { color: colors.muted, fontSize: 11, lineHeight: 17, marginTop: 3 },
+  treePanel: { alignItems: "center", backgroundColor: "#101b25", borderColor: "#3b5261", borderRadius: 14, borderWidth: 1, marginTop: 14, overflow: "hidden", paddingHorizontal: 8, paddingVertical: 16 }, treeEyebrow: { color: colors.gold, fontSize: 12, fontWeight: "900", letterSpacing: 1.5 }, treeHint: { color: colors.muted, fontSize: 8, fontWeight: "900", letterSpacing: 1, marginBottom: 13, marginTop: 3 }, nodeRow: { alignItems: "center", flexDirection: "row", gap: 6, justifyContent: "center", width: "100%" }, nodeTouch: { alignItems: "center", backgroundColor: "#151d25", borderColor: colors.border, borderRadius: 34, borderWidth: 3, height: 64, justifyContent: "center", width: 64 }, nodeLearned: { backgroundColor: "#173124", borderColor: colors.green }, nodeAvailable: { backgroundColor: "#342b16", borderColor: colors.gold }, nodeLocked: { opacity: .88 }, nodeSelected: { borderColor: "#f5e3a3", shadowColor: colors.gold, shadowOpacity: .7, shadowRadius: 7 }, check: { backgroundColor: colors.green, borderRadius: 9, color: "#07100a", fontSize: 10, fontWeight: "900", height: 18, lineHeight: 18, position: "absolute", right: -3, textAlign: "center", top: -3, width: 18 }, lockOverlay: { alignItems: "center", backgroundColor: "rgba(5,8,11,.18)", borderRadius: 25, height: 50, justifyContent: "center", position: "absolute", width: 50 }, lock: { color: "#8f999f", fontSize: 13 }, connector: { alignItems: "center", height: 27, justifyContent: "flex-end", width: "100%" }, connectorMuted: { opacity: .35 }, stem: { backgroundColor: "#68889c", height: 27, position: "absolute", top: 0, width: 3 }, rail: { backgroundColor: "#68889c", bottom: 0, height: 3, position: "absolute" }, tierLabel: { backgroundColor: "#101b25", color: colors.muted, fontSize: 10, fontWeight: "900", letterSpacing: .3, marginBottom: 7, marginTop: -4, paddingHorizontal: 6 }, milestoneRow: { flexDirection: "row", gap: 28, justifyContent: "center", width: "100%" }, milestone: { alignItems: "center", backgroundColor: "#1c2430", borderColor: colors.gold, borderRadius: 34, borderWidth: 2, height: 68, justifyContent: "center", width: 68 }, milestoneIcon: { color: colors.gold, fontSize: 23 }, milestoneLabel: { color: colors.text, fontSize: 6, fontWeight: "900", marginTop: 2, textAlign: "center" },
+  details: { borderColor: colors.gold, marginTop: 14 }, detailHeading: { alignItems: "center", flexDirection: "row", gap: 11, marginBottom: 9 }, selectedName: { color: colors.text, fontSize: 20, fontWeight: "900" }, selectedState: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: .8, marginTop: 3 }, learnAction: { marginTop: 10 }, lockReason: { color: colors.muted, fontSize: 12, marginTop: 8 }, guidance: { marginTop: 12 }, guidanceTitle: { color: colors.gold, fontSize: 12, fontWeight: "900", letterSpacing: 1 }, pathRow: { alignItems: "center", borderTopColor: colors.border, borderTopWidth: 1, flexDirection: "row", justifyContent: "space-between", marginTop: 9, paddingTop: 9 }, pathName: { color: colors.text, fontSize: 12, fontWeight: "900" }, pathIcons: { flexDirection: "row", gap: 5 }, error: { color: colors.danger, marginTop: 10 },
+});

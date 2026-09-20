@@ -1,0 +1,190 @@
+[
+  {
+    "file": "src\\screens\\Alchemy\\AlchemyScreen.tsx",
+    "name": "AlchemyScreen"
+  },
+  {
+    "file": "src\\screens\\ArtworkReviewScreen.tsx",
+    "name": "ArtworkReviewScreen"
+  },
+  {
+    "file": "src\\screens\\Campaign\\CampaignScreen.tsx",
+    "name": "CampaignScreen"
+  },
+  {
+    "file": "src\\screens\\CombatScreen.tsx",
+    "name": "CombatScreen"
+  },
+  {
+    "file": "src\\screens\\ContentUnlock\\ContentUnlockScreen.tsx",
+    "name": "ContentUnlockScreen"
+  },
+  {
+    "file": "src\\screens\\Crafting\\CraftingScreen.tsx",
+    "name": "CraftingScreen"
+  },
+  {
+    "file": "src\\screens\\Dungeon\\DungeonScreen.tsx",
+    "name": "DungeonScreen"
+  },
+  {
+    "file": "src\\screens\\Gathering\\GatheringScreen.tsx",
+    "name": "GatheringScreen"
+  },
+  {
+    "file": "src\\screens\\GemsSupport\\GemsSupportScreen.tsx",
+    "name": "GemsSupportScreen"
+  },
+  {
+    "file": "src\\screens\\Guild\\FinancesScreen.tsx",
+    "name": "FinancesScreen"
+  },
+  {
+    "file": "src\\screens\\Guild\\GuildManagementScreen.tsx",
+    "name": "GuildManagementScreen"
+  },
+  {
+    "file": "src\\screens\\Guild\\GuildScreen.tsx",
+    "name": "GuildScreen"
+  },
+  {
+    "file": "src\\screens\\Guild\\ServicePlaceholderScreen.tsx",
+    "name": "ServicePlaceholderScreen"
+  },
+  {
+    "file": "src\\screens\\GuildLegacy\\GuildLegacyScreen.tsx",
+    "name": "GuildLegacyScreen"
+  },
+  {
+    "file": "src\\screens\\Guildmaster\\GuildmasterSkillTreeScreen.tsx",
+    "name": "GuildmasterSkillTreeScreen"
+  },
+  {
+    "file": "src\\screens\\GuildOperations\\GuildOperationsScreen.tsx",
+    "name": "GuildOperationsScreen"
+  },
+  {
+    "file": "src\\screens\\HeroCodex\\HeroCodexScreen.tsx",
+    "name": "HeroCodexScreen"
+  },
+  {
+    "file": "src\\screens\\HeroDetailScreen.tsx",
+    "name": "HeroDetailScreen"
+  },
+  {
+    "file": "src\\screens\\Heroes\\HeroesScreen.tsx",
+    "name": "HeroesScreen"
+  },
+  {
+    "file": "src\\screens\\Inventory\\InventoryScreen.tsx",
+    "name": "InventoryScreen"
+  },
+  {
+    "file": "src\\screens\\Inventory\\ItemDetailScreen.tsx",
+    "name": "ItemDetailScreen"
+  },
+  {
+    "file": "src\\screens\\LoreJournal\\LoreJournalScreen.tsx",
+    "name": "LoreJournalScreen"
+  },
+  {
+    "file": "src\\screens\\MainMenu\\MainMenuScreen.tsx",
+    "name": "MainMenuScreen"
+  },
+  {
+    "file": "src\\screens\\MainMenu\\NewGameSetupScreen.tsx",
+    "name": "NewGameSetupScreen"
+  },
+  {
+    "file": "src\\screens\\MonsterManual\\MonsterManualScreen.tsx",
+    "name": "MonsterManualScreen"
+  },
+  {
+    "file": "src\\screens\\PartySelectionScreen.tsx",
+    "name": "PartySelectionScreen"
+  },
+  {
+    "file": "src\\screens\\QuestDecision\\QuestDecisionScreen.tsx",
+    "name": "QuestDecisionScreen"
+  },
+  {
+    "file": "src\\screens\\QuestDetailScreen.tsx",
+    "name": "QuestDetailScreen"
+  },
+  {
+    "file": "src\\screens\\QuestDialogue\\QuestBriefingScreen.tsx",
+    "name": "QuestBriefingScreen"
+  },
+  {
+    "file": "src\\screens\\QuestExploration\\QuestExplorationScreen.tsx",
+    "name": "QuestExplorationScreen"
+  },
+  {
+    "file": "src\\screens\\QuestResult\\QuestResultScreen.tsx",
+    "name": "QuestResultScreen"
+  },
+  {
+    "file": "src\\screens\\QuestSelectionScreen.tsx",
+    "name": "QuestSelectionScreen"
+  },
+  {
+    "file": "src\\screens\\Raids\\RaidScreen.tsx",
+    "name": "RaidScreen"
+  },
+  {
+    "file": "src\\screens\\Recruitment\\CandidateDetailScreen.tsx",
+    "name": "CandidateDetailScreen"
+  },
+  {
+    "file": "src\\screens\\Recruitment\\RegionalScoutPanel.tsx",
+    "name": "RegionalScoutPanel"
+  },
+  {
+    "file": "src\\screens\\RecruitmentScreen.tsx",
+    "name": "RecruitmentScreen"
+  },
+  {
+    "file": "src\\screens\\Region\\RegionMapScreen.tsx",
+    "name": "RegionMapScreen"
+  },
+  {
+    "file": "src\\screens\\Settings\\SettingsScreen.tsx",
+    "name": "SettingsScreen"
+  },
+  {
+    "file": "src\\screens\\SkillCodex\\SkillCodexScreen.tsx",
+    "name": "SkillCodexScreen"
+  },
+  {
+    "file": "src\\screens\\SkillTree\\SkillTreeScreen.tsx",
+    "name": "SkillTreeScreen"
+  },
+  {
+    "file": "src\\screens\\StoryEvent\\StoryEventScreen.tsx",
+    "name": "StoryEventScreen"
+  },
+  {
+    "file": "src\\screens\\SubclassSelection\\SubclassSelectionScreen.tsx",
+    "name": "SubclassSelectionScreen"
+  },
+  {
+    "file": "src\\screens\\Temple\\TempleScreen.tsx",
+    "name": "TempleScreen"
+  },
+  {
+    "file": "src\\screens\\Training\\TrainingGroundsScreen.tsx",
+    "name": "TrainingGroundsScreen"
+  },
+  {
+    "file": "src\\screens\\Tutorial\\TutorialGuideScreen.tsx",
+    "name": "TutorialGuideScreen"
+  },
+  {
+    "file": "src\\screens\\Tutorial\\TutorialScreen.tsx",
+    "name": "TutorialScreen"
+  },
+  {
+    "file": "src\\screens\\WorldMap\\WorldMapScreen.tsx",
+    "name": "WorldMapScreen"
+  }
+]

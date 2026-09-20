@@ -1,0 +1,19 @@
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import type { NavigationNoticeTone } from "../../ui/actionNotifications";
+import { useTheme } from "../../theme/theme";
+
+export function NotificationBadge({ count, tone = "urgent", label }: { count: number; tone?: NavigationNoticeTone; label?: string }) {
+  const { colors } = useTheme();
+  const backgroundColor = tone === "urgent" ? colors.danger : tone === "warning" ? colors.gold : tone === "ready" ? colors.green : colors.blue;
+  const textColor = tone === "warning" || tone === "ready" ? colors.buttonText : "#ffffff";
+  const value = count > 9 ? "9+" : String(Math.max(1, count));
+  return <View accessible accessibilityLabel={label ?? `${count} action${count === 1 ? "" : "s"} available`} style={[styles.badge, { backgroundColor, borderColor: colors.background }]}>
+    <Text style={[styles.text, { color: textColor }]}>{value}</Text>
+  </View>;
+}
+
+const styles = StyleSheet.create({
+  badge: { alignItems: "center", borderWidth: 1, justifyContent: "center", minHeight: 18, minWidth: 18, paddingHorizontal: 3, borderRadius: 10, },
+  text: { fontSize: 10, fontWeight: "700", lineHeight: 13 },
+});

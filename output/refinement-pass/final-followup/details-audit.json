@@ -1,0 +1,634 @@
+[
+  {
+    "name": "QuestSelectionScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 8
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "6,080",
+          "font": 10
+        },
+        {
+          "text": "35",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "180",
+          "font": 10
+        },
+        {
+          "text": "ACTIVE ORDERS",
+          "font": 7
+        },
+        {
+          "text": "TRAINING · 1",
+          "font": 8
+        },
+        {
+          "text": "2D",
+          "font": 7
+        },
+        {
+          "text": "GUILD NOTICE BOARD",
+          "font": 9
+        },
+        {
+          "text": "POSTING",
+          "font": 7
+        },
+        {
+          "text": "FIELD TEAM",
+          "font": 7
+        },
+        {
+          "text": "TOP 4 AVG · LV 6.5",
+          "font": 10
+        },
+        {
+          "text": "4/4 HEROES",
+          "font": 8
+        },
+        {
+          "text": "0 POSTINGS HERE",
+          "font": 8
+        },
+        {
+          "text": "STORY ORDER · CHAPTER 2",
+          "font": 8
+        },
+        {
+          "text": "Stonegate identifies the fragment as wyrm-tempered heartstone: material created when an el",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 8
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": null,
+    "text": "The Wayfarers\n3\nDAY 42 · GUILDHAVEN\n6,080\n35\n1\n180\nACTIVE ORDERS\nTRAINING · 1\n2D\n‹ BACK\nGUILD NOTICE BOARD\nQuest Board\nPOSTING\nGuildhaven\nFIELD TEAM\nTOP 4 AVG · LV 6.5\n4/4 HEROES\nSpecial Activities · Dungeons / Operations / Raids\nCampaign\nSide Quests\nBosses\n0 POSTINGS HERE\nShow Intel\nSTORY ORDER · CHAPTER 2\nCouncil of Splinters\nStonegate identifies the fragment as wyrm-tempered heartstone: material created when an elder dragon willingly breathed through the mountain Ward.\nOpen Campaign Timeline\nNo campaign available\nProgress the campaign, unlock more regions, or check another category.\n1\nGuild\nQuests\nWorld\n2\nHeroes\nInventory"
+  },
+  {
+    "name": "WorldMapScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/current.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fworld/eldoria-world-map-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/current.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/boss.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/region_open.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/region_open.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/boss.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/current.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/region_open.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/boss.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/locked.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/current.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/current.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 8
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "6,080",
+          "font": 10
+        },
+        {
+          "text": "35",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "180",
+          "font": 10
+        },
+        {
+          "text": "ACTIVE ORDERS",
+          "font": 7
+        },
+        {
+          "text": "TRAINING · 1",
+          "font": 8
+        },
+        {
+          "text": "2D",
+          "font": 7
+        },
+        {
+          "text": "FIELD COMMAND · WORLD MAP",
+          "font": 9
+        },
+        {
+          "text": "GUILD POSITION",
+          "font": 8
+        },
+        {
+          "text": "Greenveil · 4 field heroes",
+          "font": 9
+        },
+        {
+          "text": "RATIONS",
+          "font": 7
+        },
+        {
+          "text": "REGIONS OPEN",
+          "font": 7
+        },
+        {
+          "text": "SETTLEMENTS",
+          "font": 7
+        },
+        {
+          "text": "FIELD AVG LV",
+          "font": 7
+        },
+        {
+          "text": "CURRENT",
+          "font": 8
+        },
+        {
+          "text": "DOUBLE TAP · OPEN",
+          "font": 6
+        },
+        {
+          "text": "Guildhaven",
+          "font": 7
+        },
+        {
+          "text": "BOSS",
+          "font": 8
+        },
+        {
+          "text": "OPEN",
+          "font": 8
+        },
+        {
+          "text": "OPEN",
+          "font": 8
+        },
+        {
+          "text": "BOSS",
+          "font": 8
+        },
+        {
+          "text": "CURRENT",
+          "font": 7
+        },
+        {
+          "text": "OPEN",
+          "font": 7
+        },
+        {
+          "text": "BOSS",
+          "font": 7
+        },
+        {
+          "text": "LOCKED",
+          "font": 7
+        },
+        {
+          "text": "Tap a region to plan · Double tap the same marker to open its local map",
+          "font": 9
+        },
+        {
+          "text": "REGION DOSSIER",
+          "font": 8
+        },
+        {
+          "text": "Recommended level 1–15",
+          "font": 10
+        },
+        {
+          "text": "CURRENT POSITION",
+          "font": 10
+        },
+        {
+          "text": "QUESTS",
+          "font": 7
+        },
+        {
+          "text": "SETTLEMENTS",
+          "font": 7
+        },
+        {
+          "text": "THREAT",
+          "font": 7
+        },
+        {
+          "text": "REGIONAL ORDERS · 5%",
+          "font": 8
+        },
+        {
+          "text": "GUILD PRESENT IN THIS REGION",
+          "font": 9
+        },
+        {
+          "text": "Operating from Guildhaven.",
+          "font": 10
+        },
+        {
+          "text": "+ SHOW REGIONAL INTELLIGENCE",
+          "font": 10
+        },
+        {
+          "text": "Greenveil",
+          "font": 8
+        },
+        {
+          "text": "HERE",
+          "font": 8
+        },
+        {
+          "text": "Greenveil",
+          "font": 8
+        },
+        {
+          "text": "Greenveil",
+          "font": 8
+        },
+        {
+          "text": "Greenveil",
+          "font": 8
+        },
+        {
+          "text": "Iron Hills",
+          "font": 8
+        },
+        {
+          "text": "Iron Hills",
+          "font": 8
+        },
+        {
+          "text": "Iron Hills",
+          "font": 8
+        },
+        {
+          "text": "Iron Hills",
+          "font": 8
+        },
+        {
+          "text": "Frostmarch",
+          "font": 8
+        },
+        {
+          "text": "Frostmarch",
+          "font": 8
+        },
+        {
+          "text": "Ashlands",
+          "font": 8
+        },
+        {
+          "text": "Ashlands",
+          "font": 8
+        },
+        {
+          "text": "Ashlands",
+          "font": 8
+        },
+        {
+          "text": "Shadowfen",
+          "font": 8
+        },
+        {
+          "text": "Shadowfen",
+          "font": 8
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 8
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 2069,
+      "viewport": 652
+    },
+    "text": "The Wayfarers\n3\nDAY 42 · GUILDHAVEN\n6,080\n35\n1\n180\nACTIVE ORDERS\nTRAINING · 1\n2D\n‹ BACK\nFIELD COMMAND · WORLD MAP\nEldoria\nChapter 2 · Day 42 · Greenveil / Guildhaven\nGUILD POSITION\nGuildhaven\nGreenveil · 4 field heroes\n48\nRATIONS\n5/5\nREGIONS OPEN\n15/15\nSETTLEMENTS\n6.5\nFIELD AVG LV\nGreenveil\nCURRENT\nDOUBLE TAP · OPEN\nGuildhaven\nIron Hills\nBOSS\nAshlands\nOPEN\nFrostmarch\nOPEN\nShadowfen\nBOSS\nCURRENT\nOPEN\nBOSS\nLOCKED\nTap a region to plan · Double tap the same marker to open its local map\nREGION DOSSIER\nGreenveil\nRecommended level 1–15\nCURRENT POSITION\nThe Crownroad Garden: river cities, chartered freeholds, orchard country, deep woods, and a storm-facing western coast held together by trade, reputation, and guild-patrolled roads.\n1/21\nQUESTS\n4/4\nSETTLEMENTS\n0/4\nTHREAT\nREGIONAL ORDERS · 5%\nGUILD PRESENT IN THIS REGION\nOperating from Guildhaven.\n+ SHOW REGIONAL INTELLIGENCE\nOPEN REGION MAP\nRESTOCK · +8 RATIONS · 40G\nCAMPAIGN ORDERS\nTRAVEL LEDGER\nGuildhaven\nGreenveil\nHERE\nHighcourt\nGreenveil\nBrambleford\nGreenveil\nTidewatch\nGreenveil\nStonegate\nIron Hills\nKharum-Deep\nIron Hills\nFlintwatch\nIron Hills\nSkyvault Embassy\nIron Hills\nNorthwatch\nFrostmarch\nSilverbough Enclaves\nFrostmarch\nEmberfall\nAshlands\nRed Mesa Clanroads\nAshlands\nCinderwell Oasis\nAshlands\nBlackwater\nShadowfen\nMirewatch\nShadowfen\n1\nGuild\nQuests\nWorld\n2\nHeroes\nInventory"
+  },
+  {
+    "name": "CandidateDetailScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Franger/male-v1.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "ADVENTURER DOSSIER",
+          "font": 10
+        },
+        {
+          "text": "RANGED STRIKER",
+          "font": 9
+        },
+        {
+          "text": "RANGED",
+          "font": 10
+        },
+        {
+          "text": "NOTABLE",
+          "font": 10
+        },
+        {
+          "text": "ROSTER DEPTH",
+          "font": 10
+        },
+        {
+          "text": "LEAVES IN 7D",
+          "font": 10
+        },
+        {
+          "text": "Age 24 · PROSPECT · Mercenary",
+          "font": 10
+        },
+        {
+          "text": "GUILD FIT",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT AFFORDABLE NOW · After minimum fee: 5714 G · Payroll becomes 916–956 G/week",
+          "font": 10
+        },
+        {
+          "text": "SCOUT REPORT",
+          "font": 8
+        },
+        {
+          "text": "POTENTIAL",
+          "font": 10
+        },
+        {
+          "text": "Good–Exceptional",
+          "font": 10
+        },
+        {
+          "text": "FEE",
+          "font": 10
+        },
+        {
+          "text": "PAY",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 951,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nADVENTURER DOSSIER\nAldric Crowhurst\nHuman · Ranger · Lv 1\nRANGED STRIKER\nRANGED\nNOTABLE\nROSTER DEPTH\nLEAVES IN 7D\nAge 24 · PROSPECT · Mercenary\nGUILD FIT\nROSTER DEPTH\nYou already have 3 living ranged heroes.\nCONTRACT AFFORDABLE NOW · After minimum fee: 5714 G · Payroll becomes 916–956 G/week\nOverview\nStats\nTraits\nContract\nSCOUT REPORT\nPOTENTIAL\n61–97\nGood–Exceptional\nFEE\n366–586 G\nPAY\n66–106/WK\nContract preference: 24 weeks\nScouting: Level 0/3\nDeparture: Day 49 · LEAVES IN 7D\nSCOUT · 100G\nRESERVE · 50G\nFurther scouting narrows potential, recruitment fee, weekly salary, and attributes. Expert scouting reveals exact figures.\nGUILD CAPACITY REACHED"
+  }
+]

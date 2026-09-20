@@ -1,0 +1,3 @@
+import React from "react"; import { ScrollView, StyleSheet, Text } from "react-native"; import { BackButton, EmptyState, colors } from "../../components/ui";
+export function ServicePlaceholderScreen({ title, onBack }: { title: string; onBack(): void }) { return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={styles.title}>{title}</Text><EmptyState title="Coming Soon" message={`${title} is represented in the guild architecture, but its economy and time-resolution backend is not part of this milestone.`} /></ScrollView>; }
+const styles = StyleSheet.create({ content: { padding: 20, gap: 16 }, title: { color: colors.text, fontSize: 30, fontWeight: "900" } });

@@ -1,0 +1,115 @@
+import React, { useMemo, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useGameDialog } from "../../components/dialogs/GameDialog";
+import { ActionButton, BackButton, EmptyState, MiniMeter, Panel, SecondaryButton, SectionTitle, StatusChip, colors } from "../../components/ui";
+import { MaterialIcon } from "../../components/materials/MaterialIcon";
+import { EquipmentIcon } from "../../components/equipment/EquipmentIcon";
+import { MATERIALS } from "../../data/crafting/materials";
+import { CLASSES } from "../../data/classes/classes";
+import { describeEquipmentSpecialEffect } from "../../game/equipment/equipmentSpecialEffectService";
+import { resolveEquipmentDefinition } from "../../game/equipment/equipmentResolver";
+import { equipItem } from "../../game/equipment/equipmentService";
+import { getDurabilityLabel, getRepairCost, repairInventoryEquipment } from "../../game/equipment/equipmentDurabilityService";
+import { getInventoryItemPresentation } from "../../game/equipment/inventoryPresentationService";
+import { useGuild } from "../../state/GuildContext";
+import { compareEquipment } from "../../ui/equipmentComparison";
+import { getRaceNameColor } from "../../ui/raceColors";
+import { previewEquipmentDisposition, salvageInventoryEquipment, sellInventoryEquipment } from "../../game/equipment/equipmentDispositionService";
+import type { MaterialId } from "../../game/crafting/craftingTypes";
+import { getEquipmentRarityColor } from "../../ui/equipmentRarity";
+import { getModifierTargetLabel } from "../../ui/modifierLabels";
+import { formatGameId } from "../../ui/textFormat";
+
+export function ItemDetailScreen({ itemId, onBack }: { itemId: string; onBack(): void }) {
+  const { showDialog } = useGameDialog();
+  const { guild, updateGuild } = useGuild();
+  const item = resolveEquipmentDefinition(itemId);
+  const compatible = item ? guild.heroes.filter((hero) => hero.level >= item.levelRequirement && (!item.classRestrictions.length || item.classRestrictions.includes(hero.classId))) : [];
+  const [selectedId, setSelectedId] = useState(compatible[0]?.id);
+  const [equipNotice, setEquipNotice] = useState<{ title: string; message: string; error?: boolean }>();
+  const hero = compatible.find((entry) => entry.id === selectedId);
+  const comparison = useMemo(() => hero && item ? compareEquipment(hero, item.inventoryKey) : [], [hero, item]);
+  if (!item) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><EmptyState title="Item unavailable" message="This item definition could not be found." /></ScrollView>;
+
+  const presentation = getInventoryItemPresentation(item, guild.heroes);
+  const disposition = previewEquipmentDisposition(item.inventoryKey);
+  const salvageMaterials = Object.entries(disposition.salvageMaterials) as [MaterialId, number][];
+  const salvageWorkshop = guild.artisans[disposition.salvageArtisan];
+  const specialEffects = item.specialEffectIds.map(describeEquipmentSpecialEffect).filter((effect): effect is NonNullable<typeof effect> => Boolean(effect));
+  const rarityColor = getEquipmentRarityColor(item.rarity);
+  const durabilityLabel = getDurabilityLabel(item.durability);
+  const durabilityColor = item.durability < 40 ? colors.danger : item.durability < 75 ? colors.gold : colors.green;
+  const repairCost = getRepairCost(item.inventoryKey);
+  const inventoryIndex = guild.inventory.indexOf(item.inventoryKey);
+
+  const equip = () => {
+    if (!hero) return;
+    try {
+      const oldId = hero.equipment[item.slot];
+      const updated = equipItem(hero, item.inventoryKey);
+      const inventory = [...guild.inventory];
+      const index = inventory.indexOf(item.inventoryKey);
+      if (index >= 0) inventory.splice(index, 1);
+      if (oldId) inventory.push(oldId);
+      updateGuild({ ...guild, inventory, heroes: guild.heroes.map((entry) => entry.id === hero.id ? updated : entry) });
+      setEquipNotice({ title: "Equipment Ready", message: `${item.name} is now equipped by ${hero.name}.` });
+    } catch (error) {
+      setEquipNotice({ title: "Cannot Equip", message: error instanceof Error ? error.message : "Equipment failed", error: true });
+    }
+  };
+
+  const repair = () => {
+    if (inventoryIndex < 0 || !repairCost) return;
+    showDialog({
+      title: "Repair equipment?",
+      message: `${item.name} will be restored from ${item.durability}% to 100% durability for ${repairCost} gold.`,
+      eyebrow: "BLACKSMITH ORDER",
+      actions: [{ label: "Cancel", tone: "secondary" }, { label: `Repair · ${repairCost}g`, onPress: () => {
+        try { updateGuild(repairInventoryEquipment(guild, inventoryIndex)); onBack(); }
+        catch (error) { showDialog({ title: "Cannot repair", message: error instanceof Error ? error.message : "Repair failed", tone: "danger" }); }
+      } }],
+    });
+  };
+
+  if (equipNotice) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack}/><Panel style={{ borderColor: equipNotice.error ? colors.danger : colors.green, gap: 14, marginTop: 28 }}><Text style={{ color: equipNotice.error ? colors.danger : colors.green, fontSize: 24, fontWeight: "900" }}>{equipNotice.title}</Text><Text style={{ color: colors.text, fontSize: 15, lineHeight: 21 }}>{equipNotice.message}</Text><ActionButton label="Return to Inventory" onPress={onBack}/></Panel></ScrollView>;
+
+  return <ScrollView contentContainerStyle={styles.content}>
+    <BackButton onPress={onBack} />
+    <View style={styles.itemHeader}><View style={[styles.iconFrame, { borderColor: rarityColor }]}><EquipmentIcon equipmentKey={item.inventoryKey} slot={item.slot} label={item.name} size={76}/></View><View style={styles.flex}><Text style={styles.eyebrow}>QUARTERMASTER DOSSIER</Text><Text style={[styles.title, { color: rarityColor }]}>{item.name}</Text><Text style={[styles.rarity, { color: rarityColor }]}>{item.rarity.toUpperCase()} · {formatGameId(item.slot).toUpperCase()} · ITEM LV {item.level}</Text><View style={styles.chipRow}><StatusChip label={presentation.bestFitLabel} tone={presentation.bestFitTone}/><StatusChip label={`${durabilityLabel} ${item.durability}%`} tone={item.durability < 40 ? "danger" : item.durability < 75 ? "gold" : "good"}/>{item.enchantmentIds.length > 0 && <StatusChip label="ENCHANTED" tone="gold"/>}</View></View></View>
+
+    <Panel style={[styles.overview, { borderColor: rarityColor }]}>
+      <View style={styles.statGrid}><View style={styles.statCell}><Text style={styles.statValue}>{item.value}g</Text><Text style={styles.statLabel}>VALUE</Text></View><View style={styles.statCell}><Text style={styles.statValue}>LV {item.levelRequirement}</Text><Text style={styles.statLabel}>REQUIREMENT</Text></View><View style={styles.statCell}><Text style={styles.statValue}>{presentation.compatibleCount}</Text><Text style={styles.statLabel}>ELIGIBLE HEROES</Text></View></View>
+      <View style={styles.durabilityHead}><Text style={[styles.durabilityTitle, { color: durabilityColor }]}>DURABILITY · {durabilityLabel}</Text><Text style={styles.meta}>{item.durability}/100</Text></View><MiniMeter value={item.durability} max={100} color={durabilityColor} height={7}/>
+      <Text style={styles.meta}>Classes: {item.classRestrictions.length ? item.classRestrictions.map((id) => CLASSES[id].name).join(", ") : "Any class"}</Text>
+      <View style={styles.modifiers}>{item.modifiers.map((modifier, index) => <Text key={index} style={styles.effect}>{modifier.value >= 0 ? "+" : ""}{modifier.operation === "percentage" ? `${Math.round(modifier.value * 100)}%` : modifier.value} {getModifierTargetLabel(modifier.target)}</Text>)}</View>
+      {repairCost > 0 && <View style={styles.repairCallout}><View style={styles.flex}><Text style={styles.repairTitle}>{durabilityLabel === "BROKEN" ? "ITEM BROKEN" : "MAINTENANCE AVAILABLE"}</Text><Text style={styles.meta}>{guild.artisans.blacksmith.recruited ? `Blacksmith can restore all bonuses for ${repairCost} gold.` : "Build the Blacksmith to repair worn equipment."}</Text></View><SecondaryButton label={guild.artisans.blacksmith.recruited ? `REPAIR · ${repairCost}G` : "BLACKSMITH REQUIRED"} disabled={!guild.artisans.blacksmith.recruited || guild.gold < repairCost} onPress={repair}/></View>}
+    </Panel>
+
+    {specialEffects.length ? <><SectionTitle>SPECIAL EFFECTS</SectionTitle>{specialEffects.map((effect) => <Panel key={effect.name} style={styles.special}><Text style={styles.specialName}>✦ {effect.name}</Text><Text style={styles.specialDescription}>{effect.description}</Text></Panel>)}</> : null}
+
+    <SectionTitle>WHO SHOULD EQUIP IT?</SectionTitle>
+    {compatible.map((entry) => {
+      const equippedKey = entry.equipment[item.slot];
+      const equipped = equippedKey ? resolveEquipmentDefinition(equippedKey) : undefined;
+      const fit = presentation.heroFits.find((candidate) => candidate.heroId === entry.id)!;
+      const fitTone = fit.fit === "upgrade" ? "good" : fit.fit === "tradeoff" ? "gold" : fit.fit === "sidegrade" ? "blue" : "danger";
+      return <Pressable key={entry.id} onPress={() => setSelectedId(entry.id)}><Panel style={[styles.hero, selectedId === entry.id && styles.selected]}><View style={styles.heroHeading}><View style={styles.flex}><Text style={[styles.heroName, { color: getRaceNameColor(entry.raceId) }]}>{entry.name}</Text><Text style={styles.meta}>Lv {entry.level} · {CLASSES[entry.classId].name}</Text></View><StatusChip label={fit.label} tone={fitTone}/></View><View style={styles.currentGear}><EquipmentIcon equipmentKey={equippedKey} size={38}/><View style={styles.flex}><Text style={styles.currentLabel}>CURRENT {formatGameId(item.slot).toUpperCase()}</Text><Text style={{ color: equipped ? getEquipmentRarityColor(equipped.rarity) : colors.muted, fontWeight: "900" }}>{equipped?.name ?? "Empty slot"}</Text>{equipped ? <Text style={styles.meta}>{equipped.rarity.toUpperCase()} · {equipped.durability}% durability</Text> : <Text style={styles.meta}>This slot is currently empty.</Text>}</View></View></Panel></Pressable>;
+    })}
+    {!compatible.length && <Panel style={styles.warning}><Text style={styles.error}>No guild hero currently meets this item's class and level requirements.</Text></Panel>}
+
+    {hero && <><SectionTitle>STAT CHANGE · {hero.name.toUpperCase()}</SectionTitle><Panel style={styles.comparison}><Text style={styles.comparisonHint}>Green improves this calculated stat. Red reduces it. Mixed results are a build tradeoff, not automatically bad.</Text>{comparison.length ? comparison.map((row) => <View key={row.label} style={styles.row}><Text style={styles.meta}>{row.label}</Text><Text style={[styles.diff, row.difference < 0 && styles.negative]}>{format(row.before, row.label)} → {format(row.after, row.label)} <Text style={styles.delta}>({row.difference > 0 ? "+" : ""}{format(row.difference, row.label)})</Text></Text></View>) : <Text style={styles.meta}>No calculated numerical stat changes. Check special effects and durability before deciding.</Text>}</Panel><View style={styles.action}><ActionButton label={`EQUIP TO ${hero.name.toUpperCase()}`} onPress={equip} /></View></>}
+
+    <SectionTitle>QUARTERMASTER ACTIONS</SectionTitle>
+    <Panel style={styles.disposition}>
+      <Text style={styles.dispositionTitle}>Dispose of this inventory copy</Text><Text style={styles.meta}>Sell for immediate gold, or salvage for part of the crafting materials. Both actions permanently destroy this copy.</Text>
+      <View style={styles.salvageRow}>{salvageMaterials.map(([materialId, amount]) => <View key={materialId} style={styles.salvageMaterial}><MaterialIcon materialId={materialId} size={32}/><Text style={styles.salvageText}>{MATERIALS[materialId].name} ×{amount}</Text></View>)}</View>
+      <Text style={salvageWorkshop.recruited ? styles.workshopReady : styles.error}>{salvageWorkshop.recruited ? `${formatGameId(disposition.salvageArtisan).toUpperCase()} WORKSHOP READY` : `Requires an operational ${formatGameId(disposition.salvageArtisan)} workshop`}</Text>
+      <View style={styles.dispositionActions}><View style={styles.flex}><SecondaryButton label={`SELL · ${disposition.saleGold}G`} onPress={() => showDialog({ title: "Sell equipment?", message: `${item.name} will be permanently sold for ${disposition.saleGold} gold.`, eyebrow: "QUARTERMASTER ORDER", tone: "danger", actions: [{ label: "Cancel", tone: "secondary" }, { label: "Sell", tone: "danger", onPress: () => { updateGuild(sellInventoryEquipment(guild, item.inventoryKey)); onBack(); } }] })}/></View><View style={styles.flex}><SecondaryButton label="SALVAGE" disabled={!salvageWorkshop.recruited || !salvageMaterials.length} onPress={() => showDialog({ title: "Salvage equipment?", message: `${item.name} will be permanently dismantled.`, eyebrow: "WORKSHOP ORDER", tone: "danger", actions: [{ label: "Cancel", tone: "secondary" }, { label: "Salvage", tone: "danger", onPress: () => { try { updateGuild(salvageInventoryEquipment(guild, item.inventoryKey)); onBack(); } catch (error) { showDialog({ title: "Cannot salvage", message: error instanceof Error ? error.message : "Salvage failed", tone: "danger" }); } } }] })}/></View></View>
+    </Panel>
+  </ScrollView>;
+}
+
+function format(value: number, label: string) { return label === "Critical Chance" ? `${(value * 100).toFixed(1)}%` : Number.isInteger(value) ? String(value) : value.toFixed(1); }
+const styles = StyleSheet.create({
+  content: { padding: 20, paddingBottom: 45 }, itemHeader: { alignItems: "center", flexDirection: "row", gap: 13, marginTop: 10 }, iconFrame: {alignItems: "center", backgroundColor: colors.panel2, height: 84, justifyContent: "center", width: 84, borderWidth: 0, borderRadius: 10}, eyebrow: { color: colors.gold, fontSize: 8, fontWeight: "900", letterSpacing: 1.2 }, title: { color: colors.text, fontSize: 25, fontWeight: "900" }, rarity: { fontSize: 10, fontWeight: "500", marginVertical: 5 }, chipRow: { flexDirection: "row", flexWrap: "wrap", gap: 5 }, overview: { gap: 10, marginTop: 13 }, statGrid: { flexDirection: "row", gap: 6 }, statCell: {alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, flex: 1, padding: 8, borderWidth: 0, borderRadius: 10}, statValue: { color: colors.text, fontSize: 16, fontWeight: "900" }, statLabel: { color: colors.muted, fontSize: 10, fontWeight: "500", marginTop: 2 }, durabilityHead: { flexDirection: "row", justifyContent: "space-between" }, durabilityTitle: { fontSize: 10, fontWeight: "900", letterSpacing: .7 }, modifiers: { flexDirection: "row", flexWrap: "wrap", gap: 6 }, effect: {backgroundColor: "#173d38", borderColor: colors.green, color: colors.green, fontSize: 9, fontWeight: "900", paddingHorizontal: 6, paddingVertical: 4, borderWidth: 0, borderRadius: 10}, repairCallout: {alignItems: "center", backgroundColor: "#302719", borderColor: colors.gold, flexDirection: "row", gap: 8, padding: 9, borderWidth: 0, borderRadius: 10}, repairTitle: { color: colors.gold, fontSize: 10, fontWeight: "900" }, special: { borderColor: "#8c6ac7", marginBottom: 8 }, specialName: { color: "#d2b8ff", fontSize: 15, fontWeight: "900" }, specialDescription: { color: colors.text, lineHeight: 19, marginTop: 5 }, hero: { marginBottom: 8 }, selected: { borderColor: colors.gold, backgroundColor: colors.panel2 }, heroHeading: { alignItems: "center", flexDirection: "row", gap: 8 }, heroName: { color: colors.text, fontSize: 16, fontWeight: "900" }, currentGear: { alignItems: "center", flexDirection: "row", gap: 9, marginTop: 8 }, currentLabel: { color: colors.muted, fontSize: 10, fontWeight: "500", letterSpacing: .5 }, meta: { color: colors.muted, fontSize: 10, lineHeight: 15, marginTop: 2 }, warning: { borderColor: colors.danger }, error: { color: colors.danger, fontSize: 11, lineHeight: 17 }, comparison: { gap: 3 }, comparisonHint: { color: colors.muted, fontSize: 10, lineHeight: 14, marginBottom: 5 }, row: { alignItems: "center", borderTopColor: colors.border, borderTopWidth: 1, flexDirection: "row", gap: 10, justifyContent: "space-between", paddingVertical: 7 }, diff: { color: colors.green, fontSize: 11, fontWeight: "900", textAlign: "right" }, negative: { color: colors.danger }, delta: { color: colors.muted }, action: { marginTop: 12 }, disposition: { gap: 10 }, dispositionTitle: { color: colors.text, fontSize: 16, fontWeight: "900" }, salvageRow: { flexDirection: "row", flexWrap: "wrap", gap: 7 }, salvageMaterial: {alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, flexDirection: "row", gap: 6, padding: 5, borderWidth: 0, borderRadius: 10}, salvageText: { color: colors.text, fontSize: 10, fontWeight: "800" }, workshopReady: { color: colors.green, fontSize: 10, fontWeight: "900" }, dispositionActions: { flexDirection: "row", gap: 8 }, flex: { flex: 1 },
+});

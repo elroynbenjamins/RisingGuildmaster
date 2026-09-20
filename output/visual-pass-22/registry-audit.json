@@ -1,0 +1,817 @@
+{
+  "questCount": 97,
+  "npcCount": 87,
+  "enemyCount": 83,
+  "missingNpcArt": [],
+  "missingEnemyArt": [],
+  "missingDialogue": [],
+  "explicitMappings": [
+    {
+      "speaker": "Guild Clerk",
+      "portraitId": "guild_clerk",
+      "portraitName": "Guild Clerk",
+      "gender": "male",
+      "quest": "wardstone_depths_expedition"
+    },
+    {
+      "speaker": "Registrar Mara Voss",
+      "portraitId": "registrar_mara_voss",
+      "portraitName": "Registrar Mara Voss",
+      "gender": "female",
+      "quest": "wardstone_depths_expedition"
+    },
+    {
+      "speaker": "Ranger Sella North",
+      "portraitId": "ranger_sella_north",
+      "portraitName": "Ranger Sella North",
+      "gender": "female",
+      "quest": "the_aurora_that_fell"
+    },
+    {
+      "speaker": "Ilyra of Silverbough",
+      "portraitId": "ilyra_silverbough",
+      "portraitName": "Ilyra of Silverbough",
+      "gender": "female",
+      "quest": "the_aurora_that_fell"
+    },
+    {
+      "speaker": "Keeper Dagna Flint",
+      "portraitId": "keeper_dagna_flint",
+      "portraitName": "Keeper Dagna Flint",
+      "gender": "female",
+      "quest": "hollow_warden_boss"
+    },
+    {
+      "speaker": "Bellkeeper Ysra Venn",
+      "portraitId": "bellkeeper_ysra_venn",
+      "portraitName": "Bellkeeper Ysra Venn",
+      "gender": "female",
+      "quest": "the_house_that_remembers"
+    },
+    {
+      "speaker": "Shadowfen Guide",
+      "portraitId": "shadowfen_guide",
+      "portraitName": "Shadowfen Guide",
+      "gender": "female",
+      "quest": "hunt_spider_queen"
+    },
+    {
+      "speaker": "Historian Pell Reed",
+      "portraitId": "historian_pell_reed",
+      "portraitName": "Historian Pell Reed",
+      "gender": "male",
+      "quest": "the_house_that_remembers"
+    },
+    {
+      "speaker": "Cinderkeeper Maela Rhun",
+      "portraitId": "cinderkeeper_maela_rhun",
+      "portraitName": "Cinderkeeper Maela Rhun",
+      "gender": "female",
+      "quest": "the_five_roads_run"
+    },
+    {
+      "speaker": "Marshal Tavia Coal",
+      "portraitId": "marshal_tavia_coal",
+      "portraitName": "Marshal Tavia Coal",
+      "gender": "female",
+      "quest": "siege_of_emberfall"
+    },
+    {
+      "speaker": "Glasswright Oren Soot",
+      "portraitId": "guild_clerk",
+      "portraitName": "Guild Clerk",
+      "gender": "male",
+      "quest": "the_children_of_cinder"
+    },
+    {
+      "speaker": "Ash-Singer Vel Aruun",
+      "portraitId": "ilyra_silverbough",
+      "portraitName": "Ilyra of Silverbough",
+      "gender": "female",
+      "quest": "a_song_for_the_last_phoenix"
+    },
+    {
+      "speaker": "Anja Reed",
+      "portraitId": "town_guard_captain",
+      "portraitName": "Town Guard Captain",
+      "gender": "female",
+      "quest": "the_empty_banner"
+    },
+    {
+      "speaker": "Innkeeper Selvi Tern",
+      "portraitId": "guild_clerk",
+      "portraitName": "Guild Clerk",
+      "gender": "male",
+      "quest": "supper_at_the_last_lantern"
+    },
+    {
+      "speaker": "Envoy Tharos",
+      "portraitId": "envoy_tharos",
+      "portraitName": "Envoy Tharos",
+      "gender": "male",
+      "quest": "serekh_chartmaker_boss"
+    },
+    {
+      "speaker": "Courier-Captain Nemi Gale",
+      "portraitId": "town_guard_captain",
+      "portraitName": "Town Guard Captain",
+      "gender": "female",
+      "quest": "feathers_over_the_abyss"
+    },
+    {
+      "speaker": "Bellsmith Orra Deepnote",
+      "portraitId": "bellsmith_orra_deepnote",
+      "portraitName": "Bellsmith Orra Deepnote",
+      "gender": "female",
+      "quest": "the_bell_that_hatched"
+    },
+    {
+      "speaker": "Harbormaster Elian Voss",
+      "portraitId": "town_guard_captain",
+      "portraitName": "Town Guard Captain",
+      "gender": "female",
+      "quest": "siege_of_tidewatch"
+    },
+    {
+      "speaker": "Watch-Captain Mirelle Sorn",
+      "portraitId": "watch_captain_mirelle_sorn",
+      "portraitName": "Watch-Captain Mirelle Sorn",
+      "gender": "female",
+      "quest": "descent_below_bells"
+    },
+    {
+      "speaker": "Grandmother Pell",
+      "portraitId": "grandmother_pell",
+      "portraitName": "Grandmother Pell",
+      "gender": "female",
+      "quest": "the_lighthouse_that_walked"
+    },
+    {
+      "speaker": "Postmistress Yara Quill",
+      "portraitId": "postmistress_yara_quill",
+      "portraitName": "Postmistress Yara Quill",
+      "gender": "female",
+      "quest": "letters_from_a_sunken_ship"
+    },
+    {
+      "speaker": "Archivist Nemea Quill",
+      "portraitId": "archivist_nemea_quill",
+      "portraitName": "Archivist Nemea Quill",
+      "gender": "female",
+      "quest": "tavern_at_the_bottom_of_the_sea"
+    },
+    {
+      "speaker": "Diver-Matron Kessa Vale",
+      "portraitId": "mira_thorn",
+      "portraitName": "Mira Thorn",
+      "gender": "female",
+      "quest": "choir_in_the_diving_bell"
+    },
+    {
+      "speaker": "Innkeeper Orro",
+      "portraitId": "innkeeper_orro",
+      "portraitName": "Innkeeper Orro",
+      "gender": "male",
+      "quest": "tavern_at_the_bottom_of_the_sea"
+    },
+    {
+      "speaker": "Greenveil Farmer",
+      "portraitId": "greenveil_farmer",
+      "portraitName": "Greenveil Farmer",
+      "gender": "male",
+      "quest": "orchard_road_patrol"
+    },
+    {
+      "speaker": "Aldren Vale",
+      "portraitId": "aldren_vale",
+      "portraitName": "Aldren Vale",
+      "gender": "male",
+      "quest": "brambleway_caravan"
+    },
+    {
+      "speaker": "Town Guard Captain",
+      "portraitId": "town_guard_captain",
+      "portraitName": "Town Guard Captain",
+      "gender": "female",
+      "quest": "attack_on_guildhaven"
+    },
+    {
+      "speaker": "Warden Elowen",
+      "portraitId": "warden_elowen",
+      "portraitName": "Warden Elowen",
+      "gender": "female",
+      "quest": "echoes_of_mosswatch"
+    },
+    {
+      "speaker": "Mira Thorn",
+      "portraitId": "mira_thorn",
+      "portraitName": "Mira Thorn",
+      "gender": "female",
+      "quest": "brambleway_caravan"
+    },
+    {
+      "speaker": "Surveyor Bruni Vale",
+      "portraitId": "surveyor_bruni_vale",
+      "portraitName": "Surveyor Bruni Vale",
+      "gender": "female",
+      "quest": "road_of_broken_carts"
+    },
+    {
+      "speaker": "Borin Slate",
+      "portraitId": "borin_slate",
+      "portraitName": "Borin Slate",
+      "gender": "male",
+      "quest": "fires_of_flintwatch"
+    },
+    {
+      "speaker": "Varka Ember-Tongue",
+      "portraitId": "varka_ember_tongue",
+      "portraitName": "Varka Ember-Tongue",
+      "gender": "female",
+      "quest": "ghorak_chainbreaker_boss"
+    },
+    {
+      "speaker": "Dwarf Rune Engineer",
+      "portraitId": "dwarf_rune_engineer",
+      "portraitName": "Dwarf Rune Engineer",
+      "gender": "female",
+      "quest": "descent_to_hollow_forge"
+    }
+  ],
+  "speakerMappings": [
+    {
+      "location": "story.GUILD_ORIGIN_SCENE.speakerLines.0",
+      "speaker": "Cassian Vane",
+      "portraitId": "cassian_vane"
+    },
+    {
+      "location": "story.GUILD_ORIGIN_SCENE.speakerLines.1",
+      "speaker": "Registrar Mara Voss",
+      "portraitId": "registrar_mara_voss"
+    },
+    {
+      "location": "story.GUILD_ORIGIN_SCENE.speakerLines.2",
+      "speaker": "Registrar Mara Voss",
+      "portraitId": "registrar_mara_voss"
+    },
+    {
+      "location": "story.STORY_SCENES.guild_origin_iron_laurel.speakerLines.0",
+      "speaker": "Cassian Vane",
+      "portraitId": "cassian_vane"
+    },
+    {
+      "location": "story.STORY_SCENES.guild_origin_iron_laurel.speakerLines.1",
+      "speaker": "Registrar Mara Voss",
+      "portraitId": "registrar_mara_voss"
+    },
+    {
+      "location": "story.STORY_SCENES.guild_origin_iron_laurel.speakerLines.2",
+      "speaker": "Registrar Mara Voss",
+      "portraitId": "registrar_mara_voss"
+    },
+    {
+      "location": "story.STORY_SCENES.strange_tracks.speakerLines.0",
+      "speaker": "Registrar Mara Voss",
+      "portraitId": "registrar_mara_voss"
+    },
+    {
+      "location": "story.STORY_SCENES.broken_wardstone.speakerLines.0",
+      "speaker": "Goblin Chieftain",
+      "portraitId": "goblin_chieftain"
+    },
+    {
+      "location": "story.STORY_SCENES.broken_wardstone.speakerLines.1",
+      "speaker": "Registrar Mara Voss",
+      "portraitId": "registrar_mara_voss"
+    },
+    {
+      "location": "story.STORY_SCENES.council_of_splinters.speakerLines.0",
+      "speaker": "Keeper Dagna Flint",
+      "portraitId": "keeper_dagna_flint"
+    },
+    {
+      "location": "story.STORY_SCENES.council_of_splinters.speakerLines.1",
+      "speaker": "Iron Laurel Envoy",
+      "portraitId": "iron_laurel_envoy"
+    },
+    {
+      "location": "story.STORY_SCENES.voices_under_stone.speakerLines.0",
+      "speaker": "Surveyor Bruni Vale",
+      "portraitId": "surveyor_bruni_vale"
+    },
+    {
+      "location": "story.STORY_SCENES.laurel_below.speakerLines.0",
+      "speaker": "Ghorak Chainbreaker",
+      "portraitId": "ghorak_chainbreaker"
+    },
+    {
+      "location": "story.STORY_SCENES.laurel_below.speakerLines.1",
+      "speaker": "Keeper Dagna Flint",
+      "portraitId": "keeper_dagna_flint"
+    },
+    {
+      "location": "story.STORY_SCENES.northwatch_two_skies.speakerLines.0",
+      "speaker": "Commander Astrid Vale",
+      "portraitId": "commander_astrid_vale"
+    },
+    {
+      "location": "story.STORY_SCENES.northwatch_two_skies.speakerLines.1",
+      "speaker": "Ilyra of Silverbough",
+      "portraitId": "ilyra_silverbough"
+    },
+    {
+      "location": "story.STORY_SCENES.council_at_northwatch.speakerLines.0",
+      "speaker": "Ranger Sella North",
+      "portraitId": "ranger_sella_north"
+    },
+    {
+      "location": "story.STORY_SCENES.council_at_northwatch.speakerLines.1",
+      "speaker": "Commander Astrid Vale",
+      "portraitId": "commander_astrid_vale"
+    },
+    {
+      "location": "story.STORY_SCENES.the_moon_gate.speakerLines.0",
+      "speaker": "Bellkeeper Orsa",
+      "portraitId": "bellkeeper_orsa"
+    },
+    {
+      "location": "story.STORY_SCENES.the_moon_gate.speakerLines.1",
+      "speaker": "Vaelith",
+      "portraitId": "vaelith_pale_echo"
+    },
+    {
+      "location": "story.STORY_SCENES.a_bell_without_tower.speakerLines.0",
+      "speaker": "Vaelith",
+      "portraitId": "vaelith_pale_echo"
+    },
+    {
+      "location": "story.STORY_SCENES.a_bell_without_tower.speakerLines.1",
+      "speaker": "Bellkeeper Ysra Venn",
+      "portraitId": "bellkeeper_ysra_venn"
+    },
+    {
+      "location": "story.STORY_SCENES.names_in_the_reeds.speakerLines.0",
+      "speaker": "Ferrymaster Neris Venn",
+      "portraitId": "ferrymaster_neris_venn"
+    },
+    {
+      "location": "story.STORY_SCENES.names_in_the_reeds.speakerLines.1",
+      "speaker": "Historian Pell Reed",
+      "portraitId": "historian_pell_reed"
+    },
+    {
+      "location": "story.STORY_SCENES.the_last_true_name.speakerLines.0",
+      "speaker": "Morrowveil",
+      "portraitId": "morrowveil_archivist"
+    },
+    {
+      "location": "story.STORY_SCENES.the_last_true_name.speakerLines.1",
+      "speaker": "Bellkeeper Ysra Venn",
+      "portraitId": "bellkeeper_ysra_venn"
+    },
+    {
+      "location": "story.STORY_SCENES.east_with_the_covenant.speakerLines.0",
+      "speaker": "Cinderkeeper Maela Rhun",
+      "portraitId": "cinderkeeper_maela_rhun"
+    },
+    {
+      "location": "story.STORY_SCENES.east_with_the_covenant.speakerLines.1",
+      "speaker": "Registrar Mara Voss",
+      "portraitId": "registrar_mara_voss"
+    },
+    {
+      "location": "story.STORY_SCENES.embers_council.speakerLines.0",
+      "speaker": "Marshal Tavia Coal",
+      "portraitId": "marshal_tavia_coal"
+    },
+    {
+      "location": "story.STORY_SCENES.embers_council.speakerLines.1",
+      "speaker": "Cinderkeeper Maela Rhun",
+      "portraitId": "cinderkeeper_maela_rhun"
+    },
+    {
+      "location": "story.STORY_SCENES.judgment_at_the_hearth.speakerLines.0",
+      "speaker": "Solkar, the Ash Herald",
+      "portraitId": "solkar_ash_herald"
+    },
+    {
+      "location": "story.STORY_SCENES.judgment_at_the_hearth.speakerLines.1",
+      "speaker": "Cinderkeeper Maela Rhun",
+      "portraitId": "cinderkeeper_maela_rhun"
+    },
+    {
+      "location": "story.STORY_SCENES.the_answer_in_brass.speakerLines.0",
+      "speaker": "Envoy Tharos",
+      "portraitId": "envoy_tharos"
+    },
+    {
+      "location": "story.STORY_SCENES.the_answer_in_brass.speakerLines.1",
+      "speaker": "Keeper Dagna Flint",
+      "portraitId": "keeper_dagna_flint"
+    },
+    {
+      "location": "story.STORY_SCENES.the_scale_and_the_signature.speakerLines.0",
+      "speaker": "Envoy Tharos",
+      "portraitId": "envoy_tharos"
+    },
+    {
+      "location": "story.STORY_SCENES.the_scale_and_the_signature.speakerLines.1",
+      "speaker": "Keeper Dagna Flint",
+      "portraitId": "keeper_dagna_flint"
+    },
+    {
+      "location": "story.STORY_SCENES.the_concord_of_six.speakerLines.0",
+      "speaker": "The Dragon Concord",
+      "portraitId": "first_crown"
+    },
+    {
+      "location": "story.STORY_SCENES.the_concord_of_six.speakerLines.1",
+      "speaker": "Envoy Tharos",
+      "portraitId": "envoy_tharos"
+    },
+    {
+      "location": "story.STORY_SCENES.six_bells_west.speakerLines.0",
+      "speaker": "Registrar Mara Voss",
+      "portraitId": "registrar_mara_voss"
+    },
+    {
+      "location": "story.STORY_SCENES.six_bells_west.speakerLines.1",
+      "speaker": "Envoy Tharos",
+      "portraitId": "envoy_tharos"
+    },
+    {
+      "location": "story.STORY_SCENES.terms_at_low_tide.speakerLines.0",
+      "speaker": "Watch-Captain Mirelle Sorn",
+      "portraitId": "watch_captain_mirelle_sorn"
+    },
+    {
+      "location": "story.STORY_SCENES.the_seventh_bell.speakerLines.0",
+      "speaker": "Registrar Mara Voss",
+      "portraitId": "registrar_mara_voss"
+    },
+    {
+      "location": "story.STORY_SCENES.the_seventh_bell.speakerLines.1",
+      "speaker": "Envoy Tharos",
+      "portraitId": "envoy_tharos"
+    },
+    {
+      "location": "story.STORY_SCENES.map_that_bled_salt.speakerLines.0",
+      "speaker": "Archivist Nemea Quill",
+      "portraitId": "archivist_nemea_quill"
+    },
+    {
+      "location": "story.STORY_SCENES.map_that_bled_salt.speakerLines.1",
+      "speaker": "Envoy Tharos",
+      "portraitId": "envoy_tharos"
+    },
+    {
+      "location": "story.STORY_SCENES.name_of_the_seventh.speakerLines.0",
+      "speaker": "Archivist Nemea Quill",
+      "portraitId": "archivist_nemea_quill"
+    },
+    {
+      "location": "story.STORY_SCENES.name_of_the_seventh.speakerLines.1",
+      "speaker": "Envoy Tharos",
+      "portraitId": "envoy_tharos"
+    },
+    {
+      "location": "story.STORY_SCENES.name_returned_to_sea.speakerLines.0",
+      "speaker": "Thalassyr",
+      "portraitId": "first_crown"
+    },
+    {
+      "location": "story.STORY_SCENES.name_returned_to_sea.speakerLines.1",
+      "speaker": "Envoy Tharos",
+      "portraitId": "envoy_tharos"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.campaign_goblin_patrol.speakerLines.0",
+      "speaker": "Selene Ashglass",
+      "portraitId": "selene_ashglass"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.campaign_goblin_patrol.speakerLines.1",
+      "speaker": "Lady Octavia Vane",
+      "portraitId": "lady_octavia_vane"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.attack_on_guildhaven.speakerLines.0",
+      "speaker": "Marshal Roderic Thorne",
+      "portraitId": "marshal_roderic_thorne"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.attack_on_guildhaven.speakerLines.1",
+      "speaker": "Lady Octavia Vane",
+      "portraitId": "lady_octavia_vane"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.broken_wardstone.speakerLines.0",
+      "speaker": "The Dreaming Wyrmling",
+      "portraitId": "dreaming_wyrmling"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.broken_wardstone.speakerLines.1",
+      "speaker": "The Ash Herald",
+      "portraitId": "ash_herald"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.road_of_broken_carts.speakerLines.0",
+      "speaker": "Kesta Flintvein",
+      "portraitId": "kesta_flintvein"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.road_of_broken_carts.speakerLines.1",
+      "speaker": "The Scale Collector",
+      "portraitId": "scale_collector"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.laurel_below.speakerLines.0",
+      "speaker": "Varka Ember-Tongue",
+      "portraitId": "varka_ember_tongue"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.laurel_below.speakerLines.1",
+      "speaker": "Edrin Mosswake",
+      "portraitId": "edrin_mosswake"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.hollow_warden_boss.speakerLines.0",
+      "speaker": "The First Crown",
+      "portraitId": "first_crown"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.hollow_warden_boss.speakerLines.1",
+      "speaker": "The Ash Herald",
+      "portraitId": "ash_herald"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.hollow_warden_boss.speakerLines.2",
+      "speaker": "The First Crown",
+      "portraitId": "first_crown"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.road_above_the_clouds.speakerLines.0",
+      "speaker": "The Crownless Navigator",
+      "portraitId": "scale_collector"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.siege_of_skyvault.speakerLines.0",
+      "speaker": "Voice of the Crownless Host",
+      "portraitId": "first_crown"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.varkesh_boss.speakerLines.0",
+      "speaker": "The Crownless Navigator",
+      "portraitId": "scale_collector"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.harbor_without_horizon.speakerLines.0",
+      "speaker": "Nhal Veyr",
+      "portraitId": "admiral_nhal_veyr"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.siege_of_tidewatch.speakerLines.0",
+      "speaker": "The Crownless Navigator",
+      "portraitId": "scale_collector"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.nhal_veyr_boss.speakerLines.0",
+      "speaker": "Voice Beneath the Fleet",
+      "portraitId": "first_crown"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.streets_drown_twice.speakerLines.0",
+      "speaker": "A Crownless Deckhand",
+      "portraitId": "master_veyr"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.chain_beneath_fleet.speakerLines.0",
+      "speaker": "Voice of the Crownless Host",
+      "portraitId": "first_crown"
+    },
+    {
+      "location": "story.STORY_INTERLUDES_BY_NODE_ID.serekh_boss.speakerLines.0",
+      "speaker": "Thalassyr",
+      "portraitId": "first_crown"
+    },
+    {
+      "location": "lore.stoneborn_awakened.perspectives.0",
+      "speaker": "Orra Bellkeeper",
+      "portraitId": "orra_bellkeeper"
+    },
+    {
+      "location": "lore.veilborn_archive.perspectives.0",
+      "speaker": "Aestra Quiet-Reed",
+      "portraitId": "aestra_quiet_reed"
+    },
+    {
+      "location": "lore.draconic_wardmakers.perspectives.0",
+      "speaker": "Master Halric Vale",
+      "portraitId": "master_halric_vale"
+    },
+    {
+      "location": "lore.draconic_wardmakers.perspectives.1",
+      "speaker": "Observatory Inscription",
+      "portraitId": null
+    },
+    {
+      "location": "lore.fivefold_accord.perspectives.0",
+      "speaker": "Ilyra of Silverbough",
+      "portraitId": "ilyra_silverbough"
+    },
+    {
+      "location": "lore.fivefold_accord.perspectives.1",
+      "speaker": "Iron Laurel Archive",
+      "portraitId": null
+    },
+    {
+      "location": "lore.wyrm_tempered_heartstone.perspectives.0",
+      "speaker": "Dagna Flint",
+      "portraitId": "keeper_dagna_flint"
+    },
+    {
+      "location": "lore.wyrm_tempered_heartstone.perspectives.1",
+      "speaker": "Master Veyr",
+      "portraitId": "master_veyr"
+    },
+    {
+      "location": "lore.sleeping_crowns.perspectives.0",
+      "speaker": "Hollow Warden",
+      "portraitId": "hollow_warden"
+    },
+    {
+      "location": "lore.sleeping_crowns.perspectives.1",
+      "speaker": "Sister Maelin",
+      "portraitId": "sister_maelin"
+    },
+    {
+      "location": "lore.wardstones.perspectives.0",
+      "speaker": "Dagna Flint",
+      "portraitId": "keeper_dagna_flint"
+    },
+    {
+      "location": "lore.wardstones.perspectives.1",
+      "speaker": "Captured Goblin Scout",
+      "portraitId": "goblin_scout"
+    },
+    {
+      "location": "lore.guildhaven.perspectives.0",
+      "speaker": "Registrar Mara Venn",
+      "portraitId": "registrar_mara_voss"
+    },
+    {
+      "location": "lore.guildhaven.perspectives.1",
+      "speaker": "Old Fenrick",
+      "portraitId": "old_fenrick"
+    },
+    {
+      "location": "lore.goblin_tribes.perspectives.0",
+      "speaker": "Nikkit Two-Knives",
+      "portraitId": "nikkit_two_knives"
+    },
+    {
+      "location": "lore.goblin_tribes.perspectives.1",
+      "speaker": "Registrar Mara Venn",
+      "portraitId": "registrar_mara_voss"
+    },
+    {
+      "location": "lore.iron_laurel.perspectives.0",
+      "speaker": "Cassian Vane",
+      "portraitId": "cassian_vane"
+    },
+    {
+      "location": "lore.iron_laurel.perspectives.1",
+      "speaker": "Tomas Reed",
+      "portraitId": "tomas_reed"
+    },
+    {
+      "location": "lore.iron_hills.perspectives.0",
+      "speaker": "Borin Slate",
+      "portraitId": "borin_slate"
+    },
+    {
+      "location": "lore.shadowfen.perspectives.0",
+      "speaker": "Bellkeeper Osa",
+      "portraitId": "bellkeeper_osa"
+    },
+    {
+      "location": "lore.frostmarch.perspectives.0",
+      "speaker": "Ranger Sella North",
+      "portraitId": "ranger_sella_north"
+    },
+    {
+      "location": "lore.fallen_aurora.perspectives.0",
+      "speaker": "Ranger Sella North",
+      "portraitId": "ranger_sella_north"
+    },
+    {
+      "location": "lore.fallen_aurora.perspectives.1",
+      "speaker": "Ilyra of Silverbough",
+      "portraitId": "ilyra_silverbough"
+    },
+    {
+      "location": "lore.fallen_aurora.perspectives.2",
+      "speaker": "Keeper Dagna Flint",
+      "portraitId": "keeper_dagna_flint"
+    },
+    {
+      "location": "lore.dragon_concord.perspectives.0",
+      "speaker": "Envoy Tharos",
+      "portraitId": "envoy_tharos"
+    },
+    {
+      "location": "lore.dragon_concord.perspectives.1",
+      "speaker": "Keeper Dagna Flint",
+      "portraitId": "keeper_dagna_flint"
+    },
+    {
+      "location": "lore.skyvault.perspectives.0",
+      "speaker": "Bellsmith Orra Deepnote",
+      "portraitId": "bellsmith_orra_deepnote"
+    },
+    {
+      "location": "lore.tidewatch.perspectives.0",
+      "speaker": "Grandmother Pell",
+      "portraitId": "grandmother_pell"
+    },
+    {
+      "location": "lore.black_tide.perspectives.0",
+      "speaker": "Admiral Nhal Veyr",
+      "portraitId": "admiral_nhal_veyr"
+    },
+    {
+      "location": "lore.black_tide.perspectives.1",
+      "speaker": "Registrar Mara Voss",
+      "portraitId": "registrar_mara_voss"
+    },
+    {
+      "location": "lore.drowned_veyr.perspectives.0",
+      "speaker": "Archivist Nemea Quill",
+      "portraitId": "archivist_nemea_quill"
+    },
+    {
+      "location": "lore.drowned_veyr.perspectives.1",
+      "speaker": "Innkeeper Orro",
+      "portraitId": "innkeeper_orro"
+    },
+    {
+      "location": "lore.thalassyr.perspectives.0",
+      "speaker": "Envoy Tharos",
+      "portraitId": "envoy_tharos"
+    },
+    {
+      "location": "lore.thalassyr.perspectives.1",
+      "speaker": "Serekh",
+      "portraitId": "serekh_chartmaker"
+    }
+  ],
+  "missingSpeakers": [
+    {
+      "location": "lore.draconic_wardmakers.perspectives.1",
+      "speaker": "Observatory Inscription",
+      "portraitId": null
+    },
+    {
+      "location": "lore.fivefold_accord.perspectives.1",
+      "speaker": "Iron Laurel Archive",
+      "portraitId": null
+    }
+  ],
+  "conflictingMappings": [],
+  "skillCount": 348,
+  "missingSkillArt": [],
+  "skillAliases": {
+    "warrior_guarded_stance": "warrior_shield_bash",
+    "warrior_cleaving_sweep": "berserker_whirlwind",
+    "warrior_second_wind": "cleric_heal",
+    "warrior_intercept": "guardian_taunt",
+    "warrior_relentless_assault": "warrior_power_strike",
+    "warrior_unbreakable": "warrior_battle_hardened",
+    "ranger_evasive_step": "ranger_hunters_focus",
+    "ranger_piercing_shot": "sharpshooter_deadeye",
+    "ranger_volley": "ranger_multi_shot",
+    "ranger_ambush_mastery": "ranger_hunters_focus",
+    "mage_arcane_shield": "paladin_holy_armor",
+    "mage_lightning_line": "mage_arcane_bolt",
+    "mage_counterspell": "hexbreaker_null_seal",
+    "mage_mana_font": "mage_arcane_knowledge",
+    "cleric_blessing": "oracle_foresight_blessing",
+    "cleric_sacred_ward": "paladin_guardians_oath",
+    "cleric_purifying_light": "cleric_divine_light",
+    "cleric_turn_undead": "cleric_holy_strike",
+    "cleric_mass_restoration": "life_priest_greater_heal",
+    "cleric_divine_intervention": "cleric_faith",
+    "paladin_lay_on_hands": "cleric_heal",
+    "paladin_compelled_challenge": "guardian_taunt",
+    "paladin_cleansing_smite": "paladin_smite",
+    "paladin_aura_of_courage": "templar_defensive_aura",
+    "paladin_judgment": "paladin_holy_slash",
+    "paladin_unyielding_faith": "paladin_holy_armor",
+    "berserker_reckless_attack": "berserker_frenzied_strike",
+    "berserker_war_cry": "commander_arcane_rally",
+    "berserker_blood_rush": "berserker_rage",
+    "berserker_groundbreaker": "berserker_whirlwind",
+    "berserker_brutal_critical": "berserker_rage",
+    "berserker_refuse_death": "warrior_battle_hardened"
+  }
+}

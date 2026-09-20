@@ -1,0 +1,6 @@
+import { ADVANCED_CLASS_NAMES, MASTERIES } from "../../../data/masteries/masteries";
+import type { Hero } from "../../heroes/types";
+export function getMasteryChoices(hero: Hero) { return Object.values(MASTERIES).filter((entry) => entry.baseClassId === hero.classId); }
+export function validateMasterySelection(hero: Hero, masteryId: string): string[] { const definition = MASTERIES[masteryId]; const errors: string[] = []; if (!definition) return ["Unknown mastery"]; if (!hero.subclassId) errors.push("Choose a level-5 subclass first"); if (hero.masteryId) errors.push("Hero already has a permanent mastery"); if (hero.level < definition.levelRequirement) errors.push(`Mastery unlocks at level ${definition.levelRequirement}`); if (hero.classId !== definition.baseClassId) errors.push("Mastery does not match hero base class"); return errors; }
+export function selectMastery(hero: Hero, masteryId: string): Hero { const errors = validateMasterySelection(hero, masteryId); if (errors.length) throw new Error(errors.join(", ")); return { ...hero, masteryId }; }
+export function getAdvancedClassName(hero: Hero): string | null { return hero.subclassId && hero.masteryId ? ADVANCED_CLASS_NAMES[`${hero.subclassId}:${hero.masteryId}`] ?? null : null; }

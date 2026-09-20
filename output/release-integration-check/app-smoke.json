@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "steps": [
+    "Found New Guild",
+    "Found Integration Guild",
+    "BEGIN GUIDED GUILD",
+    "Inspect",
+    "Stats",
+    "‹ BACK",
+    "Hire",
+    "Sign Contract",
+    "Free refresh",
+    "Hire",
+    "Sign Contract",
+    "BEGIN CHAPTER 1",
+    "Continue Guild",
+    "Reloaded save reaches redesigned dashboard"
+  ],
+  "errors": []
+}

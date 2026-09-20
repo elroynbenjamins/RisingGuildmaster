@@ -1,0 +1,70 @@
+import { selectionStyle } from "../../ui/selectionStyle";
+import React, { useMemo, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { EquipmentIcon } from "../../components/equipment/EquipmentIcon";
+import { MaterialIcon } from "../../components/materials/MaterialIcon";
+import { ActionButton, EmptyState, MiniMeter, Panel, SecondaryButton, SegmentedTabs, StatusChip, colors } from "../../components/ui";
+import { MATERIALS } from "../../data/crafting/materials";
+
+import type { ResolvedEquipmentDefinition } from "../../game/equipment/equipmentResolver";
+import { getInventoryItemPresentation } from "../../game/equipment/inventoryPresentationService";
+import { useGuild } from "../../state/GuildContext";
+import { filterInventory, type InventoryTab } from "../../ui/inventory";
+import { getEquipmentRarityColor } from "../../ui/equipmentRarity";
+
+import { formatGameId } from "../../ui/textFormat";
+
+const TABS: InventoryTab[] = ["All", "Weapons", "Armor", "Accessories", "Materials"];
+const rarityRank = { legendary: 5, epic: 4, rare: 3, uncommon: 2, common: 1 } as const;
+
+export function InventoryScreen({ openItem, openCrafting, openGathering, openPotions }: { openItem(item: ResolvedEquipmentDefinition): void; openCrafting(): void; openGathering(): void; openPotions(): void }) {
+  const { guild, updateGuild } = useGuild();
+  const [tab, setTab] = useState<InventoryTab>("All");
+  const [query, setQuery] = useState("");
+  const [upgradesOnly, setUpgradesOnly] = useState(false);
+  const normalizedQuery = query.trim().toLowerCase();
+  const primerSeen = guild.world.worldFlags.inventory_tutorial_seen === true;
+  const acknowledgePrimer = () => updateGuild({ ...guild, world: { ...guild.world, worldFlags: { ...guild.world.worldFlags, inventory_tutorial_seen: true } } });
+
+  const equipment = useMemo(() => filterInventory(guild.inventory, tab)
+    .map((item) => ({ item, presentation: getInventoryItemPresentation(item, guild.heroes) }))
+    .filter(({ item, presentation }) => (!normalizedQuery || `${item.name} ${item.slot} ${item.rarity} ${item.classRestrictions.join(" ")}`.toLowerCase().includes(normalizedQuery)) && (!upgradesOnly || presentation.upgradeCount > 0))
+    .sort((a, b) => Number(b.presentation.upgradeCount > 0) - Number(a.presentation.upgradeCount > 0) || rarityRank[b.item.rarity] - rarityRank[a.item.rarity] || b.item.level - a.item.level), [guild.inventory, guild.heroes, tab, normalizedQuery, upgradesOnly]);
+  const materials = Object.values(MATERIALS).filter((material) => !normalizedQuery || `${material.name} ${material.rarity} ${material.description}`.toLowerCase().includes(normalizedQuery));
+  const materialCount = Object.values(guild.materials).reduce((sum, amount) => sum + amount, 0);
+  const potionCount = Object.values(guild.potions).reduce((sum, amount) => sum + amount, 0);
+  const equippedCount = guild.heroes.reduce((sum, hero) => sum + Object.values(hero.equipment).filter(Boolean).length, 0);
+  const upgradeCount = guild.inventory.map((key) => filterInventory([key], "All")[0]).filter(Boolean).map((item) => getInventoryItemPresentation(item!, guild.heroes)).filter((entry) => entry.upgradeCount > 0).length;
+  const resultCount = tab === "Materials" ? materials.length : equipment.length;
+
+  return <ScrollView contentContainerStyle={styles.content}>
+    <View style={styles.header}><View style={styles.headerCopy}><Text style={styles.eyebrow}>GUILD QUARTERMASTER</Text><Text style={styles.title}>Armory & Inventory</Text><Text style={styles.count}>{guild.inventory.length} stored gear · {equippedCount} equipped</Text></View><View style={styles.upgradePlate}><Text style={styles.upgradeNumber}>{upgradeCount}</Text><Text style={styles.upgradeLabel}>POSSIBLE{`\n`}UPGRADES</Text></View></View>
+    {!primerSeen && <Panel style={styles.tutorial}><Text style={styles.tutorialLabel}>ARMORY TUTORIAL</Text><Text style={styles.tutorialTitle}>Read Gear Like a Guildmaster</Text><Text style={styles.tutorialText}>Rarity shows scarcity, not automatic superiority. Look for LIKELY UPGRADE or BUILD TRADEOFF, then inspect the hero-by-hero comparison. Durability reduces item bonuses; DAMAGED or BROKEN gear should be repaired at the Blacksmith.</Text><SecondaryButton label="GOT IT · OPEN THE ARMORY" onPress={acknowledgePrimer}/></Panel>}
+    <View style={styles.summaryRow}><Panel style={styles.summary}><Text style={styles.summaryValue}>{materialCount}</Text><Text style={styles.summaryLabel}>MATERIALS</Text></Panel><Panel style={styles.summary}><Text style={styles.summaryValue}>{potionCount}</Text><Text style={styles.summaryLabel}>POTIONS</Text></Panel><Panel style={styles.summary}><Text style={styles.summaryValue}>{guild.gold}</Text><Text style={styles.summaryLabel}>GOLD</Text></Panel></View>
+    <View style={styles.actions}><View style={styles.action}><SecondaryButton label="Workshop" onPress={openCrafting} /></View><View style={styles.action}><SecondaryButton label="Gather" onPress={openGathering} /></View><View style={styles.action}><SecondaryButton label="Potions" onPress={openPotions} /></View></View>
+    <SegmentedTabs values={TABS} value={tab} onChange={setTab}/>
+    <View style={styles.searchRow}><TextInput accessibilityLabel="Search inventory" value={query} onChangeText={setQuery} placeholder="Search inventory" placeholderTextColor={colors.muted} style={styles.search}/>{tab !== "Materials" && <Pressable accessibilityRole="button" accessibilityLabel="Filter upgrades" accessibilityState={{ selected: upgradesOnly }} aria-pressed={upgradesOnly} onPress={() => setUpgradesOnly((value) => !value)} style={[styles.filterButton, selectionStyle(colors, upgradesOnly)]}><Text style={[styles.filterText, upgradesOnly && styles.filterTextActive]}>UPGRADES</Text></Pressable>}<Text style={styles.results}>{resultCount}</Text></View>
+    {tab === "Materials" ? materials.map((material) => <Panel key={material.id} style={styles.material}><MaterialIcon materialId={material.id} size={56} /><View style={styles.flex}><Text style={styles.name}>{material.name}</Text><Text style={styles.detail}>{material.rarity.toUpperCase()} · {material.description}</Text></View><Text style={styles.quantity}>{guild.materials[material.id]}</Text></Panel>) : equipment.map(({ item, presentation }, index) => {
+      
+      const fitTone = presentation.bestFitTone === "neutral" ? "neutral" : presentation.bestFitTone;
+      const durabilityColor = presentation.durabilityTone === "good" ? colors.green : presentation.durabilityTone === "gold" ? colors.gold : colors.danger;
+      return <Pressable accessibilityRole="button" accessibilityLabel={`Inspect ${item.name}`} key={`${item.inventoryKey}-${index}`} onPress={() => openItem(item)}>
+        <Panel style={[styles.item, { borderColor: getEquipmentRarityColor(item.rarity) }]}>
+          <View style={[styles.icon, { borderColor: getEquipmentRarityColor(item.rarity) }]}><EquipmentIcon equipmentKey={item.inventoryKey} slot={item.slot} label={item.name} size={52} /></View>
+          <View style={styles.flex}>
+            <View style={styles.itemHeading}><Text style={[styles.name, styles.itemName, { color: getEquipmentRarityColor(item.rarity) }]}>{item.name}</Text><StatusChip label={presentation.bestFitLabel} tone={fitTone}/></View>
+            <Text style={[styles.rarity, { color: getEquipmentRarityColor(item.rarity) }]}>{formatGameId(item.rarity)} · {formatGameId(item.slot)} · Level {item.levelRequirement}+</Text>
+            <Text style={[styles.detail, { color: durabilityColor }]}>{formatGameId(presentation.durabilityLabel)} · {item.durability}% durability</Text>
+            <MiniMeter value={item.durability} max={100} color={durabilityColor} height={4}/>
+            {presentation.upgradeCount > 0 ? <Text style={styles.detail}>Upgrade for {presentation.upgradeCount} {presentation.upgradeCount === 1 ? "hero" : "heroes"}</Text> : null}
+          </View><Text style={styles.arrow}>›</Text>
+        </Panel>
+      </Pressable>;
+    })}
+    {resultCount === 0 && <EmptyState title={upgradesOnly ? "No obvious upgrades" : query ? "No matching items" : "No equipment here"} message={upgradesOnly ? "Tradeoffs and sidegrades are still available in the full inventory. Rarity alone does not guarantee an upgrade." : query ? "Try a different name, slot, rarity, class, or material." : "Craft gear, complete quests, or send heroes on gathering missions to expand the guild inventory."} />}
+  </ScrollView>;
+}
+
+const styles = StyleSheet.create({
+  headerCopy: { flex: 1, minWidth: 0, marginRight: 12 }, content: { padding: 18, paddingBottom: 40 }, header: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginBottom: 12 }, eyebrow: { color: colors.gold, fontSize: 9, fontWeight: "500", letterSpacing: .3 }, title: { color: colors.text, fontSize: 28, fontWeight: "900" }, count: { color: colors.muted, fontSize: 11, marginTop: 3 }, upgradePlate: { alignItems: "center", backgroundColor: "#173d38", borderColor: colors.green, minWidth: 78, paddingHorizontal: 8, paddingVertical: 7, borderWidth: 0, borderRadius: 10, }, upgradeNumber: { color: colors.green, fontSize: 22, fontWeight: "900" }, upgradeLabel: { color: colors.text, fontSize: 7, fontWeight: "900", lineHeight: 10, textAlign: "center" }, tutorial: { borderColor: colors.blue, gap: 7, marginBottom: 12 }, tutorialLabel: { color: colors.blue, fontSize: 9, fontWeight: "900", letterSpacing: 1 }, tutorialTitle: { color: colors.text, fontSize: 17, fontWeight: "900" }, tutorialText: { color: colors.muted, fontSize: 11, lineHeight: 17 }, summaryRow: { flexDirection: "row", gap: 6, marginBottom: 10 }, summary: { alignItems: "center", flex: 1, padding: 8, backgroundColor: "transparent", borderWidth: 0, }, summaryValue: { color: colors.text, fontSize: 17, fontWeight: "900" }, summaryLabel: { color: colors.muted, fontSize: 7, fontWeight: "500", letterSpacing: .3, marginTop: 2 }, actions: {flexDirection: "row", gap: 6, marginBottom: 12, flexWrap: "wrap"}, action: {flex: 1, minWidth: 86}, searchRow: { alignItems: "center", flexDirection: "row", gap: 6, marginBottom: 12 }, search: { backgroundColor: colors.panel, borderColor: colors.border, color: colors.text, flex: 1, minHeight: 44, paddingHorizontal: 11, borderWidth: 0, borderRadius: 10, }, filterButton: { backgroundColor: colors.panel2, borderColor: colors.border, justifyContent: "center", minHeight: 44, paddingHorizontal: 8, borderWidth: 0, borderRadius: 10, }, filterButtonActive: { backgroundColor: "#173d38", borderColor: colors.green }, filterText: { color: colors.muted, fontSize: 8, fontWeight: "900" }, filterTextActive: { color: colors.green }, results: { color: colors.gold, fontSize: 14, fontWeight: "900", minWidth: 26, textAlign: "center" }, flex: { flex: 1 }, item: { borderWidth: 0, borderLeftWidth: 2, alignItems: "center", flexDirection: "row", gap: 10, marginBottom: 9, padding: 11 }, icon: { alignItems: "center", backgroundColor: colors.panel2, height: 58, justifyContent: "center", overflow: "hidden", width: 58, borderWidth: 0, borderRadius: 10, }, itemHeading: {flexWrap: "wrap", gap: 6, alignItems: "flex-start", flexDirection: "column"}, itemName: { flexShrink: 1 }, name: {color: colors.text, fontWeight: "600", fontSize: 16, lineHeight: 21}, rarity: {marginTop: 2, fontWeight: "400", fontSize: 11, lineHeight: 16}, itemMetaRow: { alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: 7, marginBottom: 3, marginTop: 4 }, usable: { color: colors.green, fontSize: 8, fontWeight: "900" }, unusable: { color: colors.danger, fontSize: 8, fontWeight: "900" }, upgradeText: { color: colors.green, fontSize: 8, fontWeight: "900" }, durability: { fontSize: 8, fontWeight: "900" }, detail: {color: colors.muted, marginTop: 3, fontSize: 11, lineHeight: 16}, enchanted: { color: colors.gold, fontSize: 9, fontWeight: "900", marginTop: 4 }, arrow: { color: colors.gold, fontSize: 24 }, material: { alignItems: "center", flexDirection: "row", gap: 11, marginBottom: 8 }, quantity: { color: colors.gold, fontSize: 24, fontWeight: "900" },
+});

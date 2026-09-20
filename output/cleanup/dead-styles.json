@@ -1,0 +1,310 @@
+[
+  {
+    "file": "src/components/combat/PartyStatusPanel.tsx",
+    "name": "active"
+  },
+  {
+    "file": "src/components/combat/PartyStatusPanel.tsx",
+    "name": "activeText"
+  },
+  {
+    "file": "src/components/combat/SkillBar.tsx",
+    "name": "selected"
+  },
+  {
+    "file": "src/components/combat/SkillBar.tsx",
+    "name": "quickSelected"
+  },
+  {
+    "file": "src/components/dialogs/GameDialog.tsx",
+    "name": "primaryAction"
+  },
+  {
+    "file": "src/components/dialogs/GameDialog.tsx",
+    "name": "primaryActionText"
+  },
+  {
+    "file": "src/components/dungeons/DungeonArtwork.tsx",
+    "name": "iconViewport"
+  },
+  {
+    "file": "src/components/dungeons/DungeonRunPanels.tsx",
+    "name": "cleared"
+  },
+  {
+    "file": "src/components/navigation/GuildActivityStrip.tsx",
+    "name": "kicker"
+  },
+  {
+    "file": "src/screens/Campaign/CampaignScreen.tsx",
+    "name": "rivalCrest"
+  },
+  {
+    "file": "src/screens/Campaign/CampaignScreen.tsx",
+    "name": "crestText"
+  },
+  {
+    "file": "src/screens/CombatScreen.tsx",
+    "name": "active"
+  },
+  {
+    "file": "src/screens/CombatScreen.tsx",
+    "name": "disabled"
+  },
+  {
+    "file": "src/screens/Dungeon/DungeonScreen.tsx",
+    "name": "themeGlyph"
+  },
+  {
+    "file": "src/screens/Heroes/HeroesScreen.tsx",
+    "name": "bannerCopy"
+  },
+  {
+    "file": "src/screens/Heroes/HeroesScreen.tsx",
+    "name": "eyebrow"
+  },
+  {
+    "file": "src/screens/Heroes/HeroesScreen.tsx",
+    "name": "recruitAction"
+  },
+  {
+    "file": "src/screens/Heroes/HeroesScreen.tsx",
+    "name": "memorialTitle"
+  },
+  {
+    "file": "src/screens/Heroes/HeroesScreen.tsx",
+    "name": "memorialText"
+  },
+  {
+    "file": "src/screens/Heroes/HeroesScreen.tsx",
+    "name": "toolHeading"
+  },
+  {
+    "file": "src/screens/Heroes/HeroesScreen.tsx",
+    "name": "sectionLabel"
+  },
+  {
+    "file": "src/screens/Heroes/HeroesScreen.tsx",
+    "name": "resultCount"
+  },
+  {
+    "file": "src/screens/Heroes/HeroesScreen.tsx",
+    "name": "search"
+  },
+  {
+    "file": "src/screens/Heroes/HeroesScreen.tsx",
+    "name": "sortHeading"
+  },
+  {
+    "file": "src/screens/Heroes/HeroesScreen.tsx",
+    "name": "label"
+  },
+  {
+    "file": "src/screens/Heroes/HeroesScreen.tsx",
+    "name": "cardHint"
+  },
+  {
+    "file": "src/screens/Inventory/InventoryScreen.tsx",
+    "name": "filterButtonActive"
+  },
+  {
+    "file": "src/screens/Inventory/InventoryScreen.tsx",
+    "name": "itemMetaRow"
+  },
+  {
+    "file": "src/screens/Inventory/InventoryScreen.tsx",
+    "name": "usable"
+  },
+  {
+    "file": "src/screens/Inventory/InventoryScreen.tsx",
+    "name": "unusable"
+  },
+  {
+    "file": "src/screens/Inventory/InventoryScreen.tsx",
+    "name": "upgradeText"
+  },
+  {
+    "file": "src/screens/Inventory/InventoryScreen.tsx",
+    "name": "durability"
+  },
+  {
+    "file": "src/screens/Inventory/InventoryScreen.tsx",
+    "name": "enchanted"
+  },
+  {
+    "file": "src/screens/Inventory/ItemDetailScreen.tsx",
+    "name": "selected"
+  },
+  {
+    "file": "src/screens/QuestDecision/QuestDecisionScreen.tsx",
+    "name": "avatar"
+  },
+  {
+    "file": "src/screens/QuestDecision/QuestDecisionScreen.tsx",
+    "name": "avatarText"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "emblem"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "rewards"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "reward"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "rewardIcon"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "rewardValue"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "rewardLabel"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "loot"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "lootName"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "materialReward"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "heroRow"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "heroMeta"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "level"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "levelUp"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "skillPoint"
+  },
+  {
+    "file": "src/screens/QuestResult/QuestResultScreen.tsx",
+    "name": "journal"
+  },
+  {
+    "file": "src/screens/Raids/RaidScreen.tsx",
+    "name": "skull"
+  },
+  {
+    "file": "src/screens/RecruitmentScreen.tsx",
+    "name": "readyText"
+  },
+  {
+    "file": "src/screens/RecruitmentScreen.tsx",
+    "name": "offerGood"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "primary"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "actionText"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "primaryText"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "dim"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "gemPanel"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "panelTitle"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "section"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "pack"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "recommendedPack"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "packCopy"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "packHeading"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "recommended"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "packDescription"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "buyArea"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "price"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "storeNotice"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "storeNoticeTitle"
+  },
+  {
+    "file": "src/screens/Temple/TempleScreen.tsx",
+    "name": "legal"
+  },
+  {
+    "file": "src/screens/WorldMap/WorldMapScreen.tsx",
+    "name": "selectedMarker"
+  },
+  {
+    "file": "src/screens/WorldMap/WorldMapScreen.tsx",
+    "name": "nodeState"
+  },
+  {
+    "file": "src/screens/WorldMap/WorldMapScreen.tsx",
+    "name": "nodeHint"
+  },
+  {
+    "file": "src/screens/WorldMap/WorldMapScreen.tsx",
+    "name": "threatBadge"
+  },
+  {
+    "file": "src/screens/WorldMap/WorldMapScreen.tsx",
+    "name": "settlementRow"
+  }
+]

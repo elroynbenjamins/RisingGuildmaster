@@ -1,0 +1,500 @@
+[
+  {
+    "name": "GuildScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/temple.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/recruitment.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/temple.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/management.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 8
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "6,080",
+          "font": 10
+        },
+        {
+          "text": "35",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "180",
+          "font": 10
+        },
+        {
+          "text": "ACTIVE ORDERS",
+          "font": 7
+        },
+        {
+          "text": "TRAINING · 1",
+          "font": 8
+        },
+        {
+          "text": "2D",
+          "font": 7
+        },
+        {
+          "text": "GUILD HALL · WAR TABLE",
+          "font": 9
+        },
+        {
+          "text": "GUILD DAY",
+          "font": 7
+        },
+        {
+          "text": "THE WAYFARERS",
+          "font": 10
+        },
+        {
+          "text": "TREASURY",
+          "font": 7
+        },
+        {
+          "text": "REPUTATION",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 7
+        },
+        {
+          "text": "LOCATION",
+          "font": 7
+        },
+        {
+          "text": "GUILDMASTER",
+          "font": 8
+        },
+        {
+          "text": "0 / 100 XP · 0 skill points",
+          "font": 10
+        },
+        {
+          "text": "LEADERSHIP TREE ›",
+          "font": 8
+        },
+        {
+          "text": "IMMEDIATE ACTION",
+          "font": 8
+        },
+        {
+          "text": "1/2 BUSY",
+          "font": 8
+        },
+        {
+          "text": "A ready hero can use downtime to gain XP and develop toward the current campaign progressi",
+          "font": 10
+        },
+        {
+          "text": "ASSIGN TRAINING ›",
+          "font": 8
+        },
+        {
+          "text": "RECRUIT",
+          "font": 9
+        },
+        {
+          "text": "Tavern Board",
+          "font": 7
+        },
+        {
+          "text": "TRAIN",
+          "font": 9
+        },
+        {
+          "text": "Training Hall",
+          "font": 7
+        },
+        {
+          "text": "TEMPLE",
+          "font": 9
+        },
+        {
+          "text": "Recovery",
+          "font": 7
+        },
+        {
+          "text": "MANAGE",
+          "font": 9
+        },
+        {
+          "text": "Guild Services",
+          "font": 7
+        },
+        {
+          "text": "NEXT MILESTONE",
+          "font": 8
+        },
+        {
+          "text": "+10% MAX HP",
+          "font": 7
+        },
+        {
+          "text": "+25 READINESS",
+          "font": 7
+        },
+        {
+          "text": "+43 GOLD",
+          "font": 7
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "GUILD",
+          "font": 8
+        },
+        {
+          "text": "ACTIVE",
+          "font": 6
+        },
+        {
+          "text": "QUESTS",
+          "font": 8
+        },
+        {
+          "text": "WORLD",
+          "font": 8
+        },
+        {
+          "text": "2",
+          "font": 8
+        },
+        {
+          "text": "HEROES",
+          "font": 8
+        },
+        {
+          "text": "INVENTORY",
+          "font": 8
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1229,
+      "viewport": 650
+    },
+    "text": "The Wayfarers\n3\nDAY 42 · GUILDHAVEN\n6,080\n35\n1\n180\nACTIVE ORDERS\nTRAINING · 1\n2D\nGUILD HALL · WAR TABLE\nCommand Center\nGUILD DAY\n42\nTHE WAYFARERS\nTREASURY\n6,080 G\nREPUTATION\n180\nFIELD READY\n9/11\nLOCATION\nGuildhaven\nGUILDMASTER\nLV 1\n0 / 100 XP · 0 skill points\nLEADERSHIP TREE ›\nCURRENT ORDER\nIMMEDIATE ACTION\nAttend to the Fallen\n1 hero is awaiting revival at the Temple of Renewal.\nOpen Temple\nGUILD ORDERS · 1\n1/2 BUSY\n›\n1 Training Slot Open\nA ready hero can use downtime to gain XP and develop toward the current campaign progression cap.\nASSIGN TRAINING ›\nGUILD FACILITIES\nRECRUIT\nTavern Board\nTRAIN\nTraining Hall\nTEMPLE\nRecovery\nMANAGE\nGuild Services\nCALENDAR WATCH\nNEXT MILESTONE\nDay 44 · +2 days\nD43\nNorri Embermantle completed training and is available again.\n+10% MAX HP\n+25 READINESS\n+43 GOLD\nEnd Day\nOpen 7-Day Planner\nRECENT PARTY\nNo recent party\nAssemble a party from a quest and your latest adventurers will appear here.\nView heroes\n1\nGUILD\nACTIVE\nQUESTS\nWORLD\n2\nHEROES\nINVENTORY"
+  },
+  {
+    "name": "GuildScreen--HighContrast--390",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/temple.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/recruitment.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/temple.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/management.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 8
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "6,080",
+          "font": 10
+        },
+        {
+          "text": "35",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "180",
+          "font": 10
+        },
+        {
+          "text": "ACTIVE ORDERS",
+          "font": 7
+        },
+        {
+          "text": "TRAINING · 1",
+          "font": 8
+        },
+        {
+          "text": "2D",
+          "font": 7
+        },
+        {
+          "text": "GUILD HALL · WAR TABLE",
+          "font": 9
+        },
+        {
+          "text": "GUILD DAY",
+          "font": 7
+        },
+        {
+          "text": "THE WAYFARERS",
+          "font": 10
+        },
+        {
+          "text": "TREASURY",
+          "font": 7
+        },
+        {
+          "text": "REPUTATION",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 7
+        },
+        {
+          "text": "LOCATION",
+          "font": 7
+        },
+        {
+          "text": "GUILDMASTER",
+          "font": 8
+        },
+        {
+          "text": "0 / 100 XP · 0 skill points",
+          "font": 10
+        },
+        {
+          "text": "LEADERSHIP TREE ›",
+          "font": 8
+        },
+        {
+          "text": "IMMEDIATE ACTION",
+          "font": 8
+        },
+        {
+          "text": "1/2 BUSY",
+          "font": 8
+        },
+        {
+          "text": "A ready hero can use downtime to gain XP and develop toward the current campaign progressi",
+          "font": 10
+        },
+        {
+          "text": "ASSIGN TRAINING ›",
+          "font": 8
+        },
+        {
+          "text": "RECRUIT",
+          "font": 9
+        },
+        {
+          "text": "Tavern Board",
+          "font": 7
+        },
+        {
+          "text": "TRAIN",
+          "font": 9
+        },
+        {
+          "text": "Training Hall",
+          "font": 7
+        },
+        {
+          "text": "TEMPLE",
+          "font": 9
+        },
+        {
+          "text": "Recovery",
+          "font": 7
+        },
+        {
+          "text": "MANAGE",
+          "font": 9
+        },
+        {
+          "text": "Guild Services",
+          "font": 7
+        },
+        {
+          "text": "NEXT MILESTONE",
+          "font": 8
+        },
+        {
+          "text": "+10% MAX HP",
+          "font": 7
+        },
+        {
+          "text": "+25 READINESS",
+          "font": 7
+        },
+        {
+          "text": "+43 GOLD",
+          "font": 7
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "GUILD",
+          "font": 8
+        },
+        {
+          "text": "ACTIVE",
+          "font": 6
+        },
+        {
+          "text": "QUESTS",
+          "font": 8
+        },
+        {
+          "text": "WORLD",
+          "font": 8
+        },
+        {
+          "text": "2",
+          "font": 8
+        },
+        {
+          "text": "HEROES",
+          "font": 8
+        },
+        {
+          "text": "INVENTORY",
+          "font": 8
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1173,
+      "viewport": 650
+    },
+    "text": "The Wayfarers\n3\nDAY 42 · GUILDHAVEN\n6,080\n35\n1\n180\nACTIVE ORDERS\nTRAINING · 1\n2D\nGUILD HALL · WAR TABLE\nCommand Center\nGUILD DAY\n42\nTHE WAYFARERS\nTREASURY\n6,080 G\nREPUTATION\n180\nFIELD READY\n9/11\nLOCATION\nGuildhaven\nGUILDMASTER\nLV 1\n0 / 100 XP · 0 skill points\nLEADERSHIP TREE ›\nCURRENT ORDER\nIMMEDIATE ACTION\nAttend to the Fallen\n1 hero is awaiting revival at the Temple of Renewal.\nOpen Temple\nGUILD ORDERS · 1\n1/2 BUSY\n›\n1 Training Slot Open\nA ready hero can use downtime to gain XP and develop toward the current campaign progression cap.\nASSIGN TRAINING ›\nGUILD FACILITIES\nRECRUIT\nTavern Board\nTRAIN\nTraining Hall\nTEMPLE\nRecovery\nMANAGE\nGuild Services\nCALENDAR WATCH\nNEXT MILESTONE\nDay 44 · +2 days\nD43\nNorri Embermantle completed training and is available again.\n+10% MAX HP\n+25 READINESS\n+43 GOLD\nEnd Day\nOpen 7-Day Planner\nRECENT PARTY\nNo recent party\nAssemble a party from a quest and your latest adventurers will appear here.\nView heroes\n1\nGUILD\nACTIVE\nQUESTS\nWORLD\n2\nHEROES\nINVENTORY"
+  }
+]

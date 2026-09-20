@@ -1,0 +1,32 @@
+export interface QuestOutcomeConsequences { victory: string[]; defeat: string[] }
+
+/** Authored visible consequences. Mechanical flags are recorded alongside these by the chronicle service. */
+export const QUEST_OUTCOME_CONSEQUENCES: Record<string, QuestOutcomeConsequences> = {
+  knives_of_stonegate: { victory: ["Keeper Dagna survives and Stonegate's Gloam Knife cell is broken.", "A blackglass assassination contract enters the guild evidence vault."], defeat: ["The fourth civic target is murdered and the Gloam Knives remain active in Stonegate."] },
+  goblin_patrol: { victory: ["Greenveil's nearest patrol road is safe again."], defeat: ["Goblin patrols retain control of the road."] },
+  orchard_road_patrol: { victory: ["Guildhaven's orchard wagons can travel under guild protection."], defeat: ["Goblin scouts temporarily close the orchard road again."] },
+  missing_merchant: { victory: ["A missing merchant returns to Guildhaven with testimony about the organized raids."], defeat: ["The merchant remains missing and the trail grows colder."] },
+  attack_on_guildhaven: { victory: ["Guildhaven's defenses hold and the guild earns the town's confidence."], defeat: ["Guildhaven survives, but loses supplies and captives to the attackers."] },
+  goblin_chieftain_boss: { victory: ["The Greenveil goblin warband is broken; its leader's fate now rests with the guild."], defeat: ["The Chieftain remains in power and prepares for another guild assault."] },
+  smoke_without_fire: { victory: ["The scorched grove is secured and an ancient scale enters the guild's evidence vault."], defeat: ["Relic hunters strip the grove before the guild can secure its evidence."] },
+  the_scale_collector: { victory: ["Master Veyr's scale trade is disrupted and its eastern buyer is exposed."], defeat: ["Veyr escapes east with his strongest relics and surviving records."] },
+  the_hollow_below: { victory: ["The hidden observatory is opened and its Wardmaker mural is preserved in the guild record."], defeat: ["The star door seals, leaving the observatory and its guardian intact."] },
+  ashes_of_blackbridge: { victory: ["Keeper Sella and half of the Blackbridge ledger are recovered."], defeat: ["Blackbridge's hidden witness and evidence are lost beneath the river."] },
+  blackbridge_ledger: { victory: ["The Iron Laurel's sealed order is recovered as evidence."], defeat: ["The storehouse records are destroyed before they can identify who gave the order."] },
+  oath_of_the_broken_bridge: { victory: ["Blackbridge's dead deliver testimony that clears the Guildmaster and implicates the Iron Laurel."], defeat: ["The final testimony remains sealed in the drowned undercroft."] },
+  the_aurora_that_fell: { victory: ["The fallen aurora withdraws from Northwatch's southern road and the regional threat is cleared.", "Frostmarch confirms that the damaged Wardstones are transmitting a summons toward the Ashlands."], defeat: ["The false aurora consumes another signal tower and Frostmarch's regional threat continues to rise."] },
+  road_above_the_clouds: { victory: ["The forbidden skyroad reopens and Skyvault becomes a discoverable Iron Hills destination.", "Envoy Tharos reaches the embassy alive."], defeat: ["The skyroad remains contested and the dragon envoy cannot reach Skyvault."] },
+  embassy_of_empty_armor: { victory: ["Skyvault's guest-law is restored and its unedited diplomatic record is secured."], defeat: ["The animated honor guard retains control of the embassy archive."] },
+  siege_of_skyvault: { victory: ["Skyvault's three terraces hold and the surviving delegation reaches the inner embassy."], defeat: ["The embassy loses its outer aeries and withdraws behind its final defenses."] },
+  the_severed_voice: { victory: ["The counterfeit transmission is stopped and the dragon council's stolen voice is recovered.", "Varkesh is identified as the author of the rupture."], defeat: ["A forged declaration continues transmitting in Eldoria's voice."] },
+  varkesh_gilded_rupture_boss: { victory: ["Varkesh is defeated and its stolen council voice is freed.", "The Crownless signature forgery is exposed and Eldoria is recognized as the Sixth Signatory.", "The Concordance Glaive recipe enters the guild archive."], defeat: ["Varkesh retains the observatory and continues rewriting Eldoria's answer."] },
+  the_bell_that_hatched: { victory: ["The brasswing hatchling survives and the Firstsong Ring recipe is recovered."], defeat: ["Relic hunters scatter the hatchling into Skyvault's sealed vents."] },
+  feathers_over_the_abyss: { victory: ["Skyvault's courier route is restored and the Galewing Mantle recipe is recovered."], defeat: ["The stormcrow rookery keeps the stolen council dispatches."] },
+  road_to_tidewatch:{victory:["The refugee column reaches Tidewatch and the western fortress is discovered."],defeat:["The coastal road remains contested beneath the unnatural storm."]},
+  harbor_without_horizon:{victory:["A living Crownless chart is captured and Tidewatch can see the fleet's approach lanes."],defeat:["The black fog retains the outer docks and the harbor watch remains missing."]},
+  siege_of_tidewatch:{victory:["All three defensive lines hold and the Crownless flagship is drawn into boarding range."],defeat:["Tidewatch withdraws behind its inner bell while the vanguard occupies the flooded market."]},
+  board_the_nameless:{victory:["The flagship's signal masts are cut and its erased prisoner manifest enters the guild archive."],defeat:["The Nameless keeps its anchor-heart and prepares another Wardstone broadside."]},
+  admiral_nhal_veyr_boss:{victory:["Nhal Veyr is defeated, Tidewatch survives and the Sixth-Tide Blade recipe is recovered.","The vanguard breaks, but charts reveal a much larger Crownless fleet beyond the western sea."],defeat:["The admiral keeps the sea road open for the true Crownless Host."]},
+  the_lighthouse_that_walked:{victory:["The lighthouse returns to its cliff and the Beaconheart Ring recipe is recovered."],defeat:["The walking lighthouse continues inland while western ships navigate without its light."]},
+  letters_from_a_sunken_ship:{victory:["The drowned courier completes his final route and the Deadletter Coat recipe is recovered."],defeat:["The impossible letters continue erasing their living recipients."]},
+};

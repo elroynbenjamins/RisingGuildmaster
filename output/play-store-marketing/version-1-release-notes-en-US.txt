@@ -1,0 +1,12 @@
+<en-US>
+Welcome to Rising Guildmaster's first release!
+
+- Recruit heroes with distinct classes, traits, and potential.
+- Lead tactical turn-based battles with unlockable skills.
+- Explore five regions, story quests, branching dungeons, and raids.
+- Train heroes, craft equipment, brew potions, and upgrade your guild.
+- Manage supplies, salaries, and recovery.
+- Choose Standard, Veteran, or Iron Guild difficulty.
+
+Your guild. Your next adventure.
+</en-US>

@@ -1,0 +1,342 @@
+import React, { useMemo, useState } from "react";
+import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActionButton, BackButton, MiniMeter, Panel, StatusChip, colors } from "../../components/ui";
+import { getRegionLocations } from "../../data/world/regionLocations";
+import { REGIONS } from "../../data/world/regions";
+import { SETTLEMENTS } from "../../data/world/settlements";
+import { REGION_MAP_ART } from "../../data/world/worldArt";
+import { REGION_LORE } from "../../data/world/regionLore";
+import type { RegionLocationDefinition, RegionLocationType, RegionLoreDefinition } from "../../game/world/worldTypes";
+import type { GuildState } from "../../game/guild/types";
+import { useGuild } from "../../state/GuildContext";
+import { mapChromeStyles } from "../../ui/worldMap";
+import { GameIcon } from "../../components/icons/GameIcon";
+import type { GameIconId } from "../../data/ui/gameIcons";
+import { visitSettlementWithEvent } from "../../game/world/travelService";
+import { getLocalTravelPreview, getRegionProgressSummary, getSettlementQuestSummary, getTravelPartySize } from "../../game/world/worldMapPresentationService";
+import { QUESTS } from "../../data/quests/quests";
+import type { RandomSource } from "../../utils/random";
+import type { WorldEventDefinition } from "../../game/world/worldTypes";
+import { needsBramblefordSideQuest, needsStarterJourneyTravel, needsStarterRoadEncounter, STARTER_JOURNEY, starterBramblewayEvent } from "../../game/onboarding/starterJourneyService";
+import { useGameDialog } from "../../components/dialogs/GameDialog";
+import { acknowledgeTimeAdvanceGuidance, getTimeAdvanceGuidance, payrollWarningLine } from "../../game/onboarding/timeAndPayrollGuidanceService";
+import { isQuestAvailable, isQuestAvailableAtCurrentLocation } from "../../game/quests/questAvailability";
+
+const LOCATION_MARKERS: Record<RegionLocationType, GameIconId> = {
+  city: "settlement",
+  town: "settlement",
+  village: "settlement",
+  homeland: "hero_codex",
+  stronghold: "guild",
+  landmark: "current",
+  ruin: "defeat",
+  dungeon: "boss",
+};
+
+export function RegionMapScreen({ regionId, onBack, openQuest, random, openEvent }: { regionId: string; onBack(): void; openQuest(questId: string): void; random: RandomSource; openEvent(event: WorldEventDefinition): void }) {
+  const { showDialog } = useGameDialog();
+  const { guild, updateGuild } = useGuild();
+  const region = REGIONS[regionId];
+  const locations = useMemo(() => getRegionLocations(regionId), [regionId]);
+  const currentLocationId = locations.find((entry) => entry.settlementId === guild.world.currentSettlementId)?.id;
+  const [selectedId, setSelectedId] = useState(currentLocationId ?? locations[0]?.id ?? "");
+  const [showChronicle, setShowChronicle] = useState(false);
+  const [travelMessage, setTravelMessage] = useState<string>();
+  const selected = locations.find((entry) => entry.id === selectedId) ?? locations[0];
+  if (!region || !REGION_MAP_ART[regionId]) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={styles.title}>Unknown Region</Text></ScrollView>;
+  const regionUnlocked = guild.world.unlockedRegionIds.includes(regionId);
+  const regionLore = REGION_LORE[regionId];
+  const regionLoreDiscovered = guild.world.worldFlags[`lore_${regionId}`] === true;
+  const regionProgress = getRegionProgressSummary(guild, regionId);
+  const regionThreat = guild.world.regionThreat?.[regionId] ?? 0;
+  const currentSettlement = guild.world.currentSettlementId ? SETTLEMENTS[guild.world.currentSettlementId] : undefined;
+  const guidedTravel = regionId === "greenveil" && needsStarterJourneyTravel(guild);
+  const guidedRoadEncounter = regionId === "greenveil" && needsStarterRoadEncounter(guild);
+  const guidedSideQuest = regionId === "greenveil" && needsBramblefordSideQuest(guild);
+
+  const visit = (settlementId: string, sourceGuild: GuildState) => {
+    try {
+      if (guidedTravel && settlementId !== STARTER_JOURNEY.targetSettlementId) { setTravelMessage("Tutorial route: walk to Brambleford first."); return; }
+      const result = visitSettlementWithEvent(sourceGuild, settlementId, getTravelPartySize(sourceGuild), random);
+      updateGuild(result.guild);
+      const starterEvent = guidedTravel && settlementId === STARTER_JOURNEY.targetSettlementId ? starterBramblewayEvent() : result.event;
+      const daysPassed = result.guild.currentDay - sourceGuild.currentDay;
+      setTravelMessage(`ARRIVED · ${SETTLEMENTS[settlementId]?.name}${daysPassed > 0 ? ` · Day ${result.guild.currentDay}` : ""}${starterEvent ? " · road encounter discovered" : ""}`);
+      if (starterEvent) openEvent(starterEvent);
+    } catch (error) {
+      setTravelMessage(error instanceof Error ? error.message : "Local travel failed");
+    }
+  };
+
+  const beginVisit = (settlementId: string) => {
+    if (guidedRoadEncounter && settlementId === STARTER_JOURNEY.targetSettlementId) { openEvent(starterBramblewayEvent()); return; }
+    const guidance = getTimeAdvanceGuidance(guild, 1); const payrollLine = payrollWarningLine(guidance);
+    if (!guidance.showCalendarPrimer && !payrollLine) { visit(settlementId, guild); return; }
+    showDialog({ title: payrollLine ? "Walk Crosses Payroll Day" : "Local Travel Advances Time", eyebrow: guidance.showCalendarPrimer ? "TIME & PAYROLL TUTORIAL" : "PAYROLL WARNING", message: `${guidance.showCalendarPrimer ? "Walking between settlements advances the calendar. Recovery, projects, candidates, contracts, threats, tavern income, and payroll resolve during that day." : "Walking there advances the calendar by one day."}${payrollLine ? `\n\n${payrollLine}\nTreasury now: ${guild.gold} gold.` : ""}\n\nArrive on Day ${guidance.targetDay}.`, tone: guidance.projectedShortfall > 0 ? "danger" : "default", actions: [{ label: "Stay Here", tone: "secondary" }, { label: "Walk There", tone: "primary", onPress: () => visit(settlementId, acknowledgeTimeAdvanceGuidance(guild, guidance)) }] });
+  };
+
+  return (
+    <ScrollView contentContainerStyle={styles.content}>
+      <BackButton onPress={onBack} />
+      <View style={styles.heading}>
+        <View style={styles.flex}><Text style={styles.eyebrow}>LOCAL ROUTE BOARD</Text><Text style={styles.title}>{region.name}</Text><Text style={styles.subtitle}>Lv {region.recommendedLevelMin}–{region.recommendedLevelMax} · {locations.length} mapped locations · Day {guild.currentDay}</Text></View>
+        <StatusChip label={regionUnlocked ? "REGION OPEN" : "LOCKED"} tone={regionUnlocked ? "good" : "danger"} />
+      </View>
+
+      <Panel style={styles.regionCommand}>
+        <View style={styles.regionCommandRow}>
+          <GameIcon id="current" size={28} framed={false} />
+          <View style={styles.flex}><Text style={styles.regionCommandLabel}>GUILD POSITION</Text><Text style={styles.regionCommandValue}>{currentSettlement?.regionId === regionId ? currentSettlement.name : `Outside ${region.name}`}</Text></View>
+          <View style={styles.rationPlate}><Text style={styles.rationValue}>{guild.rations}</Text><Text style={styles.rationLabel}>RATIONS</Text></View>
+        </View>
+        <View style={styles.regionSummaryRow}>
+          <SummaryStat label="ORDERS" value={`${regionProgress.completedQuests}/${regionProgress.totalQuests}`} />
+          <SummaryStat label="KNOWN" value={`${regionProgress.discoveredSettlements}/${regionProgress.totalSettlements}`} />
+          <SummaryStat label="THREAT" value={`${regionThreat}/4`} danger={regionThreat >= 3} />
+          <SummaryStat label="FIELD" value={`${getTravelPartySize(guild)} HERO${getTravelPartySize(guild) === 1 ? "" : "ES"}`} />
+        </View>
+        <MiniMeter value={regionProgress.completedQuests} max={Math.max(1, regionProgress.totalQuests)} color={colors.gold} height={6} />
+      </Panel>
+
+      <View style={mapChromeStyles.frame}>
+        <ImageBackground source={REGION_MAP_ART[regionId]} resizeMode="cover" style={mapChromeStyles.canvas} imageStyle={mapChromeStyles.image}>
+          <View pointerEvents="none" style={styles.mapShade} />
+          {locations.map((entry) => {
+            const active = entry.id === selected?.id;
+            const settlementKnown = entry.settlementId ? guild.world.discoveredSettlementIds.includes(entry.settlementId) : true;
+            const completed = entry.questId ? guild.world.completedQuestIds.includes(entry.questId) : false;
+            const here = Boolean(entry.settlementId && entry.settlementId === guild.world.currentSettlementId);
+            const questSummary = entry.settlementId ? getSettlementQuestSummary(guild, entry.settlementId) : undefined;
+            return (
+              <Pressable
+                accessibilityLabel={`${entry.name}, ${entry.type}${here ? ", current location" : ""}`}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
+                key={entry.id}
+                onPress={() => setSelectedId(entry.id)}
+                style={({ pressed }: { pressed: boolean }) => [styles.marker, { left: `${entry.mapPosition.x * 100}%`, top: `${entry.mapPosition.y * 100}%` }, !settlementKnown && styles.unknownMarker, completed && styles.completedMarker, active && styles.activeMarker, here && styles.hereMarker, pressed && styles.pressedMarker]}
+              >
+                <View style={[styles.markerPlate, active && styles.markerPlateActive, here && styles.markerPlateHere]}><GameIcon id={completed ? "complete" : here ? "current" : LOCATION_MARKERS[entry.type]} size={18} framed={false} /></View>
+                <Text numberOfLines={2} style={[styles.markerName, active && styles.activeMarkerName]}>{entry.name}</Text>
+                {questSummary && questSummary.ready > 0 && <Text style={styles.questBadge}>{questSummary.ready} ORDER{questSummary.ready === 1 ? "" : "S"}</Text>}
+                {here && <Text style={styles.hereBadge}>HERE</Text>}
+              </Pressable>
+            );
+          })}
+          {!regionUnlocked && <View pointerEvents="none" style={styles.fog}><Text style={styles.fogText}>REGION LOCKED · MAP INFORMATION ONLY</Text></View>}
+        </ImageBackground>
+        <View style={mapChromeStyles.legend}>
+          <LegendItem icon="current" label="YOU" />
+          <LegendItem icon="settlement" label="SETTLEMENT" />
+          <LegendItem icon="boss" label="DUNGEON" />
+          <LegendItem icon="complete" label="CLEARED" />
+        </View>
+      </View>
+
+      <Text style={styles.mapHint}>Select a marker to inspect its services, orders and travel cost.</Text>
+
+      {guidedTravel && <Panel style={styles.tutorial}><Text style={styles.tutorialEyebrow}>TRAVEL TUTORIAL · STEP 1 OF 3</Text><Text style={styles.tutorialTitle}>Walk to Brambleford</Text><Text style={styles.tutorialText}>Select Brambleford and read the Local Route preview before walking. Travel advances one day and spends rations, so the panel shows the cost and arrival day before you commit. Brambleford is the guided route until you protect Aldren's caravan.</Text></Panel>}
+      {guidedRoadEncounter && <Panel style={styles.tutorial}><Text style={styles.tutorialEyebrow}>TRAVEL TUTORIAL · STEP 2 OF 3</Text><Text style={styles.tutorialTitle}>Answer the Caravan Alarm</Text><Text style={styles.tutorialText}>You are already in Brambleford. Select it and resume Aldren's road encounter without spending another day or more rations.</Text></Panel>}
+      {guidedSideQuest && <Panel style={styles.tutorial}><Text style={styles.tutorialEyebrow}>TRAVEL TUTORIAL · STEP 3 OF 3</Text><Text style={styles.tutorialTitle}>Take the Brambleford Charter</Text><Text style={styles.tutorialText}>Aldren's local Side Quest, The Brambleway Run, is now available below. Side Quests are tied to their settlement, clear only once, and pay their rewards once. Complete this charter before recruiting your fourth hero and confronting the Chieftain.</Text></Panel>}
+
+      {selected && <LocationPanel location={selected} guild={guild} regionUnlocked={regionUnlocked} openQuest={openQuest} forcedSettlementId={guidedTravel || guidedRoadEncounter ? STARTER_JOURNEY.targetSettlementId : undefined} onVisit={beginVisit} />}
+      {travelMessage && <Text style={styles.travelMessage}>{travelMessage}</Text>}
+      {regionLore && <RegionChronicle lore={regionLore} unlocked={regionLoreDiscovered} expanded={showChronicle} toggle={() => setShowChronicle((value) => !value)} />}
+    </ScrollView>
+  );
+}
+
+function SummaryStat({ label, value, danger = false }: { label: string; value: string; danger?: boolean }) {
+  return <View style={styles.summaryStat}><Text numberOfLines={1} style={[styles.summaryValue, danger && styles.summaryDanger]}>{value}</Text><Text style={styles.summaryLabel}>{label}</Text></View>;
+}
+
+function LegendItem({ icon, label }: { icon: GameIconId; label: string }) {
+  return <View style={styles.legendItem}><GameIcon id={icon} size={13} framed={false}/><Text style={styles.legendText}>{label}</Text></View>;
+}
+
+function RegionChronicle({ lore, unlocked, expanded, toggle }: { lore: RegionLoreDefinition; unlocked: boolean; expanded: boolean; toggle(): void }) {
+  return (
+    <Panel style={styles.chronicle}>
+      <Text style={styles.chronicleEyebrow}>REGIONAL CHRONICLE</Text>
+      <Text style={styles.chronicleTitle}>{lore.epithet}</Text>
+      <Text style={styles.chronicleText}>{lore.overview}</Text>
+      {!unlocked && <Text style={styles.lockedNote}>Travel to this region to unlock its complete history, culture, customs, and Wardstone records.</Text>}
+      {unlocked && <ActionButton label={expanded ? "CLOSE CHRONICLE" : "READ FULL CHRONICLE"} onPress={toggle} />}
+      {unlocked && expanded && <View style={styles.chronicleBody}>
+        <LoreSection title="HISTORY" text={lore.history} />
+        <LoreSection title="PEOPLE & CULTURE" text={lore.peopleAndCulture} />
+        <LoreSection title="TRADE & CRAFT" text={lore.tradeAndCraft} />
+        <LoreSection title="WARDSTONE LEGACY" text={lore.wardstoneLegacy} />
+        <LoreSection title="TRAVELER'S NOTES" text={lore.travelNotes} />
+        <Text style={styles.loreHeading}>CUSTOMS</Text>
+        {lore.customs.map((custom) => <Text key={custom} style={styles.loreList}>◆ {custom}</Text>)}
+        <Text style={styles.loreHeading}>LOCAL SAYINGS</Text>
+        {lore.sayings.map((saying) => <Text key={saying} style={styles.saying}>“{saying}”</Text>)}
+      </View>}
+    </Panel>
+  );
+}
+
+function LoreSection({ title, text }: { title: string; text: string }) {
+  return <View><Text style={styles.loreHeading}>{title}</Text><Text style={styles.chronicleText}>{text}</Text></View>;
+}
+
+function LocationPanel({ location, guild, regionUnlocked, openQuest, onVisit, forcedSettlementId }: { location: RegionLocationDefinition; guild: GuildState; regionUnlocked: boolean; openQuest(questId: string): void; onVisit(settlementId: string): void; forcedSettlementId?: string }) {
+  const settlement = location.settlementId ? SETTLEMENTS[location.settlementId] : undefined;
+  const localQuestIds = settlement?.questIds.filter((questId) => QUESTS[questId]?.questType !== "contract") ?? [];
+  const associatedQuest = location.questId ? QUESTS[location.questId] : undefined;
+  const associatedQuestAvailable = associatedQuest ? isQuestAvailableAtCurrentLocation(associatedQuest, guild.world) : false;
+  const isTravelOnlyEncounter = associatedQuest?.questType === "contract";
+  const discovered = settlement ? guild.world.discoveredSettlementIds.includes(settlement.id) : true;
+  const questComplete = location.questId ? guild.world.completedQuestIds.includes(location.questId) : false;
+  const localPreview = settlement ? getLocalTravelPreview(guild, settlement.id) : undefined;
+  const questSummary = settlement ? getSettlementQuestSummary(guild, settlement.id) : undefined;
+  const forcedElsewhere = Boolean(settlement && forcedSettlementId && settlement.id !== forcedSettlementId);
+  const canWalk = Boolean(settlement && regionUnlocked && !forcedElsewhere && (localPreview?.isCurrent || localPreview?.canAfford));
+
+  return (
+    <Panel style={[styles.panel, localPreview?.isCurrent && styles.panelCurrent]}>
+      <View style={styles.locationHeader}>
+        <View style={[styles.locationIcon, localPreview?.isCurrent && styles.locationIconCurrent]}><GameIcon id={localPreview?.isCurrent ? "current" : LOCATION_MARKERS[location.type]} size={28} framed={false}/></View>
+        <View style={styles.flex}><Text style={styles.locationEyebrow}>{location.type.toUpperCase()} · {discovered ? "KNOWN" : "UNDISCOVERED"}</Text><Text style={styles.locationName}>{location.name}</Text><Text style={styles.locationType}>{location.recommendedLevel ? `RECOMMENDED LEVEL ${location.recommendedLevel}` : "REGIONAL LOCATION"}</Text></View>
+        {localPreview?.isCurrent && <StatusChip label="GUILD HERE" tone="good" />}
+      </View>
+      <Text style={styles.description}>{location.description}</Text>
+
+      {settlement && <View style={styles.settlementOverview}>
+        <SummaryStat label="SERVICES" value={`${settlement.serviceIds.length}`} />
+        <SummaryStat label="ORDERS" value={`${questSummary?.ready ?? 0}`} />
+        <SummaryStat label="CLEARED" value={`${questSummary?.completed ?? 0}/${questSummary?.total ?? 0}`} />
+      </View>}
+
+      {settlement && <><Text style={styles.label}>SERVICES</Text><View style={styles.serviceGrid}>{settlement.serviceIds.map((serviceId) => <View key={serviceId} style={styles.serviceChip}><Text style={styles.serviceText}>{pretty(serviceId).toUpperCase()}</Text></View>)}</View></>}
+
+      {settlement && regionUnlocked && localPreview && !localPreview.isCurrent && <View style={[styles.walkPlan, localPreview.canAfford ? styles.walkPlanReady : styles.walkPlanBlocked]}>
+        <Text style={styles.walkPlanTitle}>LOCAL ROUTE · 1 DAY</Text>
+        <Text style={styles.walkPlanText}>{localPreview.partySize} hero{localPreview.partySize === 1 ? "" : "es"} · {localPreview.rationCost} rations · arrive Day {localPreview.arrivalDay} · {localPreview.rationsAfterTravel} rations left</Text>
+        {!localPreview.canAfford && <Text style={styles.walkPlanError}>NOT ENOUGH RATIONS · Need {localPreview.rationCost - guild.rations} more.</Text>}
+      </View>}
+
+      {settlement && regionUnlocked && <ActionButton
+        label={forcedElsewhere ? "TUTORIAL ROUTE LOCKED" : forcedSettlementId === settlement.id && localPreview?.isCurrent ? "ANSWER CARAVAN ALARM" : localPreview?.isCurrent ? "CURRENT GUILD POSITION" : `WALK HERE · 1D · ${localPreview?.rationCost ?? 0} RATIONS`}
+        disabled={!canWalk || (Boolean(localPreview?.isCurrent) && forcedSettlementId !== settlement.id)}
+        onPress={() => onVisit(settlement.id)}
+      />}
+
+      {settlement && localQuestIds.length > 0 && <>
+        <Text style={styles.label}>LOCAL ORDERS</Text>
+        <View style={styles.questList}>{localQuestIds.map((questId) => <LocalQuestOrder key={questId} questId={questId} guild={guild} settlementId={settlement.id} openQuest={openQuest} />)}</View>
+      </>}
+
+      {location.questId && !isTravelOnlyEncounter && !localQuestIds.includes(location.questId) && <View style={styles.questRow}>
+        <View style={styles.flex}><Text style={styles.label}>ASSOCIATED ORDER</Text><Text style={questComplete ? styles.complete : associatedQuestAvailable ? styles.questName : styles.lockedNote}>{pretty(location.questId)}{questComplete ? " · COMPLETE" : associatedQuestAvailable ? " · READY" : " · LOCKED"}</Text></View>
+        <ActionButton label={questComplete ? "REVIEW" : associatedQuestAvailable ? "OPEN ORDER" : "LOCKED"} disabled={!regionUnlocked || (!associatedQuestAvailable && !questComplete)} onPress={() => openQuest(location.questId!)} />
+      </View>}
+      {isTravelOnlyEncounter && <Text style={styles.lockedNote}>ROAD ENCOUNTER · This opportunity can be discovered while travelling through the region.</Text>}
+      {!regionUnlocked && <Text style={styles.lockedNote}>CAMPAIGN LOCKED · Unlock and travel to this region before beginning its orders or using local services.</Text>}
+    </Panel>
+  );
+}
+
+function LocalQuestOrder({ questId, guild, settlementId, openQuest }: { questId: string; guild: GuildState; settlementId: string; openQuest(questId: string): void }) {
+  const quest = QUESTS[questId];
+  if (!quest) return null;
+  const complete = guild.world.completedQuestIds.includes(questId);
+  const availableSomewhere = isQuestAvailable(quest, guild.world) && (quest.repeatable || !complete);
+  const here = guild.world.currentSettlementId === settlementId;
+  const ready = here && isQuestAvailableAtCurrentLocation(quest, guild.world) && (quest.repeatable || !complete);
+  const status = complete && !quest.repeatable ? "COMPLETE" : ready ? "READY" : availableSomewhere ? "TRAVEL HERE" : "LOCKED";
+  const tone = status === "READY" ? "good" : status === "COMPLETE" ? "blue" : status === "TRAVEL HERE" ? "gold" : "neutral";
+  return <View style={[styles.localQuestCard, ready && styles.localQuestReady]}>
+    <View style={styles.localQuestHeader}><View style={styles.flex}><Text style={styles.localQuestType}>{quest.questType.toUpperCase()}{quest.questType === "side" && !quest.repeatable ? " · ONE CLEAR" : ""}</Text><Text style={styles.localQuestName}>{quest.name}</Text></View><StatusChip label={status} tone={tone} /></View>
+    <View style={styles.localQuestMeta}><Text style={styles.localQuestMetaText}>LV {quest.recommendedLevelMin ?? quest.difficulty}{quest.recommendedLevelMax ? `–${quest.recommendedLevelMax}` : ""}</Text><Text style={styles.localQuestMetaText}>{quest.encounterIds.length} BATTLE{quest.encounterIds.length === 1 ? "" : "S"}</Text><Text style={styles.localQuestMetaText}>{quest.goldRewardMin}–{quest.goldRewardMax}G</Text><Text style={styles.localQuestMetaText}>{quest.xpRewardPerHero} XP</Text></View>
+    {(ready || (complete && !quest.repeatable && here)) && <ActionButton label={ready ? "OPEN ORDER" : "REVIEW ORDER"} onPress={() => openQuest(questId)} />}
+  </View>;
+}
+
+function pretty(value: string): string { return value.split("_").map((word) => word[0]!.toUpperCase() + word.slice(1)).join(" "); }
+
+const styles = StyleSheet.create({
+  content: { padding: 16, paddingBottom: 50 },
+  heading: { alignItems: "flex-start", flexDirection: "row", gap: 8, marginTop: 7 },
+  flex: { flex: 1 },
+  eyebrow: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: 1.5 },
+  title: { color: colors.text, fontSize: 30, fontWeight: "900", marginTop: 2 },
+  subtitle: { color: colors.muted, fontSize: 10, marginTop: 3 },
+  regionCommand: { borderColor: colors.gold, marginTop: 12, padding: 10 },
+  regionCommandRow: { alignItems: "center", flexDirection: "row", gap: 8 },
+  regionCommandLabel: { color: colors.gold, fontSize: 7, fontWeight: "900", letterSpacing: .9 },
+  regionCommandValue: { color: colors.text, fontSize: 14, fontWeight: "900", marginTop: 1 },
+  rationPlate: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, borderWidth: 1, minWidth: 50, padding: 6 },
+  rationValue: { color: colors.text, fontSize: 16, fontWeight: "900" },
+  rationLabel: { color: colors.gold, fontSize: 6, fontWeight: "900", letterSpacing: .5 },
+  regionSummaryRow: { flexDirection: "row", gap: 4, marginBottom: 7, marginTop: 8 },
+  summaryStat: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, borderWidth: 1, flex: 1, minWidth: 0, paddingHorizontal: 3, paddingVertical: 6 },
+  summaryValue: { color: colors.text, fontSize: 11, fontWeight: "900" },
+  summaryDanger: { color: colors.danger },
+  summaryLabel: { color: colors.muted, fontSize: 6, fontWeight: "900", letterSpacing: .5, marginTop: 1 },
+  mapShade: { backgroundColor: "rgba(3, 9, 14, .08)", bottom: 0, left: 0, position: "absolute", right: 0, top: 0 },
+  marker: { alignItems: "center", backgroundColor: "transparent", marginLeft: -38, marginTop: -13, minHeight: 48, paddingHorizontal: 3, position: "absolute", width: 76 },
+  markerPlate: { alignItems: "center", backgroundColor: "rgba(22,31,33,.92)", borderColor: colors.border, borderWidth: 1, height: 24, justifyContent: "center", width: 24 },
+  markerPlateActive: { borderColor: colors.gold, borderWidth: 2 },
+  markerPlateHere: { backgroundColor: "rgba(25,72,45,.95)", borderColor: colors.green },
+  unknownMarker: { opacity: .68 },
+  completedMarker: { opacity: 1 },
+  activeMarker: { transform: [{ scale: 1.08 }] },
+  hereMarker: { zIndex: 3 },
+  pressedMarker: { opacity: .7 },
+  markerName: { color: colors.text, fontSize: 7, fontWeight: "900", lineHeight: 9, marginTop: 2, textAlign: "center", textShadowColor: "#050707", textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 2 },
+  activeMarkerName: { color: colors.gold },
+  questBadge: { backgroundColor: "rgba(94,70,28,.94)", color: "#ffe0a2", fontSize: 5, fontWeight: "900", marginTop: 1, overflow: "hidden", paddingHorizontal: 3, paddingVertical: 1 },
+  hereBadge: { backgroundColor: "rgba(28,83,51,.96)", color: "#b6f0c5", fontSize: 5, fontWeight: "900", marginTop: 1, overflow: "hidden", paddingHorizontal: 3, paddingVertical: 1 },
+  fog: { alignItems: "center", backgroundColor: "rgba(12, 17, 20, .34)", bottom: 0, justifyContent: "flex-end", left: 0, paddingBottom: 5, position: "absolute", right: 0, top: 0 },
+  fogText: { backgroundColor: "rgba(12, 17, 20, .9)", color: colors.muted, fontSize: 8, fontWeight: "900", letterSpacing: .6, padding: 4 },
+  legendItem: { alignItems: "center", flexDirection: "row", gap: 3 },
+  legendText: { color: colors.muted, fontSize: 7, fontWeight: "900" },
+  mapHint: { color: colors.gold, fontSize: 8, fontWeight: "800", marginBottom: 10, marginTop: -7, textAlign: "center" },
+  panel: { borderColor: "#4a5857" },
+  panelCurrent: { borderColor: colors.green },
+  locationHeader: { alignItems: "center", flexDirection: "row", gap: 9 },
+  locationIcon: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.gold, borderWidth: 1, height: 40, justifyContent: "center", width: 40 },
+  locationIconCurrent: { backgroundColor: "#14251b", borderColor: colors.green },
+  locationEyebrow: { color: colors.gold, fontSize: 7, fontWeight: "900", letterSpacing: .8 },
+  locationName: { color: colors.text, fontSize: 20, fontWeight: "900", marginTop: 1 },
+  locationType: { color: colors.muted, fontSize: 8, fontWeight: "800", marginTop: 2 },
+  description: { color: colors.muted, lineHeight: 19, marginTop: 10 },
+  settlementOverview: { flexDirection: "row", gap: 4, marginTop: 10 },
+  label: { color: colors.gold, fontSize: 8, fontWeight: "900", letterSpacing: 1, marginTop: 12 },
+  serviceGrid: { flexDirection: "row", flexWrap: "wrap", gap: 5, marginBottom: 10, marginTop: 6 },
+  serviceChip: { backgroundColor: colors.panel2, borderColor: colors.border, borderWidth: 1, paddingHorizontal: 6, paddingVertical: 5 },
+  serviceText: { color: colors.text, fontSize: 7, fontWeight: "800" },
+  walkPlan: { borderWidth: 1, marginBottom: 9, marginTop: 2, padding: 8 },
+  walkPlanReady: { backgroundColor: "#14251b", borderColor: colors.green },
+  walkPlanBlocked: { backgroundColor: "#291b18", borderColor: colors.danger },
+  walkPlanTitle: { color: colors.gold, fontSize: 8, fontWeight: "900", letterSpacing: .8 },
+  walkPlanText: { color: colors.text, fontSize: 9, lineHeight: 14, marginTop: 3 },
+  walkPlanError: { color: colors.danger, fontSize: 9, fontWeight: "900", marginTop: 4 },
+  questList: { gap: 7, marginTop: 6 },
+  localQuestCard: { backgroundColor: colors.panel2, borderColor: colors.border, borderLeftColor: colors.gold, borderLeftWidth: 3, borderWidth: 1, gap: 7, padding: 9 },
+  localQuestReady: { borderColor: colors.green, borderLeftColor: colors.green },
+  localQuestHeader: { alignItems: "flex-start", flexDirection: "row", gap: 6 },
+  localQuestType: { color: colors.gold, fontSize: 7, fontWeight: "900", letterSpacing: .7 },
+  localQuestName: { color: colors.text, fontSize: 12, fontWeight: "900", marginTop: 2 },
+  localQuestMeta: { flexDirection: "row", flexWrap: "wrap", gap: 7 },
+  localQuestMetaText: { color: colors.muted, fontSize: 8, fontWeight: "800" },
+  questRow: { alignItems: "center", borderTopColor: colors.border, borderTopWidth: 1, flexDirection: "row", gap: 10, marginTop: 12, paddingTop: 3 },
+  questName: { color: colors.text, fontSize: 12, fontWeight: "800", marginTop: 3 },
+  complete: { color: colors.green, fontSize: 12, fontWeight: "800", marginTop: 3 },
+  lockedNote: { color: colors.danger, fontSize: 10, lineHeight: 16, marginTop: 10 },
+  travelMessage: { color: colors.green, fontSize: 10, fontWeight: "800", marginTop: 8 },
+  tutorial: { borderColor: colors.gold, marginTop: 12 },
+  tutorialEyebrow: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: 1.2 },
+  tutorialTitle: { color: colors.text, fontSize: 18, fontWeight: "900", marginTop: 4 },
+  tutorialText: { color: colors.muted, lineHeight: 18, marginTop: 5 },
+  chronicle: { borderColor: colors.gold, marginTop: 12 },
+  chronicleEyebrow: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: 1.5 },
+  chronicleTitle: { color: colors.text, fontSize: 20, fontWeight: "900", marginBottom: 7, marginTop: 3 },
+  chronicleText: { color: colors.muted, lineHeight: 20, marginBottom: 10 },
+  chronicleBody: { borderTopColor: colors.border, borderTopWidth: 1, marginTop: 12, paddingTop: 2 },
+  loreHeading: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: 1.2, marginBottom: 5, marginTop: 13 },
+  loreList: { color: colors.text, fontSize: 11, lineHeight: 17, marginBottom: 5 },
+  saying: { borderLeftColor: colors.gold, borderLeftWidth: 2, color: colors.text, fontStyle: "italic", lineHeight: 19, marginBottom: 7, paddingLeft: 8 },
+});

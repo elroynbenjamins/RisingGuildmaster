@@ -1,0 +1,130 @@
+import React, { useMemo, useState } from "react";
+import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActionButton, EmptyState, Panel, SegmentedTabs, SecondaryButton } from "../../components/ui";
+import { HeroRosterCard } from "../../components/heroes/HeroRosterCard";
+import { CLASSES } from "../../data/classes/classes";
+import { RACES } from "../../data/races/races";
+import { RECRUITMENT_CONFIG } from "../../data/recruitment/recruitmentBalance";
+import type { Hero } from "../../game/heroes/types";
+import { getHeroLoyalty, getHeroLoyaltyBand } from "../../game/heroes/heroLoyaltyService";
+import { getAvailableClassSkillPoints } from "../../game/progression/skills/skillProgressionService";
+import { useGuild } from "../../state/GuildContext";
+import { filterAndSortHeroes, type HeroFilter, type HeroSort } from "../../ui/heroList";
+import { heroHasSkillChoice } from "../../ui/actionNotifications";
+import { useTheme } from "../../theme/theme";
+
+const FILTERS: HeroFilter[] = ["All", "Available", "Injured", "Fallen"];
+const SORTS: HeroSort[] = ["Level", "Name", "Class", "Potential"];
+
+function averageTopFour(heroes: readonly Hero[]): number {
+  const top = [...heroes].sort((a, b) => b.level - a.level).slice(0, 4);
+  return top.length ? top.reduce((sum, hero) => sum + hero.level, 0) / top.length : 0;
+}
+
+export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void; recruit(): void }) {
+  const { guild } = useGuild();
+  const { colors: themeColors } = useTheme();
+  const [filter, setFilter] = useState<HeroFilter>("All");
+  const [sort, setSort] = useState<HeroSort>("Level");
+  const [query, setQuery] = useState("");
+  const normalizedQuery = query.trim().toLowerCase();
+  const heroes = filterAndSortHeroes(guild.heroes, filter, sort).filter((hero) =>
+    !normalizedQuery || `${hero.name} ${RACES[hero.raceId].name} ${CLASSES[hero.classId].name}`.toLowerCase().includes(normalizedQuery)
+  );
+
+  const fallenCount = guild.heroes.filter((hero) => hero.currentHP <= 0).length;
+  const availableCount = guild.heroes.filter((hero) => hero.currentHP > 0 && hero.isAvailable).length;
+  const totalSkillChoices = guild.heroes.reduce((sum, hero) => sum + getAvailableClassSkillPoints(hero), 0);
+  const topFourAverage = averageTopFour(guild.heroes);
+  const contractByHeroId = useMemo(() => new Map(guild.heroContracts.map((contract) => [contract.heroId, contract])), [guild.heroContracts]);
+  const trainingByHeroId = useMemo(() => new Map(guild.trainingGround.sessions.map((session) => [session.heroId, session])), [guild.trainingGround.sessions]);
+  const attentionCount = guild.heroes.filter((hero) => {
+    const loyalty = getHeroLoyalty(guild, hero.id).score;
+    const contract = contractByHeroId.get(hero.id);
+    return hero.currentHP <= 0
+      || hero.conditions.some((entry) => entry.conditionId !== "inspired")
+      || heroHasSkillChoice(hero)
+      || getHeroLoyaltyBand(loyalty) === "unhappy"
+      || getHeroLoyaltyBand(loyalty) === "resentful"
+      || (!!contract && contract.endDay - guild.currentDay <= 14);
+  }).length;
+  const capacityReached = guild.heroes.length >= RECRUITMENT_CONFIG.heroCapacity;
+
+  return <ScrollView style={{ backgroundColor: themeColors.background }} contentContainerStyle={styles.content}>
+    <View style={[styles.rosterBanner, { backgroundColor: themeColors.panel, borderColor: themeColors.gold }]}>
+      <View style={styles.bannerCopy}>
+        <Text style={[styles.eyebrow, { color: themeColors.gold }]}>GUILD HALL · ADVENTURERS</Text>
+        <Text style={[styles.title, { color: themeColors.text }]}>Adventurers</Text>
+        <Text style={[styles.count, { color: themeColors.muted }]}>{guild.heroes.length} / {RECRUITMENT_CONFIG.heroCapacity} roster slots · Day {guild.currentDay}</Text>
+      </View>
+      <View style={styles.recruitAction}>
+        {capacityReached ? <SecondaryButton label="Roster full" disabled onPress={recruit} /> : <ActionButton label="Recruit" onPress={recruit} />}
+      </View>
+    </View>
+
+    <View style={styles.overview}>
+      <View style={[styles.overviewItem, { backgroundColor: "transparent", borderColor: themeColors.green }]}><Text style={[styles.overviewValue, { color: themeColors.green }]}>{availableCount}</Text><Text style={[styles.overviewLabel, { color: themeColors.muted }]}>FIELD READY</Text></View>
+      <View style={[styles.overviewItem, { backgroundColor: "transparent", borderColor: attentionCount ? themeColors.gold : themeColors.border }]}><Text style={[styles.overviewValue, { color: attentionCount ? themeColors.gold : themeColors.text }]}>{attentionCount}</Text><Text style={[styles.overviewLabel, { color: themeColors.muted }]}>ATTENTION</Text></View>
+      <View style={[styles.overviewItem, { backgroundColor: "transparent", borderColor: themeColors.blue }]}><Text style={[styles.overviewValue, { color: themeColors.blue }]}>{topFourAverage.toFixed(1)}</Text><Text style={[styles.overviewLabel, { color: themeColors.muted }]}>TOP 4 AVG</Text></View>
+      <View style={[styles.overviewItem, { backgroundColor: "transparent", borderColor: totalSkillChoices ? themeColors.gold : themeColors.border }]}><Text style={[styles.overviewValue, { color: totalSkillChoices ? themeColors.gold : themeColors.text }]}>{totalSkillChoices}</Text><Text style={[styles.overviewLabel, { color: themeColors.muted }]}>SKILL PTS</Text></View>
+    </View>
+
+    {fallenCount > 0 && <View style={[styles.memorial, { backgroundColor: themeColors.panel, borderColor: themeColors.danger }]}><Text style={[styles.memorialTitle, { color: themeColors.danger }]}>⚑ TEMPLE ATTENTION REQUIRED</Text><Text style={[styles.memorialText, { color: themeColors.text }]}>{fallenCount} fallen guild member{fallenCount === 1 ? " awaits" : "s await"} revival. Use the Fallen filter to inspect them.</Text></View>}
+
+    <Panel style={styles.rosterTools}>
+      <View style={styles.toolHeading}><Text style={[styles.sectionLabel, { color: themeColors.gold }]}>ROSTER LEDGER</Text><Text style={[styles.resultCount, { color: themeColors.muted }]}>{heroes.length} SHOWN</Text></View>
+      <TextInput accessibilityLabel="Search hero roster" value={query} onChangeText={setQuery} placeholder="Search hero, race, or class" placeholderTextColor={themeColors.muted} style={[styles.search, { backgroundColor: themeColors.panel2, borderColor: themeColors.border, color: themeColors.text }]} />
+      <SegmentedTabs values={FILTERS} value={filter} onChange={setFilter} />
+      <View style={styles.sortHeading}><Text style={[styles.label, { color: themeColors.muted }]}>SORT ORDER</Text></View>
+      <SegmentedTabs values={SORTS} value={sort} onChange={setSort} />
+    </Panel>
+
+    <View style={styles.cardHeader}>
+      <Text style={[styles.sectionLabel, { color: themeColors.gold }]}>ADVENTURER CARDS</Text>
+      <Text style={[styles.cardHint, { color: themeColors.muted }]}>Tap a hero to inspect equipment, skills, history & relationships.</Text>
+    </View>
+
+    {heroes.map((hero) => {
+      const skillPoints = getAvailableClassSkillPoints(hero);
+      const loyalty = getHeroLoyalty(guild, hero.id).score;
+      return <HeroRosterCard
+        key={hero.id}
+        hero={hero}
+        loyaltyScore={loyalty}
+        skillPoints={skillPoints}
+        contract={contractByHeroId.get(hero.id)}
+        trainingSession={trainingByHeroId.get(hero.id)}
+        currentDay={guild.currentDay}
+        onPress={() => openHero(hero)}
+      />;
+    })}
+
+    {!heroes.length && <EmptyState title={filter === "Fallen" && !query ? "No fallen heroes" : guild.heroes.length ? "No matching heroes" : "Your roster is empty"} message={query ? "Try another hero name, race, or class." : filter === "Fallen" ? "Every guild member is still standing." : guild.heroes.length ? "Change the current roster filter." : "Recruit candidates to begin building your guild."} actionLabel={!guild.heroes.length ? "Open Recruitment" : undefined} onAction={!guild.heroes.length ? recruit : undefined} />}
+  </ScrollView>;
+}
+
+const styles = StyleSheet.create({
+  content: { padding: 14, paddingBottom: 38 },
+  rosterBanner: {gap: 12, justifyContent: "space-between", marginBottom: 10, minHeight: 96, padding: 13, borderWidth: 0, borderRadius: 12, flexDirection: "column", alignItems: "stretch"},
+  bannerCopy: { flex: 0, minWidth: 0},
+  eyebrow: { fontSize: 9, fontWeight: "500", letterSpacing: .3 },
+  title: { fontSize: 27, fontWeight: "900", letterSpacing: .4, lineHeight: 31, marginTop: 2 },
+  count: { fontSize: 10, fontWeight: "500", marginTop: 3 },
+  recruitAction: {minWidth: 96, alignSelf: "flex-start"},
+  overview: { flexDirection: "row", gap: 5, marginBottom: 10 },
+  overviewItem: { alignItems: "center", flex: 1, minHeight: 61, paddingHorizontal: 3, paddingVertical: 8, borderWidth: 0, borderRadius: 12,  backgroundColor: "transparent", },
+  overviewValue: { fontSize: 18, fontWeight: "900" },
+  overviewLabel: { fontSize: 7, fontWeight: "500", letterSpacing: .3, marginTop: 2, textAlign: "center" },
+  memorial: { marginBottom: 10, padding: 11, borderWidth: 0, borderRadius: 12, },
+  memorialTitle: { fontSize: 10, fontWeight: "900", letterSpacing: .9 },
+  memorialText: { fontSize: 11, lineHeight: 16, marginTop: 4 },
+  rosterTools: { marginBottom: 12, padding: 10 },
+  toolHeading: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginBottom: 8 },
+  sectionLabel: { fontSize: 10, fontWeight: "500", letterSpacing: .3 },
+  resultCount: { fontSize: 8, fontWeight: "500", letterSpacing: .3 },
+  search: { marginBottom: 8, minHeight: 42, paddingHorizontal: 11, borderWidth: 0, borderRadius: 12, },
+  sortHeading: { marginBottom: 4, marginTop: -4 },
+  label: { fontSize: 8, fontWeight: "500", letterSpacing: .3 },
+  cardHeader: { marginBottom: 8, paddingHorizontal: 2 },
+  cardHint: { fontSize: 9, lineHeight: 13, marginTop: 2 },
+});

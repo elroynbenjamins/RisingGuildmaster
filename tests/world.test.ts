@@ -1,0 +1,74 @@
+import { describe, expect, it } from "vitest";
+import { REGIONS } from "../src/data/world/regions";
+import { SETTLEMENTS } from "../src/data/world/settlements";
+import { WORLD_EVENTS } from "../src/data/world/worldEvents";
+import { getTravelContractEvents } from "../src/data/world/travelContractEvents";
+import { CHAPTER_1 } from "../src/data/campaign/chapter1";
+import { CHAPTER_5 } from "../src/data/campaign/chapter5";
+import { QUEST_ENCOUNTERS } from "../src/data/encounters/questEncounters";
+import { BATTLEFIELDS } from "../src/data/combat/battlefields";
+import { completeCampaignNode, getAvailableCampaignNodes, isCampaignQuestUnlocked } from "../src/game/campaign/campaignService";
+import { getCampaignNodeLocationRequirement, isCampaignNodeAtCurrentLocation } from "../src/game/campaign/campaignLocationService";
+import { QUESTS } from "../src/data/quests/quests";
+import { isQuestAvailable, isQuestAvailableAtCurrentLocation } from "../src/game/quests/questAvailability";
+import { resolveCampaignChoice } from "../src/game/campaign/campaignChoiceResolver";
+import { createGuild } from "../src/game/guild/guildService";
+import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
+import { canTravel, getRegionalTravelDays, rollTravelEvent, travelGuildToRegion, travelToRegion, visitSettlement } from "../src/game/world/travelService";
+import { describeEventOutcomes, resolveAbilityCheck, resolveEventChoice, resolveGuildEventChoice } from "../src/game/world/worldEventResolver";
+import { createWorldState } from "../src/game/world/worldState";
+import { sequenceRandom } from "./combatTestUtils";
+import { testHero } from "./testHero";
+import { unlockRegionalThreats } from "../src/game/world/regionalThreatService";
+
+describe("persistent world and campaign", () => {
+  it("turns contracts into travel-only opportunities with an accept route", () => { const greenveil = getTravelContractEvents("greenveil"); expect(greenveil.map((event) => event.choices.find((choice) => choice.questId)?.questId)).toEqual(expect.arrayContaining(["orchard_road_patrol", "spider_nest", "goblin_cave_hideout"])); expect(getTravelContractEvents("shadowfen")).toEqual([]); });
+  it("defines Eldoria's five connected regions and expanded settlements", () => { expect(Object.keys(REGIONS)).toHaveLength(5); expect(Object.keys(SETTLEMENTS)).toHaveLength(15); expect(REGIONS.greenveil?.connectedRegionIds).toEqual(["iron_hills", "shadowfen"]); expect(REGIONS.iron_hills?.connectedRegionIds).toEqual(["greenveil", "frostmarch", "ashlands"]); });
+  it("rejects locked travel, then permits direct travel after Chapter 1", () => { let world = createWorldState(); expect(canTravel(world, "iron_hills")).toBe(false); expect(() => travelToRegion(world, "iron_hills", sequenceRandom([.9]))).toThrow(); for (const id of CHAPTER_1.nodeIds) world = completeCampaignNode(world, id).worldState; expect(world.unlockedRegionIds).toEqual(expect.arrayContaining(["greenveil", "iron_hills", "shadowfen"])); expect(travelToRegion(world, "iron_hills", sequenceRandom([.9])).state.currentRegionId).toBe("iron_hills"); expect(() => travelToRegion(world, "ashlands", sequenceRandom([.9]))).toThrow(); });
+  it("preserves day-based world changes during regional travel", () => {
+    const guild = createGuild();
+    guild.world = unlockRegionalThreats({ ...guild.world, unlockedRegionIds: [...guild.world.unlockedRegionIds, "shadowfen"] });
+    guild.world = { ...guild.world, regionCrisisDays: { shadowfen: 19 }, regionThreat: { shadowfen: 0 } };
+    const days = getRegionalTravelDays("greenveil", "shadowfen");
+    const result = travelGuildToRegion(guild, "shadowfen", 2, sequenceRandom([.4, .9, .9, .9]));
+    expect(result.guild.currentDay).toBe(guild.currentDay + days);
+    expect(result.guild.world.regionCrisisDays?.shadowfen).toBe(19 + days);
+    expect(result.guild.world.regionThreat?.shadowfen).toBe(Math.floor((19 + days) / 20));
+    expect(result.guild.world.currentRegionId).toBe("shadowfen");
+    expect(result.guild.world.discoveredSettlementIds).toContain(result.guild.world.currentSettlementId);
+  });
+
+  it("enforces regional-crisis settlement closures through every travel path", () => {
+    let world = unlockRegionalThreats(createWorldState());
+    world = { ...world, unlockedRegionIds: [...world.unlockedRegionIds, "shadowfen"], regionThreat: { shadowfen: 4 }, regionCrisisDays: { shadowfen: 80 } };
+    const arrived = travelToRegion(world, "shadowfen", sequenceRandom([.4, .9]));
+    expect(arrived.state.currentSettlementId).toBe("mirewatch");
+
+    const guild = createGuild();
+    guild.world = arrived.state;
+    expect(() => visitSettlement(guild, "blackwater", 2)).toThrow("regional crisis");
+  });
+
+  it("uses a tiered regional d100 travel table", () => { expect(rollTravelEvent("greenveil", sequenceRandom([.55, 0]))?.tier).toBe("common"); expect(rollTravelEvent("greenveil", sequenceRandom([.54]))).toBeNull(); expect(rollTravelEvent("shadowfen", sequenceRandom([.99, 0]))?.tier).toBe("legendary"); });
+  it("uses the standard D&D ability modifier for non-combat checks", () => { const hero = { ...testHero(), baseAttributes: { ...testHero().baseAttributes, strength: 16 } }; expect(resolveAbilityCheck({ attribute: "strength", difficultyClass: 12 }, [hero], sequenceRandom([.4]))).toMatchObject({ diceRoll: 9, modifier: 3, total: 12, success: true }); });
+  it("applies explicit travel event outcomes", () => { const hero = { ...testHero(), baseAttributes: { ...testHero().baseAttributes, strength: 16 } }; const choice = WORLD_EVENTS.broken_caravan!.choices[0]!; const result = resolveEventChoice(choice, [hero], createWorldState(), sequenceRandom([.4])); expect(result.goldDelta).toBe(40); expect(result.worldState.factionReputation.merchants).toBe(2); });
+  it("provides an authored narrative encounter for every region", () => { for (const regionId of Object.keys(REGIONS)) expect(Object.values(WORLD_EVENTS).some((event) => event.regionIds.includes(regionId) && event.weight === 2 && event.choices.some((choice) => choice.dialogue))).toBe(true); });
+  it("applies travel relationship moments without mutating the event definition", () => { const guild = createGuild(); const first = testHero(); const second = { ...testHero(), id: "hero-two", name: "Second Hero" }; guild.heroes = [first, second]; guild.recentPartyHeroIds = [first.id, second.id]; const choice = WORLD_EVENTS.greenveil_oathstone!.choices[1]!; const result = resolveGuildEventChoice(choice, guild, guild.heroes, sequenceRandom([0])); expect(result.relationshipChange).toMatchObject({ heroIdA: first.id, heroIdB: second.id, previousScore: 0, newScore: 1, delta: 1 }); expect(result.guild.relationships[0]?.score).toBe(1); expect(guild.relationships).toEqual([]); expect(choice.successOutcomes).toContainEqual({ type: "party_relationship", value: 1 }); });
+  it("describes event rewards and persistent consequences clearly", () => { expect(describeEventOutcomes([{ type: "gold", value: 40 }, { type: "rations", value: -2 }, { type: "world_flag", flag: "road_known", value: true }])).toEqual(["+40 gold", "-2 rations", "World state changed: road known"]); });
+  it("enforces campaign prerequisites, choices, flags, rewards, and chapter progression", () => { let world = createWorldState(); expect(getAvailableCampaignNodes(world).map((node) => node.id)).toEqual(["founding_the_guild"]); expect(() => completeCampaignNode(world, "missing_merchant")).toThrow(); world.worldFlags.starter_brambleford_side_quest_complete = true; world.worldFlags.starter_fourth_hero_ready = true; for (const id of CHAPTER_1.nodeIds.slice(0, -1)) world = completeCampaignNode(world, id).worldState; world = resolveCampaignChoice(world, "spare_chieftain"); expect(world.worldFlags.chieftain_spared).toBe(true); world = resolveCampaignChoice(world, "execute_chieftain"); expect(world.worldFlags.chieftain_spared).toBe(false); expect(world.worldFlags.chieftain_killed).toBe(true); const final = completeCampaignNode(world, "broken_wardstone"); expect(final).toMatchObject({ goldReward: 500, guildReputationReward: 10 }); expect(final.worldState.campaignChapter).toBe(2); expect(final.worldState.worldFlags.greenveil_wardstone_damaged).toBe(true); });
+  it("locks campaign quests to their exact story order", () => { let world = createWorldState(); expect(isQuestAvailable(QUESTS.guildhaven_cellar_slimes!, world)).toBe(false); expect(isQuestAvailable(QUESTS.goblin_patrol!, world)).toBe(false); world = completeCampaignNode(world, "founding_the_guild").worldState; expect(isCampaignQuestUnlocked("guildhaven_cellar_slimes", world)).toBe(true); expect(isQuestAvailable(QUESTS.guildhaven_cellar_slimes!, world)).toBe(true); expect(isQuestAvailable(QUESTS.rats_beneath_guildhaven!, world)).toBe(false); world = completeCampaignNode(world, "guildhaven_cellar_slimes").worldState; expect(isQuestAvailable(QUESTS.guildhaven_cellar_slimes!, world)).toBe(false); expect(isQuestAvailable(QUESTS.rats_beneath_guildhaven!, world)).toBe(true); expect(isQuestAvailable(QUESTS.goblin_chieftain_boss!, world)).toBe(false); });
+  it("requires the guild to travel to the quest and campaign location", () => {
+    const world = createWorldState();
+    expect(isQuestAvailableAtCurrentLocation(QUESTS.highcourt_silent_charter!, world)).toBe(false);
+    expect(isQuestAvailableAtCurrentLocation(QUESTS.highcourt_silent_charter!, { ...world, currentSettlementId: "highcourt" })).toBe(true);
+    expect(getCampaignNodeLocationRequirement("council_of_splinters")).toEqual({ regionId: "iron_hills", settlementIds: ["stonegate"] });
+    const chapterTwo = { ...world, campaignChapter: 2, completedCampaignNodeIds: ["broken_wardstone"], unlockedRegionIds: [...world.unlockedRegionIds, "iron_hills"] };
+    expect(isCampaignNodeAtCurrentLocation("council_of_splinters", chapterTwo)).toBe(false);
+    expect(isCampaignNodeAtCurrentLocation("council_of_splinters", { ...chapterTwo, currentRegionId: "iron_hills", currentSettlementId: "stonegate" })).toBe(true);
+  });
+
+  it("round-trips world, subclass and mastery state through save serialization", () => { const guild = createGuild(); guild.world.worldFlags.test = true; guild.world.unlockedRegionIds.push("iron_hills"); guild.heroes = [{ ...testHero(), level: 10, subclassId: "guardian", masteryId: "vanguard" }]; const loaded = deserializeGuild(serializeGuild(guild)); expect(loaded.world.worldFlags.test).toBe(true); expect(loaded.world.unlockedRegionIds).toContain("iron_hills"); expect(loaded.heroes[0]?.subclassId).toBe("guardian"); expect(loaded.heroes[0]?.masteryId).toBe("vanguard"); });
+  it("persists gems and migrates older saves with the configured starting balance", () => { const guild = createGuild(); guild.gems = 12; expect(deserializeGuild(serializeGuild(guild)).gems).toBe(12); const legacy = JSON.parse(serializeGuild(guild)); delete legacy.gems; delete legacy.gemTransactions; const migrated = deserializeGuild(JSON.stringify(legacy)); expect(migrated.gems).toBe(5); expect(migrated.gemTransactions).toEqual([]); });
+  it("connects Chapter 5 directly to the Drowned Archive finale", () => { expect(CHAPTER_5).toMatchObject({ chapterNumber: 5, recommendedLevelMin: 8, recommendedLevelMax: 9 }); expect(CHAPTER_5.sideQuestIds).toEqual(["the_children_of_cinder", "a_song_for_the_last_phoenix"]); expect(getAvailableCampaignNodes({ ...createWorldState(), campaignChapter: 5, completedCampaignNodeIds: ["drowned_archivist_boss"] }).map((node) => node.id)).toContain("east_with_the_covenant"); });
+  it("builds the Burning Causeway as three advancing tactical stages", () => { const ids = QUESTS.the_burning_causeway!.encounterIds; expect(ids).toEqual(["burning_causeway_rear", "burning_causeway_mid", "burning_causeway_breach"]); expect(ids.map((id) => QUEST_ENCOUNTERS[id]!.heroSpawnPositions[0]!.x)).toEqual([1, 3, 5]); expect(ids.every((id) => Boolean(BATTLEFIELDS[QUEST_ENCOUNTERS[id]!.battlefieldId]))).toBe(true); });
+});

@@ -1,0 +1,118 @@
+import React from "react";
+import { Pressable, StyleSheet, Text, View, type ViewProps } from "react-native";
+import { CLASSES } from "../data/classes/classes";
+import { RACES } from "../data/races/races";
+import { GAME_CONFIG } from "../config/gameConfig";
+import { calculateHero } from "../game/heroes/heroCalculator";
+import type { Hero } from "../game/heroes/types";
+import { getRaceNameColor } from "../ui/raceColors";
+import { HeroPortrait } from "./heroes/HeroPortrait";
+import { useTheme } from "../theme/theme";
+import { NotificationDot } from "./navigation/NotificationDot";
+
+export const colors = { background: "#101416", panel: "#1a2123", panel2: "#232d2f", gold: "#d8ad5c", text: "#f3eee3", muted: "#a8b1ad", green: "#79b887", danger: "#dd7a73", border: "#354044", blue: "#70a4c5" };
+
+export function Panel(props: ViewProps) {
+  const { colors: c } = useTheme();
+  return <View {...props} style={[styles.panel, { backgroundColor: c.panel, borderColor: c.panel }, props.style]} />;
+}
+
+export function SectionTitle({ children }: React.PropsWithChildren) {
+  const { colors: c } = useTheme();
+  return <View style={styles.sectionHeading}><Text style={[styles.sectionTitle, { color: c.gold }]}>{children}</Text></View>;
+}
+
+export function ActionButton({ label, onPress, disabled = false }: { label: string; onPress(): void; disabled?: boolean }) {
+  const { colors: c } = useTheme();
+  return <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.button, { backgroundColor: c.gold, borderColor: c.gold }, (pressed || disabled) && styles.buttonDim, pressed && styles.buttonPressed]}><Text style={[styles.buttonText, { color: c.buttonText }]}>{label}</Text></Pressable>;
+}
+
+export function SecondaryButton({ label, onPress, disabled = false }: { label: string; onPress(): void; disabled?: boolean }) {
+  const { colors: c } = useTheme();
+  return <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.secondaryButton, { borderColor: c.gold, backgroundColor: c.panel2 }, (pressed || disabled) && styles.buttonDim, pressed && styles.buttonPressed]}><Text style={[styles.secondaryText, { color: c.gold }]}>{label}</Text></Pressable>;
+}
+
+export function BackButton({ onPress }: { onPress(): void }) {
+  const { colors: c } = useTheme();
+  return <Pressable accessibilityRole="button" onPress={onPress} hitSlop={12} style={({ pressed }) => [styles.backButton, { backgroundColor: "transparent" }, pressed && styles.buttonDim]}><Text style={[styles.back, { color: c.gold }]}>‹ BACK</Text></Pressable>;
+}
+
+export function EmptyState({ title, message, actionLabel, onAction }: { title: string; message: string; actionLabel?: string; onAction?(): void }) {
+  const { colors: c } = useTheme();
+  return <Panel style={styles.empty}><Text style={[styles.emptyTitle, { color: c.text }]}>{title}</Text><Text style={[styles.muted, { color: c.muted }]}>{message}</Text>{actionLabel && onAction ? <ActionButton label={actionLabel} onPress={onAction} /> : null}</Panel>;
+}
+
+export function SegmentedTabs<T extends string>({ values, value, onChange, notificationValues = [] }: { values: readonly T[]; value: T; onChange(value: any): void; notificationValues?: readonly T[] }) {
+  const { colors: c } = useTheme();
+  return <View style={[styles.tabs, { borderColor: c.border }]}>{values.map((item) => <Pressable key={item} onPress={() => onChange(item)} accessibilityRole="tab" accessibilityState={{ selected: item === value }} style={[styles.tab, { borderColor: "transparent" }, item === value && { borderColor: c.gold }]}><Text style={[styles.tabText, { color: c.muted }, item === value && { color: c.gold }]}>{item}</Text>{notificationValues.includes(item) ? <View style={{ position: "absolute", top: 0, right: 1 }}><NotificationDot label={`${item}: choice available`} /></View> : null}</Pressable>)}</View>;
+}
+
+export function StatusChip({ label, tone = "neutral" }: { label: string; tone?: "neutral" | "gold" | "good" | "danger" | "blue" }) {
+  const { colors: c } = useTheme();
+  const toneColor = tone === "gold" ? c.gold : tone === "good" ? c.green : tone === "danger" ? c.danger : tone === "blue" ? c.blue : c.muted;
+  return <View style={[styles.chip, { borderColor: toneColor, backgroundColor: c.panel2 }]}><Text style={[styles.chipText, { color: toneColor }]}>{label}</Text></View>;
+}
+
+export function MiniMeter({ value, max, color, backgroundColor, height = 5 }: { value: number; max: number; color: string; backgroundColor?: string; height?: number }) {
+  const { colors: c } = useTheme();
+  const pct = max > 0 ? Math.max(0, Math.min(100, value / max * 100)) : 0;
+  return <View style={[styles.meterTrack, { height, backgroundColor: backgroundColor ?? c.panel2, borderColor: c.border }]}><View style={[styles.meterFill, { width: `${pct}%`, backgroundColor: color }]} /></View>;
+}
+
+export function Portrait({ hero, size = 84 }: { hero: Hero; size?: number }) {
+  return <HeroPortrait raceId={hero.raceId} classId={hero.classId} gender={hero.gender} variant={hero.portraitVariant ?? 0} label={hero.name} size={size} />;
+}
+
+export function HeroCard({ hero, onPress, subtitle, notification = false, loyaltyScore }: { hero: Hero; onPress(): void; subtitle?: string; notification?: boolean; loyaltyScore?: number }) {
+  const { colors: c } = useTheme();
+  const calculated = calculateHero(hero);
+  const hpMax = Math.max(1, calculated.stats.maxHP);
+  const status = hero.currentHP <= 0 ? "FALLEN" : hero.conditions.length ? "CONDITION" : hero.isAvailable ? "READY" : "BUSY";
+  const statusTone = hero.currentHP <= 0 ? "danger" : hero.conditions.length ? "gold" : hero.isAvailable ? "good" : "neutral";
+  return <Pressable accessibilityRole="button" accessibilityLabel={`Inspect ${hero.name}`} onPress={onPress} style={({ pressed }) => [styles.heroCard, { backgroundColor: c.panel, borderColor: pressed ? c.gold : c.border }, pressed && styles.heroCardPressed]}>
+    <Portrait hero={hero} size={72} />
+    <View style={styles.heroCardText}>
+      <View style={styles.heroHeading}><Text numberOfLines={1} style={[styles.heroName, { color: getRaceNameColor(hero.raceId) }]}>{hero.name}</Text><StatusChip label={status} tone={statusTone} /></View>
+      <Text numberOfLines={1} style={[styles.muted, { color: c.muted }]}>{subtitle ?? `${RACES[hero.raceId].name} • ${CLASSES[hero.classId].name}`}</Text>
+      <View style={styles.heroMetaRow}><Text style={[styles.smallStrong, { color: c.text }]}>LV {hero.level}</Text><Text style={[styles.small, { color: c.muted }]}>HP {Math.round(hero.currentHP)}/{Math.round(hpMax)}</Text><Text style={[styles.small, { color: c.muted }]}>RDY {Math.round(hero.adventureStamina)}</Text>{loyaltyScore !== undefined ? <Text style={[styles.small, { color: c.gold }]}>LOY {Math.round(loyaltyScore)}</Text> : null}</View>
+      <View style={styles.heroMeters}><MiniMeter value={hero.currentHP} max={hpMax} color={hero.currentHP <= hpMax * .3 ? c.danger : c.green} /><MiniMeter value={hero.adventureStamina} max={GAME_CONFIG.maxAdventureStamina} color={hero.adventureStamina < 40 ? c.danger : c.blue} /></View>
+    </View>
+    {notification ? <View style={styles.heroNotice}><NotificationDot label="Hero skill choice available" /></View> : null}
+    <Text style={[styles.chevron, { color: c.gold }]}>›</Text>
+  </Pressable>;
+}
+
+const styles = StyleSheet.create({
+  panel: { backgroundColor: colors.panel, borderColor: colors.border, borderWidth: 1, borderRadius: 12, padding: 15 },
+  sectionHeading: { alignItems: "center", flexDirection: "row", gap: 8, marginBottom: 10, marginTop: 18 },
+  sectionTitle: { color: colors.gold, fontSize: 12, letterSpacing: 1.5, fontWeight: "900" },
+  button: { paddingHorizontal: 18, paddingVertical: 12, alignItems: "center", minHeight: 44, justifyContent: "center", borderWidth: 0, borderRadius: 10, },
+  secondaryButton: { paddingHorizontal: 16, paddingVertical: 10, alignItems: "center", minHeight: 44, justifyContent: "center", borderWidth: 0, borderRadius: 10, },
+  secondaryText: { color: colors.gold, fontSize: 13, fontWeight: "900", letterSpacing: .3 },
+  buttonDim: { opacity: 0.55 },
+  buttonPressed: { transform: [{ translateY: 1 }] },
+  buttonText: { color: "#17130c", fontSize: 14, fontWeight: "900", letterSpacing: .3 },
+  backButton: { alignSelf: "flex-start", minHeight: 38, justifyContent: "center", paddingHorizontal: 10, borderWidth: 0, borderRadius: 10, },
+  back: { color: colors.gold, fontSize: 12, fontWeight: "900", letterSpacing: .8 },
+  empty: { alignItems: "stretch", gap: 12 },
+  emptyTitle: { color: colors.text, fontSize: 18, fontWeight: "900" },
+  muted: { color: colors.muted, fontSize: 12 },
+  tabs: { flexDirection: "row", borderBottomWidth: 1, marginBottom: 16, gap: 3 },
+  tab: { flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 10, borderBottomWidth: 2, minHeight: 44 },
+  tabText: { color: colors.muted, fontSize: 10, fontWeight: "900", letterSpacing: .2, textAlign: "center" },
+  chip: { alignSelf: "flex-start", paddingHorizontal: 6, paddingVertical: 3, borderWidth: 0, borderRadius: 12, },
+  chipText: { fontSize: 8, fontWeight: "900", letterSpacing: .7 },
+  meterTrack: { overflow: "hidden", borderWidth: 0, borderRadius: 3, },
+  meterFill: { height: "100%" },
+  heroCard: { backgroundColor: colors.panel, borderColor: colors.border, padding: 11, flexDirection: "row", alignItems: "center", gap: 11, marginBottom: 10, minHeight: 98, borderWidth: 0, borderRadius: 10, },
+  heroCardPressed: { transform: [{ translateY: 1 }] },
+  heroCardText: { flex: 1, gap: 4 },
+  heroHeading: { alignItems: "center", flexDirection: "row", gap: 7 },
+  heroName: { color: colors.text, fontSize: 18, fontWeight: "900", flexShrink: 1 },
+  heroMetaRow: { alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  heroMeters: { gap: 3 },
+  small: { color: colors.text, fontSize: 9 },
+  smallStrong: { color: colors.text, fontSize: 10, fontWeight: "900" },
+  heroNotice: { position: "absolute", right: 6, top: 6 },
+  chevron: { color: colors.gold, fontSize: 28, fontWeight: "800" },
+});

@@ -1,0 +1,116 @@
+[
+  {
+    "id": "grandmother_pell",
+    "before": 1547995,
+    "after": 335141,
+    "size": 512
+  },
+  {
+    "id": "postmistress_yara_quill",
+    "before": 1468350,
+    "after": 301778,
+    "size": 512
+  },
+  {
+    "id": "commander_astrid_vale",
+    "before": 1534058,
+    "after": 329748,
+    "size": 512
+  },
+  {
+    "id": "cinderkeeper_maela_rhun",
+    "before": 1575320,
+    "after": 323006,
+    "size": 512
+  },
+  {
+    "id": "watch_captain_mirelle_sorn",
+    "before": 1515919,
+    "after": 314735,
+    "size": 512
+  },
+  {
+    "id": "archivist_nemea_quill",
+    "before": 1522320,
+    "after": 309056,
+    "size": 512
+  },
+  {
+    "id": "envoy_tharos",
+    "before": 1547816,
+    "after": 335112,
+    "size": 512
+  },
+  {
+    "id": "bellkeeper_orsa",
+    "before": 1572477,
+    "after": 325189,
+    "size": 512
+  },
+  {
+    "id": "ferrymaster_neris_venn",
+    "before": 1544553,
+    "after": 319054,
+    "size": 512
+  },
+  {
+    "id": "historian_pell_reed",
+    "before": 1520702,
+    "after": 305969,
+    "size": 512
+  },
+  {
+    "id": "marshal_tavia_coal",
+    "before": 1547080,
+    "after": 319328,
+    "size": 512
+  },
+  {
+    "id": "orra_bellkeeper",
+    "before": 1956520,
+    "after": 384168,
+    "size": 512
+  },
+  {
+    "id": "aestra_quiet_reed",
+    "before": 1844155,
+    "after": 362213,
+    "size": 512
+  },
+  {
+    "id": "bellsmith_orra_deepnote",
+    "before": 1523108,
+    "after": 313751,
+    "size": 512
+  },
+  {
+    "id": "innkeeper_orro",
+    "before": 1606961,
+    "after": 315516,
+    "size": 512
+  },
+  {
+    "id": "mage_chain_lightning",
+    "before": 1277584,
+    "after": 145115,
+    "size": 384
+  },
+  {
+    "id": "mage_mist_step",
+    "before": 1338757,
+    "after": 153697,
+    "size": 384
+  },
+  {
+    "id": "ranger_hunters_mark",
+    "before": 1260694,
+    "after": 145441,
+    "size": 384
+  },
+  {
+    "id": "ranger_ensnaring_arrow",
+    "before": 1374112,
+    "after": 158587,
+    "size": 384
+  }
+]

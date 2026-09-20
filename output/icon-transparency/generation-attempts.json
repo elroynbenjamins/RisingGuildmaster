@@ -1,0 +1,218 @@
+[
+  {
+    "id": "guild",
+    "prompt": "Edit this existing game icon: remove ALL dark navy/black square background, smoke and scenery outside the guild building and flags. Isolate the guildhall and flags as a clean pixel-art cutout on a genuinely TRANSPARENT alpha background. Preserve the existing building identity, amber lighting, muted red flags, gold trim, fine pixel clusters, centered square composition and all internal dark stone/roof shadows. Do not replace internal dark details with holes. No new background, no checkerboard painted into the image, no enclosing card, no drop shadow rectangle. Keep entire silhouette visible with a little transparent padding. Output transparent PNG.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-2cb2bb69-d720-4266-b2a3-dbc3873caf43.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-2cb2bb69-d720-4266-b2a3-dbc3873caf43.png"
+  },
+  {
+    "id": "quests",
+    "prompt": "Edit this existing game icon: remove ALL dark navy/black square background and smoke outside the scroll and quill. Isolate the parchment scroll, wax seal, ribbons and feather quill as a clean pixel-art cutout on a genuinely TRANSPARENT alpha background. Preserve the existing identity, golden parchment, red seal, fine pixel clusters, centered square composition and all internal dark shadows. Do not replace internal dark details with holes. Keep entire silhouette visible with a little transparent padding. Output a transparent PNG with a real alpha channel; the empty background must have alpha=0.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-59f86047-b03d-49d6-9cf8-9f639fec8f76.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-59f86047-b03d-49d6-9cf8-9f639fec8f76.png"
+  },
+  {
+    "id": "inventory",
+    "prompt": "Edit this existing game icon: remove ALL dark navy/black square background, smoke and scenery outside the central object. Isolate the object as a clean pixel-art cutout on a genuinely TRANSPARENT alpha background. Preserve the existing identity, golden lighting, red accents, fine pixel clusters, centered square composition and all internal dark shadows. Do not replace internal dark details with holes. Keep entire silhouette visible with a little transparent padding. Output a transparent PNG with a real alpha channel; the empty background must have alpha=0. Keep backpack with scroll, potion, straps and cup.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-64b54cc6-b0dc-4cbe-9289-b8743777a78c.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-64b54cc6-b0dc-4cbe-9289-b8743777a78c.png"
+  },
+  {
+    "id": "world",
+    "prompt": "Edit this existing game icon: remove ALL dark navy/black square background, smoke and scenery outside the central object. Isolate the object as a clean pixel-art cutout on a genuinely TRANSPARENT alpha background. Preserve the existing identity, golden lighting, red accents, fine pixel clusters, centered square composition and all internal dark shadows. Do not replace internal dark details with holes. Keep entire silhouette visible with a little transparent padding. Output a transparent PNG with a real alpha channel; the empty background must have alpha=0. Keep the complete globe and brass stand. The globe's dark ocean surface must remain opaque.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-a65d1621-9b91-4128-b37c-dfca5b1ae715.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-a65d1621-9b91-4128-b37c-dfca5b1ae715.png"
+  },
+  {
+    "id": "heroes",
+    "prompt": "Remove the background from this three-heroes game icon. Deliver the SAME three busts and their red banner isolated on transparency. Actual transparent PNG, RGBA, alpha channel 0 outside the silhouette. Preserve the original pixel artwork, faces, armor, hair, colors and internal shadows. Erase only the external backdrop. Background removal only.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-b8769c8e-a6e9-4a49-886f-3db74f54497b.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-b8769c8e-a6e9-4a49-886f-3db74f54497b.png"
+  },
+  {
+    "id": "gold",
+    "prompt": "Remove the background from this gold game icon. Deliver the SAME gold coins and small red cloth beneath them isolated on transparency. Actual transparent PNG, RGBA, alpha channel 0 outside the silhouette. Preserve the original pixel artwork, embossed symbols, gold colors and internal shadows. Remove the distant hall, banners and external backdrop. Background removal only.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-915e35dd-cc48-44a1-b94e-a9aa2680a326.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-915e35dd-cc48-44a1-b94e-a9aa2680a326.png"
+  },
+  {
+    "id": "jeweler",
+    "prompt": "Remove the background from this game icon. Deliver the SAME central object isolated on transparency. Actual transparent PNG, RGBA, alpha channel 0 outside the silhouette. Preserve the original pixel artwork, colors and internal shadows. Erase only the external dark/smoky backdrop and distant scenery. Background removal only. Keep ruby, gold setting and crossed tools.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-a87d75d8-2e9e-4388-8ee8-56b0128de3b6.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-a87d75d8-2e9e-4388-8ee8-56b0128de3b6.png"
+  },
+  {
+    "id": "victory",
+    "prompt": "Remove the background from this game icon. Deliver the SAME central object isolated on transparency. Actual transparent PNG, RGBA, alpha channel 0 outside the silhouette. Preserve the original pixel artwork, colors and internal shadows. Erase only the external dark/smoky backdrop and distant scenery. Background removal only. Keep the sword, golden laurel wreath, star glint and red ribbons.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-35e8d698-ec86-490a-93c2-52df273e2a9b.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-35e8d698-ec86-490a-93c2-52df273e2a9b.png"
+  },
+  {
+    "id": "training",
+    "prompt": "Remove the background from this game icon. Deliver the SAME central object isolated on transparency. Actual transparent PNG, RGBA, alpha channel 0 outside the silhouette. Preserve the original pixel artwork, colors and internal shadows. Erase only the external dark/smoky backdrop and distant scenery. Background removal only. Keep crossed wooden practice swords, round target shield and attached red cloth.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-a6dc3f0d-2456-4b92-877a-58d6843f0411.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-a6dc3f0d-2456-4b92-877a-58d6843f0411.png"
+  },
+  {
+    "id": "recruitment",
+    "prompt": "Remove the background from this game icon. Deliver the SAME central object isolated on transparency. Actual transparent PNG, RGBA, alpha channel 0 outside the silhouette. Preserve the original pixel artwork, colors and internal shadows. Erase only the external dark/smoky backdrop and distant scenery. Background removal only. Keep the young adventurer bust, raised gloved fist, gold emphasis marks and recruitment banner.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-5515b9fe-64aa-4470-9922-c49e218831cd.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-5515b9fe-64aa-4470-9922-c49e218831cd.png"
+  },
+  {
+    "id": "temple",
+    "prompt": "Remove the background from this game icon. Deliver the SAME central object isolated on transparency. Actual transparent PNG, RGBA, alpha channel 0 outside the silhouette. Preserve the original pixel artwork, colors and internal shadows. Erase only the external dark/smoky backdrop and distant scenery. Background removal only. Keep the stone shrine, steps, banners, candles and warm holy flame. Keep shrine interior opaque; only outside silhouette transparent.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-c78f0a53-4ab6-4fb4-8ec7-7299b8e562a8.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-c78f0a53-4ab6-4fb4-8ec7-7299b8e562a8.png"
+  },
+  {
+    "id": "management",
+    "prompt": "Remove the background from this game icon. Deliver the SAME central object isolated on transparency. Actual transparent PNG, RGBA, alpha channel 0 outside the silhouette. Preserve the original pixel artwork, colors and internal shadows. Erase only the external dark/smoky backdrop and distant scenery. Background removal only. Keep the open ledger book, brass ruler, wax seal and bookmark ribbon. Remove background castle silhouettes and banners.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-526b5f03-0bb9-46f9-ad81-c64732df7f0d.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-526b5f03-0bb9-46f9-ad81-c64732df7f0d.png"
+  },
+  {
+    "id": "blacksmith",
+    "prompt": "Remove the background from this game icon. Deliver the SAME central object isolated on transparency. Actual transparent PNG, RGBA, alpha channel 0 outside the silhouette. Preserve the original pixel artwork, colors and internal shadows. Erase only the external dark/smoky backdrop and distant scenery. Background removal only. Keep hammer, anvil, supporting stone block, red cloth and sparks.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-47978448-0048-47c3-bb80-67ee07ecc108.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-47978448-0048-47c3-bb80-67ee07ecc108.png"
+  },
+  {
+    "id": "tailor",
+    "prompt": "Background removal: extract the spool of red thread and needle from the input image onto a transparent background. Preserve their pixel art. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-45208faf-168e-467b-a998-e63617dd393f.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-45208faf-168e-467b-a998-e63617dd393f.png"
+  },
+  {
+    "id": "scouting",
+    "prompt": "Background removal: extract the telescope, parchment map and attached red cloth from the input image onto a transparent background. Preserve their pixel art, lens and internal shadows. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-d49260fc-cf98-4be9-9ca8-9be01726375d.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-d49260fc-cf98-4be9-9ca8-9be01726375d.png"
+  },
+  {
+    "id": "monster_manual",
+    "prompt": "Background removal: extract the closed black leather monster manual book with its horned skull ornament, brass corners and red bookmark from the input image onto a transparent background. Preserve its pixel art and keep the black cover fully opaque. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-29920132-2dfb-40da-b146-5e0d2f0f9f1d.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-29920132-2dfb-40da-b146-5e0d2f0f9f1d.png"
+  },
+  {
+    "id": "hero_codex",
+    "prompt": "Background removal: extract the red leather hero codex book, gold helmet ornament and cream bookmark from the input image onto a transparent background. Preserve its pixel art and keep the book cover fully opaque. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-45fe132f-f2e6-4856-ba44-9d0ea2f46306.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-45fe132f-f2e6-4856-ba44-9d0ea2f46306.png"
+  },
+  {
+    "id": "skill_codex",
+    "prompt": "Background removal: extract the open skill book and glowing gold skill-tree symbols from the input image onto a transparent background. Preserve pixel art and keep book pages fully opaque. Remove the smoky exterior and faint background sigil. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-6564aac5-9cf7-4318-b20d-99240dc444cf.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-6564aac5-9cf7-4318-b20d-99240dc444cf.png"
+  },
+  {
+    "id": "calendar",
+    "prompt": "Background removal: extract the parchment calendar, brass hanging rings and red cloth from the input image onto a transparent background. Preserve the original pixel art. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-7989867f-28ab-4fec-bdc3-6092667000ea.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-7989867f-28ab-4fec-bdc3-6092667000ea.png"
+  },
+  {
+    "id": "weapon",
+    "prompt": "Background removal: extract the single steel sword with brass hilt from the input image onto a transparent background. Preserve the original pixel art and highlights. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-39dde313-74e1-4edc-897e-1abe14020ef2.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-39dde313-74e1-4edc-897e-1abe14020ef2.png"
+  },
+  {
+    "id": "armor",
+    "prompt": "Background removal: extract the steel and brass chest armor with shoulder plates from the input image onto a transparent background. Preserve the original pixel art, red fabric and internal dark armor shadows. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-7d4a75f9-8da3-40db-af14-586d77784c4f.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-7d4a75f9-8da3-40db-af14-586d77784c4f.png"
+  },
+  {
+    "id": "helmet",
+    "prompt": "Background removal: extract the steel greathelm with gold trim and attached red cloth from the input image onto a transparent background. Preserve the original pixel art. Keep eye slit and ventilation holes dark and opaque as interior shadows. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-edf97b57-81a3-4c6c-b316-268bc5df4482.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-edf97b57-81a3-4c6c-b316-268bc5df4482.png"
+  },
+  {
+    "id": "boots",
+    "prompt": "Background removal: extract the pair of brown leather boots with brass buckles from the input image onto a transparent background. Preserve the original pixel art and keep dark boot interiors opaque. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-c59f4f17-5369-4a38-984a-38085c3290b0.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-c59f4f17-5369-4a38-984a-38085c3290b0.png"
+  },
+  {
+    "id": "ring",
+    "prompt": "Background removal: extract the gold ruby ring from the input image onto a transparent background. Preserve the original pixel art. The open space through the ring should be transparent; the ring's interior metal stays opaque. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-3c46c4f5-0384-4030-891b-07df2fda4de2.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-3c46c4f5-0384-4030-891b-07df2fda4de2.png"
+  },
+  {
+    "id": "amulet",
+    "prompt": "Background removal: extract the ruby pendant, gold setting and chain from the input image onto a transparent background. Preserve the original pixel art. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-23461101-44a6-4857-ac09-aeb3ac870cb3.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-23461101-44a6-4857-ac09-aeb3ac870cb3.png"
+  },
+  {
+    "id": "defeat",
+    "prompt": "Background removal: extract the broken sword and torn red banner from the input image onto a transparent background. Preserve the original pixel art and muted colors. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-b192495b-783a-4abd-be8d-a9538d18fd45.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-b192495b-783a-4abd-be8d-a9538d18fd45.png"
+  },
+  {
+    "id": "xp",
+    "prompt": "Background removal: extract the golden eight-point star and three stacked chevrons from the input image onto a transparent background. Remove the distant castle and banners. Preserve the original pixel art. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-3b7b122f-ba7c-49d2-8e72-00cb43e16565.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-3b7b122f-ba7c-49d2-8e72-00cb43e16565.png"
+  },
+  {
+    "id": "loot",
+    "prompt": "Background removal: extract the open treasure chest full of coins and red cloth immediately under it from the input image onto a transparent background. Remove distant castle, banners and stone floor. Preserve original pixel art and warm highlights. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-c93902fb-5ac0-45bb-bda2-07e53418e973.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-c93902fb-5ac0-45bb-bda2-07e53418e973.png"
+  },
+  {
+    "id": "materials",
+    "prompt": "Background removal: extract the bundle of wood, metal ingot and pale crystal tied with red cord from the input image onto a transparent background. Preserve the original pixel art and internal shading. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-7382880d-a940-42c1-9c15-9d26228b3757.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-7382880d-a940-42c1-9c15-9d26228b3757.png"
+  },
+  {
+    "id": "journal",
+    "prompt": "Background removal: extract the brown leather journal, strap and gold quill from the input image onto a transparent background. Preserve the original pixel art and keep the dark cover opaque. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-f3ed6236-81b5-4fb5-a2ec-0e2bb1a0387b.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-f3ed6236-81b5-4fb5-a2ec-0e2bb1a0387b.png"
+  },
+  {
+    "id": "region_open",
+    "prompt": "Background removal: turn this region-open game icon into an isolated stone gateway cutout on real transparency. Keep the two towers, open doors, banners, torches, arch and a short path. Keep the sunset landscape visible ONLY within the arch opening. Remove surrounding dark square background and wide ground outside the gateway silhouette. Preserve existing finely shaded pixel art. Entire gateway visible with transparent margin. Return transparent RGBA PNG, alpha zero outside the silhouette.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-5ad685f9-3f7a-45f3-a6b5-11035f1afd45.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-5ad685f9-3f7a-45f3-a6b5-11035f1afd45.png"
+  },
+  {
+    "id": "locked",
+    "prompt": "Background removal: extract the iron padlock, gold keyhole plate, short side chains and attached red fabric from the input image onto a transparent background. Remove faint background sigils. Preserve original pixel art; padlock interior shadows stay opaque. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-34206c7a-99cf-4e75-ad22-a9a8d5f665ce.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-34206c7a-99cf-4e75-ad22-a9a8d5f665ce.png"
+  },
+  {
+    "id": "current",
+    "prompt": "Background removal: extract the gold location pin and compass star from the input image onto a transparent background. Preserve the original pixel art. Open spaces between star points and pin rim should be transparent. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-bb0e93e2-eb1f-4fd4-82af-c6078dd943db.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-bb0e93e2-eb1f-4fd4-82af-c6078dd943db.png"
+  },
+  {
+    "id": "complete",
+    "prompt": "Background removal: extract the gold checkmark, circular medal rim, laurel and attached red ribbon from the input image onto a transparent background. Preserve original pixel art. Remove smoky background and faint background red sigil. Open spaces inside the rim around the checkmark should be transparent. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-79545117-c174-4f00-b160-47fa409db1b6.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-79545117-c174-4f00-b160-47fa409db1b6.png"
+  },
+  {
+    "id": "boss",
+    "prompt": "Background removal: extract the dark horned boss crown/helmet with red glowing eyes and attached red fabric from the input image onto a transparent background. Preserve original pixel art and dark metal surfaces; do not erase the helmet's black internal details. Remove smoky exterior. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-e807cd0b-ffd7-4d71-b19a-1c9665572e1c.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-e807cd0b-ffd7-4d71-b19a-1c9665572e1c.png"
+  },
+  {
+    "id": "settlement",
+    "prompt": "Background removal: extract the small settlement gatehouse, tower, warm windows, flag and compact rocky base from the input image onto a transparent background. Preserve original pixel art and building shadows. Remove all exterior dark smoky backdrop; retain only a little chimney smoke attached to the building. Return an RGBA PNG cutout with transparency, not an illustration of transparency.",
+    "hint": "Generated images are saved to C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495 as C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-a5a44755-d5de-498d-945d-282cd743c098.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+    "sourcePath": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-a5a44755-d5de-498d-945d-282cd743c098.png"
+  }
+]

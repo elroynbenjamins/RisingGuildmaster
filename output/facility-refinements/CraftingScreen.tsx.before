@@ -1,0 +1,258 @@
+import React, { useMemo, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useGameDialog } from "../../components/dialogs/GameDialog";
+import { ActionButton, BackButton, MiniMeter, Panel, SecondaryButton, SectionTitle, StatusChip, colors } from "../../components/ui";
+import { MaterialIcon } from "../../components/materials/MaterialIcon";
+import { EquipmentIcon } from "../../components/equipment/EquipmentIcon";
+import { ARTISAN_BUILDINGS, ARTISANS } from "../../data/crafting/artisans";
+import { ENCHANTMENTS } from "../../data/crafting/enchantments";
+import { MATERIALS } from "../../data/crafting/materials";
+import { GUILDMASTER_SKILLS } from "../../data/guildmaster/guildmasterSkills";
+import { getNextArtisanBuildingTier, startArtisanConstruction } from "../../game/crafting/artisanBuildingService";
+import { craftEquipment, enchantInventoryEquipment } from "../../game/crafting/craftingService";
+import {
+  getCraftingRecipePresentations,
+  getEnchantmentPresentation,
+  getWorkshopTierUnlocks,
+  type CraftingRecipeFilter,
+  type MaterialRequirementPresentation,
+} from "../../game/crafting/craftingPresentationService";
+import type { ArtisanType } from "../../game/crafting/craftingTypes";
+import { resolveEquipmentDefinition } from "../../game/equipment/equipmentResolver";
+import { hasGuildmasterSkill } from "../../game/guildmaster/guildmasterProgression";
+import { useGuild } from "../../state/GuildContext";
+import { GameIcon } from "../../components/icons/GameIcon";
+import { describeEquipmentSpecialEffect } from "../../game/equipment/equipmentSpecialEffectService";
+import { getDurabilityLabel, getRepairCost, repairHeroEquipment, repairInventoryEquipment } from "../../game/equipment/equipmentDurabilityService";
+import { getEquipmentRarityColor } from "../../ui/equipmentRarity";
+
+const TABS: ArtisanType[] = ["blacksmith", "tailor", "jeweler"];
+const FILTERS: CraftingRecipeFilter[] = ["all", "craftable", "upgrades", "locked"];
+const FILTER_LABELS: Record<CraftingRecipeFilter, string> = { all: "ALL", craftable: "CRAFTABLE", upgrades: "UPGRADES", locked: "LOCKED" };
+
+function toneColor(tone: "good" | "gold" | "blue" | "danger" | "neutral") {
+  return tone === "good" ? colors.green : tone === "gold" ? colors.gold : tone === "blue" ? colors.blue : tone === "danger" ? colors.danger : colors.muted;
+}
+
+function workshopIcon(type: ArtisanType) {
+  return type === "blacksmith" ? "blacksmith" : type === "tailor" ? "tailor" : "jeweler";
+}
+
+export function CraftingScreen({ onBack, openCalendar }: { onBack(): void; openCalendar(): void }) {
+  const { showDialog } = useGameDialog();
+  const { guild, updateGuild } = useGuild();
+  const [tab, setTab] = useState<ArtisanType>("blacksmith");
+  const [filter, setFilter] = useState<CraftingRecipeFilter>("all");
+  const artisan = ARTISANS[tab];
+  const state = guild.artisans[tab];
+  const nextTier = getNextArtisanBuildingTier(guild, tab);
+  const recipeRows = useMemo(() => getCraftingRecipePresentations(guild, tab, filter), [guild, tab, filter]);
+  const allRecipeRows = useMemo(() => getCraftingRecipePresentations(guild, tab, "all"), [guild, tab]);
+  const counts = useMemo(() => ({
+    all: allRecipeRows.length,
+    craftable: allRecipeRows.filter((row) => row.craftable).length,
+    upgrades: allRecipeRows.filter((row) => row.unlocked && row.upgradeHeroCount > 0).length,
+    locked: allRecipeRows.filter((row) => row.hardLocked).length,
+  }), [allRecipeRows]);
+  const act = (action: () => typeof guild, message: string) => {
+    try {
+      updateGuild(action());
+      showDialog({ title: "Workshop order complete", message, tone: "success" });
+    } catch (error) {
+      showDialog({ title: "Cannot complete", message: error instanceof Error ? error.message : "Workshop action failed", tone: "danger" });
+    }
+  };
+  const tierName = state.level > 0 ? ARTISAN_BUILDINGS[tab][state.level - 1]?.name : "Not constructed";
+  const requiredSkill = nextTier ? GUILDMASTER_SKILLS[nextTier.requiredSkillId] : null;
+  const skillMet = nextTier ? hasGuildmasterSkill(guild.guildmaster, nextTier.requiredSkillId) : false;
+  const construction = state.construction;
+  const anyConstruction = Object.values(guild.artisans).some((entry) => entry.construction);
+  const damagedInventory = guild.inventory.map((key, index) => ({ key, index, item: resolveEquipmentDefinition(key) })).filter((entry) => entry.item && entry.item.durability < 100);
+  const damagedEquipped = guild.heroes.flatMap((hero) => Object.entries(hero.equipment).flatMap(([slot, key]) => {
+    const item = key ? resolveEquipmentDefinition(key) : undefined;
+    return item && item.durability < 100 ? [{ hero, slot: slot as keyof typeof hero.equipment, key, item }] : [];
+  }));
+  const totalRepairCost = damagedInventory.reduce((sum, entry) => sum + getRepairCost(entry.key), 0) + damagedEquipped.reduce((sum, entry) => sum + getRepairCost(entry.key), 0);
+  const workshopPrimerSeen = guild.world.worldFlags.workshop_v2_tutorial_seen === true;
+  const acknowledgeWorkshopPrimer = () => updateGuild({ ...guild, world: { ...guild.world, worldFlags: { ...guild.world.worldFlags, workshop_v2_tutorial_seen: true } } });
+
+  const showMaterial = (entry: MaterialRequirementPresentation) => {
+    const material = MATERIALS[entry.materialId];
+    showDialog({
+      title: material.name,
+      message: `${material.description}\n\nOwned ${entry.owned} / ${entry.required}${entry.missing ? ` · missing ${entry.missing}` : " · requirement met"}\n\nKNOWN SOURCES\n${entry.sourceHints.map((hint) => `• ${hint}`).join("\n")}`,
+    });
+  };
+
+  const repairAll = () => act(() => {
+    if (!state.recruited) throw new Error("Build the Blacksmith before repairing equipment");
+    if (guild.gold < totalRepairCost) throw new Error(`Need ${(totalRepairCost - guild.gold).toLocaleString()} more gold to repair everything`);
+    let next = guild;
+    for (const entry of damagedEquipped) next = repairHeroEquipment(next, entry.hero.id, entry.slot);
+    for (const entry of damagedInventory) next = repairInventoryEquipment(next, entry.index);
+    return next;
+  }, `All damaged equipment restored to 100% durability for ${totalRepairCost.toLocaleString()} gold.`);
+
+  return <ScrollView contentContainerStyle={styles.content}>
+    <BackButton onPress={onBack} />
+    <View style={styles.header}>
+      <View style={styles.flex}><Text style={styles.eyebrow}>GUILDHAVEN CRAFT DISTRICT</Text><Text style={styles.title}>Guild Workshops</Text><Text style={styles.day}>Guild Day {guild.currentDay} · {guild.gold.toLocaleString()} GOLD</Text></View>
+      {anyConstruction && <SecondaryButton label="Calendar" onPress={openCalendar} />}
+    </View>
+    <Text style={styles.intro}>Forge field upgrades, repair worn gear, and turn discovered patterns into equipment. Workshop levels unlock capability; materials and gold decide what can be made today.</Text>
+
+    {!workshopPrimerSeen && <Panel style={styles.tutorialPrimer}>
+      <Text style={styles.tutorialLabel}>WORKSHOP TUTORIAL</Text><Text style={styles.tutorialTitle}>Read the recipe before spending</Text>
+      <Text style={styles.tutorialText}>Green material counts mean you own enough. Gold or red blocker text tells you exactly what is preventing a craft. UPGRADES means the finished item improves at least one eligible hero based on actual calculated stats—not rarity alone. Tap any material requirement to see known sources.</Text>
+      <SecondaryButton label="GOT IT · OPEN WORKSHOPS" onPress={acknowledgeWorkshopPrimer} />
+    </Panel>}
+
+    <View style={styles.workshopTabs}>{TABS.map((value) => <Pressable key={value} onPress={() => { setTab(value); setFilter("all"); }} style={[styles.workshopTab, tab === value && styles.workshopTabSelected]}><GameIcon id={workshopIcon(value)} size={30} /><Text style={[styles.workshopTabText, tab === value && styles.workshopTabTextSelected]}>{value.toUpperCase()}</Text><Text style={styles.workshopTabMeta}>{guild.artisans[value].recruited ? `LV ${guild.artisans[value].level}` : guild.artisans[value].construction ? "BUILDING" : "LOCKED"}</Text></Pressable>)}</View>
+
+    <Panel style={[styles.artisan, !state.recruited && styles.lockedWorkshop]}>
+      <View style={styles.buildingHead}><GameIcon id={workshopIcon(tab)} size={52} /><View style={styles.flex}><Text style={styles.artisanName}>{artisan.name}</Text><Text style={state.recruited ? styles.operational : styles.locked}>{state.recruited ? `LEVEL ${state.level} · ${tierName?.toUpperCase()} · OPERATIONAL` : construction ? "CONSTRUCTION IN PROGRESS" : "WORKSHOP NOT BUILT"}</Text><Text style={styles.role}>{artisan.fantasyRole}</Text></View></View>
+      <Text style={styles.description}>{artisan.description}</Text>
+      <View style={styles.workshopStats}><View style={styles.statPlate}><Text style={styles.statValue}>{counts.craftable}</Text><Text style={styles.statLabel}>CRAFTABLE</Text></View><View style={styles.statPlate}><Text style={styles.statValue}>{counts.upgrades}</Text><Text style={styles.statLabel}>UPGRADES</Text></View><View style={styles.statPlate}><Text style={styles.statValue}>{counts.locked}</Text><Text style={styles.statLabel}>LOCKED</Text></View></View>
+      {construction ? <View style={styles.project}>
+        <View style={styles.projectHead}><View style={styles.flex}><Text style={styles.projectEyebrow}>ACTIVE CONSTRUCTION</Text><Text style={styles.projectName}>{ARTISAN_BUILDINGS[tab][construction.targetLevel - 1]!.name}</Text></View><StatusChip label={`DAY ${construction.completionDay}`} tone="gold" /></View>
+        <Text style={styles.projectMeta}>Started Day {construction.startDay} · {Math.max(0, construction.completionDay - guild.currentDay)} day(s) remaining</Text>
+        <MiniMeter value={guild.currentDay - construction.startDay} max={Math.max(1, construction.completionDay - construction.startDay)} color={colors.green} height={8} />
+        <Text style={styles.unlockTitle}>WHEN COMPLETE</Text>{getWorkshopTierUnlocks(tab, construction.targetLevel).map((unlock) => <Text key={unlock} style={styles.unlockLine}>✓ {unlock}</Text>)}
+        <SecondaryButton label="OPEN GUILD CALENDAR" onPress={openCalendar} />
+      </View> : nextTier ? <View style={styles.project}>
+        <View style={styles.projectHead}><View style={styles.flex}><Text style={styles.projectEyebrow}>{state.level === 0 ? "CONSTRUCTION ORDER" : "WORKSHOP UPGRADE"}</Text><Text style={styles.projectName}>{state.level === 0 ? "Construct" : "Upgrade to"} {nextTier.name}</Text></View><StatusChip label={`${nextTier.durationDays} DAYS`} tone="blue" /></View>
+        <Text style={styles.projectMeta}>{nextTier.goldCost.toLocaleString()} gold · Requires {requiredSkill?.name}</Text>
+        <Text style={styles.unlockTitle}>UNLOCKS</Text>{getWorkshopTierUnlocks(tab, nextTier.level).map((unlock) => <Text key={unlock} style={styles.unlockLine}>• {unlock}</Text>)}
+        {!skillMet && <Text style={styles.lockReason}>Unlock {requiredSkill?.name} in the Guildmaster Skill Tree first.</Text>}
+        {skillMet && guild.gold < nextTier.goldCost && <Text style={styles.lockReason}>Need {(nextTier.goldCost - guild.gold).toLocaleString()} more gold.</Text>}
+        <ActionButton label={skillMet ? `${state.level === 0 ? "BEGIN CONSTRUCTION" : "BEGIN UPGRADE"} · ${nextTier.goldCost.toLocaleString()}G` : "GUILDMASTER SKILL REQUIRED"} disabled={!skillMet || guild.gold < nextTier.goldCost} onPress={() => act(() => startArtisanConstruction(guild, tab), `${nextTier.name} will complete on Day ${guild.currentDay + nextTier.durationDays}.`)} />
+      </View> : <Text style={styles.mastered}>★ MASTER WORKSHOP · MAXIMUM BUILDING LEVEL</Text>}
+    </Panel>
+
+    {tab === "blacksmith" && <>
+      <SectionTitle>REPAIR BENCH</SectionTitle>
+      <Panel style={styles.recipe}>
+        <View style={styles.projectHead}><View style={styles.flex}><Text style={styles.projectName}>Equipment Maintenance</Text><Text style={styles.description}>Durability scales numerical equipment bonuses. Broken equipment contributes none until repaired.</Text></View>{totalRepairCost > 0 && <StatusChip label={`${damagedEquipped.length + damagedInventory.length} DAMAGED`} tone="danger" />}</View>
+        {!damagedInventory.length && !damagedEquipped.length ? <Text style={styles.operational}>✓ ALL EQUIPMENT IS IN GOOD REPAIR</Text> : <>
+          <View style={styles.repairSummary}><Text style={styles.cost}>FULL REPAIR · {totalRepairCost.toLocaleString()} GOLD</Text><SecondaryButton label="REPAIR ALL" disabled={!state.recruited || guild.gold < totalRepairCost} onPress={repairAll} /></View>
+          {damagedEquipped.map((entry) => <View key={`${entry.hero.id}-${entry.slot}`} style={styles.repairRow}><EquipmentIcon equipmentKey={entry.key} slot={entry.item.slot} label={entry.item.name} size={42}/><View style={styles.flex}><View style={styles.line}><Text style={styles.itemNameSmall}>{entry.item.name}</Text><Text style={[styles.durability, entry.item.durability < 40 && styles.danger]}>{getDurabilityLabel(entry.item.durability)} · {entry.item.durability}%</Text></View><Text style={styles.meta}>{entry.hero.name} · {entry.slot.toUpperCase()}</Text><MiniMeter value={entry.item.durability} max={100} color={entry.item.durability < 40 ? colors.danger : colors.gold} /></View><SecondaryButton label={`${getRepairCost(entry.key)}G`} disabled={!state.recruited || guild.gold < getRepairCost(entry.key)} onPress={() => act(() => repairHeroEquipment(guild, entry.hero.id, entry.slot), `${entry.item.name} restored to 100% durability.`)}/></View>)}
+          {damagedInventory.map((entry) => <View key={`${entry.key}-${entry.index}`} style={styles.repairRow}><EquipmentIcon equipmentKey={entry.key} slot={entry.item!.slot} label={entry.item!.name} size={42}/><View style={styles.flex}><View style={styles.line}><Text style={styles.itemNameSmall}>{entry.item!.name}</Text><Text style={[styles.durability, entry.item!.durability < 40 && styles.danger]}>{getDurabilityLabel(entry.item!.durability)} · {entry.item!.durability}%</Text></View><Text style={styles.meta}>INVENTORY COPY {entry.index + 1}</Text><MiniMeter value={entry.item!.durability} max={100} color={entry.item!.durability < 40 ? colors.danger : colors.gold} /></View><SecondaryButton label={`${getRepairCost(entry.key)}G`} disabled={!state.recruited || guild.gold < getRepairCost(entry.key)} onPress={() => act(() => repairInventoryEquipment(guild, entry.index), `${entry.item!.name} restored to 100% durability.`)}/></View>)}
+        </>}
+      </Panel>
+    </>}
+
+    <SectionTitle>WORKSHOP RECIPES</SectionTitle>
+    <View style={styles.filters}>{FILTERS.map((value) => <Pressable key={value} onPress={() => setFilter(value)} style={[styles.filter, filter === value && styles.filterSelected]}><Text style={[styles.filterLabel, filter === value && styles.filterLabelSelected]}>{FILTER_LABELS[value]}</Text><Text style={styles.filterCount}>{counts[value]}</Text></Pressable>)}</View>
+    {!recipeRows.length && <Panel style={styles.recipe}><Text style={styles.projectName}>No recipes in this view</Text><Text style={styles.description}>Try ALL to see available and undiscovered patterns, or keep exploring for additional recipes.</Text></Panel>}
+    {recipeRows.map((row) => {
+      if (!row.unlocked) return <Panel key={row.recipe.id} style={[styles.recipe, styles.undiscovered]}><View style={styles.recipeHead}><View style={styles.unknownIcon}><Text style={styles.unknownText}>?</Text></View><View style={styles.flex}><Text style={styles.itemName}>Undiscovered Pattern</Text><Text style={styles.meta}>WORKSHOP LV {row.recipe.artisanLevel} · RECIPE LOCKED</Text></View><StatusChip label="UNDISCOVERED" tone="gold" /></View><Text style={styles.description}>{row.unlockHint ?? "Discover this pattern through exploration."}</Text></Panel>;
+      const output = row.output;
+      const rarityColor = getEquipmentRarityColor(output.rarity);
+      const effects = output.specialEffectIds.map(describeEquipmentSpecialEffect).filter((effect): effect is NonNullable<typeof effect> => Boolean(effect));
+      const statusTone = row.craftable ? "good" : row.hardLocked ? "danger" : "gold";
+      const statusLabel = row.craftable ? "CRAFTABLE" : row.hardLocked ? "LOCKED" : "MISSING COST";
+      return <Panel key={row.recipe.id} style={[styles.recipe, { borderColor: rarityColor }, row.hardLocked && styles.disabled]}>
+        <View style={styles.recipeHead}><EquipmentIcon equipmentKey={output.id} slot={output.slot} label={output.name} size={58}/><View style={styles.flex}><Text style={[styles.itemName, { color: rarityColor }]}>{output.name}</Text><Text style={[styles.meta, { color: rarityColor }]}>{output.rarity.toUpperCase()} · {output.slot.toUpperCase()} · ITEM LV {output.levelRequirement}</Text><View style={styles.chips}><StatusChip label={statusLabel} tone={statusTone}/>{row.upgradeHeroCount > 0 && <StatusChip label={`UPGRADE · ${row.upgradeHeroCount} HERO${row.upgradeHeroCount === 1 ? "" : "ES"}`} tone="good" />}{row.tradeoffHeroCount > 0 && <StatusChip label={`${row.tradeoffHeroCount} TRADEOFF`} tone="gold" />}</View></View></View>
+        <Text style={styles.description}>{row.recipe.description}</Text>
+        <View style={styles.fitBox}><Text style={[styles.fitLabel, { color: toneColor(row.bestFitTone) }]}>{row.bestFitLabel}</Text><Text style={styles.meta}>{row.compatibleHeroCount} eligible hero{row.compatibleHeroCount === 1 ? "" : "es"} · Workshop Lv {row.recipe.artisanLevel}</Text></View>
+        {effects.map((effect) => <View key={effect.name} style={styles.effect}><Text style={styles.effectName}>{effect.name}</Text><Text style={styles.description}>{effect.description}</Text></View>)}
+        <Text style={styles.cost}>CRAFTING COST · {row.recipe.goldCost.toLocaleString()} GOLD</Text>
+        <View style={styles.materials}>{row.materials.map((entry) => <Pressable key={entry.materialId} onPress={() => showMaterial(entry)} style={[styles.materialRow, !entry.met && styles.materialMissing]}><MaterialIcon materialId={entry.materialId} size={31}/><View style={styles.flex}><Text style={styles.materialName}>{entry.name}</Text><Text style={[styles.materialCount, { color: entry.met ? colors.green : colors.danger }]}>{entry.owned} / {entry.required}{entry.met ? " · READY" : ` · NEED ${entry.missing}`}</Text></View><Text style={styles.sourceArrow}>›</Text></Pressable>)}</View>
+        {row.blockers.map((blocker) => <Text key={`${blocker.kind}-${blocker.label}`} style={[styles.blocker, blocker.tone === "danger" && styles.danger]}>• {blocker.label}</Text>)}
+        <ActionButton label={row.craftable ? `CRAFT ${output.name.toUpperCase()}` : statusLabel} disabled={!row.craftable} onPress={() => act(() => craftEquipment(guild, row.recipe.id), `${output.name} added to inventory.`)} />
+      </Panel>;
+    })}
+
+    {tab === "jeweler" && state.recruited && <>
+      <SectionTitle>ENCHANTMENT FORGE</SectionTitle>
+      <Panel style={styles.enchantIntro}><Text style={styles.projectName}>Bind a Build Choice</Text><Text style={styles.description}>Each item has one initial enchantment slot. Choose deliberately: enchantments remain attached when gear is equipped and cannot be replaced through this forge.</Text></Panel>
+      {guild.inventory.map((key, inventoryIndex) => {
+        const item = resolveEquipmentDefinition(key);
+        if (!item || item.enchantmentIds.length) return null;
+        const options = Object.values(ENCHANTMENTS).filter((enchantment) => enchantment.applicableSlots.includes(item.slot));
+        if (!options.length) return null;
+        return <Panel key={`${key}-${inventoryIndex}`} style={styles.recipe}><View style={styles.recipeHead}><EquipmentIcon equipmentKey={key} slot={item.slot} label={item.name} size={48}/><View style={styles.flex}><Text style={styles.itemName}>{item.name}</Text><Text style={styles.meta}>{item.slot.toUpperCase()} · COPY {inventoryIndex + 1} · ENCHANTMENT SLOT EMPTY</Text></View></View>{options.map((enchantment) => {
+          const presentation = getEnchantmentPresentation(guild, enchantment);
+          return <View key={enchantment.id} style={[styles.enchant, !presentation.craftable && styles.disabled]}><View style={styles.line}><View style={styles.flex}><Text style={styles.enchantName}>{enchantment.name}</Text><Text style={styles.description}>{enchantment.description}</Text></View><StatusChip label={presentation.craftable ? "READY" : `LV ${enchantment.artisanLevel}`} tone={presentation.craftable ? "good" : "gold"}/></View><Text style={styles.cost}>{enchantment.goldCost} GOLD</Text><View style={styles.materials}>{presentation.materials.map((entry) => <Pressable key={entry.materialId} onPress={() => showMaterial(entry)} style={[styles.materialRow, !entry.met && styles.materialMissing]}><MaterialIcon materialId={entry.materialId} size={27}/><View style={styles.flex}><Text style={styles.materialName}>{entry.name}</Text><Text style={[styles.materialCount, { color: entry.met ? colors.green : colors.danger }]}>{entry.owned} / {entry.required}</Text></View><Text style={styles.sourceArrow}>›</Text></Pressable>)}</View>{presentation.blockers.map((blocker) => <Text key={`${enchantment.id}-${blocker.kind}`} style={styles.blocker}>• {blocker.label}</Text>)}<SecondaryButton label={presentation.craftable ? `APPLY ${enchantment.name.toUpperCase()}` : "REQUIREMENTS NOT MET"} disabled={!presentation.craftable} onPress={() => act(() => enchantInventoryEquipment(guild, inventoryIndex, enchantment.id), `${item.name} gained ${enchantment.name}.`)} /></View>;
+        })}</Panel>;
+      })}
+    </>}
+  </ScrollView>;
+}
+
+const styles = StyleSheet.create({
+  content: { padding: 18, paddingBottom: 55 },
+  header: { alignItems: "center", flexDirection: "row", gap: 8, marginTop: 7 },
+  eyebrow: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: 1.5 },
+  title: { color: colors.text, fontSize: 29, fontWeight: "900", marginTop: 2 },
+  day: { color: colors.gold, fontSize: 10, fontWeight: "800", marginTop: 3 },
+  intro: { color: colors.muted, lineHeight: 20, marginVertical: 12 },
+  tutorialPrimer: { borderColor: colors.blue, gap: 7, marginBottom: 12 },
+  tutorialLabel: { color: colors.blue, fontSize: 9, fontWeight: "900", letterSpacing: 1 },
+  tutorialTitle: { color: colors.text, fontSize: 17, fontWeight: "900" },
+  tutorialText: { color: colors.muted, fontSize: 11, lineHeight: 17 },
+  workshopTabs: { flexDirection: "row", gap: 6, marginBottom: 12 },
+  workshopTab: { alignItems: "center", backgroundColor: colors.panel, borderColor: colors.border, borderWidth: 2, flex: 1, gap: 2, minHeight: 79, padding: 7 },
+  workshopTabSelected: { backgroundColor: colors.panel2, borderColor: colors.gold },
+  workshopTabText: { color: colors.muted, fontSize: 9, fontWeight: "900", letterSpacing: .4 },
+  workshopTabTextSelected: { color: colors.gold },
+  workshopTabMeta: { color: colors.muted, fontSize: 8, fontWeight: "800" },
+  artisan: { gap: 9, borderColor: colors.gold },
+  lockedWorkshop: { borderColor: colors.border },
+  buildingHead: { alignItems: "center", flexDirection: "row", gap: 11 },
+  artisanName: { color: colors.text, fontSize: 21, fontWeight: "900" },
+  operational: { color: colors.green, fontSize: 9, fontWeight: "900", marginTop: 2 },
+  locked: { color: colors.muted, fontSize: 9, fontWeight: "900", marginTop: 2 },
+  role: { color: colors.gold, fontSize: 11, fontWeight: "800", marginTop: 3 },
+  description: { color: colors.muted, fontSize: 11, lineHeight: 17 },
+  workshopStats: { flexDirection: "row", gap: 6 },
+  statPlate: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, borderWidth: 1, flex: 1, padding: 8 },
+  statValue: { color: colors.text, fontSize: 17, fontWeight: "900" },
+  statLabel: { color: colors.muted, fontSize: 8, fontWeight: "900", letterSpacing: .5, marginTop: 2 },
+  project: { backgroundColor: colors.panel2, borderColor: colors.border, borderWidth: 1, gap: 7, marginTop: 4, padding: 11 },
+  projectHead: { alignItems: "flex-start", flexDirection: "row", gap: 8 },
+  projectEyebrow: { color: colors.gold, fontSize: 8, fontWeight: "900", letterSpacing: .8 },
+  projectName: { color: colors.text, fontSize: 16, fontWeight: "900", marginTop: 2 },
+  projectMeta: { color: colors.gold, fontSize: 10, fontWeight: "800" },
+  unlockTitle: { color: colors.muted, fontSize: 8, fontWeight: "900", letterSpacing: 1, marginTop: 3 },
+  unlockLine: { color: colors.text, fontSize: 10, lineHeight: 15 },
+  lockReason: { color: colors.danger, fontSize: 10, lineHeight: 15 },
+  mastered: { color: colors.green, fontWeight: "900", marginTop: 6 },
+  recipe: { marginBottom: 10, gap: 8 },
+  undiscovered: { borderColor: colors.border, opacity: .8 },
+  recipeHead: { alignItems: "center", flexDirection: "row", gap: 10 },
+  unknownIcon: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, borderWidth: 2, height: 54, justifyContent: "center", width: 54 },
+  unknownText: { color: colors.muted, fontSize: 28, fontWeight: "900" },
+  repairSummary: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, borderWidth: 1, flexDirection: "row", gap: 8, justifyContent: "space-between", padding: 8 },
+  repairRow: { alignItems: "center", borderTopColor: colors.border, borderTopWidth: 1, flexDirection: "row", gap: 9, paddingTop: 9 },
+  itemName: { color: colors.text, fontSize: 17, fontWeight: "900" },
+  itemNameSmall: { color: colors.text, flex: 1, fontSize: 12, fontWeight: "900" },
+  durability: { color: colors.gold, fontSize: 9, fontWeight: "900" },
+  meta: { color: colors.muted, fontSize: 9, fontWeight: "800" },
+  chips: { flexDirection: "row", flexWrap: "wrap", gap: 5, marginTop: 5 },
+  fitBox: { backgroundColor: colors.panel2, borderLeftColor: colors.blue, borderLeftWidth: 3, gap: 2, padding: 8 },
+  fitLabel: { fontSize: 10, fontWeight: "900", letterSpacing: .5 },
+  effect: { backgroundColor: colors.panel2, borderLeftColor: colors.gold, borderLeftWidth: 3, padding: 8 },
+  effectName: { color: colors.gold, fontSize: 11, fontWeight: "900", marginBottom: 2 },
+  cost: { color: colors.gold, fontSize: 10, fontWeight: "900" },
+  filters: { flexDirection: "row", gap: 5, marginBottom: 10 },
+  filter: { alignItems: "center", backgroundColor: colors.panel, borderColor: colors.border, borderWidth: 1, flex: 1, minHeight: 45, padding: 6 },
+  filterSelected: { backgroundColor: colors.panel2, borderColor: colors.gold, borderWidth: 2 },
+  filterLabel: { color: colors.muted, fontSize: 8, fontWeight: "900" },
+  filterLabelSelected: { color: colors.gold },
+  filterCount: { color: colors.text, fontSize: 12, fontWeight: "900", marginTop: 2 },
+  materials: { gap: 5 },
+  materialRow: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, borderWidth: 1, flexDirection: "row", gap: 7, minHeight: 43, padding: 5 },
+  materialMissing: { borderColor: colors.danger },
+  materialName: { color: colors.text, fontSize: 10, fontWeight: "800" },
+  materialCount: { fontSize: 9, fontWeight: "900", marginTop: 2 },
+  sourceArrow: { color: colors.gold, fontSize: 20, fontWeight: "900" },
+  blocker: { color: colors.gold, fontSize: 10, lineHeight: 15 },
+  danger: { color: colors.danger },
+  enchantIntro: { borderColor: colors.blue, gap: 4, marginBottom: 9 },
+  enchant: { backgroundColor: colors.panel2, borderTopColor: colors.border, borderTopWidth: 1, gap: 7, marginTop: 4, padding: 9 },
+  enchantName: { color: colors.text, fontSize: 13, fontWeight: "900" },
+  line: { alignItems: "center", flexDirection: "row", gap: 7 },
+  flex: { flex: 1 },
+  disabled: { opacity: .55 },
+});

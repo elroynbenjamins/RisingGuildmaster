@@ -1,0 +1,81 @@
+const fs=require('node:fs'),path=require('node:path');
+const walk=d=>fs.readdirSync(d,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(d,e.name)):[path.join(d,e.name)]);
+const screens=walk('src/screens').filter(f=>f.endsWith('.tsx')).map(file=>({file,name:fs.readFileSync(file,'utf8').match(/export function (\w+)/)?.[1]})).filter(x=>x.name);
+const imports=screens.map(s=>`import { ${s.name} } from '../${s.file.replaceAll('\\','/').replace(/\.tsx$/,'')}';`).join('\n');
+const extra=`
+import React,{useEffect,useState} from 'react';
+import {View,Text} from 'react-native';
+import {registerRootComponent} from 'expo';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {GuildProvider,useGuild} from '../src/state/GuildContext';
+import {ThemeProvider} from '../src/theme/theme';
+import {GameDialogProvider} from '../src/components/dialogs/GameDialog';
+import {ManagementShell} from '../src/components/navigation/ManagementShell';
+import {createGuild} from '../src/game/guild/guildService';
+import {initializeRecruitment} from '../src/game/recruitment/recruitmentService';
+import {generateHero} from '../src/game/heroes/heroGenerator';
+import {createSeededRandom} from '../src/utils/random';
+import {REGIONS} from '../src/data/world/regions';
+import {SETTLEMENTS} from '../src/data/world/settlements';
+import {ENEMIES} from '../src/data/enemies';
+import {EQUIPMENT} from '../src/data/equipment/equipment';
+import {WORLD_EVENTS} from '../src/data/world/worldEvents';
+import {LORE_ENTRIES} from '../src/data/world/lore';
+import {CAMPAIGN_CHAPTERS,CAMPAIGN_NODES} from '../src/data/campaign/chapter1';
+import {QUESTS} from '../src/data/quests/quests';
+import {createHeroContract} from '../src/game/recruitment/contractService';
+import {startHeroTraining} from '../src/game/training/trainingService';
+import {startDungeonRun,markDungeonNodeResolved} from '../src/game/dungeons/dungeonService';
+import {createHeroCombatInstance} from '../src/game/combat/heroCombatFactory';
+const noop=()=>{};
+const screens={${screens.map(s=>s.name).join(',')}};
+const params=new URLSearchParams(window.location.search);
+const random=createSeededRandom(4932);
+let fixture=createGuild('The Wayfarers');
+fixture.currentDay=42;fixture.gold=6240;fixture.gems=35;fixture.reputation=180;fixture.rations=48;
+fixture.tutorial.active=false;fixture.tutorial.completed=true;fixture.tutorial.step='complete';
+fixture.world.campaignChapter=2;
+fixture.world.unlockedRegionIds=Object.keys(REGIONS);fixture.world.discoveredSettlementIds=Object.keys(SETTLEMENTS);
+fixture.world.completedCampaignNodeIds=[...CAMPAIGN_CHAPTERS[1].nodeIds];
+fixture.world.completedQuestIds=fixture.world.completedCampaignNodeIds.map(id=>CAMPAIGN_NODES[id]?.questId).filter(Boolean);
+fixture.world.worldFlags={...fixture.world.worldFlags,starter_brambleford_side_quest_complete:true,starter_fourth_hero_ready:true};
+for(const key of ${JSON.stringify([...new Set(walk('src').filter(f=>/\.tsx?$/.test(f)).flatMap(f=>[...fs.readFileSync(f,'utf8').matchAll(/\b([a-z_0-9]*(?:tutorial_seen|guide_seen|hint_seen|guidance_seen))\b/g)].map(m=>m[1])))])})fixture.world.worldFlags[key]=true;
+for(const key of Object.keys(LORE_ENTRIES))fixture.world.worldFlags['lore_'+key]=true;
+fixture.discoveredEnemyIds=Object.keys(ENEMIES);
+fixture.heroes=['warrior','cleric','ranger','mage','paladin','berserker','monk','bard','summoner','bulwark','spellbow'].map((classId,i)=>generateHero(random,{classId,raceId:['human','dwarf','elf','orc','tiefling','stoneborn','veilborn'][i%7],gender:i%2?'female':'male',level:4+i%4}));
+fixture.heroContracts=fixture.heroes.map(h=>createHeroContract(h,85,12,38));
+fixture.heroes[1].currentHP=Math.round(fixture.heroes[1].currentHP*.35);
+fixture.heroes[5].currentHP=0;fixture.heroes[5].isAvailable=false;
+fixture.inventory=Object.keys(EQUIPMENT).slice(0,24);
+for(const key of Object.keys(fixture.materials))fixture.materials[key]=12;
+fixture.potions={minor_healing_potion:6,mana_tonic:4,stamina_draught:2};
+for(const key of Object.keys(fixture.artisans))fixture.artisans[key]={recruited:true,level:2,construction:null};
+fixture.trainingGround.level=2;
+fixture=initializeRecruitment(fixture,random);
+fixture=startHeroTraining(fixture,fixture.heroes[8].id,'focused_practice');
+if(params.get('state')==='empty'){fixture=createGuild('New Banner');fixture.tutorial.active=false;fixture.tutorial.completed=true;}
+if(params.get('screen')==='DungeonScreen'&&params.get('state')!=='empty')fixture.activeDungeonRun=markDungeonNodeResolved(startDungeonRun('wardstone_depths',[],fixture.heroes.slice(0,4).map(h=>h.id),fixture.heroes.slice(0,4).map(createHeroCombatInstance),random),'Opening room cleared');
+class Boundary extends React.Component{state={error:null};static getDerivedStateFromError(error){return {error:String(error)}}render(){return this.state.error?<Text testID="audit-error">{this.state.error}</Text>:this.props.children}}
+function Preview(){
+const {isHydrated,updateGuild,guild}=useGuild();const [ready,setReady]=useState(false);
+useEffect(()=>{if(isHydrated){updateGuild(fixture);setReady(true)}},[isHydrated]);
+if(!ready)return <Text>Preparing audit fixture</Text>;
+const name=params.get('screen')||'GuildScreen',Screen=screens[name];
+const hero=guild.heroes[0]||fixture.heroes[0];
+const questId=params.get('quest')||(['QuestExplorationScreen'].includes(name)?'echoes_of_mosswatch':name==='PartySelectionScreen'?'missing_merchant':name==='CombatScreen'?(params.get('state')==='raid'?'raid_broodheart_awakening':'goblin_chieftain_boss'):'ashes_of_blackbridge');
+const chronicle={id:'audit-result',day:42,questId,questName:QUESTS[questId].name,status:'victory',aftermath:'The guild returns with rescued travelers and evidence from the old bridge.',consequences:[{id:'rep',text:'The guild earned the trust of the surrounding settlements.',tone:'positive'}],loreDiscoveries:[],heroMoments:[],relationshipChanges:[]};
+const heroOutcomes=guild.heroes.slice(0,4).map(h=>({heroId:h.id,name:h.name,raceId:h.raceId,classId:h.classId,gender:h.gender,portraitVariant:h.portraitVariant,levelBefore:h.level-1,levelAfter:h.level,xpBefore:100,xpAfter:200,xpEarned:700,currentHP:h.currentHP,maxHP:createHeroCombatInstance(h).maxHP,conditionIds:[],availableSkillPoints:2,fellInBattle:false,newlyInjured:false}));
+const summary={questId,status:'victory',goldEarned:450,reputationEarned:5,guildmasterXpEarned:60,guildmasterLevelBefore:2,guildmasterLevelAfter:3,xpEarnedPerHero:700,lootIds:guild.inventory.slice(0,3),materials:{iron_ore:3},heroOutcomes,chronicle};
+const common={...Object.fromEntries(${JSON.stringify([...new Set(screens.flatMap(s=>[...fs.readFileSync(s.file,'utf8').matchAll(/\b((?:on|open|start|inspect|select|recruit|assemble|navigate|update)[A-Za-z]*)\s*(?:\?|\()/g)].map(m=>m[1])))])}.map(k=>[k,noop])),onBack:noop,onContinue:noop,onNewGame:noop,onBegin:noop,onSkip:noop,inspect:noop,recruit:noop,start:noop,navigate:noop,guild,updateGuild,random,hero,heroes:guild.heroes.filter(h=>h.currentHP>0).slice(0,params.get('state')==='raid'?8:4),questId,party:{id:'audit-party',heroIds:guild.heroes.slice(0,4).map(h=>h.id)},regionId:'greenveil',itemId:guild.inventory[0]||'worn-sword',candidateId:guild.recruitment.candidates[0]?.candidateId,event:WORLD_EVENTS.greenveil_oathstone,summary,title:'Future Guild Service',saveSlots:{1:{slotId:1,guildName:guild.guildName,currentDay:42,campaignChapter:2,heroCount:guild.heroes.length,reputation:180,difficultyId:'standard'},2:null},saveSlotIssues:{1:null,2:null},saveSlot:2};
+const mainTabs={GuildScreen:'Guild',HeroesScreen:'Heroes',QuestSelectionScreen:'Quests',WorldMapScreen:'World',InventoryScreen:'Inventory'};
+window.__auditReady=true;window.__auditScreens=Object.keys(screens);
+return <Boundary><View style={{flex:1,backgroundColor:'#101416'}}>{mainTabs[name]?<ManagementShell guild={guild} active={mainTabs[name]} onSelect={noop} onOpenGems={noop}><Screen {...common}/></ManagementShell>:<Screen {...common}/>}</View></Boundary>;
+}
+function Audit(){return <SafeAreaProvider><ThemeProvider themeId={params.get('theme')||'guild_dark'}><GuildProvider><GameDialogProvider><Preview/></GameDialogProvider></GuildProvider></ThemeProvider></SafeAreaProvider>}
+registerRootComponent(Audit);
+`;
+// Fixture-only entry; never imported by App.tsx or package.json.
+fs.writeFileSync('scripts/visual-audit-entry.tsx',imports+extra);
+fs.mkdirSync('output/visual-audit',{recursive:true});
+fs.writeFileSync('output/visual-audit/screens.json',JSON.stringify(screens,null,2));
+console.log(`Prepared ${screens.length} screens`);

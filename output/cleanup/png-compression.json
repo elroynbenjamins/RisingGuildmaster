@@ -1,0 +1,1946 @@
+{
+  "written": true,
+  "checked": 1406,
+  "changed": 323,
+  "savedBytes": 2372133,
+  "results": [
+    {
+      "file": "assets/alchemy/mana-tonic.png",
+      "before": 74244,
+      "after": 70318,
+      "saved": 3926
+    },
+    {
+      "file": "assets/alchemy/minor-healing-potion.png",
+      "before": 88255,
+      "after": 84700,
+      "saved": 3555
+    },
+    {
+      "file": "assets/alchemy/potion-icons-sheet-v1.png",
+      "before": 1306332,
+      "after": 1252102,
+      "saved": 54230
+    },
+    {
+      "file": "assets/alchemy/stamina-draught.png",
+      "before": 87675,
+      "after": 84363,
+      "saved": 3312
+    },
+    {
+      "file": "assets/app/guildmaster-adaptive-foreground-v2.png",
+      "before": 570138,
+      "after": 563796,
+      "saved": 6342
+    },
+    {
+      "file": "assets/app/guildmaster-app-icon-v1.png",
+      "before": 1815513,
+      "after": 1754086,
+      "saved": 61427
+    },
+    {
+      "file": "assets/app/guildmaster-app-icon-v2.png",
+      "before": 1462723,
+      "after": 1385052,
+      "saved": 77671
+    },
+    {
+      "file": "assets/art-review/enemy-v1.png",
+      "before": 1218068,
+      "after": 1154567,
+      "saved": 63501
+    },
+    {
+      "file": "assets/art-review/hero-v1.png",
+      "before": 1567604,
+      "after": 1543166,
+      "saved": 24438
+    },
+    {
+      "file": "assets/art-review/npc-v1.png",
+      "before": 1312913,
+      "after": 1264377,
+      "saved": 48536
+    },
+    {
+      "file": "assets/art-review/skill-v1.png",
+      "before": 1068713,
+      "after": 996112,
+      "saved": 72601
+    },
+    {
+      "file": "assets/artwork-v2/enemies/ash-story/ashscale_vermin.png",
+      "before": 523991,
+      "after": 519274,
+      "saved": 4717
+    },
+    {
+      "file": "assets/artwork-v2/enemies/ash-story/wardstone_scale_guardian.png",
+      "before": 507523,
+      "after": 503797,
+      "saved": 3726
+    },
+    {
+      "file": "assets/artwork-v2/enemies/ashlands/glasswing_stalker.png",
+      "before": 524532,
+      "after": 522807,
+      "saved": 1725
+    },
+    {
+      "file": "assets/artwork-v2/enemies/ashlands/solkar_ash_herald.png",
+      "before": 513296,
+      "after": 511984,
+      "saved": 1312
+    },
+    {
+      "file": "assets/artwork-v2/enemies/bandits/bandit.png",
+      "before": 457469,
+      "after": 456233,
+      "saved": 1236
+    },
+    {
+      "file": "assets/artwork-v2/enemies/bandits/bandit_captain.png",
+      "before": 490554,
+      "after": 488495,
+      "saved": 2059
+    },
+    {
+      "file": "assets/artwork-v2/enemies/beasts/carrion_crow_swarm.png",
+      "before": 510193,
+      "after": 504803,
+      "saved": 5390
+    },
+    {
+      "file": "assets/artwork-v2/enemies/beasts/dire_wolf.png",
+      "before": 498195,
+      "after": 491840,
+      "saved": 6355
+    },
+    {
+      "file": "assets/artwork-v2/enemies/beasts/frostmarch_yeti.png",
+      "before": 582767,
+      "after": 567936,
+      "saved": 14831
+    },
+    {
+      "file": "assets/artwork-v2/enemies/beasts/giant_spider.png",
+      "before": 544167,
+      "after": 541589,
+      "saved": 2578
+    },
+    {
+      "file": "assets/artwork-v2/enemies/beasts/great_forest_serpent.png",
+      "before": 511836,
+      "after": 510664,
+      "saved": 1172
+    },
+    {
+      "file": "assets/artwork-v2/enemies/beasts/spiderling_swarm.png",
+      "before": 562963,
+      "after": 560389,
+      "saved": 2574
+    },
+    {
+      "file": "assets/artwork-v2/enemies/beasts/spider_broodguard.png",
+      "before": 536163,
+      "after": 531457,
+      "saved": 4706
+    },
+    {
+      "file": "assets/artwork-v2/enemies/beasts/spider_queen.png",
+      "before": 542293,
+      "after": 540914,
+      "saved": 1379
+    },
+    {
+      "file": "assets/artwork-v2/enemies/beasts/webspinner.png",
+      "before": 508838,
+      "after": 506196,
+      "saved": 2642
+    },
+    {
+      "file": "assets/artwork-v2/enemies/constructs/hollow_warden.png",
+      "before": 541701,
+      "after": 540200,
+      "saved": 1501
+    },
+    {
+      "file": "assets/artwork-v2/enemies/constructs/ironbound_sentry.png",
+      "before": 489703,
+      "after": 488067,
+      "saved": 1636
+    },
+    {
+      "file": "assets/artwork-v2/enemies/drowned-seventh/abyssal_lanternbearer.png",
+      "before": 504953,
+      "after": 502083,
+      "saved": 2870
+    },
+    {
+      "file": "assets/artwork-v2/enemies/drowned-seventh/drowned_legionary.png",
+      "before": 535626,
+      "after": 534039,
+      "saved": 1587
+    },
+    {
+      "file": "assets/artwork-v2/enemies/drowned-seventh/nameleech_swarm.png",
+      "before": 533158,
+      "after": 527643,
+      "saved": 5515
+    },
+    {
+      "file": "assets/artwork-v2/enemies/drowned-seventh/serekh_chartmaker.png",
+      "before": 529087,
+      "after": 523481,
+      "saved": 5606
+    },
+    {
+      "file": "assets/artwork-v2/enemies/drowned-seventh/seventh_gate_colossus.png",
+      "before": 551938,
+      "after": 547607,
+      "saved": 4331
+    },
+    {
+      "file": "assets/artwork-v2/enemies/drowned-seventh/tideglass_stalker.png",
+      "before": 526045,
+      "after": 521431,
+      "saved": 4614
+    },
+    {
+      "file": "assets/artwork-v2/enemies/frostmarch/aurora_seer.png",
+      "before": 553825,
+      "after": 545620,
+      "saved": 8205
+    },
+    {
+      "file": "assets/artwork-v2/enemies/frostmarch/hroth_iceblood.png",
+      "before": 605802,
+      "after": 597076,
+      "saved": 8726
+    },
+    {
+      "file": "assets/artwork-v2/enemies/frostmarch/icebound_warden.png",
+      "before": 540887,
+      "after": 534260,
+      "saved": 6627
+    },
+    {
+      "file": "assets/artwork-v2/enemies/frostmarch/rimefang_wolf.png",
+      "before": 534252,
+      "after": 520544,
+      "saved": 13708
+    },
+    {
+      "file": "assets/artwork-v2/enemies/frostmarch/vaelith_pale_echo.png",
+      "before": 568585,
+      "after": 558041,
+      "saved": 10544
+    },
+    {
+      "file": "assets/artwork-v2/enemies/goblins/goblin_wardbreaker.png",
+      "before": 529120,
+      "after": 527961,
+      "saved": 1159
+    },
+    {
+      "file": "assets/artwork-v2/enemies/iron-hills/brasswing_drake.png",
+      "before": 539844,
+      "after": 536890,
+      "saved": 2954
+    },
+    {
+      "file": "assets/artwork-v2/enemies/iron-hills/crownmarked_saboteur.png",
+      "before": 551640,
+      "after": 548983,
+      "saved": 2657
+    },
+    {
+      "file": "assets/artwork-v2/enemies/iron-hills/stormcrow_mimic.png",
+      "before": 542877,
+      "after": 539935,
+      "saved": 2942
+    },
+    {
+      "file": "assets/artwork-v2/enemies/orcs/ghorak_chainbreaker.png",
+      "before": 544247,
+      "after": 542910,
+      "saved": 1337
+    },
+    {
+      "file": "assets/artwork-v2/enemies/orcs/troll.png",
+      "before": 495388,
+      "after": 492149,
+      "saved": 3239
+    },
+    {
+      "file": "assets/artwork-v2/enemies/sewer-vermin/giant_rat.png",
+      "before": 530704,
+      "after": 525153,
+      "saved": 5551
+    },
+    {
+      "file": "assets/artwork-v2/enemies/sewer-vermin/sewer_rat.png",
+      "before": 501948,
+      "after": 500363,
+      "saved": 1585
+    },
+    {
+      "file": "assets/artwork-v2/enemies/shadowfen/bell_widow.png",
+      "before": 480259,
+      "after": 475562,
+      "saved": 4697
+    },
+    {
+      "file": "assets/artwork-v2/enemies/shadowfen/drowned_legionnaire.png",
+      "before": 544500,
+      "after": 543316,
+      "saved": 1184
+    },
+    {
+      "file": "assets/artwork-v2/enemies/shadowfen/gravewater_hexer.png",
+      "before": 551011,
+      "after": 548310,
+      "saved": 2701
+    },
+    {
+      "file": "assets/artwork-v2/enemies/shadowfen/mire_lurker.png",
+      "before": 514635,
+      "after": 511141,
+      "saved": 3494
+    },
+    {
+      "file": "assets/artwork-v2/enemies/shadowfen/morrowveil_archivist.png",
+      "before": 534107,
+      "after": 530086,
+      "saved": 4021
+    },
+    {
+      "file": "assets/artwork-v2/enemies/stonegate-assassins/gloam_knife_assassin.png",
+      "before": 489427,
+      "after": 484962,
+      "saved": 4465
+    },
+    {
+      "file": "assets/artwork-v2/enemies/stonegate-assassins/nightglass_trapper.png",
+      "before": 521883,
+      "after": 517173,
+      "saved": 4710
+    },
+    {
+      "file": "assets/artwork-v2/enemies/stonegate-assassins/seressa_vane.png",
+      "before": 500915,
+      "after": 496689,
+      "saved": 4226
+    },
+    {
+      "file": "assets/artwork-v2/enemies/undead/heartstone_revenant.png",
+      "before": 540771,
+      "after": 539432,
+      "saved": 1339
+    },
+    {
+      "file": "assets/artwork-v2/enemies/undead/skeleton.png",
+      "before": 497493,
+      "after": 496270,
+      "saved": 1223
+    },
+    {
+      "file": "assets/artwork-v2/enemies/undead/skeleton_archer.png",
+      "before": 481578,
+      "after": 480289,
+      "saved": 1289
+    },
+    {
+      "file": "assets/artwork-v2/enemies/undead/zombie.png",
+      "before": 508808,
+      "after": 504534,
+      "saved": 4274
+    },
+    {
+      "file": "assets/artwork-v2/enemies/western-sea/admiral_nhal_veyr.png",
+      "before": 553244,
+      "after": 546272,
+      "saved": 6972
+    },
+    {
+      "file": "assets/artwork-v2/enemies/western-sea/blacktide_reaver.png",
+      "before": 547502,
+      "after": 544872,
+      "saved": 2630
+    },
+    {
+      "file": "assets/artwork-v2/enemies/western-sea/crownless_mariner.png",
+      "before": 526177,
+      "after": 521121,
+      "saved": 5056
+    },
+    {
+      "file": "assets/artwork-v2/enemies/western-sea/leviathan_thrall.png",
+      "before": 552781,
+      "after": 548435,
+      "saved": 4346
+    },
+    {
+      "file": "assets/artwork-v2/enemies/western-sea/nullwake_arbalist.png",
+      "before": 551139,
+      "after": 543369,
+      "saved": 7770
+    },
+    {
+      "file": "assets/artwork-v2/enemies/western-sea/oath_eater.png",
+      "before": 496692,
+      "after": 494557,
+      "saved": 2135
+    },
+    {
+      "file": "assets/artwork-v2/heroes/orc/berserker/male-v3.png",
+      "before": 387355,
+      "after": 386253,
+      "saved": 1102
+    },
+    {
+      "file": "assets/artwork-v2/heroes/stoneborn/berserker/female-v1.png",
+      "before": 416749,
+      "after": 408585,
+      "saved": 8164
+    },
+    {
+      "file": "assets/artwork-v2/heroes/stoneborn/berserker/female-v2.png",
+      "before": 407046,
+      "after": 401606,
+      "saved": 5440
+    },
+    {
+      "file": "assets/artwork-v2/heroes/stoneborn/berserker/female-v3.png",
+      "before": 401732,
+      "after": 396710,
+      "saved": 5022
+    },
+    {
+      "file": "assets/artwork-v2/heroes/stoneborn/berserker/female-v4.png",
+      "before": 397248,
+      "after": 393519,
+      "saved": 3729
+    },
+    {
+      "file": "assets/artwork-v2/heroes/stoneborn/berserker/male-v1.png",
+      "before": 387141,
+      "after": 385058,
+      "saved": 2083
+    },
+    {
+      "file": "assets/artwork-v2/heroes/stoneborn/berserker/male-v3.png",
+      "before": 392832,
+      "after": 390638,
+      "saved": 2194
+    },
+    {
+      "file": "assets/artwork-v2/heroes/stoneborn/berserker/male-v4.png",
+      "before": 391543,
+      "after": 388944,
+      "saved": 2599
+    },
+    {
+      "file": "assets/artwork-v2/heroes/stoneborn/monk/female-v1.png",
+      "before": 402591,
+      "after": 401180,
+      "saved": 1411
+    },
+    {
+      "file": "assets/artwork-v2/heroes/veilborn/berserker/female-v1.png",
+      "before": 404905,
+      "after": 402923,
+      "saved": 1982
+    },
+    {
+      "file": "assets/artwork-v2/heroes/veilborn/berserker/female-v2.png",
+      "before": 423175,
+      "after": 419610,
+      "saved": 3565
+    },
+    {
+      "file": "assets/artwork-v2/heroes/veilborn/berserker/female-v3.png",
+      "before": 410890,
+      "after": 409090,
+      "saved": 1800
+    },
+    {
+      "file": "assets/artwork-v2/heroes/veilborn/berserker/female-v4.png",
+      "before": 411405,
+      "after": 408842,
+      "saved": 2563
+    },
+    {
+      "file": "assets/artwork-v2/heroes/veilborn/berserker/male-v1.png",
+      "before": 417334,
+      "after": 415667,
+      "saved": 1667
+    },
+    {
+      "file": "assets/artwork-v2/heroes/veilborn/berserker/male-v3.png",
+      "before": 399703,
+      "after": 398255,
+      "saved": 1448
+    },
+    {
+      "file": "assets/artwork-v2/heroes/veilborn/berserker/male-v4.png",
+      "before": 417243,
+      "after": 414041,
+      "saved": 3202
+    },
+    {
+      "file": "assets/artwork-v2/icons/game-transparent/monster_manual.png",
+      "before": 216512,
+      "after": 215373,
+      "saved": 1139
+    },
+    {
+      "file": "assets/enemies/bandits.png",
+      "before": 1726174,
+      "after": 1629617,
+      "saved": 96557
+    },
+    {
+      "file": "assets/enemies/beasts-a.png",
+      "before": 1872872,
+      "after": 1820448,
+      "saved": 52424
+    },
+    {
+      "file": "assets/enemies/beasts-b.png",
+      "before": 1743610,
+      "after": 1600337,
+      "saved": 143273
+    },
+    {
+      "file": "assets/enemies/constructs.png",
+      "before": 1643668,
+      "after": 1544587,
+      "saved": 99081
+    },
+    {
+      "file": "assets/enemies/goblins.png",
+      "before": 1828730,
+      "after": 1751269,
+      "saved": 77461
+    },
+    {
+      "file": "assets/enemies/orcs.png",
+      "before": 1748682,
+      "after": 1663166,
+      "saved": 85516
+    },
+    {
+      "file": "assets/enemies/undead.png",
+      "before": 1804422,
+      "after": 1724524,
+      "saved": 79898
+    },
+    {
+      "file": "assets/images/companions/complete/wolf_companion.png",
+      "before": 504991,
+      "after": 496818,
+      "saved": 8173
+    },
+    {
+      "file": "assets/images/equipment/complete/adamant-door-shield.png",
+      "before": 248271,
+      "after": 245171,
+      "saved": 3100
+    },
+    {
+      "file": "assets/images/equipment/complete/ashglass-visor.png",
+      "before": 305265,
+      "after": 304053,
+      "saved": 1212
+    },
+    {
+      "file": "assets/images/equipment/complete/battle-harness.png",
+      "before": 291730,
+      "after": 288890,
+      "saved": 2840
+    },
+    {
+      "file": "assets/images/equipment/complete/cloudstep-boots.png",
+      "before": 273799,
+      "after": 271244,
+      "saved": 2555
+    },
+    {
+      "file": "assets/images/equipment/complete/deadletter-coat.png",
+      "before": 312463,
+      "after": 308073,
+      "saved": 4390
+    },
+    {
+      "file": "assets/images/equipment/complete/disciple-wraps.png",
+      "before": 309311,
+      "after": 304783,
+      "saved": 4528
+    },
+    {
+      "file": "assets/images/equipment/complete/dunewalker-boots.png",
+      "before": 299546,
+      "after": 297107,
+      "saved": 2439
+    },
+    {
+      "file": "assets/images/equipment/complete/free-oath-coat.png",
+      "before": 266348,
+      "after": 264717,
+      "saved": 1631
+    },
+    {
+      "file": "assets/images/equipment/complete/frostwood-bow.png",
+      "before": 258967,
+      "after": 257908,
+      "saved": 1059
+    },
+    {
+      "file": "assets/images/equipment/complete/galewing-mantle.png",
+      "before": 299683,
+      "after": 297965,
+      "saved": 1718
+    },
+    {
+      "file": "assets/images/equipment/complete/glacier-spike-sabatons.png",
+      "before": 296657,
+      "after": 293399,
+      "saved": 3258
+    },
+    {
+      "file": "assets/images/equipment/complete/gravewater-waders.png",
+      "before": 279714,
+      "after": 277837,
+      "saved": 1877
+    },
+    {
+      "file": "assets/images/equipment/complete/hunter-leathers.png",
+      "before": 311132,
+      "after": 307775,
+      "saved": 3357
+    },
+    {
+      "file": "assets/images/equipment/complete/iron-chainmail.png",
+      "before": 333724,
+      "after": 326023,
+      "saved": 7701
+    },
+    {
+      "file": "assets/images/equipment/complete/iron-guard-helm.png",
+      "before": 314049,
+      "after": 308744,
+      "saved": 5305
+    },
+    {
+      "file": "assets/images/equipment/complete/iron-sabatons.png",
+      "before": 270125,
+      "after": 267336,
+      "saved": 2789
+    },
+    {
+      "file": "assets/images/equipment/complete/iron-skullcap.png",
+      "before": 286804,
+      "after": 284698,
+      "saved": 2106
+    },
+    {
+      "file": "assets/images/equipment/complete/leather-cap.png",
+      "before": 290651,
+      "after": 288397,
+      "saved": 2254
+    },
+    {
+      "file": "assets/images/equipment/complete/leather-scout-hood.png",
+      "before": 298164,
+      "after": 296070,
+      "saved": 2094
+    },
+    {
+      "file": "assets/images/equipment/complete/memoryglass-blade.png",
+      "before": 248807,
+      "after": 247084,
+      "saved": 1723
+    },
+    {
+      "file": "assets/images/equipment/complete/oak-recurve-bow.png",
+      "before": 230471,
+      "after": 228474,
+      "saved": 1997
+    },
+    {
+      "file": "assets/images/equipment/complete/padded-armor.png",
+      "before": 310107,
+      "after": 305024,
+      "saved": 5083
+    },
+    {
+      "file": "assets/images/equipment/complete/recruit-bulwark-mail.png",
+      "before": 330980,
+      "after": 325013,
+      "saved": 5967
+    },
+    {
+      "file": "assets/images/equipment/complete/rimeguard-greathelm.png",
+      "before": 320412,
+      "after": 314948,
+      "saved": 5464
+    },
+    {
+      "file": "assets/images/equipment/complete/runehunter-mantle.png",
+      "before": 294062,
+      "after": 290475,
+      "saved": 3587
+    },
+    {
+      "file": "assets/images/equipment/complete/runespun-cowl.png",
+      "before": 295963,
+      "after": 294720,
+      "saved": 1243
+    },
+    {
+      "file": "assets/images/equipment/complete/scout-cloak.png",
+      "before": 285985,
+      "after": 282418,
+      "saved": 3567
+    },
+    {
+      "file": "assets/images/equipment/complete/shadowweave-mantle.png",
+      "before": 281199,
+      "after": 277933,
+      "saved": 3266
+    },
+    {
+      "file": "assets/images/equipment/complete/silken-trail-boots.png",
+      "before": 277619,
+      "after": 273773,
+      "saved": 3846
+    },
+    {
+      "file": "assets/images/equipment/complete/simple-iron-band.png",
+      "before": 268517,
+      "after": 264755,
+      "saved": 3762
+    },
+    {
+      "file": "assets/images/equipment/complete/sluicefang-ring.png",
+      "before": 275672,
+      "after": 273786,
+      "saved": 1886
+    },
+    {
+      "file": "assets/images/equipment/complete/soft-leather-boots.png",
+      "before": 268138,
+      "after": 266714,
+      "saved": 1424
+    },
+    {
+      "file": "assets/images/equipment/complete/steel-greathelm.png",
+      "before": 305122,
+      "after": 302291,
+      "saved": 2831
+    },
+    {
+      "file": "assets/images/equipment/complete/still-water-band.png",
+      "before": 250705,
+      "after": 249404,
+      "saved": 1301
+    },
+    {
+      "file": "assets/images/equipment/complete/stormglass-boots.png",
+      "before": 283742,
+      "after": 282050,
+      "saved": 1692
+    },
+    {
+      "file": "assets/images/equipment/complete/traveler-feather-cap.png",
+      "before": 298630,
+      "after": 296506,
+      "saved": 2124
+    },
+    {
+      "file": "assets/images/equipment/complete/vigilant-trail-coat.png",
+      "before": 288927,
+      "after": 287221,
+      "saved": 1706
+    },
+    {
+      "file": "assets/images/equipment/complete/ward-thread-boots.png",
+      "before": 288974,
+      "after": 287068,
+      "saved": 1906
+    },
+    {
+      "file": "assets/images/equipment/complete/warded-handwraps.png",
+      "before": 304822,
+      "after": 301541,
+      "saved": 3281
+    },
+    {
+      "file": "assets/images/equipment/complete/wardens-oathblade.png",
+      "before": 245367,
+      "after": 244155,
+      "saved": 1212
+    },
+    {
+      "file": "assets/images/equipment/complete/wardmarch-boots.png",
+      "before": 291700,
+      "after": 287382,
+      "saved": 4318
+    },
+    {
+      "file": "assets/images/equipment/complete/watch-shield.png",
+      "before": 272191,
+      "after": 271095,
+      "saved": 1096
+    },
+    {
+      "file": "assets/images/equipment/complete/wayfarer-clasp.png",
+      "before": 273916,
+      "after": 272389,
+      "saved": 1527
+    },
+    {
+      "file": "assets/images/equipment/complete/white-maw-mantle.png",
+      "before": 245517,
+      "after": 242601,
+      "saved": 2916
+    },
+    {
+      "file": "assets/images/equipment/complete/windstep-sandals.png",
+      "before": 288371,
+      "after": 285871,
+      "saved": 2500
+    },
+    {
+      "file": "assets/images/equipment/complete/wolfhide-boots.png",
+      "before": 280820,
+      "after": 277663,
+      "saved": 3157
+    },
+    {
+      "file": "assets/images/materials/complete/ancient_hide.png",
+      "before": 349863,
+      "after": 337203,
+      "saved": 12660
+    },
+    {
+      "file": "assets/images/materials/complete/arcane_dust.png",
+      "before": 357453,
+      "after": 353782,
+      "saved": 3671
+    },
+    {
+      "file": "assets/images/materials/complete/armored_scute.png",
+      "before": 371288,
+      "after": 359000,
+      "saved": 12288
+    },
+    {
+      "file": "assets/images/materials/complete/coal.png",
+      "before": 291491,
+      "after": 286627,
+      "saved": 4864
+    },
+    {
+      "file": "assets/images/materials/complete/crocodile_recipe_fragment.png",
+      "before": 288850,
+      "after": 286427,
+      "saved": 2423
+    },
+    {
+      "file": "assets/images/materials/complete/crocodile_tooth.png",
+      "before": 272120,
+      "after": 269696,
+      "saved": 2424
+    },
+    {
+      "file": "assets/images/materials/complete/frost_crystal.png",
+      "before": 333388,
+      "after": 331427,
+      "saved": 1961
+    },
+    {
+      "file": "assets/images/materials/complete/iron_ore.png",
+      "before": 280950,
+      "after": 278286,
+      "saved": 2664
+    },
+    {
+      "file": "assets/images/materials/complete/oak_timber.png",
+      "before": 347568,
+      "after": 336967,
+      "saved": 10601
+    },
+    {
+      "file": "assets/images/materials/complete/rough_ruby.png",
+      "before": 341018,
+      "after": 339182,
+      "saved": 1836
+    },
+    {
+      "file": "assets/images/materials/complete/rough_sapphire.png",
+      "before": 330681,
+      "after": 326028,
+      "saved": 4653
+    },
+    {
+      "file": "assets/images/materials/complete/rough_topaz.png",
+      "before": 343284,
+      "after": 341537,
+      "saved": 1747
+    },
+    {
+      "file": "assets/images/materials/complete/serpent_fang.png",
+      "before": 304824,
+      "after": 301896,
+      "saved": 2928
+    },
+    {
+      "file": "assets/images/materials/complete/serpent_recipe_fragment.png",
+      "before": 336160,
+      "after": 332148,
+      "saved": 4012
+    },
+    {
+      "file": "assets/images/materials/complete/serpent_scale.png",
+      "before": 342212,
+      "after": 337455,
+      "saved": 4757
+    },
+    {
+      "file": "assets/images/materials/complete/silver_ore.png",
+      "before": 290091,
+      "after": 287061,
+      "saved": 3030
+    },
+    {
+      "file": "assets/images/materials/complete/spider_silk.png",
+      "before": 350004,
+      "after": 334174,
+      "saved": 15830
+    },
+    {
+      "file": "assets/images/materials/complete/white_maw_pelt.png",
+      "before": 304270,
+      "after": 295513,
+      "saved": 8757
+    },
+    {
+      "file": "assets/images/materials/complete/wolf_pelt.png",
+      "before": 286740,
+      "after": 280618,
+      "saved": 6122
+    },
+    {
+      "file": "assets/images/materials/complete/yeti_fang.png",
+      "before": 328916,
+      "after": 320738,
+      "saved": 8178
+    },
+    {
+      "file": "assets/images/materials/complete/yeti_recipe_fragment.png",
+      "before": 340275,
+      "after": 323987,
+      "saved": 16288
+    },
+    {
+      "file": "assets/images/skills/complete/abyssal_hide.png",
+      "before": 320201,
+      "after": 311827,
+      "saved": 8374
+    },
+    {
+      "file": "assets/images/skills/complete/accusing_whisper.png",
+      "before": 333197,
+      "after": 328661,
+      "saved": 4536
+    },
+    {
+      "file": "assets/images/skills/complete/adamant_sentinel_immovable.png",
+      "before": 339369,
+      "after": 335013,
+      "saved": 4356
+    },
+    {
+      "file": "assets/images/skills/complete/admirals_sabre.png",
+      "before": 317074,
+      "after": 308883,
+      "saved": 8191
+    },
+    {
+      "file": "assets/images/skills/complete/aimed_shot.png",
+      "before": 317256,
+      "after": 311522,
+      "saved": 5734
+    },
+    {
+      "file": "assets/images/skills/complete/archive_unbound.png",
+      "before": 374495,
+      "after": 365817,
+      "saved": 8678
+    },
+    {
+      "file": "assets/images/skills/complete/aurora_lance.png",
+      "before": 322522,
+      "after": 319204,
+      "saved": 3318
+    },
+    {
+      "file": "assets/images/skills/complete/avalanche_roar.png",
+      "before": 315929,
+      "after": 312114,
+      "saved": 3815
+    },
+    {
+      "file": "assets/images/skills/complete/bastion_sanctuary_wall.png",
+      "before": 320248,
+      "after": 317793,
+      "saved": 2455
+    },
+    {
+      "file": "assets/images/skills/complete/bell_claw.png",
+      "before": 325124,
+      "after": 320626,
+      "saved": 4498
+    },
+    {
+      "file": "assets/images/skills/complete/below_the_chart.png",
+      "before": 363196,
+      "after": 360911,
+      "saved": 2285
+    },
+    {
+      "file": "assets/images/skills/complete/blackglass_blade.png",
+      "before": 334405,
+      "after": 331014,
+      "saved": 3391
+    },
+    {
+      "file": "assets/images/skills/complete/black_squall_volley.png",
+      "before": 324144,
+      "after": 313502,
+      "saved": 10642
+    },
+    {
+      "file": "assets/images/skills/complete/black_tide_broadside.png",
+      "before": 310890,
+      "after": 303764,
+      "saved": 7126
+    },
+    {
+      "file": "assets/images/skills/complete/blasting_charge.png",
+      "before": 347021,
+      "after": 342531,
+      "saved": 4490
+    },
+    {
+      "file": "assets/images/skills/complete/blinding_wings.png",
+      "before": 351978,
+      "after": 347400,
+      "saved": 4578
+    },
+    {
+      "file": "assets/images/skills/complete/blue_horn_call.png",
+      "before": 307313,
+      "after": 302363,
+      "saved": 4950
+    },
+    {
+      "file": "assets/images/skills/complete/boarding_hook.png",
+      "before": 302033,
+      "after": 293652,
+      "saved": 8381
+    },
+    {
+      "file": "assets/images/skills/complete/bog_ambush.png",
+      "before": 305519,
+      "after": 301694,
+      "saved": 3825
+    },
+    {
+      "file": "assets/images/skills/complete/bone_precision.png",
+      "before": 334762,
+      "after": 326148,
+      "saved": 8614
+    },
+    {
+      "file": "assets/images/skills/complete/borrowed_resolve.png",
+      "before": 374131,
+      "after": 355774,
+      "saved": 18357
+    },
+    {
+      "file": "assets/images/skills/complete/brood_crush.png",
+      "before": 361715,
+      "after": 351741,
+      "saved": 9974
+    },
+    {
+      "file": "assets/images/skills/complete/brood_matriarch.png",
+      "before": 313636,
+      "after": 311228,
+      "saved": 2408
+    },
+    {
+      "file": "assets/images/skills/complete/bulwark_challenge.png",
+      "before": 300231,
+      "after": 296669,
+      "saved": 3562
+    },
+    {
+      "file": "assets/images/skills/complete/bulwark_guarded_advance.png",
+      "before": 305519,
+      "after": 303236,
+      "saved": 2283
+    },
+    {
+      "file": "assets/images/skills/complete/bulwark_last_bastion.png",
+      "before": 292167,
+      "after": 289474,
+      "saved": 2693
+    },
+    {
+      "file": "assets/images/skills/complete/bulwark_shield_sweep.png",
+      "before": 342068,
+      "after": 338070,
+      "saved": 3998
+    },
+    {
+      "file": "assets/images/skills/complete/bulwark_unyielding.png",
+      "before": 292843,
+      "after": 290262,
+      "saved": 2581
+    },
+    {
+      "file": "assets/images/skills/complete/caltrop_burst.png",
+      "before": 331003,
+      "after": 322919,
+      "saved": 8084
+    },
+    {
+      "file": "assets/images/skills/complete/chained_voice.png",
+      "before": 384724,
+      "after": 377420,
+      "saved": 7304
+    },
+    {
+      "file": "assets/images/skills/complete/chartmakers_blade.png",
+      "before": 364009,
+      "after": 360505,
+      "saved": 3504
+    },
+    {
+      "file": "assets/images/skills/complete/civic_bulwark.png",
+      "before": 388493,
+      "after": 385560,
+      "saved": 2933
+    },
+    {
+      "file": "assets/images/skills/complete/coiled_fury.png",
+      "before": 328456,
+      "after": 325293,
+      "saved": 3163
+    },
+    {
+      "file": "assets/images/skills/complete/deathless_watch.png",
+      "before": 327557,
+      "after": 321785,
+      "saved": 5772
+    },
+    {
+      "file": "assets/images/skills/complete/death_from_shadow.png",
+      "before": 287030,
+      "after": 283924,
+      "saved": 3106
+    },
+    {
+      "file": "assets/images/skills/complete/death_roll.png",
+      "before": 308872,
+      "after": 307388,
+      "saved": 1484
+    },
+    {
+      "file": "assets/images/skills/complete/devour_oath.png",
+      "before": 371308,
+      "after": 357732,
+      "saved": 13576
+    },
+    {
+      "file": "assets/images/skills/complete/dirty_strike.png",
+      "before": 288505,
+      "after": 286921,
+      "saved": 1584
+    },
+    {
+      "file": "assets/images/skills/complete/drake_fang.png",
+      "before": 320191,
+      "after": 314080,
+      "saved": 6111
+    },
+    {
+      "file": "assets/images/skills/complete/drowned_discipline.png",
+      "before": 318535,
+      "after": 311443,
+      "saved": 7092
+    },
+    {
+      "file": "assets/images/skills/complete/drowned_halberd.png",
+      "before": 374888,
+      "after": 370571,
+      "saved": 4317
+    },
+    {
+      "file": "assets/images/skills/complete/dusk_reaper_silence_arrow.png",
+      "before": 248773,
+      "after": 244247,
+      "saved": 4526
+    },
+    {
+      "file": "assets/images/skills/complete/echo_of_the_first.png",
+      "before": 329480,
+      "after": 323455,
+      "saved": 6025
+    },
+    {
+      "file": "assets/images/skills/complete/erase_from_record.png",
+      "before": 299599,
+      "after": 296628,
+      "saved": 2971
+    },
+    {
+      "file": "assets/images/skills/complete/false_sky_chorus.png",
+      "before": 314016,
+      "after": 308502,
+      "saved": 5514
+    },
+    {
+      "file": "assets/images/skills/complete/feast_on_the_fallen.png",
+      "before": 295464,
+      "after": 292383,
+      "saved": 3081
+    },
+    {
+      "file": "assets/images/skills/complete/final_testimony.png",
+      "before": 288597,
+      "after": 285092,
+      "saved": 3505
+    },
+    {
+      "file": "assets/images/skills/complete/freezing_gust.png",
+      "before": 312847,
+      "after": 308716,
+      "saved": 4131
+    },
+    {
+      "file": "assets/images/skills/complete/frozen_halberd.png",
+      "before": 327229,
+      "after": 322915,
+      "saved": 4314
+    },
+    {
+      "file": "assets/images/skills/complete/funeral_toll.png",
+      "before": 297374,
+      "after": 295705,
+      "saved": 1669
+    },
+    {
+      "file": "assets/images/skills/complete/gate_fist.png",
+      "before": 400950,
+      "after": 397912,
+      "saved": 3038
+    },
+    {
+      "file": "assets/images/skills/complete/gilded_bite.png",
+      "before": 365150,
+      "after": 363888,
+      "saved": 1262
+    },
+    {
+      "file": "assets/images/skills/complete/gloam_stiletto.png",
+      "before": 268534,
+      "after": 266967,
+      "saved": 1567
+    },
+    {
+      "file": "assets/images/skills/complete/goblin_stab.png",
+      "before": 286847,
+      "after": 285657,
+      "saved": 1190
+    },
+    {
+      "file": "assets/images/skills/complete/gravewater_bolt.png",
+      "before": 365555,
+      "after": 357209,
+      "saved": 8346
+    },
+    {
+      "file": "assets/images/skills/complete/heartstone_pulse.png",
+      "before": 350271,
+      "after": 342628,
+      "saved": 7643
+    },
+    {
+      "file": "assets/images/skills/complete/heavy_swing.png",
+      "before": 304874,
+      "after": 302835,
+      "saved": 2039
+    },
+    {
+      "file": "assets/images/skills/complete/hexbreaker_weakened_oath.png",
+      "before": 342545,
+      "after": 340306,
+      "saved": 2239
+    },
+    {
+      "file": "assets/images/skills/complete/hollow_ward_shell.png",
+      "before": 298345,
+      "after": 296913,
+      "saved": 1432
+    },
+    {
+      "file": "assets/images/skills/complete/hroth_greataxe.png",
+      "before": 330432,
+      "after": 323919,
+      "saved": 6513
+    },
+    {
+      "file": "assets/images/skills/complete/hush_the_sixth.png",
+      "before": 357263,
+      "after": 346916,
+      "saved": 10347
+    },
+    {
+      "file": "assets/images/skills/complete/iceblood_fury.png",
+      "before": 333644,
+      "after": 328889,
+      "saved": 4755
+    },
+    {
+      "file": "assets/images/skills/complete/ice_shard.png",
+      "before": 317675,
+      "after": 314856,
+      "saved": 2819
+    },
+    {
+      "file": "assets/images/skills/complete/ironbreaker_break_line.png",
+      "before": 316828,
+      "after": 312555,
+      "saved": 4273
+    },
+    {
+      "file": "assets/images/skills/complete/juggernaut_unstoppable_charge.png",
+      "before": 375866,
+      "after": 371650,
+      "saved": 4216
+    },
+    {
+      "file": "assets/images/skills/complete/lantern_ray.png",
+      "before": 375827,
+      "after": 373735,
+      "saved": 2092
+    },
+    {
+      "file": "assets/images/skills/complete/last_flag_phase.png",
+      "before": 373381,
+      "after": 359276,
+      "saved": 14105
+    },
+    {
+      "file": "assets/images/skills/complete/laurel_blade.png",
+      "before": 331975,
+      "after": 330089,
+      "saved": 1886
+    },
+    {
+      "file": "assets/images/skills/complete/laurel_discipline.png",
+      "before": 273859,
+      "after": 272332,
+      "saved": 1527
+    },
+    {
+      "file": "assets/images/skills/complete/law_of_the_drowned.png",
+      "before": 340181,
+      "after": 338541,
+      "saved": 1640
+    },
+    {
+      "file": "assets/images/skills/complete/legion_master_command.png",
+      "before": 318035,
+      "after": 315447,
+      "saved": 2588
+    },
+    {
+      "file": "assets/images/skills/complete/leviathan_maul.png",
+      "before": 335711,
+      "after": 327263,
+      "saved": 8448
+    },
+    {
+      "file": "assets/images/skills/complete/memory_quill.png",
+      "before": 314352,
+      "after": 312614,
+      "saved": 1738
+    },
+    {
+      "file": "assets/images/skills/complete/mimic_cry.png",
+      "before": 381775,
+      "after": 380229,
+      "saved": 1546
+    },
+    {
+      "file": "assets/images/skills/complete/mire_claw.png",
+      "before": 312379,
+      "after": 307877,
+      "saved": 4502
+    },
+    {
+      "file": "assets/images/skills/complete/monk_quivering_palm.png",
+      "before": 276508,
+      "after": 274348,
+      "saved": 2160
+    },
+    {
+      "file": "assets/images/skills/complete/monk_step_of_wind.png",
+      "before": 322271,
+      "after": 316809,
+      "saved": 5462
+    },
+    {
+      "file": "assets/images/skills/complete/monk_stillness.png",
+      "before": 280957,
+      "after": 278248,
+      "saved": 2709
+    },
+    {
+      "file": "assets/images/skills/complete/monk_stunning_strike.png",
+      "before": 305154,
+      "after": 302215,
+      "saved": 2939
+    },
+    {
+      "file": "assets/images/skills/complete/nightglass_bolt.png",
+      "before": 316277,
+      "after": 310740,
+      "saved": 5537
+    },
+    {
+      "file": "assets/images/skills/complete/no_harbor_aura.png",
+      "before": 369684,
+      "after": 358080,
+      "saved": 11604
+    },
+    {
+      "file": "assets/images/skills/complete/no_witnesses.png",
+      "before": 322290,
+      "after": 316292,
+      "saved": 5998
+    },
+    {
+      "file": "assets/images/skills/complete/nullwake_bolt.png",
+      "before": 331799,
+      "after": 323816,
+      "saved": 7983
+    },
+    {
+      "file": "assets/images/skills/complete/oathbound_shell.png",
+      "before": 299617,
+      "after": 296936,
+      "saved": 2681
+    },
+    {
+      "file": "assets/images/skills/complete/open_hand_push.png",
+      "before": 303532,
+      "after": 301167,
+      "saved": 2365
+    },
+    {
+      "file": "assets/images/skills/complete/pale_breath.png",
+      "before": 322335,
+      "after": 315466,
+      "saved": 6869
+    },
+    {
+      "file": "assets/images/skills/complete/piercing_shot.png",
+      "before": 281226,
+      "after": 279193,
+      "saved": 2033
+    },
+    {
+      "file": "assets/images/skills/complete/planar_binder_seal.png",
+      "before": 327877,
+      "after": 325329,
+      "saved": 2548
+    },
+    {
+      "file": "assets/images/skills/complete/prepared_killbox.png",
+      "before": 334036,
+      "after": 328544,
+      "saved": 5492
+    },
+    {
+      "file": "assets/images/skills/complete/queen_fangs.png",
+      "before": 309778,
+      "after": 306703,
+      "saved": 3075
+    },
+    {
+      "file": "assets/images/skills/complete/queen_frenzy.png",
+      "before": 358808,
+      "after": 354711,
+      "saved": 4097
+    },
+    {
+      "file": "assets/images/skills/complete/quick_strike.png",
+      "before": 299142,
+      "after": 295859,
+      "saved": 3283
+    },
+    {
+      "file": "assets/images/skills/complete/raking_beaks.png",
+      "before": 291054,
+      "after": 289462,
+      "saved": 1592
+    },
+    {
+      "file": "assets/images/skills/complete/reaver_blade.png",
+      "before": 336181,
+      "after": 329288,
+      "saved": 6893
+    },
+    {
+      "file": "assets/images/skills/complete/reckless_charge.png",
+      "before": 309098,
+      "after": 307290,
+      "saved": 1808
+    },
+    {
+      "file": "assets/images/skills/complete/redraw_battlefield.png",
+      "before": 382424,
+      "after": 377639,
+      "saved": 4785
+    },
+    {
+      "file": "assets/images/skills/complete/revenant_glaive.png",
+      "before": 332397,
+      "after": 328850,
+      "saved": 3547
+    },
+    {
+      "file": "assets/images/skills/complete/rimefang_bite.png",
+      "before": 330226,
+      "after": 324391,
+      "saved": 5835
+    },
+    {
+      "file": "assets/images/skills/complete/rime_pounce.png",
+      "before": 339119,
+      "after": 335193,
+      "saved": 3926
+    },
+    {
+      "file": "assets/images/skills/complete/rupture_breath.png",
+      "before": 327106,
+      "after": 326062,
+      "saved": 1044
+    },
+    {
+      "file": "assets/images/skills/complete/rusted_glaive.png",
+      "before": 325025,
+      "after": 322362,
+      "saved": 2663
+    },
+    {
+      "file": "assets/images/skills/complete/salt_iron_cutlass.png",
+      "before": 325209,
+      "after": 317788,
+      "saved": 7421
+    },
+    {
+      "file": "assets/images/skills/complete/sapper_knife.png",
+      "before": 281150,
+      "after": 278380,
+      "saved": 2770
+    },
+    {
+      "file": "assets/images/skills/complete/sever_anchor.png",
+      "before": 358450,
+      "after": 355417,
+      "saved": 3033
+    },
+    {
+      "file": "assets/images/skills/complete/shadowstep_strike.png",
+      "before": 355249,
+      "after": 351381,
+      "saved": 3868
+    },
+    {
+      "file": "assets/images/skills/complete/shadow_step.png",
+      "before": 279353,
+      "after": 277568,
+      "saved": 1785
+    },
+    {
+      "file": "assets/images/skills/complete/shield_of_silt.png",
+      "before": 331782,
+      "after": 327826,
+      "saved": 3956
+    },
+    {
+      "file": "assets/images/skills/complete/silent_coordination.png",
+      "before": 286301,
+      "after": 282884,
+      "saved": 3417
+    },
+    {
+      "file": "assets/images/skills/complete/skittering_strike.png",
+      "before": 338206,
+      "after": 332582,
+      "saved": 5624
+    },
+    {
+      "file": "assets/images/skills/complete/smoke_pot.png",
+      "before": 248336,
+      "after": 246806,
+      "saved": 1530
+    },
+    {
+      "file": "assets/images/skills/complete/spectral_brand.png",
+      "before": 334470,
+      "after": 325376,
+      "saved": 9094
+    },
+    {
+      "file": "assets/images/skills/complete/spellbow_null_arrow.png",
+      "before": 260769,
+      "after": 258910,
+      "saved": 1859
+    },
+    {
+      "file": "assets/images/skills/complete/spellbow_wardpiercer.png",
+      "before": 303736,
+      "after": 301411,
+      "saved": 2325
+    },
+    {
+      "file": "assets/images/skills/complete/spiderling_bites.png",
+      "before": 297883,
+      "after": 295195,
+      "saved": 2688
+    },
+    {
+      "file": "assets/images/skills/complete/spirit_shepherd_recall.png",
+      "before": 304971,
+      "after": 301547,
+      "saved": 3424
+    },
+    {
+      "file": "assets/images/skills/complete/stolen_concord.png",
+      "before": 347116,
+      "after": 346077,
+      "saved": 1039
+    },
+    {
+      "file": "assets/images/skills/complete/stolen_name.png",
+      "before": 304751,
+      "after": 301435,
+      "saved": 3316
+    },
+    {
+      "file": "assets/images/skills/complete/storm_beak.png",
+      "before": 370177,
+      "after": 368991,
+      "saved": 1186
+    },
+    {
+      "file": "assets/images/skills/complete/summoner_banish.png",
+      "before": 316867,
+      "after": 313281,
+      "saved": 3586
+    },
+    {
+      "file": "assets/images/skills/complete/summoner_class_crest.png",
+      "before": 364597,
+      "after": 360427,
+      "saved": 4170
+    },
+    {
+      "file": "assets/images/skills/complete/summoner_greater_eidolon.png",
+      "before": 360826,
+      "after": 357768,
+      "saved": 3058
+    },
+    {
+      "file": "assets/images/skills/complete/summoner_soul_conduit.png",
+      "before": 370810,
+      "after": 362969,
+      "saved": 7841
+    },
+    {
+      "file": "assets/images/skills/complete/summoner_spirit_chain.png",
+      "before": 312868,
+      "after": 310198,
+      "saved": 2670
+    },
+    {
+      "file": "assets/images/skills/complete/summoner_twin_invocation.png",
+      "before": 320570,
+      "after": 317833,
+      "saved": 2737
+    },
+    {
+      "file": "assets/images/skills/complete/swarm_of_doubt.png",
+      "before": 393120,
+      "after": 388123,
+      "saved": 4997
+    },
+    {
+      "file": "assets/images/skills/complete/thick_winter_fur.png",
+      "before": 315971,
+      "after": 310586,
+      "saved": 5385
+    },
+    {
+      "file": "assets/images/skills/complete/thunder_sweep.png",
+      "before": 394781,
+      "after": 393140,
+      "saved": 1641
+    },
+    {
+      "file": "assets/images/skills/complete/tidal_sentence.png",
+      "before": 379522,
+      "after": 374655,
+      "saved": 4867
+    },
+    {
+      "file": "assets/images/skills/complete/tideglass_claw.png",
+      "before": 384415,
+      "after": 380692,
+      "saved": 3723
+    },
+    {
+      "file": "assets/images/skills/complete/troll_regeneration.png",
+      "before": 298899,
+      "after": 296893,
+      "saved": 2006
+    },
+    {
+      "file": "assets/images/skills/complete/troll_smash.png",
+      "before": 313556,
+      "after": 312433,
+      "saved": 1123
+    },
+    {
+      "file": "assets/images/skills/complete/unbound_fury.png",
+      "before": 347933,
+      "after": 346590,
+      "saved": 1343
+    },
+    {
+      "file": "assets/images/skills/complete/undertow_charge.png",
+      "before": 323088,
+      "after": 316976,
+      "saved": 6112
+    },
+    {
+      "file": "assets/images/skills/complete/undertow_guard.png",
+      "before": 395034,
+      "after": 389107,
+      "saved": 5927
+    },
+    {
+      "file": "assets/images/skills/complete/unfinished_oath.png",
+      "before": 279260,
+      "after": 277924,
+      "saved": 1336
+    },
+    {
+      "file": "assets/images/skills/complete/vanishing_cut.png",
+      "before": 338570,
+      "after": 326253,
+      "saved": 12317
+    },
+    {
+      "file": "assets/images/skills/complete/warden_hammer.png",
+      "before": 295678,
+      "after": 293174,
+      "saved": 2504
+    },
+    {
+      "file": "assets/images/skills/complete/warden_judgment_protocol.png",
+      "before": 263530,
+      "after": 261376,
+      "saved": 2154
+    },
+    {
+      "file": "assets/images/skills/complete/warden_pulse.png",
+      "before": 346665,
+      "after": 343030,
+      "saved": 3635
+    },
+    {
+      "file": "assets/images/skills/complete/web_bolt.png",
+      "before": 313544,
+      "after": 306033,
+      "saved": 7511
+    },
+    {
+      "file": "assets/images/skills/complete/web_entomb.png",
+      "before": 328586,
+      "after": 325222,
+      "saved": 3364
+    },
+    {
+      "file": "assets/images/skills/complete/whiteout_fury.png",
+      "before": 368240,
+      "after": 352595,
+      "saved": 15645
+    },
+    {
+      "file": "assets/images/skills/complete/widows_refrain.png",
+      "before": 311884,
+      "after": 308067,
+      "saved": 3817
+    },
+    {
+      "file": "assets/images/skills/complete/wolf_bite.png",
+      "before": 293515,
+      "after": 289278,
+      "saved": 4237
+    },
+    {
+      "file": "assets/images/skills/complete/wolf_pounce.png",
+      "before": 297992,
+      "after": 295700,
+      "saved": 2292
+    },
+    {
+      "file": "assets/images/skills/complete/yeti_maul.png",
+      "before": 326972,
+      "after": 323596,
+      "saved": 3376
+    },
+    {
+      "file": "assets/materials/arcane-dust.png",
+      "before": 103779,
+      "after": 96751,
+      "saved": 7028
+    },
+    {
+      "file": "assets/materials/coal.png",
+      "before": 91628,
+      "after": 84918,
+      "saved": 6710
+    },
+    {
+      "file": "assets/materials/iron-ore.png",
+      "before": 103984,
+      "after": 97699,
+      "saved": 6285
+    },
+    {
+      "file": "assets/materials/oak-timber.png",
+      "before": 107011,
+      "after": 100893,
+      "saved": 6118
+    },
+    {
+      "file": "assets/materials/rough-ruby.png",
+      "before": 104015,
+      "after": 97902,
+      "saved": 6113
+    },
+    {
+      "file": "assets/materials/rough-sapphire.png",
+      "before": 100384,
+      "after": 93464,
+      "saved": 6920
+    },
+    {
+      "file": "assets/materials/rough-topaz.png",
+      "before": 104873,
+      "after": 98954,
+      "saved": 5919
+    },
+    {
+      "file": "assets/materials/silver-ore.png",
+      "before": 99548,
+      "after": 95068,
+      "saved": 4480
+    },
+    {
+      "file": "assets/materials/spider-silk.png",
+      "before": 122053,
+      "after": 116527,
+      "saved": 5526
+    },
+    {
+      "file": "assets/materials/wolf-pelt.png",
+      "before": 104427,
+      "after": 97745,
+      "saved": 6682
+    },
+    {
+      "file": "assets/portraits/reference/guildmaster-portrait-style-reference-v1.png",
+      "before": 1771876,
+      "after": 1753796,
+      "saved": 18080
+    },
+    {
+      "file": "assets/world/eldoria-world-map.png",
+      "before": 1566697,
+      "after": 1553795,
+      "saved": 12902
+    },
+    {
+      "file": "assets/world/regions/ashlands-mainland.png",
+      "before": 1599604,
+      "after": 1595231,
+      "saved": 4373
+    },
+    {
+      "file": "assets/world/regions/ashlands.png",
+      "before": 1592733,
+      "after": 1589853,
+      "saved": 2880
+    },
+    {
+      "file": "assets/world/regions/frostmarch-mainland.png",
+      "before": 1785113,
+      "after": 1782594,
+      "saved": 2519
+    },
+    {
+      "file": "assets/world/regions/frostmarch.png",
+      "before": 1780460,
+      "after": 1775694,
+      "saved": 4766
+    },
+    {
+      "file": "assets/world/regions/greenveil.png",
+      "before": 1663793,
+      "after": 1660266,
+      "saved": 3527
+    },
+    {
+      "file": "assets/world/regions/iron-hills.png",
+      "before": 1624841,
+      "after": 1621437,
+      "saved": 3404
+    },
+    {
+      "file": "assets/world/regions/shadowfen-mainland.png",
+      "before": 1564262,
+      "after": 1560415,
+      "saved": 3847
+    },
+    {
+      "file": "assets/world/regions/shadowfen.png",
+      "before": 1548976,
+      "after": 1542318,
+      "saved": 6658
+    }
+  ]
+}

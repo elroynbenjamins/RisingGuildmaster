@@ -1,0 +1,10 @@
+const fs=require('fs');
+const root='output/refinement-pass';
+const records=new Map();
+for(const folder of ['final-phones','final-followup']) for(const row of JSON.parse(fs.readFileSync(root+'/'+folder+'/details-audit.json','utf8'))) records.set(row.name,{...row,folder});
+const results=[...records.values()];
+if(results.some(r=>r.errors.length||r.failed.length||r.metrics.error||r.metrics.horizontalOverflow||r.metrics.images.some(i=>!i.loaded)))throw Error('Review checks failed');
+fs.writeFileSync(root+'/verified-screens.json',JSON.stringify(results.map(({name,folder,errors,failed,metrics})=>({name,folder,errors,failed,images:metrics.images.length,horizontalOverflow:metrics.horizontalOverflow})),null,2));
+const cards=results.map(r=>'<section><h2>'+r.name.replace('--Narrow--320',' · 320px').replace('--HighContrast--390',' · high contrast, 390px')+'</h2><div class="pair">'+['top','bottom'].map(pos=>'<figure><figcaption>'+pos+'</figcaption><img loading="lazy" src="'+r.folder+'/screens/'+r.name+'-'+pos+'.png" alt="'+r.name+' '+pos+'"></figure>').join('')+'</div></section>').join('');
+fs.writeFileSync(root+'/index.html','<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guildmaster visual refinements</title><style>body{margin:0;background:#101416;color:#f3eee3;font:16px/1.5 system-ui}main{max-width:960px;margin:auto;padding:28px}h1{font-size:30px}h2{font-size:18px;font-weight:600}p,figcaption{color:#a8b1ad}section{margin:36px 0}.pair{display:flex;gap:24px;flex-wrap:wrap}figure{margin:0;flex:1;min-width:270px;max-width:390px}img{width:100%;height:auto;border-radius:12px}figcaption{margin-bottom:8px}</style><main><h1>A calmer, more atmospheric Guildmaster</h1><p>Lighter typography, readable names, focused hero and gear cards, balanced actions, and new guild-hall and tavern artwork. A second review also refined inspection screens, the quest board, world summaries, and scouting estimates.</p><p>Latest verified web previews at phone sizes. Scroll each top/bottom pair below.</p>'+cards+'</main></html>');
+console.log(results.length+' verified screen configurations');

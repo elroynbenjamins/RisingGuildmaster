@@ -1,0 +1,13 @@
+{
+  "passed": 8,
+  "cases": [
+    "zero",
+    "unabbreviated",
+    "thousands",
+    "below carry",
+    "carry into millions",
+    "millions",
+    "negative",
+    "billions"
+  ]
+}

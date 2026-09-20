@@ -1,0 +1,889 @@
+[
+  {
+    "name": "TempleScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fstoneborn%2Fberserker/female-v3.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [],
+      "horizontalOverflow": false
+    },
+    "scroll": null,
+    "text": "‹ BACK\nGUILDHAVEN SANCTUARY\nTemple of Renewal\nRestore wounded adventurers with guild gold. Fallen heroes require rare soul gems before ordinary treatment can continue.\n◆ 6,130 gold\n◇ 35 gems\nTreatment\nRevival\nAlma Stonewake\nFALLEN • Level 5\nRevival restores 25% HP and leaves the hero Injured. Further healing costs gold.\nRevive · ◇3"
+  },
+  {
+    "name": "TrainingGroundsScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fsummoner/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Ftiefling%2Fpaladin/male-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fveilborn%2Fmonk/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Fbulwark/female-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fspellbow/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "DAY 42 · 6,130 GOLD",
+          "font": 10
+        },
+        {
+          "text": "1/2 SLOTS",
+          "font": 10
+        },
+        {
+          "text": "+1 SLOT",
+          "font": 10
+        },
+        {
+          "text": "2D LEFT",
+          "font": 10
+        },
+        {
+          "text": "+136 XP",
+          "font": 10
+        },
+        {
+          "text": "1D",
+          "font": 10
+        },
+        {
+          "text": "2D",
+          "font": 10
+        },
+        {
+          "text": "3D",
+          "font": 10
+        },
+        {
+          "text": "HALL LV 3",
+          "font": 10
+        },
+        {
+          "text": "READY",
+          "font": 10
+        },
+        {
+          "text": "TRAINING CAP · LEVEL 5",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 2242,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nGUILDHAVEN FACILITY\nGuild Training Yard\nDAY 42 · 6,130 GOLD\n1/2 SLOTS\nTrain reserves while the field team adventures. Earn XP up to the campaign and roster cap; attributes stay unchanged.\nTRAINING HALL\nLEVEL 2\nVeteran Training Hall\n2 concurrent training slots · 0 completed programs\nNEXT FACILITY LEVEL\nTraining Hall Level 3\n+1 SLOT\n1,800 gold · 5 days · capacity becomes 3\nBEGIN UPGRADE · 1,800G\nACTIVE TRAINING\nSLOT 1 · TRAINING\nNorri Embermantle\nAdventuring Fundamentals\n2D LEFT\n+136 XP\nReadiness on return · 100\nReady Day 44\nSLOT 2\nAVAILABLE\nAssign an available hero below.\nOPEN GUILD CALENDAR\nSELECT HERO\nPercival Fairwind\nLV 4\nReadiness 100\nPotential 50–67\nSolveig Flintmantle\nLV 5\nReadiness 100\nPotential 87–100\nDaelis Moonshadow\nLV 6\nReadiness 100\nPotential 67–91\nAzhra Wolf-Breaker\nLV 7\nReadiness 100\nPotential 50–65\nMordai Redspire\nLV 4\nReadiness 100\nPotential 61–83\nOrris Starless\nLV 6\nReadiness 100\nPotential 50–67\nGwen Wainwright\nLV 7\nReadiness 100\nPotential 50–72\nElaria Willowmere\nLV 5\nReadiness 100\nPotential 80–100\nKrothu Skullcleaver\nLV 6\nReadiness 100\nPotential 50–66\nCHOOSE PROGRAM\nSparring Drills\nA short catch-up course that grants XP but never attributes.\n1D\n50G\n+96 XP\nXP ONLY\nAdventuring Fundamentals\nA two-day XP course for inexperienced recruits returning to field readiness.\n2D\n110G\n+148 XP\nXP ONLY\nClass Instruction\nVeteran tutors grant catch-up XP without increasing attributes.\n3D\n190G\n+259 XP\nXP ONLY\nHeroic Curriculum\nThe hall's strongest catch-up course. It grants levels through XP only.\nHALL LV 3\n360G\n+444 XP\nXP ONLY\nTRAINING ORDER\nSELECTED TRAINEE\nSolveig Flintmantle\nSparring Drills · returns Day 43\nREADY\nLEVEL\n5\nXP REWARD\n+96\nREADINESS\n100 → 100\nCOST\n50G\nCURRENT XP · 0 / 6899\nAFTER TRAINING · 96 / 6899\nTRAINING CAP · LEVEL 5\nTraining can catch this hero toward the campaign and strongest-roster limit, but cannot overtake current progression.\nDaily calendar recovery still applies while training, so readiness can improve before the hero returns. Training never grants permanent attributes.\nBEGIN SPARRING DRILLS · READY DAY 43"
+  },
+  {
+    "name": "CraftingScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/blacksmith.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/tailor.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/blacksmith.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/barbed-war-pick.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/silver_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/battle-harness.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/wolf_pelt.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/blessed-mace.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/silver_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/oak_timber.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/arcane_dust.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/iron-chainmail.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/iron-guard-helm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/iron-longsword.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/oak_timber.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/iron-sabatons.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/wolf_pelt.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/iron-skullcap.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/iron-warhammer.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/oak_timber.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/practice-rapier.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/silver-tongue-rapier.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/silver_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/steel-greathelm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/silver_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/militia-handaxe.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/oak_timber.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/drowned-hide-bulwark.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/crocodile_recipe_fragment.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/armored_scute.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/ancient_hide.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/crocodile_tooth.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/steel-greatsword.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/silver_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/oak_timber.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/wardplate.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/iron_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/coal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/silver_ore.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fmaterials%2Fcomplete/arcane_dust.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "Guild Day 42 · 6,130 GOLD",
+          "font": 10
+        },
+        {
+          "text": "4 DAYS",
+          "font": 10
+        },
+        {
+          "text": "1,900 gold · Requires Masterwork District",
+          "font": 10
+        },
+        {
+          "text": "• Higher-tier discovered patterns",
+          "font": 10
+        },
+        {
+          "text": "• Master-tier crafting access",
+          "font": 10
+        },
+        {
+          "text": "Unlock Masterwork District in the Guildmaster Skill Tree first.",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE · 3 HEROES",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 118 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "Silver Ore",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE · 2 HEROES",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 95 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "Dire Wolf Pelt",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE · 2 HEROES",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 95 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Silver Ore",
+          "font": 10
+        },
+        {
+          "text": "Seasoned Oak",
+          "font": 10
+        },
+        {
+          "text": "Arcane Dust",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE · 4 HEROES",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 100 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE · 4 HEROES",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 60 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE · 3 HEROES",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 80 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "Seasoned Oak",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE · 3 HEROES",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 65 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "Dire Wolf Pelt",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE · 4 HEROES",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 24 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE · 3 HEROES",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 85 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "Seasoned Oak",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE · 1 HERO",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 28 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE · 1 HERO",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 90 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Silver Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE · 1 HERO",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 175 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "Silver Ore",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "SIDEGRADE",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 28 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "Seasoned Oak",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "NO ELIGIBLE HERO",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 480 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Floodgate Pattern",
+          "font": 10
+        },
+        {
+          "text": "Armored Scute",
+          "font": 10
+        },
+        {
+          "text": "Ancient Hide",
+          "font": 10
+        },
+        {
+          "text": "Crocodile Tooth",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "1 TRADEOFF",
+          "font": 10
+        },
+        {
+          "text": "BUILD TRADEOFF",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 230 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "Silver Ore",
+          "font": 10
+        },
+        {
+          "text": "Seasoned Oak",
+          "font": 10
+        },
+        {
+          "text": "CRAFTABLE",
+          "font": 10
+        },
+        {
+          "text": "NO ELIGIBLE HERO",
+          "font": 10
+        },
+        {
+          "text": "CRAFTING COST · 270 GOLD",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "Silver Ore",
+          "font": 10
+        },
+        {
+          "text": "Arcane Dust",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 11314,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nGUILDHAVEN CRAFT DISTRICT\nGuild Workshops\nGuild Day 42 · 6,130 GOLD\nForge field upgrades, repair worn gear, and turn discovered patterns into equipment. Workshop levels unlock capability; materials and gold decide what can be made today.\nBlacksmith\nLV 2\nTailor\nLV 2\nJeweler\nLV 2\nBlacksmith\nLEVEL 2 · STEELWORKS · OPERATIONAL\nWeaponsmith and armorsmith\nLike a D&D smithy or MMORPG forge, the Blacksmith turns ore, coal, and steelwork into frontline weapons, plate, helmets, and reinforced boots.\n16\nCRAFTABLE\n12\nUPGRADES\n21\nLOCKED\nWORKSHOP UPGRADE\nUpgrade to Master Forge\n4 DAYS\n1,900 gold · Requires Masterwork District\nUNLOCKS\n• Higher-tier discovered patterns\n• Master-tier crafting access\nUnlock Masterwork District in the Guildmaster Skill Tree first.\nGUILDMASTER SKILL REQUIRED\nREPAIR BENCH\nEquipment Maintenance\nDurability scales numerical equipment bonuses. Broken equipment contributes none until repaired.\n✓ ALL EQUIPMENT IS IN GOOD REPAIR\nWORKSHOP RECIPES\nALL\n37\nCRAFTABLE\n16\nUPGRADES\n12\nLOCKED\n21\nBarbed War Pick\nUNCOMMON · WEAPON · ITEM LV 3\nCRAFTABLE\nUPGRADE · 3 HEROES\nA cruelly hooked pick designed to open bleeding wounds.\nLIKELY UPGRADE\n3 eligible heroes · Workshop Lv 1\nBloodletting Barbs\nPhysical hits have a 12% chance to inflict bleeding for 3 turns.\nCRAFTING COST · 118 GOLD\nIron Ore\n12 / 6 · READY\n›\nForge Coal\n12 / 2 · READY\n›\nSilver Ore\n12 / 1 · READY\n›\nCRAFT BARBED WAR PICK\nBattle Harness\nUNCOMMON · ARMOR · ITEM LV 2\nCRAFTABLE\nUPGRADE · 2 HEROES\nOverlapping plates on a flexible harness for aggressive frontliners.\nLIKELY UPGRADE\n2 eligible heroes · Workshop Lv 1\nCRAFTING COST · 95 GOLD\nIron Ore\n12 / 5 · READY\n›\nForge Coal\n12 / 2 · READY\n›\nDire Wolf Pelt\n12 / 2 · READY\n›\nCRAFT BATTLE HARNESS\nBlessed Mace\nUNCOMMON · WEAPON · ITEM LV 2\nCRAFTABLE\nUPGRADE · 2 HEROES\nA silver-inlaid mace balanced for divine warriors and battle clerics.\nLIKELY UPGRADE\n2 eligible heroes · Workshop Lv 1\nCRAFTING COST · 95 GOLD\nIron Ore\n12 / 4 · READY\n›\nSilver Ore\n12 / 1 · READY\n›\nSeasoned Oak\n12 / 1 · READY\n›\nArcane Dust\n12 / 1 · READY\n›\nCRAFT BLESSED MACE\nIron Chainmail\nUNCOMMON · ARMOR · ITEM LV 2\nCRAFTABLE\nUPGRADE · 4 HEROES\nInterlocking iron rings offering sturdy frontline defense.\nLIKELY UPGRADE\n4 eligible heroes · Workshop Lv 1\nCRAFTING COST · 100 GOLD\nIron Ore\n12 / 7 · READY\n›\nForge Coal\n12 / 3 · READY\n›\nCRAFT IRON CHAINMAIL\nIron Guard Helm\nUNCOMMON · HELMET · ITEM LV 2\nCRAFTABLE\nUPGRADE · 4 HEROES\nA practical helm for heroes expected to hold a formation.\nLIKELY UPGRADE\n4 eligible heroes · Workshop Lv 1\nCRAFTING COST · 60 GOLD\nIron Ore\n12 / 4 · READY\n›\nForge Coal\n12 / 1 · READY\n›\nCRAFT IRON GUARD HELM\nIron Longsword\nUNCOMMON · WEAPON · ITEM LV 2\nCRAFTABLE\nUPGRADE · 3 HEROES\nA dependable martial blade similar to the standard longsword of tabletop adventurers.\nLIKELY UPGRADE\n3 eligible heroes · Workshop Lv 1\nCRAFTING COST · 80 GOLD\nIron Ore\n12 / 5 · READY\n›\nForge Coal\n12 / 2 · READY\n›\nSeasoned Oak\n12 / 1 · READY\n›\nCRAFT IRON LONGSWORD\nIron Sabatons\nUNCOMMON · BOOTS · ITEM LV 2\nCRAFTABLE\nUPGRADE · 3 HEROES\nHeavy articulated boots that trade a little speed for protection.\nLIKELY UPGRADE\n3 eligible heroes · Workshop Lv 1\nCRAFTING COST · 65 GOLD\nIron Ore\n12 / 4 · READY\n›\nForge Coal\n12 / 1 · READY\n›\nDire Wolf Pelt\n12 / 1 · READY\n›\nCRAFT IRON SABATONS\nIron Skullcap\nCOMMON · HELMET · ITEM LV 1\nCRAFTABLE\nUPGRADE · 4 HEROES\nA compact iron cap fitted beneath a hood or coif.\nLIKELY UPGRADE\n4 eligible heroes · Workshop Lv 1\nCRAFTING COST · 24 GOLD\nIron Ore\n12 / 2 · READY\n›\nForge Coal\n12 / 1 · READY\n›\nCRAFT IRON SKULLCAP\nIron Warhammer\nUNCOMMON · WEAPON · ITEM LV 2\nCRAFTABLE\nUPGRADE · 3 HEROES\nA weight-forward hammer for breaking shields and heavy armor.\nLIKELY UPGRADE\n3 eligible heroes · Workshop Lv 1\nCRAFTING COST · 85 GOLD\nIron Ore\n12 / 5 · READY\n›\nForge Coal\n12 / 2 · READY\n›\nSeasoned Oak\n12 / 1 · READY\n›\nCRAFT IRON WARHAMMER\nPractice Rapier\nCOMMON · WEAPON · ITEM LV 1\nCRAFTABLE\nUPGRADE · 1 HERO\nA light stage-and-street blade tuned for a Bard's cutting cadence.\nLIKELY UPGRADE\n1 eligible hero · Workshop Lv 1\nCRAFTING COST · 28 GOLD\nIron Ore\n12 / 2 · READY\n›\nForge Coal\n12 / 1 · READY\n›\nCRAFT PRACTICE RAPIER\nSilver-Tongue Rapier\nUNCOMMON · WEAPON · ITEM LV 2\nCRAFTABLE\nUPGRADE · 1 HERO\nA resonant rapier that carries a Bard's verse through every strike.\nLIKELY UPGRADE\n1 eligible hero · Workshop Lv 1\nCRAFTING COST · 90 GOLD\nIron Ore\n12 / 4 · READY\n›\nSilver Ore\n12 / 2 · READY\n›\nForge Coal\n12 / 2 · READY\n›\nCRAFT SILVER-TONGUE RAPIER\nSteel Greathelm\nRARE · HELMET · ITEM LV 5\nCRAFTABLE\nUPGRADE · 1 HERO\nA full helm made for heroes who must survive the first enemy charge.\nLIKELY UPGRADE\n1 eligible hero · Workshop Lv 2\nCRAFTING COST · 175 GOLD\nIron Ore\n12 / 7 · READY\n›\nForge Coal\n12 / 4 · READY\n›\nSilver Ore\n12 / 1 · READY\n›\nCRAFT STEEL GREATHELM\nMilitia Handaxe\nCOMMON · WEAPON · ITEM LV 1\nCRAFTABLE\nA cheap sidearm for a newly chartered martial recruit.\nSIDEGRADE\n3 eligible heroes · Workshop Lv 1\nCRAFTING COST · 28 GOLD\nIron Ore\n12 / 2 · READY\n›\nForge Coal\n12 / 1 · READY\n›\nSeasoned Oak\n12 / 1 · READY\n›\nCRAFT MILITIA HANDAXE\nDrowned-Hide Bulwark\nRARE · ARMOR · ITEM LV 9\nCRAFTABLE\nRivet the ancient crocodile's scutes over waterproof hide to form a punishing suit of heavy armor.\nNO ELIGIBLE HERO\n0 eligible heroes · Workshop Lv 2\nSewerborn Guard\nGain +1 Armor Class while the hide's overlapping scutes turn aside blows.\nCRAFTING COST · 480 GOLD\nFloodgate Pattern\n12 / 3 · READY\n›\nArmored Scute\n12 / 8 · READY\n›\nAncient Hide\n12 / 5 · READY\n›\nCrocodile Tooth\n12 / 2 · READY\n›\nIron Ore\n12 / 5 · READY\n›\nForge Coal\n12 / 3 · READY\n›\nCRAFT DROWNED-HIDE BULWARK\nSteel Greatsword\nRARE · WEAPON · ITEM LV 5\nCRAFTABLE\n1 TRADEOFF\nA two-handed high-tier blade requiring controlled heat and extensive finishing.\nBUILD TRADEOFF\n1 eligible hero · Workshop Lv 2\nCRAFTING COST · 230 GOLD\nIron Ore\n12 / 10 · READY\n›\nForge Coal\n12 / 6 · READY\n›\nSilver Ore\n12 / 1 · READY\n›\nSeasoned Oak\n12 / 2 · READY\n›\nCRAFT STEEL GREATSWORD\nWardplate Cuirass\nRARE · ARMOR · ITEM LV 5\nCRAFTABLE\nA reinforced cuirass etched with protective Wardstone geometry.\nNO ELIGIBLE HERO\n0 eligible heroes · Workshop Lv 2\nCRAFTING COST · 270 GOLD\nIron Ore\n12 / 12 · READY\n›\nForge Coal\n12 / 7 · READY\n›\nSilver Ore\n12 / 3 · READY\n›\nArcane Dust\n12 / 2 · READY\n›\nCRAFT WARDPLATE CUIRASS\n?\nUndiscovered Pattern\nWORKSHOP LV 1 · RECIPE LOCKED\nFind the pattern in a roguelite Elite cache.\n?\nUndiscovered Pattern\nWORKSHOP LV 1 · RECIPE LOCKED\nComplete the linked one-clear Side Quest to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 1 · RECIPE LOCKED\nFind the pattern in a roguelite Elite cache.\n?\nUndiscovered Pattern\nWORKSHOP LV 1 · RECIPE LOCKED\nComplete the linked one-clear Side Quest to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nComplete the linked one-clear Side Quest to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nDefeat a roguelite Boss to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nComplete the linked one-clear Side Quest to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nDefeat a roguelite Boss to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nComplete the linked one-clear Side Quest to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nDefeat a roguelite Boss to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nDefeat a roguelite Boss to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nDefeat a roguelite Boss to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nComplete the linked one-clear Side Quest to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nObtain this pattern from a traveling merchant event.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nComplete the linked one-clear Side Quest to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nDefeat a roguelite Boss to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 2 · RECIPE LOCKED\nDefeat a roguelite Boss to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 3 · RECIPE LOCKED\nComplete the linked one-clear Side Quest to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 3 · RECIPE LOCKED\nComplete the linked one-clear Side Quest to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 3 · RECIPE LOCKED\nComplete the linked one-clear Side Quest to discover this pattern.\n?\nUndiscovered Pattern\nWORKSHOP LV 3 · RECIPE LOCKED\nComplete the linked one-clear Side Quest to discover this pattern."
+  }
+]

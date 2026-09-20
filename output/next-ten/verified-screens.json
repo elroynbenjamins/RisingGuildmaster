@@ -1,0 +1,131 @@
+[
+  {
+    "screen": "HeroesScreen--Narrow--320",
+    "folder": "final-followup",
+    "checks": [
+      "First hero begins above 550px",
+      "Summary expands",
+      "Sort expands",
+      "Sort collapses after choice",
+      "Name sort applied",
+      "Revival warning opens Fallen filter",
+      "Empty search offers filter reset",
+      "Search clear button removes query",
+      "Filter reset clears search",
+      "Filter reset returns to All"
+    ],
+    "images": 20,
+    "errors": [],
+    "failed": [],
+    "overflow": false
+  },
+  {
+    "screen": "InventoryScreen--Narrow--320",
+    "folder": "focus-final",
+    "checks": [
+      "Upgrade filter selects",
+      "Upgrade filter clears",
+      "Empty search offers filter reset",
+      "Search clear button removes query",
+      "Filter reset clears search",
+      "Filter reset returns to All",
+      "Upgrade summary applies upgrade filter"
+    ],
+    "images": 33,
+    "errors": [],
+    "failed": [],
+    "overflow": false
+  },
+  {
+    "screen": "RecruitmentScreen--Narrow--320",
+    "folder": "preview",
+    "checks": [
+      "Locked scouting starts collapsed",
+      "Unlock requirements expand",
+      "Unlock requirement retained",
+      "Party coverage expands",
+      "Each blocked hire explains roster capacity",
+      "Capacity-blocked hire is disabled"
+    ],
+    "images": 4,
+    "errors": [],
+    "failed": [],
+    "overflow": false
+  },
+  {
+    "screen": "QuestSelectionScreen--Narrow--320",
+    "folder": "preview",
+    "checks": [
+      "Local quest empty state distinguishes story objective",
+      "No contradictory campaign empty state",
+      "Special activities disclosure expands",
+      "Activity choices are retained"
+    ],
+    "images": 9,
+    "errors": [],
+    "failed": [],
+    "overflow": false
+  },
+  {
+    "screen": "WorldMapScreen--Narrow--320",
+    "folder": "preview",
+    "checks": [
+      "Region selection changes",
+      "Duplicate marker instructions removed"
+    ],
+    "images": 36,
+    "errors": [],
+    "failed": [],
+    "overflow": false
+  },
+  {
+    "screen": "RegionMapScreen--Narrow--320",
+    "folder": "preview",
+    "checks": [],
+    "images": 15,
+    "errors": [],
+    "failed": [],
+    "overflow": false
+  },
+  {
+    "screen": "GuildScreen--Large--320",
+    "folder": "final-followup",
+    "checks": [
+      "Large gold total is compact",
+      "Full resource amount stays accessible"
+    ],
+    "images": 16,
+    "errors": [],
+    "failed": [],
+    "overflow": false
+  },
+  {
+    "screen": "HeroesScreen--HighContrast--390",
+    "folder": "final-followup",
+    "checks": [
+      "First hero begins above 550px",
+      "Summary expands",
+      "Sort expands",
+      "Sort collapses after choice",
+      "Name sort applied",
+      "Revival warning opens Fallen filter",
+      "Empty search offers filter reset",
+      "Search clear button removes query",
+      "Filter reset clears search",
+      "Filter reset returns to All"
+    ],
+    "images": 20,
+    "errors": [],
+    "failed": [],
+    "overflow": false
+  },
+  {
+    "screen": "HeroesScreen--Empty--320",
+    "folder": "preview",
+    "checks": [],
+    "images": 8,
+    "errors": [],
+    "failed": [],
+    "overflow": false
+  }
+]

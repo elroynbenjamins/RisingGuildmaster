@@ -1,0 +1,4621 @@
+[
+  {
+    "name": "CombatScreen--Battle",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_archer.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_brute.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_scout.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fmage/arcane-bolt.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "ROUND",
+          "font": 8
+        },
+        {
+          "text": "ALLIES",
+          "font": 8
+        },
+        {
+          "text": "ENEMIES",
+          "font": 8
+        },
+        {
+          "text": "▶",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Azhra Wolf-Breaker",
+          "font": 10
+        },
+        {
+          "text": "02",
+          "font": 9
+        },
+        {
+          "text": "FOE",
+          "font": 7
+        },
+        {
+          "text": "Goblin Brute",
+          "font": 10
+        },
+        {
+          "text": "03",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Percival Fairwind",
+          "font": 10
+        },
+        {
+          "text": "04",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Daelis Moonshadow",
+          "font": 10
+        },
+        {
+          "text": "05",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Solveig Flintmantle",
+          "font": 10
+        },
+        {
+          "text": "06",
+          "font": 9
+        },
+        {
+          "text": "FOE",
+          "font": 7
+        },
+        {
+          "text": "Goblin Scout",
+          "font": 10
+        },
+        {
+          "text": "07",
+          "font": 9
+        },
+        {
+          "text": "FOE",
+          "font": 7
+        },
+        {
+          "text": "Goblin Archer",
+          "font": 10
+        },
+        {
+          "text": "ACTIVE HERO",
+          "font": 8
+        },
+        {
+          "text": "MOVE READY",
+          "font": 7
+        },
+        {
+          "text": "ACTION READY",
+          "font": 7
+        },
+        {
+          "text": "TACTICAL CAMERA",
+          "font": 9
+        },
+        {
+          "text": "Fit board",
+          "font": 9
+        },
+        {
+          "text": "FIT",
+          "font": 10
+        },
+        {
+          "text": "QUICK SKILLS · Azhra Wolf-Breaker",
+          "font": 10
+        },
+        {
+          "text": "MAG",
+          "font": 6
+        },
+        {
+          "text": "Arcane Bolt",
+          "font": 9
+        },
+        {
+          "text": "END TURN",
+          "font": 10
+        },
+        {
+          "text": "Double tap a yellow tile to move. No enemy is currently in basic-attack range.",
+          "font": 10
+        },
+        {
+          "text": "REACTIONS · 4/4 allies ready · Leaving melee reach can trigger an attack.",
+          "font": 9
+        },
+        {
+          "text": "PHYS",
+          "font": 9
+        },
+        {
+          "text": "vs AC + physical defense",
+          "font": 9
+        },
+        {
+          "text": "MAG",
+          "font": 9
+        },
+        {
+          "text": "vs MDS + magic defense",
+          "font": 9
+        },
+        {
+          "text": "TRUE",
+          "font": 9
+        },
+        {
+          "text": "bypasses mitigation",
+          "font": 9
+        },
+        {
+          "text": "PARTY STATUS · 4/4 STANDING",
+          "font": 10
+        },
+        {
+          "text": "ENEMY DETAILS · 3 ALIVE",
+          "font": 10
+        },
+        {
+          "text": "COMBAT LOG · 0 EVENTS",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1235,
+      "viewport": 844
+    },
+    "text": "Goblin Chieftain\nExit\nEncounter 1 / 2 · Round 1 · Turn 1\nROUND\n1\nALLIES\n4/4\nENEMIES\n3/3\n▶\nALLY\nAzhra Wolf-Breaker\n02\nFOE\nGoblin Brute\n03\nALLY\nPercival Fairwind\n04\nALLY\nDaelis Moonshadow\n05\nALLY\nSolveig Flintmantle\n06\nFOE\nGoblin Scout\n07\nFOE\nGoblin Archer\nACTIVE HERO\nAzhra Wolf-Breaker\nMOVE READY\nACTION READY\nDeep Forest · 9×7\nForest · cost 2 · blocks sight\nTACTICAL CAMERA\nFit board\n−\nFIT\n+\nQUICK SKILLS · Azhra Wolf-Breaker\nMAG\nArcane Bolt\nEND TURN\nDouble tap a yellow tile to move. No enemy is currently in basic-attack range.\n? Combat Help\nREACTIONS · 4/4 allies ready · Leaving melee reach can trigger an attack.\nPHYS\nvs AC + physical defense\nMAG\nvs MDS + magic defense\nTRUE\nbypasses mitigation\nPotions, Stats & Full Skills\nPARTY STATUS · 4/4 STANDING\n+\nENEMY DETAILS · 3 ALIVE\n+\nCOMBAT LOG · 0 EVENTS\n+"
+  },
+  {
+    "name": "CombatScreen--Raid",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/spiderling_swarm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/spider_broodguard.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Ftiefling%2Fpaladin/male-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fveilborn%2Fmonk/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/spiderling_swarm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/spiderling_swarm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/webspinner.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/spider_broodguard.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fsummoner/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/webspinner.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/spider_broodguard.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fbard/rapier-strike.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "ROUND",
+          "font": 8
+        },
+        {
+          "text": "ALLIES",
+          "font": 8
+        },
+        {
+          "text": "ENEMIES",
+          "font": 8
+        },
+        {
+          "text": "01",
+          "font": 9
+        },
+        {
+          "text": "FOE",
+          "font": 7
+        },
+        {
+          "text": "Spiderling Swarm",
+          "font": 10
+        },
+        {
+          "text": "02",
+          "font": 9
+        },
+        {
+          "text": "FOE",
+          "font": 7
+        },
+        {
+          "text": "Webspinner",
+          "font": 10
+        },
+        {
+          "text": "03",
+          "font": 9
+        },
+        {
+          "text": "FOE",
+          "font": 7
+        },
+        {
+          "text": "Spiderling Swarm",
+          "font": 10
+        },
+        {
+          "text": "▶",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Gwen Wainwright",
+          "font": 10
+        },
+        {
+          "text": "05",
+          "font": 9
+        },
+        {
+          "text": "FOE",
+          "font": 7
+        },
+        {
+          "text": "Spider Broodguard",
+          "font": 10
+        },
+        {
+          "text": "06",
+          "font": 9
+        },
+        {
+          "text": "FOE",
+          "font": 7
+        },
+        {
+          "text": "Spiderling Swarm",
+          "font": 10
+        },
+        {
+          "text": "07",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Orris Starless",
+          "font": 10
+        },
+        {
+          "text": "08",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Norri Embermantle",
+          "font": 10
+        },
+        {
+          "text": "09",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Azhra Wolf-Breaker",
+          "font": 10
+        },
+        {
+          "text": "10",
+          "font": 9
+        },
+        {
+          "text": "FOE",
+          "font": 7
+        },
+        {
+          "text": "Webspinner",
+          "font": 10
+        },
+        {
+          "text": "11",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Solveig Flintmantle",
+          "font": 10
+        },
+        {
+          "text": "12",
+          "font": 9
+        },
+        {
+          "text": "FOE",
+          "font": 7
+        },
+        {
+          "text": "Spider Broodguard",
+          "font": 10
+        },
+        {
+          "text": "13",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Percival Fairwind",
+          "font": 10
+        },
+        {
+          "text": "14",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Daelis Moonshadow",
+          "font": 10
+        },
+        {
+          "text": "15",
+          "font": 9
+        },
+        {
+          "text": "FOE",
+          "font": 7
+        },
+        {
+          "text": "Spider Broodguard",
+          "font": 10
+        },
+        {
+          "text": "16",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Mordai Redspire",
+          "font": 10
+        },
+        {
+          "text": "ACTIVE HERO",
+          "font": 8
+        },
+        {
+          "text": "MOVE READY",
+          "font": 7
+        },
+        {
+          "text": "ACTION READY",
+          "font": 7
+        },
+        {
+          "text": "TACTICAL CAMERA",
+          "font": 9
+        },
+        {
+          "text": "Fit board",
+          "font": 9
+        },
+        {
+          "text": "FIT",
+          "font": 10
+        },
+        {
+          "text": "▲2",
+          "font": 7
+        },
+        {
+          "text": "▲2",
+          "font": 7
+        },
+        {
+          "text": "▲2",
+          "font": 7
+        },
+        {
+          "text": "▲2",
+          "font": 7
+        },
+        {
+          "text": "QUICK SKILLS · Gwen Wainwright",
+          "font": 10
+        },
+        {
+          "text": "MAG",
+          "font": 6
+        },
+        {
+          "text": "Vicious Verse",
+          "font": 9
+        },
+        {
+          "text": "END TURN",
+          "font": 10
+        },
+        {
+          "text": "Double tap a yellow tile to move. No enemy is currently in basic-attack range.",
+          "font": 10
+        },
+        {
+          "text": "REACTIONS · 8/8 allies ready · Leaving melee reach can trigger an attack.",
+          "font": 9
+        },
+        {
+          "text": "PHYS",
+          "font": 9
+        },
+        {
+          "text": "vs AC + physical defense",
+          "font": 9
+        },
+        {
+          "text": "MAG",
+          "font": 9
+        },
+        {
+          "text": "vs MDS + magic defense",
+          "font": 9
+        },
+        {
+          "text": "TRUE",
+          "font": 9
+        },
+        {
+          "text": "bypasses mitigation",
+          "font": 9
+        },
+        {
+          "text": "PARTY STATUS · 8/8 STANDING",
+          "font": 10
+        },
+        {
+          "text": "ENEMY DETAILS · 8 ALIVE",
+          "font": 10
+        },
+        {
+          "text": "COMBAT LOG · 0 EVENTS",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1303,
+      "viewport": 844
+    },
+    "text": "Raid: The Broodheart Awakening\nExit\nEncounter 1 / 2 · Round 1 · Turn 4\nROUND\n1\nALLIES\n8/8\nENEMIES\n8/8\n01\nFOE\nSpiderling Swarm\n02\nFOE\nWebspinner\n03\nFOE\nSpiderling Swarm\n▶\nALLY\nGwen Wainwright\n05\nFOE\nSpider Broodguard\n06\nFOE\nSpiderling Swarm\n07\nALLY\nOrris Starless\n08\nALLY\nNorri Embermantle\n09\nALLY\nAzhra Wolf-Breaker\n10\nFOE\nWebspinner\n11\nALLY\nSolveig Flintmantle\n12\nFOE\nSpider Broodguard\n13\nALLY\nPercival Fairwind\n14\nALLY\nDaelis Moonshadow\n15\nFOE\nSpider Broodguard\n16\nALLY\nMordai Redspire\nACTIVE HERO\nGwen Wainwright\nMOVE READY\nACTION READY\nBroodheart Cathedral · 17×13\nCathedral rock · impassable  ·  Brood web · movement cost 2  ·  Raid egg cluster · blocks movement and sight  ·  Queen's hunting dais ▲2\nTACTICAL CAMERA\nFit board\n−\nFIT\n+\n▲2\n▲2\n▲2\n▲2\nQUICK SKILLS · Gwen Wainwright\nMAG\nVicious Verse\nEND TURN\nDouble tap a yellow tile to move. No enemy is currently in basic-attack range.\n? Combat Help\nREACTIONS · 8/8 allies ready · Leaving melee reach can trigger an attack.\nPHYS\nvs AC + physical defense\nMAG\nvs MDS + magic defense\nTRUE\nbypasses mitigation\nPotions, Stats & Full Skills\nPARTY STATUS · 8/8 STANDING\n+\nENEMY DETAILS · 8 ALIVE\n+\nCOMBAT LOG · 0 EVENTS\n+"
+  },
+  {
+    "name": "HeroDetailScreen--Gear",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/worn-sword.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/padded-armor.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/worn-sword.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/padded-armor.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "ADVENTURER CHARACTER SHEET",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FRONTLINE FIGHTER",
+          "font": 9
+        },
+        {
+          "text": "Scholar · Age 43",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "★ 2 SKILL PTS",
+          "font": 8
+        },
+        {
+          "text": "Available for quests",
+          "font": 9
+        },
+        {
+          "text": "Sheet",
+          "font": 10
+        },
+        {
+          "text": "Gear",
+          "font": 10
+        },
+        {
+          "text": "Skills",
+          "font": 10
+        },
+        {
+          "text": "Stats",
+          "font": 10
+        },
+        {
+          "text": "Story",
+          "font": 10
+        },
+        {
+          "text": "Inspect the hero's equipped kit, swap saved loadouts, or unequip items back to guild stora",
+          "font": 10
+        },
+        {
+          "text": "EQUIPMENT VIEW",
+          "font": 10
+        },
+        {
+          "text": "HELMET",
+          "font": 7
+        },
+        {
+          "text": "WEAPON",
+          "font": 7
+        },
+        {
+          "text": "BOOTS",
+          "font": 7
+        },
+        {
+          "text": "ARMOR",
+          "font": 7
+        },
+        {
+          "text": "ACCESSORY 1",
+          "font": 7
+        },
+        {
+          "text": "ACCESSORY 2",
+          "font": 7
+        },
+        {
+          "text": "EQUIPMENT LOADOUTS",
+          "font": 10
+        },
+        {
+          "text": "+",
+          "font": 10
+        },
+        {
+          "text": "EQUIPPED",
+          "font": 9
+        },
+        {
+          "text": "UNEQUIP",
+          "font": 10
+        },
+        {
+          "text": "EQUIPPED",
+          "font": 9
+        },
+        {
+          "text": "UNEQUIP",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1579,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nADVENTURER CHARACTER SHEET\nLEVEL\n4\nPercival Fairwind\nFRONTLINE FIGHTER\nHuman · Warrior\nScholar · Age 43\nFIELD READY\n★ 2 SKILL PTS\nAvailable for quests\nSheet\nGear\nSkills\nStats\nStory\nEQUIPMENT & LOADOUTS\nInspect the hero's equipped kit, swap saved loadouts, or unequip items back to guild storage.\nEQUIPMENT VIEW\nx\nHELMET\nWEAPON\nx\nBOOTS\nARMOR\nx\nACCESSORY 1\nx\nACCESSORY 2\nEQUIPMENT LOADOUTS\n+\nWorn Sword\nEQUIPPED\nWEAPON • COMMON • Lv 1 • 100% durability\nUNEQUIP\nPadded Armor\nEQUIPPED\nARMOR • COMMON • Lv 1 • 100% durability\n+2% Physical Defense\nUNEQUIP\nx\nhelmet\nHELMET • EMPTY\nx\nboots\nBOOTS • EMPTY\nx\naccessory 1\nACCESSORY 1 • EMPTY\nx\naccessory 2\nACCESSORY 2 • EMPTY"
+  },
+  {
+    "name": "HeroDetailScreen--Skills",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "ADVENTURER CHARACTER SHEET",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FRONTLINE FIGHTER",
+          "font": 9
+        },
+        {
+          "text": "Scholar · Age 43",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "★ 2 SKILL PTS",
+          "font": 8
+        },
+        {
+          "text": "Available for quests",
+          "font": 9
+        },
+        {
+          "text": "Sheet",
+          "font": 10
+        },
+        {
+          "text": "Gear",
+          "font": 10
+        },
+        {
+          "text": "Skills",
+          "font": 10
+        },
+        {
+          "text": "Stats",
+          "font": 10
+        },
+        {
+          "text": "Story",
+          "font": 10
+        },
+        {
+          "text": "CLASS PROGRESSION",
+          "font": 8
+        },
+        {
+          "text": "INSPECT",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1097,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nADVENTURER CHARACTER SHEET\nLEVEL\n4\nPercival Fairwind\nFRONTLINE FIGHTER\nHuman · Warrior\nScholar · Age 43\nFIELD READY\n★ 2 SKILL PTS\nAvailable for quests\nSheet\nGear\nSkills\nStats\nStory\nCLASS PROGRESSION\n2 CLASS SKILL POINTS AVAILABLE\nLevel 1 heroes begin with one basic skill. Permanent class choices unlock at Levels 2, 4, 6, and 8.\nCHOOSE SKILLS / CLASS PATH\nD20 PROFICIENCIES\nCurrent proficiency bonus: +2\nAthletics\nClimb, jump, swim, shove, and grapple. · STRENGTH\n+2\nIntimidation\nInfluence through threats or force of presence. · CHARISMA\n+2\nHistory\nRecall peoples, wars, places, and customs. · INTELLIGENCE\n+2\nInvestigation\nDeduce meaning from physical clues. · INTELLIGENCE\n+2\nCOMBAT SKILLS\nSword Strike\nINSPECT\nBASIC ATTACK • Range 1"
+  },
+  {
+    "name": "HeroDetailScreen--Stats",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "ADVENTURER CHARACTER SHEET",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FRONTLINE FIGHTER",
+          "font": 9
+        },
+        {
+          "text": "Scholar · Age 43",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "★ 2 SKILL PTS",
+          "font": 8
+        },
+        {
+          "text": "Available for quests",
+          "font": 9
+        },
+        {
+          "text": "Sheet",
+          "font": 10
+        },
+        {
+          "text": "Gear",
+          "font": 10
+        },
+        {
+          "text": "Skills",
+          "font": 10
+        },
+        {
+          "text": "Stats",
+          "font": 10
+        },
+        {
+          "text": "Story",
+          "font": 10
+        },
+        {
+          "text": "This page contains the numbers behind the character sheet. Green values are favored by the",
+          "font": 10
+        },
+        {
+          "text": "Green attributes are favored by this class. Parentheses show the D20 modifier.",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1297,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nADVENTURER CHARACTER SHEET\nLEVEL\n4\nPercival Fairwind\nFRONTLINE FIGHTER\nHuman · Warrior\nScholar · Age 43\nFIELD READY\n★ 2 SKILL PTS\nAvailable for quests\nSheet\nGear\nSkills\nStats\nStory\nDETAILED ATTRIBUTES\nThis page contains the numbers behind the character sheet. Green values are favored by the hero's class.\nATTRIBUTE BREAKDOWN\nSTR\n18 → 19 (+4)\nrace: human +1 Strength\nDEX\n15 → 16 (+3)\nrace: human +1 Dexterity\nCON\n17 → 18 (+4)\nrace: human +1 Constitution\nINT\n8 → 11 (+0)\nrace: human +1 Intelligence\nbackground: scholar +2 Intelligence\nWIS\n13 → 14 (+2)\nrace: human +1 Wisdom\nCHA\n10 → 11 (+0)\nrace: human +1 Charisma\nGreen attributes are favored by this class. Parentheses show the D20 modifier.\nCOMBAT & QUEST STATS\nMax HP\n293\nPhysical Attack\n92\nPhysical Defense\n82\nMagic Power\n83\nMagic Defense\n53\nSpeed\n42\nCritical Chance\n13.0%\nArmor Class\n17\nMovement\n4"
+  },
+  {
+    "name": "HeroDetailScreen--Story",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "ADVENTURER CHARACTER SHEET",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FRONTLINE FIGHTER",
+          "font": 9
+        },
+        {
+          "text": "Scholar · Age 43",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "★ 2 SKILL PTS",
+          "font": 8
+        },
+        {
+          "text": "Available for quests",
+          "font": 9
+        },
+        {
+          "text": "Sheet",
+          "font": 10
+        },
+        {
+          "text": "Gear",
+          "font": 10
+        },
+        {
+          "text": "Skills",
+          "font": 10
+        },
+        {
+          "text": "Stats",
+          "font": 10
+        },
+        {
+          "text": "Story",
+          "font": 10
+        },
+        {
+          "text": "Traits, beliefs, relationships and deeds live here so combat management stays separate fro",
+          "font": 10
+        },
+        {
+          "text": "+15% Magic Power",
+          "font": 10
+        },
+        {
+          "text": "-8% Max HP",
+          "font": 10
+        },
+        {
+          "text": "+10% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "-5% Recovery Duration",
+          "font": 10
+        },
+        {
+          "text": "QUESTS",
+          "font": 7
+        },
+        {
+          "text": "DEFEATED",
+          "font": 7
+        },
+        {
+          "text": "DEEDS",
+          "font": 7
+        },
+        {
+          "text": "ACHIEVEMENTS",
+          "font": 8
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1541,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nADVENTURER CHARACTER SHEET\nLEVEL\n4\nPercival Fairwind\nFRONTLINE FIGHTER\nHuman · Warrior\nScholar · Age 43\nFIELD READY\n★ 2 SKILL PTS\nAvailable for quests\nSheet\nGear\nSkills\nStats\nStory\nPERSONAL RECORD\nTraits, beliefs, relationships and deeds live here so combat management stays separate from character history.\nBACKGROUND & CHARACTER\nScholar\nFormal study provides a keen mind and a disciplined approach to training.\nPersonality · Blunt\nSays the difficult thing directly, even when tact would be safer.\nIdeal · Honor\nA promise freely given should survive fear, loss and inconvenience.\nBond · A Fallen Companion\nKeeps one lost companion's token and refuses to forget how they died.\nFlaw · Proud\nFinds it painfully difficult to admit weakness or ask for help.\nTRAITS\nArcane-Touched · COMBAT\nChannels unusually potent magic through a fragile body.\n+15% Magic Power\n-8% Max HP\nBattle-Hardened · COMBAT\nOld scars and practiced instincts reduce both harm and recovery time.\n+10% Physical Defense\n-5% Recovery Duration\nRELATIONSHIPS\nNo meaningful bonds yet. Shared quests and difficult choices will shape them.\nCAREER RECORD\n0\nQUESTS\n0\nDEFEATED\n0\nDEEDS\nACHIEVEMENTS\nNone yet\nHERO CHRONICLE\nNo deeds have been recorded yet."
+  },
+  {
+    "name": "HeroCodexScreen--Classes",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Franger/male-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fmage/male-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fcleric/male-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fpaladin/male-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fberserker/male-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fmonk/male-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/male-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fspellbow/male-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fbulwark/male-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fsummoner/male-v1.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "ROSTER DISCOVERY",
+          "font": 10
+        },
+        {
+          "text": "Races",
+          "font": 10
+        },
+        {
+          "text": "Classes",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1551,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nGUILD ARCHIVES\nHeroes' Codex\nA living field guide to 7 peoples and 11 guild disciplines. Locked entries explain how they permanently join every save's recruitment pool.\nARCHIVE REWARDS\nROSTER DISCOVERY\n0/4 claimed · 4 READY\n+\nRaces\nClasses\nADVENTURING CLASSES · 11\nWarrior\nFrontline / Control · AVAILABLE\n+\nRanger\nRanged / Mobility · AVAILABLE\n+\nMage\nArcane Damage / Control · AVAILABLE\n+\nCleric\nHealing / Support · AVAILABLE\n+\nPaladin\nDefense / Hybrid · AVAILABLE\n+\nBerserker\nPhysical Damage / Bruiser · AVAILABLE\n+\nMonk\nMobile Striker / Control · LOCKED\n+\nBard\nSupport / Control · LOCKED\n+\nSpellbow\nArcane Ranged Damage / Control · LOCKED\n+\nBulwark\nFrontline Tank / Protection · LOCKED\n+\nSummoner\nArcane Support / Invocation · LOCKED\n+"
+  },
+  {
+    "name": "PartySelectionScreen--Balanced",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fveilborn%2Fmonk/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fveilborn%2Fmonk/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fspellbow/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fstoneborn%2Fberserker/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Fbulwark/female-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Ftiefling%2Fpaladin/male-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fsummoner/male-v3.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "FIELD DEPLOYMENT",
+          "font": 10
+        },
+        {
+          "text": "CAMPAIGN",
+          "font": 8
+        },
+        {
+          "text": "DIFFICULTY 2",
+          "font": 8
+        },
+        {
+          "text": "LV 1–2",
+          "font": 8
+        },
+        {
+          "text": "Orris Starless",
+          "font": 10
+        },
+        {
+          "text": "FRONTLINE",
+          "font": 7
+        },
+        {
+          "text": "Gwen Wainwright",
+          "font": 10
+        },
+        {
+          "text": "SUPPORT",
+          "font": 7
+        },
+        {
+          "text": "Azhra Wolf-Breaker",
+          "font": 10
+        },
+        {
+          "text": "RANGED",
+          "font": 7
+        },
+        {
+          "text": "Daelis Moonshadow",
+          "font": 10
+        },
+        {
+          "text": "RANGED",
+          "font": 7
+        },
+        {
+          "text": "Tap an occupied slot to remove that hero. Tactical positions are chosen on the battlefield",
+          "font": 9
+        },
+        {
+          "text": "READY TO DEPLOY",
+          "font": 8
+        },
+        {
+          "text": "LOWEST RDY AFTER",
+          "font": 7
+        },
+        {
+          "text": "LOWEST HP",
+          "font": 7
+        },
+        {
+          "text": "ENEMY INTEL",
+          "font": 7
+        },
+        {
+          "text": "FORMATION",
+          "font": 9
+        },
+        {
+          "text": "FRONTLINE 1",
+          "font": 8
+        },
+        {
+          "text": "SUPPORT 1",
+          "font": 8
+        },
+        {
+          "text": "RANGED 2",
+          "font": 8
+        },
+        {
+          "text": "LOADOUT",
+          "font": 9
+        },
+        {
+          "text": "MISSION INTEL",
+          "font": 9
+        },
+        {
+          "text": "Goblins",
+          "font": 10
+        },
+        {
+          "text": "FIELD SUPPLIES",
+          "font": 9
+        },
+        {
+          "text": "HEAL 6",
+          "font": 8
+        },
+        {
+          "text": "MANA 4",
+          "font": 8
+        },
+        {
+          "text": "STAMINA 2",
+          "font": 8
+        },
+        {
+          "text": "0 friendly bonds · 0 rival bonds",
+          "font": 10
+        },
+        {
+          "text": "All",
+          "font": 10
+        },
+        {
+          "text": "Frontline",
+          "font": 10
+        },
+        {
+          "text": "Support",
+          "font": 10
+        },
+        {
+          "text": "Ranged",
+          "font": 10
+        },
+        {
+          "text": "RANGED",
+          "font": 8
+        },
+        {
+          "text": "Mage · HP 272/272",
+          "font": 10
+        },
+        {
+          "text": "Readiness 100 → 55",
+          "font": 10
+        },
+        {
+          "text": "SUPPORT",
+          "font": 8
+        },
+        {
+          "text": "Bard · HP 282/282",
+          "font": 10
+        },
+        {
+          "text": "Readiness 100 → 55",
+          "font": 10
+        },
+        {
+          "text": "RANGED",
+          "font": 8
+        },
+        {
+          "text": "Ranger · HP 290/290",
+          "font": 10
+        },
+        {
+          "text": "Readiness 100 → 55",
+          "font": 10
+        },
+        {
+          "text": "FRONTLINE",
+          "font": 8
+        },
+        {
+          "text": "Monk · HP 305/305",
+          "font": 10
+        },
+        {
+          "text": "Readiness 100 → 55",
+          "font": 10
+        },
+        {
+          "text": "RANGED",
+          "font": 8
+        },
+        {
+          "text": "Spellbow · HP 282/282",
+          "font": 10
+        },
+        {
+          "text": "Readiness 100 → 55",
+          "font": 10
+        },
+        {
+          "text": "SUPPORT",
+          "font": 8
+        },
+        {
+          "text": "Cleric · HP 119/341",
+          "font": 10
+        },
+        {
+          "text": "Readiness 100 → 55",
+          "font": 10
+        },
+        {
+          "text": "FRONTLINE",
+          "font": 8
+        },
+        {
+          "text": "Berserker · HP 0/352",
+          "font": 10
+        },
+        {
+          "text": "Readiness 100 → 55",
+          "font": 10
+        },
+        {
+          "text": "FRONTLINE",
+          "font": 8
+        },
+        {
+          "text": "Bulwark · HP 314/314",
+          "font": 10
+        },
+        {
+          "text": "Readiness 100 → 55",
+          "font": 10
+        },
+        {
+          "text": "FRONTLINE",
+          "font": 8
+        },
+        {
+          "text": "Warrior · HP 293/293",
+          "font": 10
+        },
+        {
+          "text": "Readiness 100 → 55",
+          "font": 10
+        },
+        {
+          "text": "FRONTLINE",
+          "font": 8
+        },
+        {
+          "text": "Paladin · HP 284/284",
+          "font": 10
+        },
+        {
+          "text": "Readiness 100 → 55",
+          "font": 10
+        },
+        {
+          "text": "SUPPORT",
+          "font": 8
+        },
+        {
+          "text": "Summoner · HP 288/288",
+          "font": 10
+        },
+        {
+          "text": "Readiness 100 → 55",
+          "font": 10
+        },
+        {
+          "text": "FINAL FIELD ORDER",
+          "font": 9
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 2515,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nFIELD DEPLOYMENT\nThe Missing Merchant\nCAMPAIGN\nDIFFICULTY 2\nLV 1–2\n⌖ Greenveil · Return Day 43\n1 combat encounter · 45 readiness cost per hero\nFIELD SQUAD\nAUTO-FILL BALANCED\nCLEAR\nOrris Starless\nFRONTLINE\nGwen Wainwright\nSUPPORT\nAzhra Wolf-Breaker\nRANGED\nDaelis Moonshadow\nRANGED\nTap an occupied slot to remove that hero. Tactical positions are chosen on the battlefield.\nDEPLOYMENT CHECK\nFIELDMASTER ASSESSMENT\nParty Lv 6.5 · Recommended Lv 1 · 4/4 selected\nREADY TO DEPLOY\n55\nLOWEST RDY AFTER\n100%\nLOWEST HP\n3/3\nENEMY INTEL\nFORMATION\nFRONTLINE 1\nSUPPORT 1\nRANGED 2\nLOADOUT\nEquipped 8/24 slots · 0 worn · 0 damaged · 0 broken\nMISSION INTEL\nCOMPLETE INTEL · 100%\nGoblins\n✓\nFIELD SUPPLIES\nHEAL 6\nMANA 4\nSTAMINA 2\n✓ No major deployment warnings detected.\nSKILLS & PARTY CHEMISTRY\n0 friendly bonds · 0 rival bonds\nSQUAD PRESETS\n+\nAVAILABLE ADVENTURERS\nAll\nFrontline\nSupport\nRanged\nAzhra Wolf-Breaker · Lv 7\nRANGED\nMage · HP 272/272\nReadiness 100 → 55\nFIELD OK\n✓\nGwen Wainwright · Lv 7\nSUPPORT\nBard · HP 282/282\nReadiness 100 → 55\nFIELD OK\n✓\nDaelis Moonshadow · Lv 6\nRANGED\nRanger · HP 290/290\nReadiness 100 → 55\nFIELD OK\n✓\nOrris Starless · Lv 6\nFRONTLINE\nMonk · HP 305/305\nReadiness 100 → 55\nFIELD OK\n✓\nKrothu Skullcleaver · Lv 6\nRANGED\nSpellbow · HP 282/282\nReadiness 100 → 55\nFIELD OK\n+\nSolveig Flintmantle · Lv 5\nSUPPORT\nCleric · HP 119/341\nReadiness 100 → 55\nFIELD OK\n+\nAlma Stonewake · Lv 5\nFRONTLINE\nBerserker · HP 0/352\nReadiness 100 → 55\nFIELD OK\n×\nElaria Willowmere · Lv 5\nFRONTLINE\nBulwark · HP 314/314\nReadiness 100 → 55\nFIELD OK\n+\nPercival Fairwind · Lv 4\nFRONTLINE\nWarrior · HP 293/293\nReadiness 100 → 55\nFIELD OK\n+\nMordai Redspire · Lv 4\nFRONTLINE\nPaladin · HP 284/284\nReadiness 100 → 55\nFIELD OK\n+\nNorri Embermantle · Lv 4\nSUPPORT\nSummoner · HP 288/288\nReadiness 100 → 55\nFIELD OK\n×\nFINAL FIELD ORDER\n4 heroes will spend 45 readiness and return on Day 43.\nDEPLOY PARTY"
+  },
+  {
+    "name": "MonsterManualScreen--Inspect",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbandits/bandit.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbandits/bandit.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fskills%2Fcomplete/bandit_slash.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fskills%2Fcomplete/dirty_strike.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbandits/bandit_captain.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fash-story/cinder_touched_bandit.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Firon-hills/crownmarked_saboteur.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fstonegate-assassins/gloam_knife_assassin.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgreenveil/cassian_vane.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgreenveil/laurel_arbalest.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbandits/iron_laurel_enforcer.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgreenveil/laurel_vanguard.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgreenveil/laurel_oathmage.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbandits/bandit_captain.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fstonegate-assassins/nightglass_trapper.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fstonegate-assassins/seressa_vane.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/sewer_crocodile.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fash-story/ashscale_vermin.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Firon-hills/brasswing_drake.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/carrion_crow_swarm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/dire_wolf.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/frost_wisp.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/frostmarch_yeti.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fsewer-vermin/giant_rat.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/giant_spider.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fashlands/glasswing_stalker.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/great_forest_serpent.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Ffrostmarch/hroth_iceblood.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fshadowfen/mire_lurker.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Ffrostmarch/rimefang_wolf.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fsewer-vermin/sewer_rat.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fsewer-vermin/sewer_slime.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/spider_broodguard.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/spider_queen.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/spiderling_swarm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Firon-hills/stormcrow_mimic.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/webspinner.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Ffrostmarch/vaelith_pale_echo.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fbeasts/webspinner.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fashlands/ashbound_sentinel.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Ffrostmarch/aurora_seer.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Firon-hills/crown_beacon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Firon-hills/brass_honor_guard.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fconstructs/ironbound_sentry.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fashlands/cinder_keeper.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgreenveil/lying_crown_echo.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgreenveil/oath_examiner.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fashlands/solkar_ash_herald.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fconstructs/hollow_warden.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Firon-hills/varkesh_gilded_rupture.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fash-story/wardstone_scale_guardian.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fconstructs/wardstone_wisp.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fdrowned-seventh/abyssal_lanternbearer.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fwestern-sea/admiral_nhal_veyr.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fwestern-sea/blacktide_reaver.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fwestern-sea/crownless_mariner.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fdrowned-seventh/drowned_legionary.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fwestern-sea/leviathan_thrall.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fdrowned-seventh/nameleech_swarm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fwestern-sea/nullwake_arbalist.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fwestern-sea/oath_eater.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fdrowned-seventh/serekh_chartmaker.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fdrowned-seventh/seventh_gate_colossus.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fdrowned-seventh/tideglass_stalker.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_archer.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_brute.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_chieftain.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_sapper.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_scout.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_wardbreaker.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_scout.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Forcs/orc_raider.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Forcs/ghorak_chainbreaker.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Forcs/orc_raider.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Forcs/troll.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fundead/blackbridge_wraith.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fshadowfen/drowned_legionnaire.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fshadowfen/gravewater_hexer.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fundead/skeleton_archer.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fundead/heartstone_revenant.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Ffrostmarch/icebound_warden.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fshadowfen/morrowveil_archivist.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fundead/skeleton.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fundead/skeleton_archer.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fshadowfen/bell_widow.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fenemies%2Fundead/zombie.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "CREATURES RECORDED",
+          "font": 10
+        },
+        {
+          "text": "BESTIARY MILESTONES",
+          "font": 10
+        },
+        {
+          "text": "All",
+          "font": 10
+        },
+        {
+          "text": "Encountered",
+          "font": 10
+        },
+        {
+          "text": "Unknown",
+          "font": 10
+        },
+        {
+          "text": "RELATIVE STAT PROFILE",
+          "font": 10
+        },
+        {
+          "text": "Compared with a standard creature of the same level.",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "P. DMG",
+          "font": 8
+        },
+        {
+          "text": "P. DEF",
+          "font": 8
+        },
+        {
+          "text": "M. DMG",
+          "font": 8
+        },
+        {
+          "text": "M. DEF",
+          "font": 8
+        },
+        {
+          "text": "SPEED",
+          "font": 8
+        },
+        {
+          "text": "KNOWN ACTIONS & TRAITS",
+          "font": 10
+        },
+        {
+          "text": "BASIC ATTACK",
+          "font": 9
+        },
+        {
+          "text": "ACTIVE",
+          "font": 9
+        },
+        {
+          "text": "DEFENSES",
+          "font": 10
+        },
+        {
+          "text": "FIELD REWARDS",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 8471,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nGUILD ARCHIVES\nMonster Manual\nField notes gathered by guild parties. Encounter creatures to reveal their identities, portraits, combat profiles, abilities, defenses, and rewards.\n83 / 83\nCREATURES RECORDED\nARCHIVE REWARDS\nBESTIARY MILESTONES\n0/11 claimed · 11 READY\n+\nAll\nEncountered\nUnknown\nBandit\nBandits • Frontline\n⌃\nA ruthless opportunist who values exposed coin almost as much as an easy victory.\nRELATIVE STAT PROFILE\nCompared with a standard creature of the same level.\nHP\n+0%\nP. DMG\n+5%\nP. DEF\n+0%\nM. DMG\n+0%\nM. DEF\n+0%\nSPEED\n+5%\nKNOWN ACTIONS & TRAITS\nSlash\nBASIC ATTACK\n• Deals 1.00× physical damage.\n• Range 1. Target: single enemy.\nDirty Strike\nACTIVE\n• Deals 0.90× physical damage.\n• Range 1. Target: single enemy.\n• Cooldown: 3 turns.\n• Target: attackRollModifier -2 for 2 turns.\nDEFENSES\nNo Confirmed Condition Immunities.\nNo Confirmed Resistances.\nFIELD REWARDS\n30 XP • 10–25 Gold • Loot: Bandit Loot\nBandit Captain\nBandits • Elite\n›\nCinder-Touched Salvager\nBandits • Debuffer\n›\nCrownmarked Saboteur\nBandits • Skirmisher\n›\nGloam Knife Assassin\nBandits • Elite\n›\nGrandmaster Cassian Vane\nBandits • Mini Boss\n›\nIron Laurel Arbalest\nBandits • Ranged\n›\nIron Laurel Enforcer\nBandits • Elite\n›\nIron Laurel Vanguard\nBandits • Frontline\n›\nLaurel Oathmage\nBandits • Support\n›\nMara Half-Coin\nBandits • Elite\n›\nNightglass Trapper\nBandits • Debuffer\n›\nSeressa Vane, Master Assassin\nBandits • Mini Boss\n›\nAncient Sewer Crocodile\nBeasts • Mini Boss\n›\nAshscale Vermin\nBeasts • Skirmisher\n›\nBrasswing Drake\nBeasts • Elite\n›\nCarrion Crow Swarm\nBeasts • Skirmisher\n›\nDire Wolf\nBeasts • Skirmisher\n›\nFrost Wisp\nBeasts • Support\n›\nFrostmarch Yeti\nBeasts • Mini Boss\n›\nGiant Rat\nBeasts • Skirmisher\n›\nGiant Spider\nBeasts • Debuffer\n›\nGlasswing Stalker\nBeasts • Skirmisher\n›\nGreat Forest Serpent\nBeasts • Mini Boss\n›\nHroth Iceblood\nBeasts • Mini Boss\n›\nMire Lurker\nBeasts • Skirmisher\n›\nRimefang Wolf\nBeasts • Skirmisher\n›\nSewer Rat\nBeasts • Skirmisher\n›\nSewer Slime\nBeasts • Tank\n›\nSpider Broodguard\nBeasts • Tank\n›\nSpider Queen\nBeasts • Mini Boss\n›\nSpiderling Swarm\nBeasts • Skirmisher\n›\nStormcrow Mimic\nBeasts • Ranged\n›\nThe Pale Widow, Silk-Eater\nBeasts • Elite\n›\nVaelith's Pale Echo\nBeasts • Mini Boss\n›\nWebspinner\nBeasts • Ranged\n›\nAshbound Sentinel\nWard Constructs • Frontline\n›\nAurora Seer\nWard Constructs • Support\n›\nCrown Resonance Beacon\nWard Constructs • Support\n›\nHollow Brass Honor Guard\nWard Constructs • Frontline\n›\nIronbound Sentry\nWard Constructs • Tank\n›\nKeeper of Cinders\nWard Constructs • Mini Boss\n›\nLying Crown Echo\nWard Constructs • Elite\n›\nOath Examiner\nWard Constructs • Elite\n›\nSolkar, the Ash Herald\nWard Constructs • Mini Boss\n›\nThe Hollow Warden\nWard Constructs • Mini Boss\n›\nVarkesh, the Gilded Rupture\nWard Constructs • Mini Boss\n›\nWardstone Scale Guardian\nWard Constructs • Mini Boss\n›\nWardstone Wisp\nWard Constructs • Support\n›\nAbyssal Lanternbearer\nCrownless Host • Support\n›\nAdmiral Nhal Veyr, the Unrecorded\nCrownless Host • Mini Boss\n›\nBlacktide Reaver\nCrownless Host • Elite\n›\nCrownless Mariner\nCrownless Host • Frontline\n›\nDrowned Seventh Legionary\nCrownless Host • Frontline\n›\nHollow Leviathan Thrall\nCrownless Host • Tank\n›\nNameleech Swarm\nCrownless Host • Debuffer\n›\nNullwake Arbalist\nCrownless Host • Ranged\n›\nOath-Eater\nCrownless Host • Debuffer\n›\nSerekh, Chartmaker of the Lost\nCrownless Host • Mini Boss\n›\nSeventh Gate Colossus\nCrownless Host • Tank\n›\nTideglass Stalker\nCrownless Host • Skirmisher\n›\nGoblin Archer\nGoblins • Ranged\n›\nGoblin Brute\nGoblins • Frontline\n›\nGoblin Chieftain\nGoblins • Mini Boss\n›\nGoblin Sapper\nGoblins • Debuffer\n›\nGoblin Scout\nGoblins • Skirmisher\n›\nGoblin Wardbreaker\nGoblins • Debuffer\n›\nRuk One-Eye, Roadstalker\nGoblins • Elite\n›\nDrogan Ash-Tusk\nOrcs • Elite\n›\nGhorak the Chainbreaker\nOrcs • Mini Boss\n›\nOrc Raider\nOrcs • Heavy Attacker\n›\nTroll\nOrcs • Mini Boss\n›\nBlackbridge Wraith\nUndead • Elite\n›\nDrowned Legionnaire\nUndead • Frontline\n›\nGravewater Hexer\nUndead • Debuffer\n›\nHadrik Bonecaller\nUndead • Elite\n›\nHeartstone Revenant\nUndead • Mini Boss\n›\nIcebound Warden\nUndead • Tank\n›\nMorrowveil, Drowned Archivist\nUndead • Mini Boss\n›\nSkeleton\nUndead • Frontline\n›\nSkeleton Archer\nUndead • Ranged\n›\nThe Bell Widow\nUndead • Mini Boss\n›\nZombie\nUndead • Tank\n›"
+  },
+  {
+    "name": "InventoryScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/ferrymans-lantern.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/guestfire-cloak.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/moonbell-ring.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/sapphire-lamellar.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/mirrorsteel-helm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/venomsteel-spear.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/cinder-edge-axe.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/emberglass-wand.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/frostwood-bow.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/barbed-war-pick.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/runeguard-robes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/ward-thread-boots.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/antivenom-band.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/cinderheart-charm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/vigilant-trail-coat.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/quilted-travel-coat.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/iron-skullcap.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/soft-leather-boots.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/simple-iron-band.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/brass-focus-charm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/pale-echo-lance.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/militia-handaxe.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/yew-shortbow.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/pilgrim-rod.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 8
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "6,080",
+          "font": 10
+        },
+        {
+          "text": "35",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "180",
+          "font": 10
+        },
+        {
+          "text": "ACTIVE ORDERS",
+          "font": 7
+        },
+        {
+          "text": "TRAINING · 1",
+          "font": 8
+        },
+        {
+          "text": "2D",
+          "font": 7
+        },
+        {
+          "text": "GUILD QUARTERMASTER",
+          "font": 9
+        },
+        {
+          "text": "POSSIBLE\nUPGRADES",
+          "font": 7
+        },
+        {
+          "text": "MATERIALS",
+          "font": 7
+        },
+        {
+          "text": "POTIONS",
+          "font": 7
+        },
+        {
+          "text": "GOLD",
+          "font": 7
+        },
+        {
+          "text": "All",
+          "font": 10
+        },
+        {
+          "text": "Weapons",
+          "font": 10
+        },
+        {
+          "text": "Armor",
+          "font": 10
+        },
+        {
+          "text": "Accessories",
+          "font": 10
+        },
+        {
+          "text": "Materials",
+          "font": 10
+        },
+        {
+          "text": "UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "RARE · ACCESSORY 2 · LV 6+",
+          "font": 9
+        },
+        {
+          "text": "5 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 5 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 920g",
+          "font": 10
+        },
+        {
+          "text": "+2 Initiative · +10% Magic Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "RARE · ARMOR · LV 5+",
+          "font": 9
+        },
+        {
+          "text": "8 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 2 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 760g",
+          "font": 10
+        },
+        {
+          "text": "+10% Max HP · +10% Magic Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "RARE · ACCESSORY 1 · LV 6+",
+          "font": 9
+        },
+        {
+          "text": "5 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 5 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 820g",
+          "font": 10
+        },
+        {
+          "text": "+2 Magic Defense Score · +1 Initiative",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · ARMOR · LV 4+",
+          "font": 9
+        },
+        {
+          "text": "3 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 3 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Cleric, Paladin · Value 230g",
+          "font": 10
+        },
+        {
+          "text": "+7% Magic Defense · +6% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · HELMET · LV 4+",
+          "font": 9
+        },
+        {
+          "text": "4 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 4 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Cleric, Paladin, Berserker · Value 176g",
+          "font": 10
+        },
+        {
+          "text": "+6% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · WEAPON · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "3 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 3 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Ranger, Paladin · Value 185g",
+          "font": 10
+        },
+        {
+          "text": "+4% Physical Attack · +1 Attack Roll",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · WEAPON · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "2 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 2 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Berserker · Value 190g",
+          "font": 10
+        },
+        {
+          "text": "+5% Physical Attack · +1 Attack Roll",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · WEAPON · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "2 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 2 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Mage, Cleric · Value 192g",
+          "font": 10
+        },
+        {
+          "text": "+5% Magic Power · +1 Attack Roll",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · WEAPON · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "1 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 1 UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Ranger · Value 188g",
+          "font": 10
+        },
+        {
+          "text": "+4% Physical Attack · +1 Attack Roll",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · WEAPON · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "3 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 3 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Paladin, Berserker · Value 182g",
+          "font": 10
+        },
+        {
+          "text": "+0.01 Critical Chance · +1 Attack Roll",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · ARMOR · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "2 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 2 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Mage, Cleric · Value 198g",
+          "font": 10
+        },
+        {
+          "text": "+5% Magic Defense · +8% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · BOOTS · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "11 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 11 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 155g",
+          "font": 10
+        },
+        {
+          "text": "+4% Magic Defense · +4% Speed",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · ACCESSORY 1 · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "11 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 11 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 168g",
+          "font": 10
+        },
+        {
+          "text": "+5% Magic Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · ACCESSORY 2 · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "3 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 3 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Mage, Cleric, Paladin · Value 180g",
+          "font": 10
+        },
+        {
+          "text": "+4% Magic Power · +3% Magic Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · ARMOR · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "2 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 2 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Ranger, Berserker · Value 186g",
+          "font": 10
+        },
+        {
+          "text": "+3% Speed · +8% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · ARMOR · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "11 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 7 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 29g",
+          "font": 10
+        },
+        {
+          "text": "+4% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · HELMET · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "4 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 4 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Cleric, Paladin, Berserker · Value 27g",
+          "font": 10
+        },
+        {
+          "text": "+4% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · BOOTS · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "11 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 11 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 26g",
+          "font": 10
+        },
+        {
+          "text": "+2% Speed · +2% Speed",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · ACCESSORY 1 · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "11 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 11 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 36g",
+          "font": 10
+        },
+        {
+          "text": "+2% Magic Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · ACCESSORY 2 · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "11 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 11 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 39g",
+          "font": 10
+        },
+        {
+          "text": "+3% Magic Defense",
+          "font": 10
+        },
+        {
+          "text": "NO ELIGIBLE HERO",
+          "font": 8
+        },
+        {
+          "text": "EPIC · WEAPON · LV 6+",
+          "font": 9
+        },
+        {
+          "text": "NO ELIGIBLE HERO",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Paladin · Value 1180g",
+          "font": 10
+        },
+        {
+          "text": "+1 Attack Roll · +14% Physical Damage · +10% Magic Damage",
+          "font": 10
+        },
+        {
+          "text": "SIDEGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · WEAPON · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "3 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Paladin, Berserker · Value 34g",
+          "font": 10
+        },
+        {
+          "text": "No numerical modifiers",
+          "font": 10
+        },
+        {
+          "text": "SIDEGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · WEAPON · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "1 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Ranger · Value 35g",
+          "font": 10
+        },
+        {
+          "text": "No numerical modifiers",
+          "font": 10
+        },
+        {
+          "text": "SIDEGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · WEAPON · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "2 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Cleric, Paladin · Value 34g",
+          "font": 10
+        },
+        {
+          "text": "No numerical modifiers",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "GUILD",
+          "font": 8
+        },
+        {
+          "text": "QUESTS",
+          "font": 8
+        },
+        {
+          "text": "WORLD",
+          "font": 8
+        },
+        {
+          "text": "2",
+          "font": 8
+        },
+        {
+          "text": "HEROES",
+          "font": 8
+        },
+        {
+          "text": "INVENTORY",
+          "font": 8
+        },
+        {
+          "text": "ACTIVE",
+          "font": 6
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 4460,
+      "viewport": 650
+    },
+    "text": "The Wayfarers\n3\nDAY 42 · GUILDHAVEN\n6,080\n35\n1\n180\nACTIVE ORDERS\nTRAINING · 1\n2D\nGUILD QUARTERMASTER\nArmory & Inventory\n24 stored gear · 22 equipped\n20\nPOSSIBLE\nUPGRADES\n264\nMATERIALS\n12\nPOTIONS\n6080\nGOLD\nCRAFT / REPAIR\nGATHER\nPOTIONS\nAll\nWeapons\nArmor\nAccessories\nMaterials\nUPGRADES\n24\nFerryman's Lantern\nLIKELY UPGRADE\nRARE · ACCESSORY 2 · LV 6+\n5 ELIGIBLE\n★ 5 UPGRADES\nPRISTINE · 100%\nAll classes · Value 920g\n+2 Initiative · +10% Magic Defense\n›\nGuestfire Cloak\nLIKELY UPGRADE\nRARE · ARMOR · LV 5+\n8 ELIGIBLE\n★ 2 UPGRADES\nPRISTINE · 100%\nAll classes · Value 760g\n+10% Max HP · +10% Magic Defense\n›\nMoonbell Ring\nLIKELY UPGRADE\nRARE · ACCESSORY 1 · LV 6+\n5 ELIGIBLE\n★ 5 UPGRADES\nPRISTINE · 100%\nAll classes · Value 820g\n+2 Magic Defense Score · +1 Initiative\n›\nSapphire Lamellar\nLIKELY UPGRADE\nUNCOMMON · ARMOR · LV 4+\n3 ELIGIBLE\n★ 3 UPGRADES\nPRISTINE · 100%\nWarrior, Cleric, Paladin · Value 230g\n+7% Magic Defense · +6% Physical Defense\n›\nMirrorsteel Helm\nLIKELY UPGRADE\nUNCOMMON · HELMET · LV 4+\n4 ELIGIBLE\n★ 4 UPGRADES\nPRISTINE · 100%\nWarrior, Cleric, Paladin, Berserker · Value 176g\n+6% Physical Defense\n›\nVenomsteel Spear\nLIKELY UPGRADE\nUNCOMMON · WEAPON · LV 3+\n3 ELIGIBLE\n★ 3 UPGRADES\nPRISTINE · 100%\nWarrior, Ranger, Paladin · Value 185g\n+4% Physical Attack · +1 Attack Roll\n›\nCinder-Edge Axe\nLIKELY UPGRADE\nUNCOMMON · WEAPON · LV 3+\n2 ELIGIBLE\n★ 2 UPGRADES\nPRISTINE · 100%\nWarrior, Berserker · Value 190g\n+5% Physical Attack · +1 Attack Roll\n›\nEmberglass Wand\nLIKELY UPGRADE\nUNCOMMON · WEAPON · LV 3+\n2 ELIGIBLE\n★ 2 UPGRADES\nPRISTINE · 100%\nMage, Cleric · Value 192g\n+5% Magic Power · +1 Attack Roll\n›\nFrostwood Bow\nLIKELY UPGRADE\nUNCOMMON · WEAPON · LV 3+\n1 ELIGIBLE\n★ 1 UPGRADE\nPRISTINE · 100%\nRanger · Value 188g\n+4% Physical Attack · +1 Attack Roll\n›\nBarbed War Pick\nLIKELY UPGRADE\nUNCOMMON · WEAPON · LV 3+\n3 ELIGIBLE\n★ 3 UPGRADES\nPRISTINE · 100%\nWarrior, Paladin, Berserker · Value 182g\n+0.01 Critical Chance · +1 Attack Roll\n›\nRuneguard Robes\nLIKELY UPGRADE\nUNCOMMON · ARMOR · LV 3+\n2 ELIGIBLE\n★ 2 UPGRADES\nPRISTINE · 100%\nMage, Cleric · Value 198g\n+5% Magic Defense · +8% Physical Defense\n›\nWard-Thread Boots\nLIKELY UPGRADE\nUNCOMMON · BOOTS · LV 3+\n11 ELIGIBLE\n★ 11 UPGRADES\nPRISTINE · 100%\nAll classes · Value 155g\n+4% Magic Defense · +4% Speed\n›\nAntivenom Band\nLIKELY UPGRADE\nUNCOMMON · ACCESSORY 1 · LV 3+\n11 ELIGIBLE\n★ 11 UPGRADES\nPRISTINE · 100%\nAll classes · Value 168g\n+5% Magic Defense\n›\nCinderheart Charm\nLIKELY UPGRADE\nUNCOMMON · ACCESSORY 2 · LV 3+\n3 ELIGIBLE\n★ 3 UPGRADES\nPRISTINE · 100%\nMage, Cleric, Paladin · Value 180g\n+4% Magic Power · +3% Magic Defense\n›\nVigilant Trail Coat\nLIKELY UPGRADE\nUNCOMMON · ARMOR · LV 3+\n2 ELIGIBLE\n★ 2 UPGRADES\nPRISTINE · 100%\nRanger, Berserker · Value 186g\n+3% Speed · +8% Physical Defense\n›\nQuilted Travel Coat\nLIKELY UPGRADE\nCOMMON · ARMOR · LV 1+\n11 ELIGIBLE\n★ 7 UPGRADES\nPRISTINE · 100%\nAll classes · Value 29g\n+4% Physical Defense\n›\nIron Skullcap\nLIKELY UPGRADE\nCOMMON · HELMET · LV 1+\n4 ELIGIBLE\n★ 4 UPGRADES\nPRISTINE · 100%\nWarrior, Cleric, Paladin, Berserker · Value 27g\n+4% Physical Defense\n›\nSoft Leather Boots\nLIKELY UPGRADE\nCOMMON · BOOTS · LV 1+\n11 ELIGIBLE\n★ 11 UPGRADES\nPRISTINE · 100%\nAll classes · Value 26g\n+2% Speed · +2% Speed\n›\nSimple Iron Band\nLIKELY UPGRADE\nCOMMON · ACCESSORY 1 · LV 1+\n11 ELIGIBLE\n★ 11 UPGRADES\nPRISTINE · 100%\nAll classes · Value 36g\n+2% Magic Defense\n›\nBrass Focus Charm\nLIKELY UPGRADE\nCOMMON · ACCESSORY 2 · LV 1+\n11 ELIGIBLE\n★ 11 UPGRADES\nPRISTINE · 100%\nAll classes · Value 39g\n+3% Magic Defense\n›\nPale-Echo Lance\nNO ELIGIBLE HERO\nEPIC · WEAPON · LV 6+\nNO ELIGIBLE HERO\nPRISTINE · 100%\nWarrior, Paladin · Value 1180g\n+1 Attack Roll · +14% Physical Damage · +10% Magic Damage\n›\nMilitia Handaxe\nSIDEGRADE\nCOMMON · WEAPON · LV 1+\n3 ELIGIBLE\nPRISTINE · 100%\nWarrior, Paladin, Berserker · Value 34g\nNo numerical modifiers\n›\nYew Shortbow\nSIDEGRADE\nCOMMON · WEAPON · LV 1+\n1 ELIGIBLE\nPRISTINE · 100%\nRanger · Value 35g\nNo numerical modifiers\n›\nPilgrim Rod\nSIDEGRADE\nCOMMON · WEAPON · LV 1+\n2 ELIGIBLE\nPRISTINE · 100%\nCleric, Paladin · Value 34g\nNo numerical modifiers\n›\n1\nGUILD\nQUESTS\nWORLD\n2\nHEROES\nINVENTORY\nACTIVE"
+  },
+  {
+    "name": "HeroDetailScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/worn-sword.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/padded-armor.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "ADVENTURER CHARACTER SHEET",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FRONTLINE FIGHTER",
+          "font": 9
+        },
+        {
+          "text": "Scholar · Age 43",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "★ 2 SKILL PTS",
+          "font": 8
+        },
+        {
+          "text": "Available for quests",
+          "font": 9
+        },
+        {
+          "text": "Sheet",
+          "font": 10
+        },
+        {
+          "text": "Gear",
+          "font": 10
+        },
+        {
+          "text": "Skills",
+          "font": 10
+        },
+        {
+          "text": "Stats",
+          "font": 10
+        },
+        {
+          "text": "Story",
+          "font": 10
+        },
+        {
+          "text": "FIELD CONDITION",
+          "font": 8
+        },
+        {
+          "text": "COMBAT READY",
+          "font": 8
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "293 / 293",
+          "font": 9
+        },
+        {
+          "text": "READINESS",
+          "font": 8
+        },
+        {
+          "text": "100 / 100",
+          "font": 9
+        },
+        {
+          "text": "MANA",
+          "font": 8
+        },
+        {
+          "text": "81 / 81",
+          "font": 9
+        },
+        {
+          "text": "XP · NEXT LEVEL 5",
+          "font": 8
+        },
+        {
+          "text": "0 / 5279",
+          "font": 9
+        },
+        {
+          "text": "MAX HP",
+          "font": 7
+        },
+        {
+          "text": "ARMOR",
+          "font": 7
+        },
+        {
+          "text": "PHYS ATK",
+          "font": 7
+        },
+        {
+          "text": "MAGIC",
+          "font": 7
+        },
+        {
+          "text": "MOVE",
+          "font": 7
+        },
+        {
+          "text": "CRIT",
+          "font": 7
+        },
+        {
+          "text": "EQUIPMENT",
+          "font": 8
+        },
+        {
+          "text": "OPEN GEAR ›",
+          "font": 8
+        },
+        {
+          "text": "WEAPON",
+          "font": 7
+        },
+        {
+          "text": "ARMOR",
+          "font": 7
+        },
+        {
+          "text": "HELMET",
+          "font": 7
+        },
+        {
+          "text": "BOOTS",
+          "font": 7
+        },
+        {
+          "text": "ACCESSORY 1",
+          "font": 7
+        },
+        {
+          "text": "ACCESSORY 2",
+          "font": 7
+        },
+        {
+          "text": "CLASS PATH",
+          "font": 8
+        },
+        {
+          "text": "2 SKILL PTS",
+          "font": 8
+        },
+        {
+          "text": "LOYALTY",
+          "font": 8
+        },
+        {
+          "text": "WEEKLY PAY",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT 80D",
+          "font": 8
+        },
+        {
+          "text": "Signed through Day 122",
+          "font": 9
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1530,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nADVENTURER CHARACTER SHEET\nLEVEL\n4\nPercival Fairwind\nFRONTLINE FIGHTER\nHuman · Warrior\nScholar · Age 43\nFIELD READY\n★ 2 SKILL PTS\nAvailable for quests\nSheet\nGear\nSkills\nStats\nStory\nFIELD CONDITION\nCOMBAT READY\nHP\n293 / 293\nREADINESS\n100 / 100\nMANA\n81 / 81\nXP · NEXT LEVEL 5\n0 / 5279\nCOMBAT PROFILE\n293\nMAX HP\n17\nARMOR\n92\nPHYS ATK\n83\nMAGIC\n4\nMOVE\n13.0%\nCRIT\nLOADOUT\nEQUIPMENT\n2/6 SLOTS EQUIPPED\nOPEN GEAR ›\nWEAPON\nARMOR\nx\nHELMET\nx\nBOOTS\nx\nACCESSORY 1\nx\nACCESSORY 2\nPROGRESSION\nCLASS PATH\nSUBCLASS AT LEVEL 5\n2 SKILL PTS\nA permanent class skill choice is waiting.\nCHOOSE SKILLS\nVIEW SUBCLASS\nGUILD BOND & CONTRACT\nLOYALTY\nSTEADY · 60\nWEEKLY PAY\n85 GOLD\nCONTRACT 80D\nSigned through Day 122\nPOTENTIAL\nScouted Potential\n50–67\nEstimated scouting range. True potential remains hidden."
+  },
+  {
+    "name": "TrainingGroundsScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fsummoner/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Ftiefling%2Fpaladin/male-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fveilborn%2Fmonk/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Fbulwark/female-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fspellbow/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "GUILDHAVEN FACILITY",
+          "font": 9
+        },
+        {
+          "text": "DAY 42 · 6,080 GOLD",
+          "font": 10
+        },
+        {
+          "text": "1/2 SLOTS",
+          "font": 8
+        },
+        {
+          "text": "TRAINING HALL",
+          "font": 7
+        },
+        {
+          "text": "2 concurrent training slots · 0 completed programs",
+          "font": 9
+        },
+        {
+          "text": "NEXT FACILITY LEVEL",
+          "font": 8
+        },
+        {
+          "text": "+1 SLOT",
+          "font": 8
+        },
+        {
+          "text": "1,800 gold · 5 days · capacity becomes 3",
+          "font": 9
+        },
+        {
+          "text": "SLOT 1 · TRAINING",
+          "font": 8
+        },
+        {
+          "text": "Adventuring Fundamentals",
+          "font": 9
+        },
+        {
+          "text": "2D LEFT",
+          "font": 8
+        },
+        {
+          "text": "+136 XP",
+          "font": 10
+        },
+        {
+          "text": "Readiness on return · 100",
+          "font": 9
+        },
+        {
+          "text": "Ready Day 44",
+          "font": 9
+        },
+        {
+          "text": "SLOT 2",
+          "font": 8
+        },
+        {
+          "text": "Assign an available hero below.",
+          "font": 9
+        },
+        {
+          "text": "Readiness 100",
+          "font": 9
+        },
+        {
+          "text": "Potential 50–67",
+          "font": 9
+        },
+        {
+          "text": "Readiness 100",
+          "font": 9
+        },
+        {
+          "text": "Potential 87–100",
+          "font": 9
+        },
+        {
+          "text": "Readiness 100",
+          "font": 9
+        },
+        {
+          "text": "Potential 67–91",
+          "font": 9
+        },
+        {
+          "text": "Readiness 100",
+          "font": 9
+        },
+        {
+          "text": "Potential 50–65",
+          "font": 9
+        },
+        {
+          "text": "Readiness 100",
+          "font": 9
+        },
+        {
+          "text": "Potential 61–83",
+          "font": 9
+        },
+        {
+          "text": "Readiness 100",
+          "font": 9
+        },
+        {
+          "text": "Potential 50–67",
+          "font": 9
+        },
+        {
+          "text": "Readiness 100",
+          "font": 9
+        },
+        {
+          "text": "Potential 50–72",
+          "font": 9
+        },
+        {
+          "text": "Readiness 100",
+          "font": 9
+        },
+        {
+          "text": "Potential 80–100",
+          "font": 9
+        },
+        {
+          "text": "Readiness 100",
+          "font": 9
+        },
+        {
+          "text": "Potential 50–66",
+          "font": 9
+        },
+        {
+          "text": "1D",
+          "font": 8
+        },
+        {
+          "text": "80G",
+          "font": 9
+        },
+        {
+          "text": "+68 XP",
+          "font": 9
+        },
+        {
+          "text": "XP ONLY",
+          "font": 8
+        },
+        {
+          "text": "2D",
+          "font": 8
+        },
+        {
+          "text": "160G",
+          "font": 9
+        },
+        {
+          "text": "+105 XP",
+          "font": 9
+        },
+        {
+          "text": "XP ONLY",
+          "font": 8
+        },
+        {
+          "text": "3D",
+          "font": 8
+        },
+        {
+          "text": "280G",
+          "font": 9
+        },
+        {
+          "text": "+184 XP",
+          "font": 9
+        },
+        {
+          "text": "XP ONLY",
+          "font": 8
+        },
+        {
+          "text": "HALL LV 3",
+          "font": 8
+        },
+        {
+          "text": "520G",
+          "font": 9
+        },
+        {
+          "text": "+315 XP",
+          "font": 9
+        },
+        {
+          "text": "XP ONLY",
+          "font": 8
+        },
+        {
+          "text": "SELECTED TRAINEE",
+          "font": 8
+        },
+        {
+          "text": "Sparring Drills · returns Day 43",
+          "font": 9
+        },
+        {
+          "text": "READY",
+          "font": 8
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "XP REWARD",
+          "font": 7
+        },
+        {
+          "text": "READINESS",
+          "font": 7
+        },
+        {
+          "text": "COST",
+          "font": 7
+        },
+        {
+          "text": "CURRENT XP · 0 / 5279",
+          "font": 8
+        },
+        {
+          "text": "AFTER TRAINING · 68 / 5279",
+          "font": 8
+        },
+        {
+          "text": "TRAINING CAP · LEVEL 5",
+          "font": 10
+        },
+        {
+          "text": "Training can catch this hero toward the campaign and strongest-roster limit, but cannot ov",
+          "font": 9
+        },
+        {
+          "text": "Daily calendar recovery still applies while training, so readiness can improve before the ",
+          "font": 9
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 2191,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nGUILDHAVEN FACILITY\nGuild Training Yard\nDAY 42 · 6,080 GOLD\n1/2 SLOTS\nTraining is controlled catch-up XP for heroes who are staying home. It never grants permanent attributes and it is intentionally weaker than actively clearing suitable quests.\nTRAINING HALL\nLEVEL 2\nVeteran Training Hall\n2 concurrent training slots · 0 completed programs\nNEXT FACILITY LEVEL\nTraining Hall Level 3\n+1 SLOT\n1,800 gold · 5 days · capacity becomes 3\nBEGIN UPGRADE · 1,800G\nACTIVE TRAINING\nSLOT 1 · TRAINING\nNorri Embermantle\nAdventuring Fundamentals\n2D LEFT\n+136 XP\nReadiness on return · 100\nReady Day 44\nSLOT 2\nAVAILABLE\nAssign an available hero below.\nOPEN GUILD CALENDAR\nSELECT HERO\nPercival Fairwind\nLV 4\nReadiness 100\nPotential 50–67\nSolveig Flintmantle\nLV 5\nReadiness 100\nPotential 87–100\nDaelis Moonshadow\nLV 6\nReadiness 100\nPotential 67–91\nAzhra Wolf-Breaker\nLV 7\nReadiness 100\nPotential 50–65\nMordai Redspire\nLV 4\nReadiness 100\nPotential 61–83\nOrris Starless\nLV 6\nReadiness 100\nPotential 50–67\nGwen Wainwright\nLV 7\nReadiness 100\nPotential 50–72\nElaria Willowmere\nLV 5\nReadiness 100\nPotential 80–100\nKrothu Skullcleaver\nLV 6\nReadiness 100\nPotential 50–66\nCHOOSE PROGRAM\nSparring Drills\nA short catch-up course that grants XP but never attributes.\n1D\n80G\n+68 XP\nXP ONLY\nAdventuring Fundamentals\nA two-day XP course for inexperienced recruits returning to field readiness.\n2D\n160G\n+105 XP\nXP ONLY\nClass Instruction\nVeteran tutors grant catch-up XP without increasing attributes.\n3D\n280G\n+184 XP\nXP ONLY\nHeroic Curriculum\nThe hall's strongest catch-up course. It grants levels through XP only.\nHALL LV 3\n520G\n+315 XP\nXP ONLY\nTRAINING ORDER\nSELECTED TRAINEE\nPercival Fairwind\nSparring Drills · returns Day 43\nREADY\nLEVEL\n4\nXP REWARD\n+68\nREADINESS\n100 → 100\nCOST\n80G\nCURRENT XP · 0 / 5279\nAFTER TRAINING · 68 / 5279\nTRAINING CAP · LEVEL 5\nTraining can catch this hero toward the campaign and strongest-roster limit, but cannot overtake current progression.\nDaily calendar recovery still applies while training, so readiness can improve before the hero returns. Training never grants permanent attributes.\nBEGIN SPARRING DRILLS · READY DAY 43"
+  },
+  {
+    "name": "RecruitmentScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Franger/male-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fcleric/female-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Franger/male-v3.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "GUILDHAVEN TAVERN",
+          "font": 10
+        },
+        {
+          "text": "RECRUITMENT BOARD",
+          "font": 9
+        },
+        {
+          "text": "DAY 42",
+          "font": 8
+        },
+        {
+          "text": "ROSTER",
+          "font": 7
+        },
+        {
+          "text": "TREASURY",
+          "font": 7
+        },
+        {
+          "text": "PAYROLL",
+          "font": 7
+        },
+        {
+          "text": "FRONTLINE 4",
+          "font": 8
+        },
+        {
+          "text": "SUPPORT 3",
+          "font": 8
+        },
+        {
+          "text": "RANGED 3",
+          "font": 8
+        },
+        {
+          "text": "CORE COVERAGE · Frontline, support, and ranged roles are represented.",
+          "font": 10
+        },
+        {
+          "text": "TAVERN ARRIVALS",
+          "font": 8
+        },
+        {
+          "text": "Next free refresh · 7 DAYS",
+          "font": 10
+        },
+        {
+          "text": "Manual refresh · 150 gold",
+          "font": 10
+        },
+        {
+          "text": "GUILDMASTER DEVELOPMENT",
+          "font": 9
+        },
+        {
+          "text": "REQUIRES · LEVEL 2 · 1 SKILL POINT",
+          "font": 9
+        },
+        {
+          "text": "RANGED",
+          "font": 8
+        },
+        {
+          "text": "NOTABLE",
+          "font": 8
+        },
+        {
+          "text": "ROSTER DEPTH",
+          "font": 8
+        },
+        {
+          "text": "LEAVES IN 7D",
+          "font": 8
+        },
+        {
+          "text": "POTENTIAL",
+          "font": 7
+        },
+        {
+          "text": "SIGNING FEE",
+          "font": 7
+        },
+        {
+          "text": "SALARY",
+          "font": 7
+        },
+        {
+          "text": "You already have 3 living ranged heroes.",
+          "font": 10
+        },
+        {
+          "text": "TRAITS · Sickly",
+          "font": 10
+        },
+        {
+          "text": "CONTRACT AFFORDABLE NOW",
+          "font": 8
+        },
+        {
+          "text": "After min. fee: 5714 G · Payroll after hire: 916–956 G/week · 24 weeks",
+          "font": 9
+        },
+        {
+          "text": "COMPARE",
+          "font": 9
+        },
+        {
+          "text": "PASS",
+          "font": 9
+        },
+        {
+          "text": "SUPPORT",
+          "font": 8
+        },
+        {
+          "text": "NOTABLE",
+          "font": 8
+        },
+        {
+          "text": "ROSTER DEPTH",
+          "font": 8
+        },
+        {
+          "text": "LEAVES IN 7D",
+          "font": 8
+        },
+        {
+          "text": "POTENTIAL",
+          "font": 7
+        },
+        {
+          "text": "SIGNING FEE",
+          "font": 7
+        },
+        {
+          "text": "SALARY",
+          "font": 7
+        },
+        {
+          "text": "You already have 3 living support heroes.",
+          "font": 10
+        },
+        {
+          "text": "TRAITS · Wanderer · Oathbound",
+          "font": 10
+        },
+        {
+          "text": "CONTRACT AFFORDABLE NOW",
+          "font": 8
+        },
+        {
+          "text": "After min. fee: 5672 G · Payroll after hire: 926–966 G/week · 24 weeks",
+          "font": 9
+        },
+        {
+          "text": "COMPARE",
+          "font": 9
+        },
+        {
+          "text": "PASS",
+          "font": 9
+        },
+        {
+          "text": "RANGED",
+          "font": 8
+        },
+        {
+          "text": "NOTABLE",
+          "font": 8
+        },
+        {
+          "text": "ROSTER DEPTH",
+          "font": 8
+        },
+        {
+          "text": "LEAVES IN 7D",
+          "font": 8
+        },
+        {
+          "text": "POTENTIAL",
+          "font": 7
+        },
+        {
+          "text": "SIGNING FEE",
+          "font": 7
+        },
+        {
+          "text": "SALARY",
+          "font": 7
+        },
+        {
+          "text": "You already have 3 living ranged heroes.",
+          "font": 10
+        },
+        {
+          "text": "TRAITS · Brave · Alert",
+          "font": 10
+        },
+        {
+          "text": "CONTRACT AFFORDABLE NOW",
+          "font": 8
+        },
+        {
+          "text": "After min. fee: 5711 G · Payroll after hire: 903–935 G/week · 24 weeks",
+          "font": 9
+        },
+        {
+          "text": "COMPARE",
+          "font": 9
+        },
+        {
+          "text": "PASS",
+          "font": 9
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 2344,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nGUILDHAVEN TAVERN\nAdventurers for Hire\nRead the person, the party fit, and the contract. Recruitment is a long-term guild decision, not just a stat purchase.\nRECRUITMENT BOARD\n3 adventurers available\nDAY 42\nROSTER\n11/8\nTREASURY\n6,080 G\nPAYROLL\n850/WK\nFRONTLINE 4\nSUPPORT 3\nRANGED 3\nCORE COVERAGE · Frontline, support, and ranged roles are represented.\nTAVERN ARRIVALS\nRefresh Candidate Board\nNext free refresh · 7 DAYS\nManual refresh · 150 gold\nREFRESH · 150G\nGUILDMASTER DEVELOPMENT\nRegional Scouting Locked\nReach Guildmaster Level 2 and learn Regional Network in Guild Hall → Manage → Guildmaster Skills. Regular recruitment remains available while you build experience through quests.\nREQUIRES · LEVEL 2 · 1 SKILL POINT\nCANDIDATES\nAldric Crowhurst\nHuman · Ranger · Lv 1\nRANGED\nNOTABLE\nROSTER DEPTH\nLEAVES IN 7D\nPOTENTIAL\n61–97\nSIGNING FEE\n366–586 G\nSALARY\n66–106/WK\nYou already have 3 living ranged heroes.\nTRAITS · Sickly\nCONTRACT AFFORDABLE NOW\nAfter min. fee: 5714 G · Payroll after hire: 916–956 G/week · 24 weeks\nINSPECT / SCOUT\nSIGN CONTRACT\nCOMPARE\nPASS\nHelena Blackwell\nHuman · Cleric · Lv 1\nSUPPORT\nNOTABLE\nROSTER DEPTH\nLEAVES IN 7D\nPOTENTIAL\n50–77\nSIGNING FEE\n408–612 G\nSALARY\n76–116/WK\nYou already have 3 living support heroes.\nTRAITS · Wanderer · Oathbound\nCONTRACT AFFORDABLE NOW\nAfter min. fee: 5672 G · Payroll after hire: 926–966 G/week · 24 weeks\nINSPECT / SCOUT\nSIGN CONTRACT\nCOMPARE\nPASS\nVondal Copperkeg\nDwarf · Ranger · Lv 1\nRANGED\nNOTABLE\nROSTER DEPTH\nLEAVES IN 7D\nPOTENTIAL\n62–98\nSIGNING FEE\n369–591 G\nSALARY\n53–85/WK\nYou already have 3 living ranged heroes.\nTRAITS · Brave · Alert\nCONTRACT AFFORDABLE NOW\nAfter min. fee: 5711 G · Payroll after hire: 903–935 G/week · 24 weeks\nINSPECT / SCOUT\nSIGN CONTRACT\nCOMPARE\nPASS"
+  },
+  {
+    "name": "HeroesScreen--Empty",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "DAY 1 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "5,000",
+          "font": 10
+        },
+        {
+          "text": "5",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "0",
+          "font": 10
+        },
+        {
+          "text": "GUILD HALL · ADVENTURERS",
+          "font": 9
+        },
+        {
+          "text": "0 / 8 roster slots · Day 1",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 7
+        },
+        {
+          "text": "ATTENTION",
+          "font": 7
+        },
+        {
+          "text": "TOP 4 AVG",
+          "font": 7
+        },
+        {
+          "text": "SKILL PTS",
+          "font": 7
+        },
+        {
+          "text": "ROSTER LEDGER",
+          "font": 10
+        },
+        {
+          "text": "0 SHOWN",
+          "font": 8
+        },
+        {
+          "text": "All",
+          "font": 10
+        },
+        {
+          "text": "Available",
+          "font": 10
+        },
+        {
+          "text": "Injured",
+          "font": 10
+        },
+        {
+          "text": "Fallen",
+          "font": 10
+        },
+        {
+          "text": "SORT ORDER",
+          "font": 8
+        },
+        {
+          "text": "Level",
+          "font": 10
+        },
+        {
+          "text": "Name",
+          "font": 10
+        },
+        {
+          "text": "Class",
+          "font": 10
+        },
+        {
+          "text": "Potential",
+          "font": 10
+        },
+        {
+          "text": "ADVENTURER CARDS",
+          "font": 10
+        },
+        {
+          "text": "Tap a hero to inspect equipment, skills, history & relationships.",
+          "font": 9
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "GUILD",
+          "font": 8
+        },
+        {
+          "text": "QUESTS",
+          "font": 8
+        },
+        {
+          "text": "WORLD",
+          "font": 8
+        },
+        {
+          "text": "HEROES",
+          "font": 8
+        },
+        {
+          "text": "ACTIVE",
+          "font": 6
+        },
+        {
+          "text": "INVENTORY",
+          "font": 8
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": null,
+    "text": "New Banner\n1\nDAY 1 · GUILDHAVEN\n5,000\n5\n1\n0\nGUILD HALL · ADVENTURERS\nHERO ROSTER\n0 / 8 roster slots · Day 1\nRECRUIT\n0\nFIELD READY\n0\nATTENTION\n0.0\nTOP 4 AVG\n0\nSKILL PTS\nROSTER LEDGER\n0 SHOWN\nAll\nAvailable\nInjured\nFallen\nSORT ORDER\nLevel\nName\nClass\nPotential\nADVENTURER CARDS\nTap a hero to inspect equipment, skills, history & relationships.\nYour roster is empty\nRecruit candidates to begin building your guild.\nOpen Recruitment\n1\nGUILD\nQUESTS\nWORLD\nHEROES\nACTIVE\nINVENTORY"
+  },
+  {
+    "name": "InventoryScreen--Empty",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "DAY 1 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "5,000",
+          "font": 10
+        },
+        {
+          "text": "5",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "0",
+          "font": 10
+        },
+        {
+          "text": "GUILD QUARTERMASTER",
+          "font": 9
+        },
+        {
+          "text": "POSSIBLE\nUPGRADES",
+          "font": 7
+        },
+        {
+          "text": "ARMORY TUTORIAL",
+          "font": 9
+        },
+        {
+          "text": "MATERIALS",
+          "font": 7
+        },
+        {
+          "text": "POTIONS",
+          "font": 7
+        },
+        {
+          "text": "GOLD",
+          "font": 7
+        },
+        {
+          "text": "All",
+          "font": 10
+        },
+        {
+          "text": "Weapons",
+          "font": 10
+        },
+        {
+          "text": "Armor",
+          "font": 10
+        },
+        {
+          "text": "Accessories",
+          "font": 10
+        },
+        {
+          "text": "Materials",
+          "font": 10
+        },
+        {
+          "text": "UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "GUILD",
+          "font": 8
+        },
+        {
+          "text": "QUESTS",
+          "font": 8
+        },
+        {
+          "text": "WORLD",
+          "font": 8
+        },
+        {
+          "text": "HEROES",
+          "font": 8
+        },
+        {
+          "text": "INVENTORY",
+          "font": 8
+        },
+        {
+          "text": "ACTIVE",
+          "font": 6
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": null,
+    "text": "New Banner\n1\nDAY 1 · GUILDHAVEN\n5,000\n5\n1\n0\nGUILD QUARTERMASTER\nArmory & Inventory\n0 stored gear · 0 equipped\n0\nPOSSIBLE\nUPGRADES\nARMORY TUTORIAL\nRead Gear Like a Guildmaster\nRarity shows scarcity, not automatic superiority. Look for LIKELY UPGRADE or BUILD TRADEOFF, then inspect the hero-by-hero comparison. Durability reduces item bonuses; DAMAGED or BROKEN gear should be repaired at the Blacksmith.\nGOT IT · OPEN THE ARMORY\n0\nMATERIALS\n0\nPOTIONS\n5000\nGOLD\nCRAFT / REPAIR\nGATHER\nPOTIONS\nAll\nWeapons\nArmor\nAccessories\nMaterials\nUPGRADES\n0\nNo equipment here\nCraft gear, complete quests, or send heroes on gathering missions to expand the guild inventory.\n1\nGUILD\nQUESTS\nWORLD\nHEROES\nINVENTORY\nACTIVE"
+  },
+  {
+    "name": "SettingsScreen--HighContrast",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [],
+      "smallText": [
+        {
+          "text": "PLAYER PREFERENCES",
+          "font": 10
+        },
+        {
+          "text": "The original charcoal, parchment, and gold presentation.",
+          "font": 10
+        },
+        {
+          "text": "True-black foundations with subdued panels for dark rooms and OLED displays.",
+          "font": 10
+        },
+        {
+          "text": "Brighter text, stronger borders, and clearer interactive states.",
+          "font": 10
+        },
+        {
+          "text": "Light Parchment will follow after remaining feature screens have moved to semantic theme c",
+          "font": 10
+        },
+        {
+          "text": "Shows the entire board when combat opens.",
+          "font": 10
+        },
+        {
+          "text": "Starts large battlefields at 135% zoom for clearer portraits.",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1728,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nPLAYER PREFERENCES\nSettings\nThese options are stored with this guild save and do not change combat balance.\nCOLOR THEME\n✓ Guild Dark\nThe original charcoal, parchment, and gold presentation.\nOLED Dark\nTrue-black foundations with subdued panels for dark rooms and OLED displays.\nHigh Contrast\nBrighter text, stronger borders, and clearer interactive states.\nLight Parchment will follow after remaining feature screens have moved to semantic theme colors.\nHELP & TUTORIALS\nGuildmaster Handbook\nReview the current tutorials for recruitment, the War Table, Side Quests, deployment checks, red-border basic attacks, the Guild Planner, hero progression, travel, archives, gear and durability, dungeons, and Raids.\nOpen Guildmaster Handbook\nACCESSIBILITY & FLOW\nReduced combat effects\nHides projectile and impact particle layers while preserving damage and condition information.\nConfirm End Turn\nRequests confirmation before ending a hero's turn, preventing accidental taps.\nCompact quest cards\nQuest lists initially show only the information needed to choose an activity.\nDEFAULT COMBAT CAMERA\nFit Battlefield\nShows the entire board when combat opens.\nCloser View\nStarts large battlefields at 135% zoom for clearer portraits.\nSAVE SLOTS\nCurrent guild · Save Slot —\nGuild progress autosaves to this slot. Return to the save selector to continue the other guild or start a new one.\nSave & Return to Save Select\nPRIVACY & ADS\nPrivacy and advertising choices\nRead how Guildmaster and Google Mobile Ads handle information, or review the advertising choices available in your region.\nPrivacy Policy\nManage Ad Privacy"
+  },
+  {
+    "name": "SkillTreeScreen--HighContrast",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fwarrior/sword-strike.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fwarrior/shield-bash.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fwarrior/power-strike.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fwarrior/battle-hardened.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fwarrior/shield-bash.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fberserker/whirlwind.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fcleric/heal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fspecializations/guardian_taunt.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fwarrior/power-strike.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fwarrior/battle-hardened.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fwarrior/power-strike.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fberserker/whirlwind.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fcleric/heal.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fwarrior/power-strike.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fwarrior/shield-bash.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fwarrior/shield-bash.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fspecializations/guardian_taunt.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fskills%2Fwarrior/battle-hardened.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "LEVEL 1 → LEVEL 10",
+          "font": 8
+        },
+        {
+          "text": "✓",
+          "font": 10
+        },
+        {
+          "text": "LEVEL 2 · FIRST TECHNIQUE",
+          "font": 7
+        },
+        {
+          "text": "LEVEL 4 · SPECIALIZATION",
+          "font": 7
+        },
+        {
+          "text": "LEVEL 6 · VETERAN TECHNIQUE",
+          "font": 7
+        },
+        {
+          "text": "LEVEL 8 · CLASS MASTERY",
+          "font": 7
+        },
+        {
+          "text": "LEVEL 5 & 10 · PERMANENT CLASS PATHS",
+          "font": 7
+        },
+        {
+          "text": "SUBCLASS",
+          "font": 6
+        },
+        {
+          "text": "MASTERY",
+          "font": 6
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1161,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nWarrior Skills\nPercival Fairwind · Level 4\n2\nAVAILABLE SKILL POINTS\nTap an icon to inspect it. Gold means available; green means learned.\nCLASS DEVELOPMENT\nLEVEL 1 → LEVEL 10\n✓\nLEVEL 2 · FIRST TECHNIQUE\nLEVEL 4 · SPECIALIZATION\nLEVEL 6 · VETERAN TECHNIQUE\n◆\n◆\nLEVEL 8 · CLASS MASTERY\n◆\n◆\nLEVEL 5 & 10 · PERMANENT CLASS PATHS\n◆\nSUBCLASS\n◆\nMASTERY\nRECOMMENDED BUILDS\nRecommendations only—you can combine skills freely.\nVanguard\nBulwark"
+  },
+  {
+    "name": "RegionMapScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/current.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fworld%2Fregions/greenveil-mainland-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/current.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/defeat.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/current.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/complete.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/boss.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/current.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/settlement.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/boss.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/complete.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame/current.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "LOCAL ROUTE BOARD",
+          "font": 9
+        },
+        {
+          "text": "Lv 1–15 · 8 mapped locations · Day 42",
+          "font": 10
+        },
+        {
+          "text": "REGION OPEN",
+          "font": 8
+        },
+        {
+          "text": "GUILD POSITION",
+          "font": 7
+        },
+        {
+          "text": "RATIONS",
+          "font": 6
+        },
+        {
+          "text": "ORDERS",
+          "font": 6
+        },
+        {
+          "text": "KNOWN",
+          "font": 6
+        },
+        {
+          "text": "THREAT",
+          "font": 6
+        },
+        {
+          "text": "FIELD",
+          "font": 6
+        },
+        {
+          "text": "Guildhaven",
+          "font": 7
+        },
+        {
+          "text": "1 ORDER",
+          "font": 5
+        },
+        {
+          "text": "HERE",
+          "font": 5
+        },
+        {
+          "text": "Highcourt",
+          "font": 7
+        },
+        {
+          "text": "1 ORDER",
+          "font": 5
+        },
+        {
+          "text": "Brambleford",
+          "font": 7
+        },
+        {
+          "text": "1 ORDER",
+          "font": 5
+        },
+        {
+          "text": "Tidewatch",
+          "font": 7
+        },
+        {
+          "text": "Mosswatch Ruins",
+          "font": 7
+        },
+        {
+          "text": "Blackbridge",
+          "font": 7
+        },
+        {
+          "text": "Greenveil Wardstone",
+          "font": 7
+        },
+        {
+          "text": "Thornroot Hideout",
+          "font": 7
+        },
+        {
+          "text": "YOU",
+          "font": 7
+        },
+        {
+          "text": "SETTLEMENT",
+          "font": 7
+        },
+        {
+          "text": "DUNGEON",
+          "font": 7
+        },
+        {
+          "text": "CLEARED",
+          "font": 7
+        },
+        {
+          "text": "Select a marker to inspect its services, orders and travel cost.",
+          "font": 8
+        },
+        {
+          "text": "CITY · KNOWN",
+          "font": 7
+        },
+        {
+          "text": "REGIONAL LOCATION",
+          "font": 8
+        },
+        {
+          "text": "GUILD HERE",
+          "font": 8
+        },
+        {
+          "text": "SERVICES",
+          "font": 6
+        },
+        {
+          "text": "ORDERS",
+          "font": 6
+        },
+        {
+          "text": "CLEARED",
+          "font": 6
+        },
+        {
+          "text": "SERVICES",
+          "font": 8
+        },
+        {
+          "text": "GUILD HALL",
+          "font": 7
+        },
+        {
+          "text": "RECRUITMENT",
+          "font": 7
+        },
+        {
+          "text": "TEMPLE",
+          "font": 7
+        },
+        {
+          "text": "EQUIPMENT SHOP",
+          "font": 7
+        },
+        {
+          "text": "QUEST BOARD",
+          "font": 7
+        },
+        {
+          "text": "TRAINING GROUNDS",
+          "font": 7
+        },
+        {
+          "text": "LOCAL ORDERS",
+          "font": 8
+        },
+        {
+          "text": "CAMPAIGN",
+          "font": 7
+        },
+        {
+          "text": "COMPLETE",
+          "font": 8
+        },
+        {
+          "text": "LV 1–2",
+          "font": 8
+        },
+        {
+          "text": "1 BATTLE",
+          "font": 8
+        },
+        {
+          "text": "80–120G",
+          "font": 8
+        },
+        {
+          "text": "300 XP",
+          "font": 8
+        },
+        {
+          "text": "SIDE · ONE CLEAR",
+          "font": 7
+        },
+        {
+          "text": "LOCKED",
+          "font": 8
+        },
+        {
+          "text": "LV 3–5",
+          "font": 8
+        },
+        {
+          "text": "1 BATTLE",
+          "font": 8
+        },
+        {
+          "text": "340–460G",
+          "font": 8
+        },
+        {
+          "text": "800 XP",
+          "font": 8
+        },
+        {
+          "text": "SIDE · ONE CLEAR",
+          "font": 7
+        },
+        {
+          "text": "READY",
+          "font": 8
+        },
+        {
+          "text": "LV 2–4",
+          "font": 8
+        },
+        {
+          "text": "2 BATTLES",
+          "font": 8
+        },
+        {
+          "text": "260–350G",
+          "font": 8
+        },
+        {
+          "text": "700 XP",
+          "font": 8
+        },
+        {
+          "text": "SIDE · ONE CLEAR",
+          "font": 7
+        },
+        {
+          "text": "LOCKED",
+          "font": 8
+        },
+        {
+          "text": "LV 5–5",
+          "font": 8
+        },
+        {
+          "text": "2 BATTLES",
+          "font": 8
+        },
+        {
+          "text": "760–920G",
+          "font": 8
+        },
+        {
+          "text": "480 XP",
+          "font": 8
+        },
+        {
+          "text": "REGIONAL CHRONICLE",
+          "font": 9
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1811,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nLOCAL ROUTE BOARD\nGreenveil\nLv 1–15 · 8 mapped locations · Day 42\nREGION OPEN\nGUILD POSITION\nGuildhaven\n48\nRATIONS\n1/21\nORDERS\n4/4\nKNOWN\n0/4\nTHREAT\n4 HEROES\nFIELD\nGuildhaven\n1 ORDER\nHERE\nHighcourt\n1 ORDER\nBrambleford\n1 ORDER\nTidewatch\nMosswatch Ruins\nBlackbridge\nGreenveil Wardstone\nThornroot Hideout\nYOU\nSETTLEMENT\nDUNGEON\nCLEARED\nSelect a marker to inspect its services, orders and travel cost.\nCITY · KNOWN\nGuildhaven\nREGIONAL LOCATION\nGUILD HERE\nThe guild's riverbound home city. Competing companies, merchants, temples, and adventurers crowd its fortified districts.\n6\nSERVICES\n1\nORDERS\n1/4\nCLEARED\nSERVICES\nGUILD HALL\nRECRUITMENT\nTEMPLE\nEQUIPMENT SHOP\nQUEST BOARD\nTRAINING GROUNDS\nCURRENT GUILD POSITION\nLOCAL ORDERS\nCAMPAIGN\nGoblin Patrol\nCOMPLETE\nLV 1–2\n1 BATTLE\n80–120G\n300 XP\nREVIEW ORDER\nSIDE · ONE CLEAR\nThe Brambleway Run\nLOCKED\nLV 3–5\n1 BATTLE\n340–460G\n800 XP\nSIDE · ONE CLEAR\nEchoes of Mosswatch\nREADY\nLV 2–4\n2 BATTLES\n260–350G\n700 XP\nOPEN ORDER\nSIDE · ONE CLEAR\nOath of the Broken Bridge\nLOCKED\nLV 5–5\n2 BATTLES\n760–920G\n480 XP\nREGIONAL CHRONICLE\nThe Crownroad Garden\nGreenveil is Eldoria's gentlest country: broad rivers, old oak forests, orchard hills, and market roads laid over much older paths. Its prosperity makes the region feel safe, but that safety is an agreement maintained by ferrymen, village militias, temples, and adventurer guilds. When any link fails, isolated farms and roadside settlements discover how wide the woods truly are.\nREAD FULL CHRONICLE"
+  }
+]

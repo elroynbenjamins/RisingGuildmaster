@@ -1,0 +1,105 @@
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { AccessibilityInfo, Animated, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import type { CombatUnit, CombatVisualEvent } from "../../game/combat/combatTypes";
+import { getCombatImpactSummary } from "../../game/combat/combatFeedbackService";
+import type { CombatBoardState, GridPosition } from "../../game/combat/grid/gridTypes";
+import { positionKey } from "../../game/combat/grid/gridTypes";
+import { MovementPath } from "./MovementPath";
+import { CombatTile } from "./CombatTile";
+import { CombatToken } from "./CombatToken";
+import { PixelCombatEffect, type TileCombatEffect } from "./PixelCombatEffect";
+import { PixelProjectileLayer } from "./PixelProjectileLayer";
+import { PixelConditionEffect } from "./PixelConditionEffect";
+import { PixelBattlefieldEventLayer } from "./PixelBattlefieldEventLayer";
+import type { Hero } from "../../game/heroes/types";
+import { useGuild } from "../../state/GuildContext";
+import { useTheme } from "../../theme/theme";
+import { getMovementBoundaryEdges } from "../../ui/combatBoardLayout";
+
+export function CombatBoard({ board, units, labels, enemyPortraitIds = {}, heroPortraits = {}, movementPath = [], effectsByPosition = {}, visualEvent = null, reachableKeys = new Set(), targetableKeys = new Set(), autoAttackableKeys = new Set(), affectedKeys = new Set(), hazardKeys = new Set(), safeKeys = new Set(), objectiveKeys = new Set(), selectedUnitId, selectedPosition, onTilePress }: { board: CombatBoardState; units: readonly CombatUnit[]; labels: Readonly<Record<string, string>>; enemyPortraitIds?: Readonly<Record<string, string>>; heroPortraits?: Readonly<Record<string, Hero>>; movementPath?: readonly GridPosition[]; effectsByPosition?: Readonly<Record<string, TileCombatEffect>>; visualEvent?: CombatVisualEvent | null; reachableKeys?: ReadonlySet<string>; targetableKeys?: ReadonlySet<string>; autoAttackableKeys?: ReadonlySet<string>; affectedKeys?: ReadonlySet<string>; hazardKeys?: ReadonlySet<string>; safeKeys?: ReadonlySet<string>; objectiveKeys?: ReadonlySet<string>; selectedUnitId?: string; selectedPosition?: GridPosition; onTilePress(position: GridPosition, occupantId: string | null): void }) {
+  const { guild } = useGuild();
+  const { colors } = useTheme();
+  const [boardWidth, setBoardWidth] = useState(0);
+  const [viewportWidth, setViewportWidth] = useState(0);
+  const [zoom, setZoom] = useState(guild.uiPreferences.defaultCombatZoom === "close" && board.width >= 9 ? 1.35 : 1);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const shake = useRef(new Animated.Value(0)).current;
+  const impactFlash = useRef(new Animated.Value(0)).current;
+  const blockedKeys = useMemo(() => new Set(board.tiles.filter((tile) => tile.blocksMovement).map((tile) => positionKey(tile.position))), [board.tiles]);
+  const byId = useMemo(() => new Map(units.map((unit) => [unit.combatantId, unit])), [units]);
+  const impact = useMemo(() => getCombatImpactSummary(visualEvent, units), [visualEvent, units]);
+  const changeZoom = (amount: number) => setZoom((value) => Math.max(1, Math.min(2, Math.round((value + amount) * 4) / 4)));
+  const displayedEvent = guild.uiPreferences.reduceCombatEffects ? null : visualEvent;
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReducedMotion);
+    const subscription = AccessibilityInfo.addEventListener("reduceMotionChanged", setReducedMotion);
+    return () => subscription.remove();
+  }, []);
+  useEffect(() => {
+    if (!displayedEvent || reducedMotion || impact.shakeStrength <= 0) return;
+    const amount = impact.shakeStrength;
+    shake.setValue(0);
+    impactFlash.setValue(0);
+    Animated.parallel([
+      Animated.sequence([
+        Animated.timing(shake, { toValue: -amount, duration: 45, useNativeDriver: true }),
+        Animated.timing(shake, { toValue: amount, duration: 55, useNativeDriver: true }),
+        Animated.timing(shake, { toValue: -Math.max(1, amount - 1), duration: 45, useNativeDriver: true }),
+        Animated.timing(shake, { toValue: 0, duration: 55, useNativeDriver: true }),
+      ]),
+      Animated.sequence([
+        Animated.timing(impactFlash, { toValue: 1, duration: 70, useNativeDriver: true }),
+        Animated.timing(impactFlash, { toValue: 0, duration: impact.kind === "defeat" || impact.kind === "critical" ? 260 : 160, useNativeDriver: true }),
+      ]),
+    ]).start();
+  }, [displayedEvent?.id, impact.kind, impact.shakeStrength, impactFlash, reducedMotion, shake]);
+
+  const impactColor = impact.kind === "defeat" ? "#ffcf66" : impact.kind === "critical" ? "#fff0a8" : "#ff6e60";
+  return <View onLayout={(event: any) => setViewportWidth(event.nativeEvent.layout.width)}>
+    <View style={styles.cameraBar}>
+      <View><Text style={[styles.cameraTitle, { color: colors.gold }]}>TACTICAL CAMERA</Text><Text style={[styles.cameraHint, { color: colors.muted }]}>{zoom === 1 ? "Fit board" : "Drag sideways to inspect the field"}</Text></View>
+      <View style={styles.cameraActions}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Zoom combat map out" disabled={zoom <= 1} onPress={() => changeZoom(-.25)} style={[styles.cameraButton, { backgroundColor: colors.panel2, borderColor: colors.border }, zoom <= 1 && styles.disabled]}><Text style={[styles.cameraButtonText, { color: colors.text }]}>−</Text></Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Reset and fit combat map" onPress={() => setZoom(1)} style={[styles.fitButton, { backgroundColor: colors.panel, borderColor: colors.gold }]}><Text style={[styles.fitText, { color: colors.gold }]}>{zoom === 1 ? "FIT" : `${Math.round(zoom * 100)}%`}</Text></Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Zoom combat map in" disabled={zoom >= 2} onPress={() => changeZoom(.25)} style={[styles.cameraButton, { backgroundColor: colors.panel2, borderColor: colors.border }, zoom >= 2 && styles.disabled]}><Text style={[styles.cameraButtonText, { color: colors.text }]}>+</Text></Pressable>
+      </View>
+    </View>
+    <ScrollView horizontal bounces={false} showsHorizontalScrollIndicator={zoom > 1} contentContainerStyle={styles.cameraContent}>
+      <Animated.View onLayout={(event: any) => setBoardWidth(event.nativeEvent.layout.width)} accessibilityLabel={`${board.width} by ${board.height} tactical combat board at ${Math.round(zoom * 100)} percent zoom`} style={[styles.board, { aspectRatio: board.width / board.height, width: Math.max(1, viewportWidth) * zoom, transform: [{ translateX: shake }] }] }>
+        {board.tiles.map((tile) => {
+          const key = positionKey(tile.position);
+          const occupant = tile.occupantId ? byId.get(tile.occupantId) : undefined;
+          const unit = occupant?.isAlive ? occupant : undefined;
+          const hero = unit?.side === "heroes" ? heroPortraits[unit.combatantId] ?? guild.heroes.find((item) => item.id === unit.combatantId) : undefined;
+          const effect = guild.uiPreferences.reduceCombatEffects ? undefined : effectsByPosition[key];
+          return <CombatTile key={key} tile={tile} columns={board.width} rows={board.height} nearWall={[[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => blockedKeys.has(positionKey({ x: tile.position.x + dx!, y: tile.position.y + dy! })))} reachable={reachableKeys.has(key)} movementBoundary={reachableKeys.has(key) ? getMovementBoundaryEdges(tile.position, reachableKeys, blockedKeys, board.width, board.height) : undefined} targetable={targetableKeys.has(key)} autoAttackable={autoAttackableKeys.has(key)} affected={affectedKeys.has(key)} hazard={hazardKeys.has(key)} safe={safeKeys.has(key)} objective={objectiveKeys.has(key)} selected={selectedPosition ? positionKey(selectedPosition) === key : false} onPress={() => onTilePress(tile.position, unit?.combatantId ?? null)}>
+            {unit ? <CombatToken label={labels[unit.combatantId] ?? "?"} side={unit.side} enemyDefinitionId={enemyPortraitIds[unit.combatantId]} hero={hero} size={board.width >= 13 ? Math.round(20 * zoom) : Math.round(27 * zoom)} selected={unit.combatantId === selectedUnitId} attackable={targetableKeys.has(key)} currentHP={unit.currentHP} maxHP={unit.maxHP} /> : null}
+            {unit ? <PixelConditionEffect conditionIds={unit.activeConditions.map((condition) => condition.conditionId)} /> : null}
+            {effect ? <PixelCombatEffect effect={effect} /> : null}
+          </CombatTile>;
+        })}
+        <MovementPath path={movementPath} columns={board.width} rows={board.height} />
+        <PixelProjectileLayer event={displayedEvent} units={units} width={boardWidth} columns={board.width} />
+        <PixelBattlefieldEventLayer event={displayedEvent} units={units} width={boardWidth} columns={board.width} />
+        <Animated.View pointerEvents="none" style={[styles.impactFlash, { borderColor: impactColor, opacity: impactFlash }]} />
+        <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderWidth: 2, borderColor: colors.border }]} />
+      </Animated.View>
+    </ScrollView>
+  </View>;
+}
+
+const styles = StyleSheet.create({
+  cameraBar: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginTop: 9 },
+  cameraTitle: { color: "#d8ad5c", fontSize: 9, fontWeight: "900", letterSpacing: .8 },
+  cameraHint: { color: "#9ca7b9", fontSize: 9, marginTop: 2 },
+  cameraActions: { alignItems: "center", flexDirection: "row", gap: 5 },
+  cameraButton: { alignItems: "center", backgroundColor: "#202a3d", borderColor: "#69758a", borderRadius: 2, borderWidth: 1, height: 32, justifyContent: "center", width: 34 },
+  cameraButtonText: { color: "#f3f4f7", fontSize: 20, fontWeight: "900", lineHeight: 22 },
+  fitButton: { alignItems: "center", backgroundColor: "#172033", borderColor: "#d8ad5c", borderRadius: 2, borderWidth: 2, height: 32, justifyContent: "center", width: 50 },
+  fitText: { color: "#d8ad5c", fontSize: 10, fontWeight: "900" },
+  disabled: { opacity: .35 },
+  cameraContent: { minWidth: "100%" },
+  board: { position: "relative", borderRadius: 2, overflow: "hidden", marginVertical: 8 },
+  impactFlash: { bottom: 0, left: 0, position: "absolute", right: 0, top: 0, borderWidth: 4, zIndex: 45 },
+});

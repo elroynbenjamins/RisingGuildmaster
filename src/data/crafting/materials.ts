@@ -1,0 +1,26 @@
+import type { MaterialDefinition, MaterialId } from "../../game/crafting/craftingTypes";
+
+export const MATERIALS: Record<MaterialId, MaterialDefinition> = {
+  iron_ore: { id: "iron_ore", name: "Iron Ore", rarity: "common", description: "Reliable ore used for martial weapons and heavy protection.", sourceTags: ["mine", "goblins", "orcs"] },
+  coal: { id: "coal", name: "Forge Coal", rarity: "common", description: "Dense fuel required to reach armor-forging temperatures.", sourceTags: ["mine", "bandits"] },
+  silver_ore: { id: "silver_ore", name: "Silver Ore", rarity: "uncommon", description: "A magically receptive metal favored by jewelers and monster hunters.", sourceTags: ["mine", "undead"] },
+  oak_timber: { id: "oak_timber", name: "Seasoned Oak", rarity: "common", description: "Straight-grained timber for bows, staves, shields, and tool handles.", sourceTags: ["forest", "goblins"] },
+  wolf_pelt: { id: "wolf_pelt", name: "Dire Wolf Pelt", rarity: "common", description: "Tough hide suited to mobile armor and reinforced boots.", sourceTags: ["beasts", "forest"] },
+  spider_silk: { id: "spider_silk", name: "Spider Silk", rarity: "uncommon", description: "Light, stronger than ordinary thread, and naturally receptive to enchantment.", sourceTags: ["spiders", "shadowfen"] },
+  arcane_dust: { id: "arcane_dust", name: "Arcane Dust", rarity: "uncommon", description: "Residue from magical creatures, relics, and unstable spells.", sourceTags: ["magic", "undead", "wardstones"] },
+  rough_ruby: { id: "rough_ruby", name: "Rough Ruby", rarity: "rare", description: "A fire-aspected gemstone used for aggressive enchantments.", sourceTags: ["mine", "ashlands"] },
+  rough_sapphire: { id: "rough_sapphire", name: "Rough Sapphire", rarity: "rare", description: "A protective gemstone associated with mana and magical resistance.", sourceTags: ["mine", "frostmarch"] },
+  rough_topaz: { id: "rough_topaz", name: "Rough Topaz", rarity: "rare", description: "A precision-aspected stone used to sharpen reflexive enchantments.", sourceTags: ["ruins", "bandits"] },
+  serpent_scale: { id: "serpent_scale", name: "Serpent Scale", rarity: "uncommon", description: "A flexible scale from the Sunken Grove's apex predator.", sourceTags: ["great_forest_serpent", "greenveil"] },
+  venom_gland: { id: "venom_gland", name: "Venom Gland", rarity: "rare", description: "An alchemical organ that retains the Great Serpent's potent venom.", sourceTags: ["great_forest_serpent"] },
+  serpent_fang: { id: "serpent_fang", name: "Serpent Fang", rarity: "uncommon", description: "A recurved fang prized by bowyers and jewelers.", sourceTags: ["great_forest_serpent"] },
+  armored_scute: { id: "armored_scute", name: "Armored Scute", rarity: "uncommon", description: "A sewer crocodile's bony plate, hard enough to turn a blade.", sourceTags: ["sewer_crocodile", "guildhaven"] },
+  ancient_hide: { id: "ancient_hide", name: "Ancient Hide", rarity: "uncommon", description: "Waterproof hide scarred by decades beneath Guildhaven.", sourceTags: ["sewer_crocodile"] },
+  crocodile_tooth: { id: "crocodile_tooth", name: "Crocodile Tooth", rarity: "rare", description: "A heavy tooth with an edge suitable for brutal enchantments.", sourceTags: ["sewer_crocodile"] },
+  white_maw_pelt: { id: "white_maw_pelt", name: "White Maw Pelt", rarity: "rare", description: "Dense yeti fur that holds warmth even inside a Frostmarch whiteout.", sourceTags: ["frostmarch_yeti", "frostmarch"] },
+  yeti_fang: { id: "yeti_fang", name: "Yeti Fang", rarity: "rare", description: "An ice-cold trophy from the White Maw.", sourceTags: ["frostmarch_yeti"] },
+  frost_crystal: { id: "frost_crystal", name: "Frost Crystal", rarity: "rare", description: "A stable shard condensed from the magic surrounding a Frostmarch hunt.", sourceTags: ["frost_wisp", "frostmarch_yeti"] },
+  serpent_recipe_fragment: { id: "serpent_recipe_fragment", name: "Coil-Carved Pattern", rarity: "rare", description: "One of three monster-hunter pattern fragments recovered from the Sunken Grove.", sourceTags: ["great_forest_serpent", "recipe_fragment"] },
+  crocodile_recipe_fragment: { id: "crocodile_recipe_fragment", name: "Floodgate Pattern", rarity: "rare", description: "One of three water-stained crafting diagrams hidden in the old sewers.", sourceTags: ["sewer_crocodile", "recipe_fragment"] },
+  yeti_recipe_fragment: { id: "yeti_recipe_fragment", name: "White Maw Pattern", rarity: "rare", description: "One of three runic fragments needed to reproduce Frostmarch trophy gear.", sourceTags: ["frostmarch_yeti", "recipe_fragment"] },
+};

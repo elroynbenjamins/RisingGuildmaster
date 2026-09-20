@@ -1,0 +1,11 @@
+{
+  "path": "C:\\Users\\elroy\\OneDrive\\Documents\\ChatGPT\\Guildmaster\\release\\RisingGuildmaster-0.1.0-build12-production.aab",
+  "bytes": 140487503,
+  "sha256": "4C6696D08580B81CDBF9238FF1C4B40D4AC410D9B79AD82BDD9BA82A10818AEC",
+  "package": "com.elroybenjamins.risingguildmaster",
+  "runtimeWebpCount": 1310,
+  "compressedWebpBytes": 76469536.0,
+  "signatureVerified": true,
+  "signingCertificateMatchesBuild11": true,
+  "certificateSha256": "SHA256: D2:9F:3F:13:AF:68:10:DA:B5:8B:31:40:BE:23:9D:D9:3E:AA:1C:C8:EC:DC:32:7C:C9:94:DF:E3:28:8D:04:F5"
+}

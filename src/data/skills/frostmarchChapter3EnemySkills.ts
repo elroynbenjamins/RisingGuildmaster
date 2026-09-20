@@ -1,0 +1,16 @@
+import type { CombatSkillDefinition, SkillModifier } from "../../game/combat/skillTypes";
+const permanent = (stat: string, operation: SkillModifier["operation"], value: number): SkillModifier => ({ stat, operation, value, durationTurns: -1 });
+export const FROSTMARCH_CHAPTER_3_ENEMY_SKILLS: Record<string, CombatSkillDefinition> = {
+  rimefang_bite: { id: "rimefang_bite", name: "Rimefang Bite", type: "basic_attack", damageType: "physical", damageMultiplier: 1.1, targetType: "single_enemy", cooldownTurns: 0, range: 1 },
+  rime_pounce: { id: "rime_pounce", name: "Rime Pounce", type: "active", damageType: "physical", damageMultiplier: 1.25, attackRollModifier: 1, targetType: "single_enemy", cooldownTurns: 3, range: 1, targetModifiers: [{ stat: "movementRange", operation: "flat", value: -1, durationTurns: 2 }] },
+  frozen_halberd: { id: "frozen_halberd", name: "Frozen Halberd", type: "basic_attack", damageType: "physical", damageMultiplier: 1.2, targetType: "single_enemy", cooldownTurns: 0, range: 2 },
+  deathless_watch: { id: "deathless_watch", name: "Deathless Watch", type: "passive", selfModifiers: [permanent("armorClass", "flat", 2)] },
+  aurora_lance: { id: "aurora_lance", name: "Aurora Lance", type: "basic_attack", damageType: "magic", damageMultiplier: 1.1, targetType: "single_enemy", cooldownTurns: 0, range: 6 },
+  false_sky_chorus: { id: "false_sky_chorus", name: "False-Sky Chorus", type: "active", targetType: "all_allies", cooldownTurns: 4, range: 4, targetModifiers: [{ stat: "attackRollModifier", operation: "flat", value: 2, durationTurns: 2 }, { stat: "speed", operation: "percentage", value: .10, durationTurns: 2 }] },
+  hroth_greataxe: { id: "hroth_greataxe", name: "Winter Greataxe", type: "basic_attack", damageType: "physical", damageMultiplier: 1.35, attackRollModifier: -1, targetType: "single_enemy", cooldownTurns: 0, range: 1 },
+  blue_horn_call: { id: "blue_horn_call", name: "Call of the Blue Horn", type: "aura", aura: { target: "same_faction_allies", factionId: "beasts", excludeSelf: true, modifiers: [permanent("attackRollModifier", "flat", 2), permanent("physicalDamage", "percentage", .15)] } },
+  iceblood_fury: { id: "iceblood_fury", name: "Iceblood Fury", type: "passive", conditionalModifiers: [{ conditions: { selfHpRatioMax: .4 }, modifiers: [permanent("physicalDamage", "percentage", .30), permanent("speed", "percentage", .15)] }] },
+  drake_fang: { id: "drake_fang", name: "Pale Fang", type: "basic_attack", damageType: "physical", damageMultiplier: 1.3, targetType: "single_enemy", cooldownTurns: 0, range: 1 },
+  pale_breath: { id: "pale_breath", name: "Pale Breath", type: "active", damageType: "magic", damageMultiplier: 1.05, targetType: "all_enemies", cooldownTurns: 3, range: 4, targetModifiers: [{ stat: "movementRange", operation: "flat", value: -2, durationTurns: 1 }] },
+  echo_of_the_first: { id: "echo_of_the_first", name: "Echo of the First Crown", type: "passive", conditionalModifiers: [{ conditions: { selfHpRatioMax: .65 }, modifiers: [permanent("magicDamage", "percentage", .20)] }, { conditions: { selfHpRatioMax: .30 }, modifiers: [permanent("physicalDamage", "percentage", .25), permanent("speed", "percentage", .20)] }] },
+};

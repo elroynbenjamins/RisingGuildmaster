@@ -1,0 +1,2595 @@
+[
+  {
+    "name": "GuildScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/temple.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/recruitment.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/temple.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/management.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 8
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "6,080",
+          "font": 10
+        },
+        {
+          "text": "35",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "180",
+          "font": 10
+        },
+        {
+          "text": "ACTIVE ORDERS",
+          "font": 7
+        },
+        {
+          "text": "TRAINING · 1",
+          "font": 8
+        },
+        {
+          "text": "2D",
+          "font": 7
+        },
+        {
+          "text": "GUILD HALL · WAR TABLE",
+          "font": 9
+        },
+        {
+          "text": "GUILD DAY",
+          "font": 7
+        },
+        {
+          "text": "THE WAYFARERS",
+          "font": 10
+        },
+        {
+          "text": "TREASURY",
+          "font": 7
+        },
+        {
+          "text": "REPUTATION",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 7
+        },
+        {
+          "text": "LOCATION",
+          "font": 7
+        },
+        {
+          "text": "GUILDMASTER",
+          "font": 8
+        },
+        {
+          "text": "0 / 100 XP · 0 skill points",
+          "font": 10
+        },
+        {
+          "text": "LEADERSHIP TREE ›",
+          "font": 8
+        },
+        {
+          "text": "IMMEDIATE ACTION",
+          "font": 8
+        },
+        {
+          "text": "1/2 BUSY",
+          "font": 8
+        },
+        {
+          "text": "A ready hero can use downtime to gain XP and develop toward the current campaign progressi",
+          "font": 10
+        },
+        {
+          "text": "ASSIGN TRAINING ›",
+          "font": 8
+        },
+        {
+          "text": "RECRUIT",
+          "font": 9
+        },
+        {
+          "text": "Tavern Board",
+          "font": 7
+        },
+        {
+          "text": "TRAIN",
+          "font": 9
+        },
+        {
+          "text": "Training Hall",
+          "font": 7
+        },
+        {
+          "text": "TEMPLE",
+          "font": 9
+        },
+        {
+          "text": "Recovery",
+          "font": 7
+        },
+        {
+          "text": "MANAGE",
+          "font": 9
+        },
+        {
+          "text": "Guild Services",
+          "font": 7
+        },
+        {
+          "text": "NEXT MILESTONE",
+          "font": 8
+        },
+        {
+          "text": "+10% MAX HP",
+          "font": 7
+        },
+        {
+          "text": "+25 READINESS",
+          "font": 7
+        },
+        {
+          "text": "+43 GOLD",
+          "font": 7
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 8
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1256,
+      "viewport": 652
+    },
+    "text": "The Wayfarers\n3\nDAY 42 · GUILDHAVEN\n6,080\n35\n1\n180\nACTIVE ORDERS\nTRAINING · 1\n2D\nGUILD HALL · WAR TABLE\nCommand Center\nGUILD DAY\n42\nTHE WAYFARERS\nTREASURY\n6,080 G\nREPUTATION\n180\nFIELD READY\n9/11\nLOCATION\nGuildhaven\nGUILDMASTER\nLV 1\n0 / 100 XP · 0 skill points\nLEADERSHIP TREE ›\nCURRENT ORDER\nIMMEDIATE ACTION\nAttend to the Fallen\n1 hero is awaiting revival at the Temple of Renewal.\nOpen Temple\nGUILD ORDERS · 1\n1/2 BUSY\n›\n1 Training Slot Open\nA ready hero can use downtime to gain XP and develop toward the current campaign progression cap.\nASSIGN TRAINING ›\nGUILD FACILITIES\nRECRUIT\nTavern Board\nTRAIN\nTraining Hall\nTEMPLE\nRecovery\nMANAGE\nGuild Services\nCALENDAR WATCH\nNEXT MILESTONE\nDay 44 · +2 days\nD43\nNorri Embermantle completed training and is available again.\n+10% MAX HP\n+25 READINESS\n+43 GOLD\nEnd Day\nOpen 7-Day Planner\nRECENT PARTY\nNo recent party\nAssemble a party from a quest and your latest adventurers will appear here.\nView heroes\n1\nGuild\nQuests\nWorld\n2\nHeroes\nInventory"
+  },
+  {
+    "name": "GuildScreen--HighContrast--390",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/temple.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/recruitment.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/temple.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/management.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 8
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "6,080",
+          "font": 10
+        },
+        {
+          "text": "35",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "180",
+          "font": 10
+        },
+        {
+          "text": "ACTIVE ORDERS",
+          "font": 7
+        },
+        {
+          "text": "TRAINING · 1",
+          "font": 8
+        },
+        {
+          "text": "2D",
+          "font": 7
+        },
+        {
+          "text": "GUILD HALL · WAR TABLE",
+          "font": 9
+        },
+        {
+          "text": "GUILD DAY",
+          "font": 7
+        },
+        {
+          "text": "THE WAYFARERS",
+          "font": 10
+        },
+        {
+          "text": "TREASURY",
+          "font": 7
+        },
+        {
+          "text": "REPUTATION",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 7
+        },
+        {
+          "text": "LOCATION",
+          "font": 7
+        },
+        {
+          "text": "GUILDMASTER",
+          "font": 8
+        },
+        {
+          "text": "0 / 100 XP · 0 skill points",
+          "font": 10
+        },
+        {
+          "text": "LEADERSHIP TREE ›",
+          "font": 8
+        },
+        {
+          "text": "IMMEDIATE ACTION",
+          "font": 8
+        },
+        {
+          "text": "1/2 BUSY",
+          "font": 8
+        },
+        {
+          "text": "A ready hero can use downtime to gain XP and develop toward the current campaign progressi",
+          "font": 10
+        },
+        {
+          "text": "ASSIGN TRAINING ›",
+          "font": 8
+        },
+        {
+          "text": "RECRUIT",
+          "font": 9
+        },
+        {
+          "text": "Tavern Board",
+          "font": 7
+        },
+        {
+          "text": "TRAIN",
+          "font": 9
+        },
+        {
+          "text": "Training Hall",
+          "font": 7
+        },
+        {
+          "text": "TEMPLE",
+          "font": 9
+        },
+        {
+          "text": "Recovery",
+          "font": 7
+        },
+        {
+          "text": "MANAGE",
+          "font": 9
+        },
+        {
+          "text": "Guild Services",
+          "font": 7
+        },
+        {
+          "text": "NEXT MILESTONE",
+          "font": 8
+        },
+        {
+          "text": "+10% MAX HP",
+          "font": 7
+        },
+        {
+          "text": "+25 READINESS",
+          "font": 7
+        },
+        {
+          "text": "+43 GOLD",
+          "font": 7
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 8
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1175,
+      "viewport": 652
+    },
+    "text": "The Wayfarers\n3\nDAY 42 · GUILDHAVEN\n6,080\n35\n1\n180\nACTIVE ORDERS\nTRAINING · 1\n2D\nGUILD HALL · WAR TABLE\nCommand Center\nGUILD DAY\n42\nTHE WAYFARERS\nTREASURY\n6,080 G\nREPUTATION\n180\nFIELD READY\n9/11\nLOCATION\nGuildhaven\nGUILDMASTER\nLV 1\n0 / 100 XP · 0 skill points\nLEADERSHIP TREE ›\nCURRENT ORDER\nIMMEDIATE ACTION\nAttend to the Fallen\n1 hero is awaiting revival at the Temple of Renewal.\nOpen Temple\nGUILD ORDERS · 1\n1/2 BUSY\n›\n1 Training Slot Open\nA ready hero can use downtime to gain XP and develop toward the current campaign progression cap.\nASSIGN TRAINING ›\nGUILD FACILITIES\nRECRUIT\nTavern Board\nTRAIN\nTraining Hall\nTEMPLE\nRecovery\nMANAGE\nGuild Services\nCALENDAR WATCH\nNEXT MILESTONE\nDay 44 · +2 days\nD43\nNorri Embermantle completed training and is available again.\n+10% MAX HP\n+25 READINESS\n+43 GOLD\nEnd Day\nOpen 7-Day Planner\nRECENT PARTY\nNo recent party\nAssemble a party from a quest and your latest adventurers will appear here.\nView heroes\n1\nGuild\nQuests\nWorld\n2\nHeroes\nInventory"
+  },
+  {
+    "name": "HeroesScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fspellbow/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fveilborn%2Fmonk/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fstoneborn%2Fberserker/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Fbulwark/female-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Ftiefling%2Fpaladin/male-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fsummoner/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 8
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "6,080",
+          "font": 10
+        },
+        {
+          "text": "35",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "180",
+          "font": 10
+        },
+        {
+          "text": "ACTIVE ORDERS",
+          "font": 7
+        },
+        {
+          "text": "TRAINING · 1",
+          "font": 8
+        },
+        {
+          "text": "2D",
+          "font": 7
+        },
+        {
+          "text": "GUILD HALL · ADVENTURERS",
+          "font": 9
+        },
+        {
+          "text": "11 / 8 roster slots · Day 42",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 7
+        },
+        {
+          "text": "ATTENTION",
+          "font": 7
+        },
+        {
+          "text": "TOP 4 AVG",
+          "font": 7
+        },
+        {
+          "text": "SKILL PTS",
+          "font": 7
+        },
+        {
+          "text": "⚑ TEMPLE ATTENTION REQUIRED",
+          "font": 10
+        },
+        {
+          "text": "ROSTER LEDGER",
+          "font": 10
+        },
+        {
+          "text": "11 SHOWN",
+          "font": 8
+        },
+        {
+          "text": "All",
+          "font": 10
+        },
+        {
+          "text": "Available",
+          "font": 10
+        },
+        {
+          "text": "Injured",
+          "font": 10
+        },
+        {
+          "text": "Fallen",
+          "font": 10
+        },
+        {
+          "text": "SORT ORDER",
+          "font": 8
+        },
+        {
+          "text": "Level",
+          "font": 10
+        },
+        {
+          "text": "Name",
+          "font": 10
+        },
+        {
+          "text": "Class",
+          "font": 10
+        },
+        {
+          "text": "Potential",
+          "font": 10
+        },
+        {
+          "text": "ADVENTURER CARDS",
+          "font": 10
+        },
+        {
+          "text": "Tap a hero to inspect equipment, skills, history & relationships.",
+          "font": 9
+        },
+        {
+          "text": "MAGE",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "Orc · Mage",
+          "font": 10
+        },
+        {
+          "text": "★ 3",
+          "font": 10
+        },
+        {
+          "text": "Available for quests",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "272/272",
+          "font": 9
+        },
+        {
+          "text": "READINESS",
+          "font": 8
+        },
+        {
+          "text": "100/100",
+          "font": 9
+        },
+        {
+          "text": "XP TO LV 8",
+          "font": 8
+        },
+        {
+          "text": "0/10331",
+          "font": 9
+        },
+        {
+          "text": "STEADY 60",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT 80D",
+          "font": 8
+        },
+        {
+          "text": "POT 50–65",
+          "font": 8
+        },
+        {
+          "text": "INSPECT ›",
+          "font": 10
+        },
+        {
+          "text": "BARD",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "Human · Bard",
+          "font": 10
+        },
+        {
+          "text": "★ 3",
+          "font": 10
+        },
+        {
+          "text": "Available for quests",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "282/282",
+          "font": 9
+        },
+        {
+          "text": "READINESS",
+          "font": 8
+        },
+        {
+          "text": "100/100",
+          "font": 9
+        },
+        {
+          "text": "XP TO LV 8",
+          "font": 8
+        },
+        {
+          "text": "0/10331",
+          "font": 9
+        },
+        {
+          "text": "STEADY 60",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT 80D",
+          "font": 8
+        },
+        {
+          "text": "POT 50–72",
+          "font": 8
+        },
+        {
+          "text": "INSPECT ›",
+          "font": 10
+        },
+        {
+          "text": "RANGER",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "Elf · Ranger",
+          "font": 10
+        },
+        {
+          "text": "★ 3",
+          "font": 10
+        },
+        {
+          "text": "Available for quests",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "290/290",
+          "font": 9
+        },
+        {
+          "text": "READINESS",
+          "font": 8
+        },
+        {
+          "text": "100/100",
+          "font": 9
+        },
+        {
+          "text": "XP TO LV 7",
+          "font": 8
+        },
+        {
+          "text": "0/8586",
+          "font": 9
+        },
+        {
+          "text": "STEADY 60",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT 80D",
+          "font": 8
+        },
+        {
+          "text": "POT 67–91",
+          "font": 8
+        },
+        {
+          "text": "INSPECT ›",
+          "font": 10
+        },
+        {
+          "text": "SPELLBOW",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "Orc · Spellbow",
+          "font": 10
+        },
+        {
+          "text": "★ 3",
+          "font": 10
+        },
+        {
+          "text": "Available for quests",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "282/282",
+          "font": 9
+        },
+        {
+          "text": "READINESS",
+          "font": 8
+        },
+        {
+          "text": "100/100",
+          "font": 9
+        },
+        {
+          "text": "XP TO LV 7",
+          "font": 8
+        },
+        {
+          "text": "0/8586",
+          "font": 9
+        },
+        {
+          "text": "STEADY 60",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT 80D",
+          "font": 8
+        },
+        {
+          "text": "POT 50–66",
+          "font": 8
+        },
+        {
+          "text": "INSPECT ›",
+          "font": 10
+        },
+        {
+          "text": "MONK",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "Veilborn · Monk",
+          "font": 10
+        },
+        {
+          "text": "★ 3",
+          "font": 10
+        },
+        {
+          "text": "Available for quests",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "305/305",
+          "font": 9
+        },
+        {
+          "text": "READINESS",
+          "font": 8
+        },
+        {
+          "text": "100/100",
+          "font": 9
+        },
+        {
+          "text": "XP TO LV 7",
+          "font": 8
+        },
+        {
+          "text": "0/8586",
+          "font": 9
+        },
+        {
+          "text": "STEADY 60",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT 80D",
+          "font": 8
+        },
+        {
+          "text": "POT 50–67",
+          "font": 8
+        },
+        {
+          "text": "INSPECT ›",
+          "font": 10
+        },
+        {
+          "text": "BERSERKER",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FALLEN",
+          "font": 8
+        },
+        {
+          "text": "Stoneborn · Berserker",
+          "font": 10
+        },
+        {
+          "text": "★ 2",
+          "font": 10
+        },
+        {
+          "text": "Requires revival at the Temple",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "0/352",
+          "font": 9
+        },
+        {
+          "text": "READINESS",
+          "font": 8
+        },
+        {
+          "text": "100/100",
+          "font": 9
+        },
+        {
+          "text": "XP TO LV 6",
+          "font": 8
+        },
+        {
+          "text": "0/6899",
+          "font": 9
+        },
+        {
+          "text": "STEADY 60",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT 80D",
+          "font": 8
+        },
+        {
+          "text": "POT 50–73",
+          "font": 8
+        },
+        {
+          "text": "INSPECT ›",
+          "font": 10
+        },
+        {
+          "text": "BULWARK",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "Elf · Bulwark",
+          "font": 10
+        },
+        {
+          "text": "★ 2",
+          "font": 10
+        },
+        {
+          "text": "Available for quests",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "314/314",
+          "font": 9
+        },
+        {
+          "text": "READINESS",
+          "font": 8
+        },
+        {
+          "text": "100/100",
+          "font": 9
+        },
+        {
+          "text": "XP TO LV 6",
+          "font": 8
+        },
+        {
+          "text": "0/6899",
+          "font": 9
+        },
+        {
+          "text": "STEADY 60",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT 80D",
+          "font": 8
+        },
+        {
+          "text": "POT 80–100",
+          "font": 8
+        },
+        {
+          "text": "INSPECT ›",
+          "font": 10
+        },
+        {
+          "text": "CLERIC",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "Dwarf · Cleric",
+          "font": 10
+        },
+        {
+          "text": "★ 2",
+          "font": 10
+        },
+        {
+          "text": "Available for quests",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "119/341",
+          "font": 9
+        },
+        {
+          "text": "READINESS",
+          "font": 8
+        },
+        {
+          "text": "100/100",
+          "font": 9
+        },
+        {
+          "text": "XP TO LV 6",
+          "font": 8
+        },
+        {
+          "text": "0/6899",
+          "font": 9
+        },
+        {
+          "text": "STEADY 60",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT 80D",
+          "font": 8
+        },
+        {
+          "text": "POT 87–100",
+          "font": 8
+        },
+        {
+          "text": "INSPECT ›",
+          "font": 10
+        },
+        {
+          "text": "PALADIN",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "Tiefling · Paladin",
+          "font": 10
+        },
+        {
+          "text": "★ 2",
+          "font": 10
+        },
+        {
+          "text": "Available for quests",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "284/284",
+          "font": 9
+        },
+        {
+          "text": "READINESS",
+          "font": 8
+        },
+        {
+          "text": "100/100",
+          "font": 9
+        },
+        {
+          "text": "XP TO LV 5",
+          "font": 8
+        },
+        {
+          "text": "0/5279",
+          "font": 9
+        },
+        {
+          "text": "STEADY 60",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT 80D",
+          "font": 8
+        },
+        {
+          "text": "POT 61–83",
+          "font": 8
+        },
+        {
+          "text": "INSPECT ›",
+          "font": 10
+        },
+        {
+          "text": "SUMMONER",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "TRAINING",
+          "font": 8
+        },
+        {
+          "text": "Dwarf · Summoner",
+          "font": 10
+        },
+        {
+          "text": "★ 2",
+          "font": 10
+        },
+        {
+          "text": "Adventuring Fundamentals · 2 days remaining",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "288/288",
+          "font": 9
+        },
+        {
+          "text": "READINESS",
+          "font": 8
+        },
+        {
+          "text": "100/100",
+          "font": 9
+        },
+        {
+          "text": "XP TO LV 5",
+          "font": 8
+        },
+        {
+          "text": "0/5279",
+          "font": 9
+        },
+        {
+          "text": "STEADY 60",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT 80D",
+          "font": 8
+        },
+        {
+          "text": "POT 61–87",
+          "font": 8
+        },
+        {
+          "text": "INSPECT ›",
+          "font": 10
+        },
+        {
+          "text": "WARRIOR",
+          "font": 9
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 8
+        },
+        {
+          "text": "Human · Warrior",
+          "font": 10
+        },
+        {
+          "text": "★ 2",
+          "font": 10
+        },
+        {
+          "text": "Available for quests",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 8
+        },
+        {
+          "text": "293/293",
+          "font": 9
+        },
+        {
+          "text": "READINESS",
+          "font": 8
+        },
+        {
+          "text": "100/100",
+          "font": 9
+        },
+        {
+          "text": "XP TO LV 5",
+          "font": 8
+        },
+        {
+          "text": "0/5279",
+          "font": 9
+        },
+        {
+          "text": "STEADY 60",
+          "font": 8
+        },
+        {
+          "text": "CONTRACT 80D",
+          "font": 8
+        },
+        {
+          "text": "POT 50–67",
+          "font": 8
+        },
+        {
+          "text": "INSPECT ›",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 8
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 3460,
+      "viewport": 652
+    },
+    "text": "The Wayfarers\n3\nDAY 42 · GUILDHAVEN\n6,080\n35\n1\n180\nACTIVE ORDERS\nTRAINING · 1\n2D\nGUILD HALL · ADVENTURERS\nHERO ROSTER\n11 / 8 roster slots · Day 42\nROSTER FULL\n9\nFIELD READY\n11\nATTENTION\n6.5\nTOP 4 AVG\n27\nSKILL PTS\n⚑ TEMPLE ATTENTION REQUIRED\n1 fallen guild member awaits revival. Use the Fallen filter to inspect them.\nROSTER LEDGER\n11 SHOWN\nAll\nAvailable\nInjured\nFallen\nSORT ORDER\nLevel\nName\nClass\nPotential\nADVENTURER CARDS\nTap a hero to inspect equipment, skills, history & relationships.\nMAGE\nLEVEL\n7\nFIELD READY\nAzhra Wolf-Breaker\nOrc · Mage\n★ 3\nAvailable for quests\nHP\n272/272\nREADINESS\n100/100\nXP TO LV 8\n0/10331\nSTEADY 60\nCONTRACT 80D\nPOT 50–65\nINSPECT ›\nBARD\nLEVEL\n7\nFIELD READY\nGwen Wainwright\nHuman · Bard\n★ 3\nAvailable for quests\nHP\n282/282\nREADINESS\n100/100\nXP TO LV 8\n0/10331\nSTEADY 60\nCONTRACT 80D\nPOT 50–72\nINSPECT ›\nRANGER\nLEVEL\n6\nFIELD READY\nDaelis Moonshadow\nElf · Ranger\n★ 3\nAvailable for quests\nHP\n290/290\nREADINESS\n100/100\nXP TO LV 7\n0/8586\nSTEADY 60\nCONTRACT 80D\nPOT 67–91\nINSPECT ›\nSPELLBOW\nLEVEL\n6\nFIELD READY\nKrothu Skullcleaver\nOrc · Spellbow\n★ 3\nAvailable for quests\nHP\n282/282\nREADINESS\n100/100\nXP TO LV 7\n0/8586\nSTEADY 60\nCONTRACT 80D\nPOT 50–66\nINSPECT ›\nMONK\nLEVEL\n6\nFIELD READY\nOrris Starless\nVeilborn · Monk\n★ 3\nAvailable for quests\nHP\n305/305\nREADINESS\n100/100\nXP TO LV 7\n0/8586\nSTEADY 60\nCONTRACT 80D\nPOT 50–67\nINSPECT ›\nBERSERKER\nLEVEL\n5\nFALLEN\nAlma Stonewake\nStoneborn · Berserker\n★ 2\nRequires revival at the Temple\nHP\n0/352\nREADINESS\n100/100\nXP TO LV 6\n0/6899\nSTEADY 60\nCONTRACT 80D\nPOT 50–73\nINSPECT ›\nBULWARK\nLEVEL\n5\nFIELD READY\nElaria Willowmere\nElf · Bulwark\n★ 2\nAvailable for quests\nHP\n314/314\nREADINESS\n100/100\nXP TO LV 6\n0/6899\nSTEADY 60\nCONTRACT 80D\nPOT 80–100\nINSPECT ›\nCLERIC\nLEVEL\n5\nFIELD READY\nSolveig Flintmantle\nDwarf · Cleric\n★ 2\nAvailable for quests\nHP\n119/341\nREADINESS\n100/100\nXP TO LV 6\n0/6899\nSTEADY 60\nCONTRACT 80D\nPOT 87–100\nINSPECT ›\nPALADIN\nLEVEL\n4\nFIELD READY\nMordai Redspire\nTiefling · Paladin\n★ 2\nAvailable for quests\nHP\n284/284\nREADINESS\n100/100\nXP TO LV 5\n0/5279\nSTEADY 60\nCONTRACT 80D\nPOT 61–83\nINSPECT ›\nSUMMONER\nLEVEL\n4\nTRAINING\nNorri Embermantle\nDwarf · Summoner\n★ 2\nAdventuring Fundamentals · 2 days remaining\nHP\n288/288\nREADINESS\n100/100\nXP TO LV 5\n0/5279\nSTEADY 60\nCONTRACT 80D\nPOT 61–87\nINSPECT ›\nWARRIOR\nLEVEL\n4\nFIELD READY\nPercival Fairwind\nHuman · Warrior\n★ 2\nAvailable for quests\nHP\n293/293\nREADINESS\n100/100\nXP TO LV 5\n0/5279\nSTEADY 60\nCONTRACT 80D\nPOT 50–67\nINSPECT ›\n1\nGuild\nQuests\nWorld\n2\nHeroes\nInventory"
+  },
+  {
+    "name": "RecruitmentScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Franger/male-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fcleric/female-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Franger/male-v3.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "GUILDHAVEN TAVERN",
+          "font": 10
+        },
+        {
+          "text": "RECRUITMENT BOARD",
+          "font": 9
+        },
+        {
+          "text": "DAY 42",
+          "font": 8
+        },
+        {
+          "text": "ROSTER",
+          "font": 7
+        },
+        {
+          "text": "TREASURY",
+          "font": 7
+        },
+        {
+          "text": "PAYROLL",
+          "font": 7
+        },
+        {
+          "text": "FRONTLINE 4",
+          "font": 8
+        },
+        {
+          "text": "SUPPORT 3",
+          "font": 8
+        },
+        {
+          "text": "RANGED 3",
+          "font": 8
+        },
+        {
+          "text": "CORE COVERAGE · Frontline, support, and ranged roles are represented.",
+          "font": 10
+        },
+        {
+          "text": "TAVERN ARRIVALS",
+          "font": 8
+        },
+        {
+          "text": "Next free refresh · 7 DAYS",
+          "font": 10
+        },
+        {
+          "text": "Manual refresh · 150 gold",
+          "font": 10
+        },
+        {
+          "text": "GUILDMASTER DEVELOPMENT",
+          "font": 9
+        },
+        {
+          "text": "REQUIRES · LEVEL 2 · 1 SKILL POINT",
+          "font": 9
+        },
+        {
+          "text": "RANGED",
+          "font": 8
+        },
+        {
+          "text": "NOTABLE",
+          "font": 8
+        },
+        {
+          "text": "ROSTER DEPTH",
+          "font": 8
+        },
+        {
+          "text": "LEAVES IN 7D",
+          "font": 8
+        },
+        {
+          "text": "POTENTIAL",
+          "font": 7
+        },
+        {
+          "text": "SIGNING FEE",
+          "font": 7
+        },
+        {
+          "text": "SALARY",
+          "font": 7
+        },
+        {
+          "text": "You already have 3 living ranged heroes.",
+          "font": 10
+        },
+        {
+          "text": "TRAITS · Sickly",
+          "font": 10
+        },
+        {
+          "text": "CONTRACT AFFORDABLE NOW",
+          "font": 8
+        },
+        {
+          "text": "After min. fee: 5714 G · Payroll after hire: 916–956 G/week · 24 weeks",
+          "font": 9
+        },
+        {
+          "text": "COMPARE",
+          "font": 9
+        },
+        {
+          "text": "PASS",
+          "font": 9
+        },
+        {
+          "text": "SUPPORT",
+          "font": 8
+        },
+        {
+          "text": "NOTABLE",
+          "font": 8
+        },
+        {
+          "text": "ROSTER DEPTH",
+          "font": 8
+        },
+        {
+          "text": "LEAVES IN 7D",
+          "font": 8
+        },
+        {
+          "text": "POTENTIAL",
+          "font": 7
+        },
+        {
+          "text": "SIGNING FEE",
+          "font": 7
+        },
+        {
+          "text": "SALARY",
+          "font": 7
+        },
+        {
+          "text": "You already have 3 living support heroes.",
+          "font": 10
+        },
+        {
+          "text": "TRAITS · Wanderer · Oathbound",
+          "font": 10
+        },
+        {
+          "text": "CONTRACT AFFORDABLE NOW",
+          "font": 8
+        },
+        {
+          "text": "After min. fee: 5672 G · Payroll after hire: 926–966 G/week · 24 weeks",
+          "font": 9
+        },
+        {
+          "text": "COMPARE",
+          "font": 9
+        },
+        {
+          "text": "PASS",
+          "font": 9
+        },
+        {
+          "text": "RANGED",
+          "font": 8
+        },
+        {
+          "text": "NOTABLE",
+          "font": 8
+        },
+        {
+          "text": "ROSTER DEPTH",
+          "font": 8
+        },
+        {
+          "text": "LEAVES IN 7D",
+          "font": 8
+        },
+        {
+          "text": "POTENTIAL",
+          "font": 7
+        },
+        {
+          "text": "SIGNING FEE",
+          "font": 7
+        },
+        {
+          "text": "SALARY",
+          "font": 7
+        },
+        {
+          "text": "You already have 3 living ranged heroes.",
+          "font": 10
+        },
+        {
+          "text": "TRAITS · Brave · Alert",
+          "font": 10
+        },
+        {
+          "text": "CONTRACT AFFORDABLE NOW",
+          "font": 8
+        },
+        {
+          "text": "After min. fee: 5711 G · Payroll after hire: 903–935 G/week · 24 weeks",
+          "font": 9
+        },
+        {
+          "text": "COMPARE",
+          "font": 9
+        },
+        {
+          "text": "PASS",
+          "font": 9
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 2292,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nGUILDHAVEN TAVERN\nAdventurers for Hire\nRead the person, the party fit, and the contract. Recruitment is a long-term guild decision, not just a stat purchase.\nRECRUITMENT BOARD\n3 adventurers available\nDAY 42\nROSTER\n11/8\nTREASURY\n6,080 G\nPAYROLL\n850/WK\nFRONTLINE 4\nSUPPORT 3\nRANGED 3\nCORE COVERAGE · Frontline, support, and ranged roles are represented.\nTAVERN ARRIVALS\nRefresh Candidate Board\nNext free refresh · 7 DAYS\nManual refresh · 150 gold\nREFRESH · 150G\nGUILDMASTER DEVELOPMENT\nRegional Scouting Locked\nReach Guildmaster Level 2 and learn Regional Network in Guild Hall → Manage → Guildmaster Skills. Regular recruitment remains available while you build experience through quests.\nREQUIRES · LEVEL 2 · 1 SKILL POINT\nCANDIDATES\nAldric Crowhurst\nHuman · Ranger · Lv 1\nRANGED\nNOTABLE\nROSTER DEPTH\nLEAVES IN 7D\nPOTENTIAL\n61–97\nSIGNING FEE\n366–586 G\nSALARY\n66–106/WK\nYou already have 3 living ranged heroes.\nTRAITS · Sickly\nCONTRACT AFFORDABLE NOW\nAfter min. fee: 5714 G · Payroll after hire: 916–956 G/week · 24 weeks\nINSPECT / SCOUT\nSIGN CONTRACT\nCOMPARE\nPASS\nHelena Blackwell\nHuman · Cleric · Lv 1\nSUPPORT\nNOTABLE\nROSTER DEPTH\nLEAVES IN 7D\nPOTENTIAL\n50–77\nSIGNING FEE\n408–612 G\nSALARY\n76–116/WK\nYou already have 3 living support heroes.\nTRAITS · Wanderer · Oathbound\nCONTRACT AFFORDABLE NOW\nAfter min. fee: 5672 G · Payroll after hire: 926–966 G/week · 24 weeks\nINSPECT / SCOUT\nSIGN CONTRACT\nCOMPARE\nPASS\nVondal Copperkeg\nDwarf · Ranger · Lv 1\nRANGED\nNOTABLE\nROSTER DEPTH\nLEAVES IN 7D\nPOTENTIAL\n62–98\nSIGNING FEE\n369–591 G\nSALARY\n53–85/WK\nYou already have 3 living ranged heroes.\nTRAITS · Brave · Alert\nCONTRACT AFFORDABLE NOW\nAfter min. fee: 5711 G · Payroll after hire: 903–935 G/week · 24 weeks\nINSPECT / SCOUT\nSIGN CONTRACT\nCOMPARE\nPASS"
+  },
+  {
+    "name": "InventoryScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/ferrymans-lantern.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/guestfire-cloak.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/moonbell-ring.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/sapphire-lamellar.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/mirrorsteel-helm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/venomsteel-spear.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/cinder-edge-axe.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/emberglass-wand.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/frostwood-bow.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/barbed-war-pick.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/runeguard-robes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/ward-thread-boots.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/antivenom-band.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/cinderheart-charm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/vigilant-trail-coat.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/quilted-travel-coat.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/iron-skullcap.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/soft-leather-boots.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/simple-iron-band.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/brass-focus-charm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/pale-echo-lance.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/militia-handaxe.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/yew-shortbow.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/pilgrim-rod.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 8
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "6,080",
+          "font": 10
+        },
+        {
+          "text": "35",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "180",
+          "font": 10
+        },
+        {
+          "text": "ACTIVE ORDERS",
+          "font": 7
+        },
+        {
+          "text": "TRAINING · 1",
+          "font": 8
+        },
+        {
+          "text": "2D",
+          "font": 7
+        },
+        {
+          "text": "GUILD QUARTERMASTER",
+          "font": 9
+        },
+        {
+          "text": "POSSIBLE\nUPGRADES",
+          "font": 7
+        },
+        {
+          "text": "MATERIALS",
+          "font": 7
+        },
+        {
+          "text": "POTIONS",
+          "font": 7
+        },
+        {
+          "text": "GOLD",
+          "font": 7
+        },
+        {
+          "text": "All",
+          "font": 10
+        },
+        {
+          "text": "Weapons",
+          "font": 10
+        },
+        {
+          "text": "Armor",
+          "font": 10
+        },
+        {
+          "text": "Accessories",
+          "font": 10
+        },
+        {
+          "text": "Materials",
+          "font": 10
+        },
+        {
+          "text": "UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "RARE · ACCESSORY 2 · LV 6+",
+          "font": 9
+        },
+        {
+          "text": "5 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 5 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 920g",
+          "font": 10
+        },
+        {
+          "text": "+2 Initiative · +10% Magic Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "RARE · ARMOR · LV 5+",
+          "font": 9
+        },
+        {
+          "text": "8 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 2 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 760g",
+          "font": 10
+        },
+        {
+          "text": "+10% Max HP · +10% Magic Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "RARE · ACCESSORY 1 · LV 6+",
+          "font": 9
+        },
+        {
+          "text": "5 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 5 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 820g",
+          "font": 10
+        },
+        {
+          "text": "+2 Magic Defense Score · +1 Initiative",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · ARMOR · LV 4+",
+          "font": 9
+        },
+        {
+          "text": "3 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 3 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Cleric, Paladin · Value 230g",
+          "font": 10
+        },
+        {
+          "text": "+7% Magic Defense · +6% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · HELMET · LV 4+",
+          "font": 9
+        },
+        {
+          "text": "4 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 4 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Cleric, Paladin, Berserker · Value 176g",
+          "font": 10
+        },
+        {
+          "text": "+6% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · WEAPON · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "3 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 3 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Ranger, Paladin · Value 185g",
+          "font": 10
+        },
+        {
+          "text": "+4% Physical Attack · +1 Attack Roll",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · WEAPON · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "2 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 2 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Berserker · Value 190g",
+          "font": 10
+        },
+        {
+          "text": "+5% Physical Attack · +1 Attack Roll",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · WEAPON · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "2 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 2 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Mage, Cleric · Value 192g",
+          "font": 10
+        },
+        {
+          "text": "+5% Magic Power · +1 Attack Roll",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · WEAPON · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "1 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 1 UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Ranger · Value 188g",
+          "font": 10
+        },
+        {
+          "text": "+4% Physical Attack · +1 Attack Roll",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · WEAPON · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "3 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 3 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Paladin, Berserker · Value 182g",
+          "font": 10
+        },
+        {
+          "text": "+0.01 Critical Chance · +1 Attack Roll",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · ARMOR · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "2 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 2 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Mage, Cleric · Value 198g",
+          "font": 10
+        },
+        {
+          "text": "+5% Magic Defense · +8% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · BOOTS · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "11 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 11 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 155g",
+          "font": 10
+        },
+        {
+          "text": "+4% Magic Defense · +4% Speed",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · ACCESSORY 1 · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "11 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 11 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 168g",
+          "font": 10
+        },
+        {
+          "text": "+5% Magic Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · ACCESSORY 2 · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "3 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 3 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Mage, Cleric, Paladin · Value 180g",
+          "font": 10
+        },
+        {
+          "text": "+4% Magic Power · +3% Magic Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "UNCOMMON · ARMOR · LV 3+",
+          "font": 9
+        },
+        {
+          "text": "2 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 2 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Ranger, Berserker · Value 186g",
+          "font": 10
+        },
+        {
+          "text": "+3% Speed · +8% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · ARMOR · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "11 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 7 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 29g",
+          "font": 10
+        },
+        {
+          "text": "+4% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · HELMET · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "4 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 4 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Cleric, Paladin, Berserker · Value 27g",
+          "font": 10
+        },
+        {
+          "text": "+4% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · BOOTS · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "11 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 11 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 26g",
+          "font": 10
+        },
+        {
+          "text": "+2% Speed · +2% Speed",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · ACCESSORY 1 · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "11 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 11 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 36g",
+          "font": 10
+        },
+        {
+          "text": "+2% Magic Defense",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · ACCESSORY 2 · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "11 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "★ 11 UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "All classes · Value 39g",
+          "font": 10
+        },
+        {
+          "text": "+3% Magic Defense",
+          "font": 10
+        },
+        {
+          "text": "NO ELIGIBLE HERO",
+          "font": 8
+        },
+        {
+          "text": "EPIC · WEAPON · LV 6+",
+          "font": 9
+        },
+        {
+          "text": "NO ELIGIBLE HERO",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Paladin · Value 1180g",
+          "font": 10
+        },
+        {
+          "text": "+1 Attack Roll · +14% Physical Damage · +10% Magic Damage",
+          "font": 10
+        },
+        {
+          "text": "SIDEGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · WEAPON · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "3 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Warrior, Paladin, Berserker · Value 34g",
+          "font": 10
+        },
+        {
+          "text": "No numerical modifiers",
+          "font": 10
+        },
+        {
+          "text": "SIDEGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · WEAPON · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "1 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Ranger · Value 35g",
+          "font": 10
+        },
+        {
+          "text": "No numerical modifiers",
+          "font": 10
+        },
+        {
+          "text": "SIDEGRADE",
+          "font": 8
+        },
+        {
+          "text": "COMMON · WEAPON · LV 1+",
+          "font": 9
+        },
+        {
+          "text": "2 ELIGIBLE",
+          "font": 8
+        },
+        {
+          "text": "PRISTINE · 100%",
+          "font": 8
+        },
+        {
+          "text": "Cleric, Paladin · Value 34g",
+          "font": 10
+        },
+        {
+          "text": "No numerical modifiers",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 8
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 8
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 4327,
+      "viewport": 652
+    },
+    "text": "The Wayfarers\n3\nDAY 42 · GUILDHAVEN\n6,080\n35\n1\n180\nACTIVE ORDERS\nTRAINING · 1\n2D\nGUILD QUARTERMASTER\nArmory & Inventory\n24 stored gear · 22 equipped\n20\nPOSSIBLE\nUPGRADES\n264\nMATERIALS\n12\nPOTIONS\n6080\nGOLD\nCRAFT / REPAIR\nGATHER\nPOTIONS\nAll\nWeapons\nArmor\nAccessories\nMaterials\nUPGRADES\n24\nFerryman's Lantern\nLIKELY UPGRADE\nRARE · ACCESSORY 2 · LV 6+\n5 ELIGIBLE\n★ 5 UPGRADES\nPRISTINE · 100%\nAll classes · Value 920g\n+2 Initiative · +10% Magic Defense\n›\nGuestfire Cloak\nLIKELY UPGRADE\nRARE · ARMOR · LV 5+\n8 ELIGIBLE\n★ 2 UPGRADES\nPRISTINE · 100%\nAll classes · Value 760g\n+10% Max HP · +10% Magic Defense\n›\nMoonbell Ring\nLIKELY UPGRADE\nRARE · ACCESSORY 1 · LV 6+\n5 ELIGIBLE\n★ 5 UPGRADES\nPRISTINE · 100%\nAll classes · Value 820g\n+2 Magic Defense Score · +1 Initiative\n›\nSapphire Lamellar\nLIKELY UPGRADE\nUNCOMMON · ARMOR · LV 4+\n3 ELIGIBLE\n★ 3 UPGRADES\nPRISTINE · 100%\nWarrior, Cleric, Paladin · Value 230g\n+7% Magic Defense · +6% Physical Defense\n›\nMirrorsteel Helm\nLIKELY UPGRADE\nUNCOMMON · HELMET · LV 4+\n4 ELIGIBLE\n★ 4 UPGRADES\nPRISTINE · 100%\nWarrior, Cleric, Paladin, Berserker · Value 176g\n+6% Physical Defense\n›\nVenomsteel Spear\nLIKELY UPGRADE\nUNCOMMON · WEAPON · LV 3+\n3 ELIGIBLE\n★ 3 UPGRADES\nPRISTINE · 100%\nWarrior, Ranger, Paladin · Value 185g\n+4% Physical Attack · +1 Attack Roll\n›\nCinder-Edge Axe\nLIKELY UPGRADE\nUNCOMMON · WEAPON · LV 3+\n2 ELIGIBLE\n★ 2 UPGRADES\nPRISTINE · 100%\nWarrior, Berserker · Value 190g\n+5% Physical Attack · +1 Attack Roll\n›\nEmberglass Wand\nLIKELY UPGRADE\nUNCOMMON · WEAPON · LV 3+\n2 ELIGIBLE\n★ 2 UPGRADES\nPRISTINE · 100%\nMage, Cleric · Value 192g\n+5% Magic Power · +1 Attack Roll\n›\nFrostwood Bow\nLIKELY UPGRADE\nUNCOMMON · WEAPON · LV 3+\n1 ELIGIBLE\n★ 1 UPGRADE\nPRISTINE · 100%\nRanger · Value 188g\n+4% Physical Attack · +1 Attack Roll\n›\nBarbed War Pick\nLIKELY UPGRADE\nUNCOMMON · WEAPON · LV 3+\n3 ELIGIBLE\n★ 3 UPGRADES\nPRISTINE · 100%\nWarrior, Paladin, Berserker · Value 182g\n+0.01 Critical Chance · +1 Attack Roll\n›\nRuneguard Robes\nLIKELY UPGRADE\nUNCOMMON · ARMOR · LV 3+\n2 ELIGIBLE\n★ 2 UPGRADES\nPRISTINE · 100%\nMage, Cleric · Value 198g\n+5% Magic Defense · +8% Physical Defense\n›\nWard-Thread Boots\nLIKELY UPGRADE\nUNCOMMON · BOOTS · LV 3+\n11 ELIGIBLE\n★ 11 UPGRADES\nPRISTINE · 100%\nAll classes · Value 155g\n+4% Magic Defense · +4% Speed\n›\nAntivenom Band\nLIKELY UPGRADE\nUNCOMMON · ACCESSORY 1 · LV 3+\n11 ELIGIBLE\n★ 11 UPGRADES\nPRISTINE · 100%\nAll classes · Value 168g\n+5% Magic Defense\n›\nCinderheart Charm\nLIKELY UPGRADE\nUNCOMMON · ACCESSORY 2 · LV 3+\n3 ELIGIBLE\n★ 3 UPGRADES\nPRISTINE · 100%\nMage, Cleric, Paladin · Value 180g\n+4% Magic Power · +3% Magic Defense\n›\nVigilant Trail Coat\nLIKELY UPGRADE\nUNCOMMON · ARMOR · LV 3+\n2 ELIGIBLE\n★ 2 UPGRADES\nPRISTINE · 100%\nRanger, Berserker · Value 186g\n+3% Speed · +8% Physical Defense\n›\nQuilted Travel Coat\nLIKELY UPGRADE\nCOMMON · ARMOR · LV 1+\n11 ELIGIBLE\n★ 7 UPGRADES\nPRISTINE · 100%\nAll classes · Value 29g\n+4% Physical Defense\n›\nIron Skullcap\nLIKELY UPGRADE\nCOMMON · HELMET · LV 1+\n4 ELIGIBLE\n★ 4 UPGRADES\nPRISTINE · 100%\nWarrior, Cleric, Paladin, Berserker · Value 27g\n+4% Physical Defense\n›\nSoft Leather Boots\nLIKELY UPGRADE\nCOMMON · BOOTS · LV 1+\n11 ELIGIBLE\n★ 11 UPGRADES\nPRISTINE · 100%\nAll classes · Value 26g\n+2% Speed · +2% Speed\n›\nSimple Iron Band\nLIKELY UPGRADE\nCOMMON · ACCESSORY 1 · LV 1+\n11 ELIGIBLE\n★ 11 UPGRADES\nPRISTINE · 100%\nAll classes · Value 36g\n+2% Magic Defense\n›\nBrass Focus Charm\nLIKELY UPGRADE\nCOMMON · ACCESSORY 2 · LV 1+\n11 ELIGIBLE\n★ 11 UPGRADES\nPRISTINE · 100%\nAll classes · Value 39g\n+3% Magic Defense\n›\nPale-Echo Lance\nNO ELIGIBLE HERO\nEPIC · WEAPON · LV 6+\nNO ELIGIBLE HERO\nPRISTINE · 100%\nWarrior, Paladin · Value 1180g\n+1 Attack Roll · +14% Physical Damage · +10% Magic Damage\n›\nMilitia Handaxe\nSIDEGRADE\nCOMMON · WEAPON · LV 1+\n3 ELIGIBLE\nPRISTINE · 100%\nWarrior, Paladin, Berserker · Value 34g\nNo numerical modifiers\n›\nYew Shortbow\nSIDEGRADE\nCOMMON · WEAPON · LV 1+\n1 ELIGIBLE\nPRISTINE · 100%\nRanger · Value 35g\nNo numerical modifiers\n›\nPilgrim Rod\nSIDEGRADE\nCOMMON · WEAPON · LV 1+\n2 ELIGIBLE\nPRISTINE · 100%\nCleric, Paladin · Value 34g\nNo numerical modifiers\n›\n1\nGuild\nQuests\nWorld\n2\nHeroes\nInventory"
+  }
+]

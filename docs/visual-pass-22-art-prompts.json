@@ -1,0 +1,139 @@
+{
+  "method": "built-in image_gen",
+  "optimization": "scripts/optimize-generated-art.py optimize(): Lanczos, reducing_gap=3, lossless PNG compress_level=9",
+  "assets": [
+    {
+      "id": "grandmother_pell",
+      "prompt": "Use case: stylized-concept. Create one NEW square NPC portrait asset for Guildmaster, Grandmother Pell, an elderly human woman who tends a coastal lighthouse. Match the provided newer hero portrait EXACTLY in medium and density: crisp fine pixel-art clusters, restrained dithering, warm amber upper-left highlights, deep navy/teal plain background, clear dark contour, richly shaded but visibly pixel-rendered face and clothing. Input image is STYLE/FRAMING reference only, not identity. Subject: distinct elderly woman about 75, weathered kind face, silver hair in a practical braided bun, amused determined expression, rust-brown wool shawl over a dark ocean-blue collar, small simple brass lighthouse key clasp at collar. Head and upper chest centered at same scale as reference, all hair contained, shoulders reach lower corners, front three-quarter gaze. No hands, no scene, no light halo, no frame, no lettering, no border, no watermark. Not smooth painting, not photorealistic, not vector. One portrait only. Opaque square image.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-b4585f0b-85f2-4b22-b695-4faa80545beb.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/grandmother_pell.png",
+      "size": 512
+    },
+    {
+      "id": "postmistress_yara_quill",
+      "prompt": "Use case: stylized-concept. Generate one new square Guildmaster NPC portrait. Input image is STYLE and FRAMING reference ONLY; change the identity completely. Subject: Postmistress Yara Quill, a middle-aged human woman, warm brown skin, dark curly hair pinned up with a brass pen, alert discerning face, midnight-blue postal coat with modest gold piping and a small wax-seal clasp. Clearly a practical fantasy postal official, not a warrior. Match reference's crisp fine pixel-art clusters, controlled dithering, warm amber upper-left highlights, dark navy/teal nearly plain backdrop, sharp silhouette and layered pixel shading. Head and upper chest centered, all hair contained, shoulders filling lower corners, face readable at 52px. No hands, text, frame, border, lettering, watermark, scenic background or glowing halo. Not smooth painting, not photorealism, not vector. Same cohesive 1990s fantasy RPG portrait rendering as the reference. Opaque square, single person.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-d2eb513e-69ec-45b8-b6ff-5cdd2b86c164.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/postmistress_yara_quill.png",
+      "size": 512
+    },
+    {
+      "id": "commander_astrid_vale",
+      "prompt": "Use case: stylized-concept. Generate one new square Guildmaster NPC portrait. Input image is STYLE and FRAMING reference ONLY; change the identity completely. Subject: Commander Astrid Vale, a seasoned northern human woman commander about 50, broad weathered face, faint old eyebrow scar, ash-blonde hair with grey braided tightly back, slate steel armor with restrained gold edging and a dark navy wool/fur winter collar. Steady protective authority. Match reference's crisp fine pixel-art clusters, controlled dithering, warm amber upper-left highlights, dark navy/teal nearly plain backdrop, sharp silhouette and layered pixel shading. Head and upper chest centered, all hair contained, shoulders filling lower corners, face readable at 52px. No hands, text, frame, border, lettering, watermark, scenic background or glowing halo. Not smooth painting, not photorealism, not vector. Same cohesive 1990s fantasy RPG portrait rendering as the reference. Opaque square, single person.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-1fddbd44-ae74-4014-ad50-6fcdeec71a5e.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/commander_astrid_vale.png",
+      "size": 512
+    },
+    {
+      "id": "cinderkeeper_maela_rhun",
+      "prompt": "Use case: stylized-concept. Generate one new square Guildmaster NPC portrait. Input image is STYLE and FRAMING reference ONLY; change the identity completely. Subject: Cinderkeeper Maela Rhun, a mature female orc keeper of ancient hearth rites, olive-charcoal green skin, subtle lower tusks, deep amber eyes, grey-black hair in heavy braids, dark plum and charcoal ceremonial mantle with restrained brass ember-shaped clasp. Wise and resolute, soot touches at temples, no flame aura. Match reference's crisp fine pixel-art clusters, controlled dithering, warm amber upper-left highlights, dark navy/teal nearly plain backdrop, sharp silhouette and layered pixel shading. Head and upper chest centered, all hair contained, shoulders filling lower corners, face readable at 52px. No hands, text, frame, border, lettering, watermark, scenic background or glowing halo. Not smooth painting, not photorealism, not vector. Same cohesive 1990s fantasy RPG portrait rendering as the reference. Opaque square, single person.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-fcfa1c1d-0b1e-40fd-a3a4-f920783f9bcd.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/cinderkeeper_maela_rhun.png",
+      "size": 512
+    },
+    {
+      "id": "watch_captain_mirelle_sorn",
+      "prompt": "Use case: stylized-concept. Generate one new square Guildmaster NPC portrait. Input image is STYLE and FRAMING reference ONLY; change the identity completely. Subject: Watch-Captain Mirelle Sorn, human woman coastal city commander about 40, medium brown skin, sharp attentive face, black hair in a short practical side-part, sea-blue officer coat over worn steel shoulder armor, modest brass chain clasp. Reserved tough competence, salt-weathered features. Match reference's crisp fine pixel-art clusters, controlled dithering, warm amber upper-left highlights, dark navy/teal nearly plain backdrop, sharp silhouette and layered pixel shading. Head and upper chest centered, all hair contained, shoulders filling lower corners, face readable at 52px. No hands, text, frame, border, lettering, watermark, scenic background or glowing halo. Not smooth painting, not photorealism, not vector. Same cohesive 1990s fantasy RPG portrait rendering as the reference. Opaque square, single person.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-e672403b-2ec4-47c0-8fa0-c7c60cca09bb.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/watch_captain_mirelle_sorn.png",
+      "size": 512
+    },
+    {
+      "id": "archivist_nemea_quill",
+      "prompt": "Use case: stylized-concept. Generate one new square Guildmaster NPC portrait. Input image is STYLE and FRAMING reference ONLY; change the identity completely. Subject: Archivist Nemea Quill, human woman scholar about 55, long thoughtful face, tawny skin, greying dark hair in a neat low braid, small round brass spectacles, deep desaturated plum archivist robes with old gold embroidered collar, one bronze pen at her collar. Serious measured intelligence. Match reference's crisp fine pixel-art clusters, controlled dithering, warm amber upper-left highlights, dark navy/teal nearly plain backdrop, sharp silhouette and layered pixel shading. Head and upper chest centered, all hair contained, shoulders filling lower corners, face readable at 52px. No hands, text, frame, border, lettering, watermark, scenic background or glowing halo. Not smooth painting, not photorealism, not vector. Same cohesive 1990s fantasy RPG portrait rendering as the reference. Opaque square, single person.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-b5865517-f66a-452b-92ea-ae7af1315b1f.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/archivist_nemea_quill.png",
+      "size": 512
+    },
+    {
+      "id": "envoy_tharos",
+      "prompt": "Use case: stylized-concept. Generate one new square Guildmaster NPC portrait. Input image is STYLE and FRAMING reference ONLY; change the identity completely. Subject: Envoy Tharos, mature male elven diplomat about apparent 45, long narrow face, pronounced pointed ears, bronze complexion, swept-back silver-white hair to shoulders, calm penetrating amber eyes, high-collared deep midnight teal formal robe with restrained gold filigree and a small six-point ceremonial clasp. Dignified otherworldly restraint, no crown. Match reference's crisp fine pixel-art clusters, controlled dithering, warm amber upper-left highlights, dark navy/teal nearly plain backdrop, sharp silhouette and layered pixel shading. Head and upper chest centered, all hair contained, shoulders filling lower corners, face readable at 52px. No hands, text, frame, border, lettering, watermark, scenic background or glowing halo. Not smooth painting, not photorealism, not vector. Same cohesive 1990s fantasy RPG portrait rendering as the reference. Opaque square, single person.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-a7b77254-4831-4299-b2e4-4af0b341aab2.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/envoy_tharos.png",
+      "size": 512
+    },
+    {
+      "id": "bellkeeper_orsa",
+      "prompt": "Use case: stylized-concept. One NEW standalone square Guildmaster NPC portrait. Reference image is STYLE/FRAMING and species guidance, not identity. Bellkeeper Orsa, elderly northern human woman, narrow weathered face, grey hair in two short braids, pale blue eyes, navy wool hood thrown back, simple brass bell fastener at throat, quiet ritual authority. Match the newer hero art: fine crisp visible pixel clusters, controlled dithering, dark contours, warm upper-left light, rich restrained shading, dark navy/teal nearly plain background. Bust only, face centered readable at 52px, all hair inside canvas, shoulders in bottom corners. No hands, scenery, letters, borders, frame or watermark, no glowing aura. Not painterly smooth, not photo, not vector. Distinct person and silhouette. Opaque square.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-891c6e47-dafb-4537-a847-517b8b258711.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/bellkeeper_orsa.png",
+      "size": 512
+    },
+    {
+      "id": "ferrymaster_neris_venn",
+      "prompt": "Use case: stylized-concept. One NEW standalone square Guildmaster NPC portrait. Reference image is STYLE/FRAMING and species guidance, not identity. Ferrymaster Neris Venn, middle-aged human woman river guide, sun-browned skin, broad kind face, dark brown hair under a weathered russet headscarf, desaturated moss-green waxed cloak and rope clasp, practical and quietly confident. Match the newer hero art: fine crisp visible pixel clusters, controlled dithering, dark contours, warm upper-left light, rich restrained shading, dark navy/teal nearly plain background. Bust only, face centered readable at 52px, all hair inside canvas, shoulders in bottom corners. No hands, scenery, letters, borders, frame or watermark, no glowing aura. Not painterly smooth, not photo, not vector. Distinct person and silhouette. Opaque square.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-16f30449-650c-47d6-a88c-522996a1aae3.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/ferrymaster_neris_venn.png",
+      "size": 512
+    },
+    {
+      "id": "historian_pell_reed",
+      "prompt": "Use case: stylized-concept. One NEW standalone square Guildmaster NPC portrait. Reference image is STYLE/FRAMING and species guidance, not identity. Historian Pell Reed, elderly human male historian, long oval face, receding grey hair, neatly trimmed silver beard, weary thoughtful eyes, dark green scholarly coat, ochre cravat and a small bronze pen clasp. No glasses. Match the newer hero art: fine crisp visible pixel clusters, controlled dithering, dark contours, warm upper-left light, rich restrained shading, dark navy/teal nearly plain background. Bust only, face centered readable at 52px, all hair inside canvas, shoulders in bottom corners. No hands, scenery, letters, borders, frame or watermark, no glowing aura. Not painterly smooth, not photo, not vector. Distinct person and silhouette. Opaque square.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-3d21bd82-ca15-4b33-9f12-f52f16a313f9.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/historian_pell_reed.png",
+      "size": 512
+    },
+    {
+      "id": "marshal_tavia_coal",
+      "prompt": "Use case: stylized-concept. One NEW standalone square Guildmaster NPC portrait. Reference image is STYLE/FRAMING and species guidance, not identity. Marshal Tavia Coal, middle-aged human woman militia marshal, deep brown skin, strong round face, close-cropped salt-and-pepper hair, stern determined expression, worn charcoal steel plate and dark rust-red scarf, restrained brass edging, tiny soot smudges. Match the newer hero art: fine crisp visible pixel clusters, controlled dithering, dark contours, warm upper-left light, rich restrained shading, dark navy/teal nearly plain background. Bust only, face centered readable at 52px, all hair inside canvas, shoulders in bottom corners. No hands, scenery, letters, borders, frame or watermark, no glowing aura. Not painterly smooth, not photo, not vector. Distinct person and silhouette. Opaque square.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-b9750c76-7794-4ff1-9d3e-507cbd73086d.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/marshal_tavia_coal.png",
+      "size": 512
+    },
+    {
+      "id": "orra_bellkeeper",
+      "prompt": "Use case: stylized-concept. One NEW standalone square Guildmaster NPC portrait. Reference image is STYLE/FRAMING and species guidance, not identity. Orra Bellkeeper, female Stoneborn, first of her awakened people. Mature distinct round face made of grey basalt with fine seams of warm gold, amber eyes, sculpted swept-back slate hair, mineral neck, plain ancient navy ritual mantle with bronze bell clasp. Thoughtful and newly alive. Match reference Stoneborn species, change her face/hair/clothes. Match the newer hero art: fine crisp visible pixel clusters, controlled dithering, dark contours, warm upper-left light, rich restrained shading, dark navy/teal nearly plain background. Bust only, face centered readable at 52px, all hair inside canvas, shoulders in bottom corners. No hands, scenery, letters, borders, frame or watermark, no glowing aura. Not painterly smooth, not photo, not vector. Distinct person and silhouette. Opaque square.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-cf9a4e04-adde-4d64-b6b9-c44e41b3797e.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/orra_bellkeeper.png",
+      "size": 512
+    },
+    {
+      "id": "aestra_quiet_reed",
+      "prompt": "Use case: stylized-concept. One NEW standalone square Guildmaster NPC portrait. Reference image is STYLE/FRAMING and species guidance, not identity. Aestra Quiet-Reed, female Veilborn witness. Muted lavender skin, luminous blue eyes, pointed ears, fine violet memory seams at temples, silver hair in a short asymmetrical chin-length bob, long graceful face and sober searching expression, simple desaturated blue and plum witness robes, restrained brass clasp. Match reference Veilborn species, distinct face and short hair. Match the newer hero art: fine crisp visible pixel clusters, controlled dithering, dark contours, warm upper-left light, rich restrained shading, dark navy/teal nearly plain background. Bust only, face centered readable at 52px, all hair inside canvas, shoulders in bottom corners. No hands, scenery, letters, borders, frame or watermark, no glowing aura. Not painterly smooth, not photo, not vector. Distinct person and silhouette. Opaque square.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-22237c2f-f651-40f6-b13e-c05416102f13.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/aestra_quiet_reed.png",
+      "size": 512
+    },
+    {
+      "id": "bellsmith_orra_deepnote",
+      "prompt": "Use case: stylized-concept. One NEW standalone square Guildmaster NPC portrait. Reference image is STYLE/FRAMING and species guidance, not identity. Bellsmith Orra Deepnote, sturdy middle-aged dwarf woman artisan from Kharum-Deep, broad cheeks and broad nose, thick auburn hair in two heavy plaits, warm brown eyes, soot-freckled copper complexion, worn leather apron at shoulders over a navy high collar, small brass tuning-fork brooch. Skilled, jovial and resolute. Match the newer hero art: fine crisp visible pixel clusters, controlled dithering, dark contours, warm upper-left light, rich restrained shading, dark navy/teal nearly plain background. Bust only, face centered readable at 52px, all hair inside canvas, shoulders in bottom corners. No hands, scenery, letters, borders, frame or watermark, no glowing aura. Not painterly smooth, not photo, not vector. Distinct person and silhouette. Opaque square.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-8c5e043f-5a62-4380-80c3-13c028d875a5.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/bellsmith_orra_deepnote.png",
+      "size": 512
+    },
+    {
+      "id": "innkeeper_orro",
+      "prompt": "Use case: stylized-concept. One NEW standalone square Guildmaster NPC portrait. Reference image is STYLE/FRAMING and species guidance, not identity. Innkeeper Orro, older human man tavern keeper from a mysterious drowned city, broad friendly face, ruddy weathered skin, short iron-grey hair, heavy grey moustache with no beard, smiling eyes, plain ochre waistcoat over navy linen collar, small weathered brass key at throat. Mortal and welcoming, not undead. Match the newer hero art: fine crisp visible pixel clusters, controlled dithering, dark contours, warm upper-left light, rich restrained shading, dark navy/teal nearly plain background. Bust only, face centered readable at 52px, all hair inside canvas, shoulders in bottom corners. No hands, scenery, letters, borders, frame or watermark, no glowing aura. Not painterly smooth, not photo, not vector. Distinct person and silhouette. Opaque square.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-d03f3562-d137-419d-b827-e81314c486b5.png",
+      "destination": "assets/artwork-v2/npcs/expansion-cast/innkeeper_orro.png",
+      "size": 512
+    },
+    {
+      "id": "mage_chain_lightning",
+      "prompt": "Use case: stylized-concept. NEW square fantasy RPG skill icon for Guildmaster. Chain Lightning: one bold forked zigzag of blue-white electricity visibly jumping through three small distinct violet sparks in an arcing chain. Recognizable branched lightning silhouette, not a fireball, no flame. Style reference supplied is the existing pixel skill rendering and plain dark navy/teal background. Match its crisp bright pixel clusters, dark edges, controlled dithering and simple large readable shape. Also compatible with the newer pixel hero portraits. Main symbol fills about 75% canvas, centered with breathing room. Render in restrained richly shaded pixel art, not smooth painting or vector. Must read at 32px. Opaque plain dark teal/navy background. No portrait, frame, border, text, letters, watermark or scenery. Single icon only.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-7b7c0f78-4495-4388-916d-17d5a0162af5.png",
+      "destination": "assets/artwork-v2/skills/clarity-pass/mage_chain_lightning.png",
+      "size": 384
+    },
+    {
+      "id": "mage_mist_step",
+      "prompt": "Use case: stylized-concept. NEW square fantasy RPG skill icon for Guildmaster. Mist Step: a single dark-blue boot silhouette dissolving behind into a curling pale violet mist trail, emerging at the upper-right with two clean bright cyan arc sparks. Recognizable teleport movement, not an ice projectile, no snowflakes. Style reference supplied is the existing pixel skill rendering and plain dark navy/teal background. Match its crisp bright pixel clusters, dark edges, controlled dithering and simple large readable shape. Also compatible with the newer pixel hero portraits. Main symbol fills about 75% canvas, centered with breathing room. Render in restrained richly shaded pixel art, not smooth painting or vector. Must read at 32px. Opaque plain dark teal/navy background. No portrait, frame, border, text, letters, watermark or scenery. Single icon only.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-b1708a01-edaf-4522-966d-d9ba4e35d0f7.png",
+      "destination": "assets/artwork-v2/skills/clarity-pass/mage_mist_step.png",
+      "size": 384
+    },
+    {
+      "id": "ranger_hunters_mark",
+      "prompt": "Use case: stylized-concept. NEW square fantasy RPG skill icon for Guildmaster. Hunter's Mark: one simple bright amber archery target ring centered over a dark jade animal-track paw silhouette, four short aiming ticks outside the ring. Strong instantly readable target symbol, not a portrait or bow. Style reference supplied is the existing pixel skill rendering and plain dark navy/teal background. Match its crisp bright pixel clusters, dark edges, controlled dithering and simple large readable shape. Also compatible with the newer pixel hero portraits. Main symbol fills about 75% canvas, centered with breathing room. Render in restrained richly shaded pixel art, not smooth painting or vector. Must read at 32px. Opaque plain dark teal/navy background. No portrait, frame, border, text, letters, watermark or scenery. Single icon only.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-38db21bb-753d-4729-be3b-b8f914dff027.png",
+      "destination": "assets/artwork-v2/skills/clarity-pass/ranger_hunters_mark.png",
+      "size": 384
+    },
+    {
+      "id": "ranger_ensnaring_arrow",
+      "prompt": "Use case: stylized-concept. NEW square fantasy RPG skill icon for Guildmaster. Ensnaring Arrow: one diagonally rising steel arrow with wood shaft visibly caught in a bold curling emerald thorn vine; a few pale green magic sparks. Distinct arrow plus binding loop silhouette, not a normal unbound arrow. Style reference supplied is the existing pixel skill rendering and plain dark navy/teal background. Match its crisp bright pixel clusters, dark edges, controlled dithering and simple large readable shape. Also compatible with the newer pixel hero portraits. Main symbol fills about 75% canvas, centered with breathing room. Render in restrained richly shaded pixel art, not smooth painting or vector. Must read at 32px. Opaque plain dark teal/navy background. No portrait, frame, border, text, letters, watermark or scenery. Single icon only.",
+      "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-3e647c4e-f499-4161-8bf0-df06b5d02055.png",
+      "destination": "assets/artwork-v2/skills/clarity-pass/ranger_ensnaring_arrow.png",
+      "size": 384
+    }
+  ]
+}

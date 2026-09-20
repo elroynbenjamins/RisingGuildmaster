@@ -1,0 +1,13 @@
+import { GAME_CONFIG } from "../../config/gameConfig";
+import { RECRUITMENT_CONFIG } from "../../data/recruitment/recruitmentBalance";
+import { ATTRIBUTE_KEYS, type Attributes } from "../attributes/types";
+import type { RecruitmentCandidate, ScoutingLevel } from "./recruitmentTypes";
+const RADII: Record<ScoutingLevel, number> = { 0: 0, 1: 10, 2: 5, 3: 0 };
+const FINANCIAL_RADII: Record<ScoutingLevel, number> = { 0: 0, 1: .10, 2: .05, 3: 0 };
+const ATTRIBUTE_RADII: Record<ScoutingLevel, number> = { 0: 3, 1: 2, 2: 1, 3: 0 };
+export function scoutingCost(nextLevel: ScoutingLevel): number { if (nextLevel === 1) return RECRUITMENT_CONFIG.basicScoutCost; if (nextLevel === 2) return RECRUITMENT_CONFIG.advancedScoutCost; if (nextLevel === 3) return RECRUITMENT_CONFIG.expertScoutCost; return 0; }
+export function potentialEstimate(truePotential: number, radius: number) { return { minimum: Math.max(GAME_CONFIG.potentialMin, truePotential - radius), maximum: Math.min(GAME_CONFIG.potentialMax, truePotential + radius) }; }
+export function financialEstimate(value: number, radius: number) { return { minimum: Math.max(0, Math.floor(value * (1 - radius))), maximum: Math.ceil(value * (1 + radius)) }; }
+export function attributeEstimates(attributes: Attributes, level: ScoutingLevel) { const radius = ATTRIBUTE_RADII[level]; return Object.fromEntries(ATTRIBUTE_KEYS.map((key) => [key, { minimum: Math.max(3, attributes[key] - radius), maximum: Math.min(20, attributes[key] + radius) }])) as RecruitmentCandidate["attributeEstimates"]; }
+export function scoutCandidate(candidate: RecruitmentCandidate): RecruitmentCandidate { if (candidate.scoutingLevel >= 3) throw new Error("Candidate is already fully scouted"); const level = (candidate.scoutingLevel + 1) as ScoutingLevel; const estimate = potentialEstimate(candidate.truePotential, RADII[level]); const fee = financialEstimate(candidate.recruitmentFee, FINANCIAL_RADII[level]); const salary = financialEstimate(candidate.weeklySalary, FINANCIAL_RADII[level]); return { ...candidate, scoutingLevel: level, potentialEstimateMin: estimate.minimum, potentialEstimateMax: estimate.maximum, attributeEstimates: attributeEstimates(candidate.heroPreview.baseAttributes, level), recruitmentFeeEstimateMin: fee.minimum, recruitmentFeeEstimateMax: fee.maximum, weeklySalaryEstimateMin: salary.minimum, weeklySalaryEstimateMax: salary.maximum, heroPreview: { ...candidate.heroPreview, potentialEstimateMin: estimate.minimum, potentialEstimateMax: estimate.maximum } }; }
+export function potentialRating(value: number): "Average" | "Good" | "Excellent" | "Exceptional" { return value < 60 ? "Average" : value < 75 ? "Good" : value < 90 ? "Excellent" : "Exceptional"; }

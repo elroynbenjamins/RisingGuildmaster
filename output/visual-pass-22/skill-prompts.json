@@ -1,0 +1,30 @@
+[
+  {
+    "id": "mage_chain_lightning",
+    "prompt": "Use case: stylized-concept. NEW square fantasy RPG skill icon for Guildmaster. Chain Lightning: one bold forked zigzag of blue-white electricity visibly jumping through three small distinct violet sparks in an arcing chain. Recognizable branched lightning silhouette, not a fireball, no flame. Style reference supplied is the existing pixel skill rendering and plain dark navy/teal background. Match its crisp bright pixel clusters, dark edges, controlled dithering and simple large readable shape. Also compatible with the newer pixel hero portraits. Main symbol fills about 75% canvas, centered with breathing room. Render in restrained richly shaded pixel art, not smooth painting or vector. Must read at 32px. Opaque plain dark teal/navy background. No portrait, frame, border, text, letters, watermark or scenery. Single icon only.",
+    "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-7b7c0f78-4495-4388-916d-17d5a0162af5.png",
+    "destination": "assets/artwork-v2/skills/clarity-pass/mage_chain_lightning.png",
+    "size": 384
+  },
+  {
+    "id": "mage_mist_step",
+    "prompt": "Use case: stylized-concept. NEW square fantasy RPG skill icon for Guildmaster. Mist Step: a single dark-blue boot silhouette dissolving behind into a curling pale violet mist trail, emerging at the upper-right with two clean bright cyan arc sparks. Recognizable teleport movement, not an ice projectile, no snowflakes. Style reference supplied is the existing pixel skill rendering and plain dark navy/teal background. Match its crisp bright pixel clusters, dark edges, controlled dithering and simple large readable shape. Also compatible with the newer pixel hero portraits. Main symbol fills about 75% canvas, centered with breathing room. Render in restrained richly shaded pixel art, not smooth painting or vector. Must read at 32px. Opaque plain dark teal/navy background. No portrait, frame, border, text, letters, watermark or scenery. Single icon only.",
+    "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-b1708a01-edaf-4522-966d-d9ba4e35d0f7.png",
+    "destination": "assets/artwork-v2/skills/clarity-pass/mage_mist_step.png",
+    "size": 384
+  },
+  {
+    "id": "ranger_hunters_mark",
+    "prompt": "Use case: stylized-concept. NEW square fantasy RPG skill icon for Guildmaster. Hunter's Mark: one simple bright amber archery target ring centered over a dark jade animal-track paw silhouette, four short aiming ticks outside the ring. Strong instantly readable target symbol, not a portrait or bow. Style reference supplied is the existing pixel skill rendering and plain dark navy/teal background. Match its crisp bright pixel clusters, dark edges, controlled dithering and simple large readable shape. Also compatible with the newer pixel hero portraits. Main symbol fills about 75% canvas, centered with breathing room. Render in restrained richly shaded pixel art, not smooth painting or vector. Must read at 32px. Opaque plain dark teal/navy background. No portrait, frame, border, text, letters, watermark or scenery. Single icon only.",
+    "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-38db21bb-753d-4729-be3b-b8f914dff027.png",
+    "destination": "assets/artwork-v2/skills/clarity-pass/ranger_hunters_mark.png",
+    "size": 384
+  },
+  {
+    "id": "ranger_ensnaring_arrow",
+    "prompt": "Use case: stylized-concept. NEW square fantasy RPG skill icon for Guildmaster. Ensnaring Arrow: one diagonally rising steel arrow with wood shaft visibly caught in a bold curling emerald thorn vine; a few pale green magic sparks. Distinct arrow plus binding loop silhouette, not a normal unbound arrow. Style reference supplied is the existing pixel skill rendering and plain dark navy/teal background. Match its crisp bright pixel clusters, dark edges, controlled dithering and simple large readable shape. Also compatible with the newer pixel hero portraits. Main symbol fills about 75% canvas, centered with breathing room. Render in restrained richly shaded pixel art, not smooth painting or vector. Must read at 32px. Opaque plain dark teal/navy background. No portrait, frame, border, text, letters, watermark or scenery. Single icon only.",
+    "source": "C:\\Users\\elroy\\.codex\\generated_images\\01a09666-e216-79e3-9978-931b3b19a495\\exec-3e647c4e-f499-4161-8bf0-df06b5d02055.png",
+    "destination": "assets/artwork-v2/skills/clarity-pass/ranger_ensnaring_arrow.png",
+    "size": 384
+  }
+]

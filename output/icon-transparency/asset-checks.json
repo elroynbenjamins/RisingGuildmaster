@@ -1,0 +1,542 @@
+[
+  {
+    "id": "guild",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 61421,
+    "beforeBytes": 1565766,
+    "afterBytes": 214644
+  },
+  {
+    "id": "quests",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 90083,
+    "beforeBytes": 1055619,
+    "afterBytes": 148259
+  },
+  {
+    "id": "inventory",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 58433,
+    "beforeBytes": 1505154,
+    "afterBytes": 208024
+  },
+  {
+    "id": "world",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 89802,
+    "beforeBytes": 1118422,
+    "afterBytes": 151669
+  },
+  {
+    "id": "heroes",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 52938,
+    "beforeBytes": 1696831,
+    "afterBytes": 239174
+  },
+  {
+    "id": "gold",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 79337,
+    "beforeBytes": 1051957,
+    "afterBytes": 151276
+  },
+  {
+    "id": "jeweler",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 99323,
+    "beforeBytes": 886608,
+    "afterBytes": 125761
+  },
+  {
+    "id": "victory",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 80691,
+    "beforeBytes": 1315779,
+    "afterBytes": 178248
+  },
+  {
+    "id": "training",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 74806,
+    "beforeBytes": 1088363,
+    "afterBytes": 161571
+  },
+  {
+    "id": "recruitment",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 72873,
+    "beforeBytes": 1060044,
+    "afterBytes": 156366
+  },
+  {
+    "id": "temple",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 94465,
+    "beforeBytes": 960664,
+    "afterBytes": 130662
+  },
+  {
+    "id": "management",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 64282,
+    "beforeBytes": 1553471,
+    "afterBytes": 200859
+  },
+  {
+    "id": "blacksmith",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 77203,
+    "beforeBytes": 1313735,
+    "afterBytes": 181904
+  },
+  {
+    "id": "tailor",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 92697,
+    "beforeBytes": 849859,
+    "afterBytes": 125043
+  },
+  {
+    "id": "scouting",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 64407,
+    "beforeBytes": 1122089,
+    "afterBytes": 169807
+  },
+  {
+    "id": "monster_manual",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 64123,
+    "beforeBytes": 1733287,
+    "afterBytes": 216512
+  },
+  {
+    "id": "hero_codex",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 68059,
+    "beforeBytes": 1477631,
+    "afterBytes": 192395
+  },
+  {
+    "id": "skill_codex",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 63968,
+    "beforeBytes": 1236468,
+    "afterBytes": 177931
+  },
+  {
+    "id": "calendar",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 65623,
+    "beforeBytes": 1154598,
+    "afterBytes": 164950
+  },
+  {
+    "id": "weapon",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 125830,
+    "beforeBytes": 526932,
+    "afterBytes": 70468
+  },
+  {
+    "id": "armor",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 54768,
+    "beforeBytes": 1468321,
+    "afterBytes": 208222
+  },
+  {
+    "id": "helmet",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 70339,
+    "beforeBytes": 1307255,
+    "afterBytes": 187767
+  },
+  {
+    "id": "boots",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 86206,
+    "beforeBytes": 972833,
+    "afterBytes": 142431
+  },
+  {
+    "id": "ring",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 76231,
+    "beforeBytes": 1103820,
+    "afterBytes": 159018
+  },
+  {
+    "id": "amulet",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 115633,
+    "beforeBytes": 653581,
+    "afterBytes": 89725
+  },
+  {
+    "id": "defeat",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 99269,
+    "beforeBytes": 1011605,
+    "afterBytes": 117718
+  },
+  {
+    "id": "xp",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 111851,
+    "beforeBytes": 740027,
+    "afterBytes": 102841
+  },
+  {
+    "id": "loot",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 63488,
+    "beforeBytes": 1306566,
+    "afterBytes": 187032
+  },
+  {
+    "id": "materials",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 66726,
+    "beforeBytes": 1151474,
+    "afterBytes": 178873
+  },
+  {
+    "id": "journal",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 64474,
+    "beforeBytes": 1461188,
+    "afterBytes": 196719
+  },
+  {
+    "id": "region_open",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 35791,
+    "beforeBytes": 2248126,
+    "afterBytes": 280016
+  },
+  {
+    "id": "locked",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 78033,
+    "beforeBytes": 1120549,
+    "afterBytes": 159014
+  },
+  {
+    "id": "current",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 97985,
+    "beforeBytes": 782037,
+    "afterBytes": 114851
+  },
+  {
+    "id": "complete",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 85254,
+    "beforeBytes": 1082662,
+    "afterBytes": 155861
+  },
+  {
+    "id": "boss",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 82513,
+    "beforeBytes": 1020999,
+    "afterBytes": 149132
+  },
+  {
+    "id": "settlement",
+    "size": [
+      384,
+      384
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "transparentPixels": 73893,
+    "beforeBytes": 1162223,
+    "afterBytes": 163133
+  }
+]

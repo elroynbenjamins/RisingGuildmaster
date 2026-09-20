@@ -1,0 +1,15 @@
+{
+  "date": "2026-09-12",
+  "method": "Built-in image generation; portrait style reference used for palette and pixel treatment. Runtime copies resized to 960 x 320 PNG.",
+  "reference": "assets/portraits/reference/guildmaster-portrait-style-reference-v1.png",
+  "assets": [
+    {
+      "path": "assets/artwork-v2/locations/guild-hall-v1.png",
+      "source": "C:/Users/elroy/.codex/generated_images/01a09666-e216-79e3-9978-931b3b19a495/exec-9b4f6000-081a-4770-b179-1926fe34bf8b.png"
+    },
+    {
+      "path": "assets/artwork-v2/locations/tavern-v1.png",
+      "source": "C:/Users/elroy/.codex/generated_images/01a09666-e216-79e3-9978-931b3b19a495/exec-141e282d-2525-4192-b64a-84d8e71ca1a6.png"
+    }
+  ]
+}

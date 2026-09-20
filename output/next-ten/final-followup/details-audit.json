@@ -1,0 +1,1219 @@
+[
+  {
+    "name": "HeroesScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fspellbow/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fveilborn%2Fmonk/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fstoneborn%2Fberserker/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Fbulwark/female-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Ftiefling%2Fpaladin/male-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fsummoner/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 10
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "1",
+          "font": 10
+        },
+        {
+          "text": "2D",
+          "font": 10
+        },
+        {
+          "text": "11 / 8 roster slots",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FALLEN",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "TRAINING",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 10
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 10
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 3148,
+      "viewport": 659
+    },
+    "text": "The Wayfarers\n3\nDAY 42 · GUILDHAVEN\n6,080\n35\n1\n180\nTRAINING · 1\n2D\n›\nAdventurers\n11 / 8 roster slots\nRoster full\n9 ready · 11 need attention\n+\n1 fallen · View heroes needing revival ›\nSort: Level +\nAll\nAvailable\nInjured\nFallen\n11 heroes shown · Tap to inspect\nAzhra Wolf-Breaker\nOrc · Mage · Level 7\nFIELD READY\nAvailable for quests\nHP\n272/272\nReadiness\n100/100\n3 skill choices\nInspect ›\nGwen Wainwright\nHuman · Bard · Level 7\nFIELD READY\nAvailable for quests\nHP\n282/282\nReadiness\n100/100\n3 skill choices\nInspect ›\nDaelis Moonshadow\nElf · Ranger · Level 6\nFIELD READY\nAvailable for quests\nHP\n290/290\nReadiness\n100/100\n3 skill choices\nInspect ›\nKrothu Skullcleaver\nOrc · Spellbow · Level 6\nFIELD READY\nAvailable for quests\nHP\n282/282\nReadiness\n100/100\n3 skill choices\nInspect ›\nOrris Starless\nVeilborn · Monk · Level 6\nFIELD READY\nAvailable for quests\nHP\n305/305\nReadiness\n100/100\n3 skill choices\nInspect ›\nAlma Stonewake\nStoneborn · Berserker · Level 5\nFALLEN\nRequires revival at the Temple\nHP\n0/352\nReadiness\n100/100\n2 skill choices\nInspect ›\nElaria Willowmere\nElf · Bulwark · Level 5\nFIELD READY\nAvailable for quests\nHP\n314/314\nReadiness\n100/100\n2 skill choices\nInspect ›\nSolveig Flintmantle\nDwarf · Cleric · Level 5\nFIELD READY\nAvailable for quests\nHP\n119/341\nReadiness\n100/100\n2 skill choices\nInspect ›\nMordai Redspire\nTiefling · Paladin · Level 4\nFIELD READY\nAvailable for quests\nHP\n284/284\nReadiness\n100/100\n2 skill choices\nInspect ›\nNorri Embermantle\nDwarf · Summoner · Level 4\nTRAINING\nAdventuring Fundamentals · 2 days remaining\nHP\n288/288\nReadiness\n100/100\n2 skill choices\nInspect ›\nPercival Fairwind\nHuman · Warrior · Level 4\nFIELD READY\nAvailable for quests\nHP\n293/293\nReadiness\n100/100\n2 skill choices\nInspect ›\n1\nGuild\nQuests\nWorld\n2\nHeroes\nInventory",
+    "checks": [
+      "First hero begins above 550px",
+      "Summary expands",
+      "Sort expands",
+      "Sort collapses after choice",
+      "Name sort applied",
+      "Revival warning opens Fallen filter",
+      "Empty search offers filter reset",
+      "Search clear button removes query",
+      "Filter reset clears search",
+      "Filter reset returns to All"
+    ]
+  },
+  {
+    "name": "InventoryScreen--Narrow--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/ferrymans-lantern.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/guestfire-cloak.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/moonbell-ring.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/sapphire-lamellar.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/mirrorsteel-helm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/venomsteel-spear.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/cinder-edge-axe.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/emberglass-wand.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/frostwood-bow.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/barbed-war-pick.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/runeguard-robes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/ward-thread-boots.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/antivenom-band.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/cinderheart-charm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/vigilant-trail-coat.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/quilted-travel-coat.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/iron-skullcap.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/soft-leather-boots.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/simple-iron-band.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/brass-focus-charm.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/pale-echo-lance.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/militia-handaxe.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/yew-shortbow.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fimages%2Fequipment%2Fcomplete/pilgrim-rod.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 10
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "1",
+          "font": 10
+        },
+        {
+          "text": "2D",
+          "font": 10
+        },
+        {
+          "text": "GUILD QUARTERMASTER",
+          "font": 9
+        },
+        {
+          "text": "Show upgrades ›",
+          "font": 10
+        },
+        {
+          "text": "MATERIALS",
+          "font": 7
+        },
+        {
+          "text": "POTIONS",
+          "font": 7
+        },
+        {
+          "text": "GOLD",
+          "font": 7
+        },
+        {
+          "text": "UPGRADES",
+          "font": 8
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "LIKELY UPGRADE",
+          "font": 10
+        },
+        {
+          "text": "NO ELIGIBLE HERO",
+          "font": 10
+        },
+        {
+          "text": "SIDEGRADE",
+          "font": 10
+        },
+        {
+          "text": "SIDEGRADE",
+          "font": 10
+        },
+        {
+          "text": "SIDEGRADE",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 10
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 10
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 3645,
+      "viewport": 659
+    },
+    "text": "The Wayfarers\n3\nDAY 42 · GUILDHAVEN\n6,080\n35\n1\n180\nTRAINING · 1\n2D\n›\nGUILD QUARTERMASTER\nArmory & Inventory\n24 stored gear · 22 equipped\n20\nShow upgrades ›\n264\nMATERIALS\n12\nPOTIONS\n6080\nGOLD\nWorkshop\nGather\nPotions\nAll\nWeapons\nArmor\nAccessories\nMaterials\nUPGRADES\n24\nFerryman's Lantern\nLIKELY UPGRADE\nRare · Accessory 2 · Level 6+\nPristine · 100% durability\nUpgrade for 5 heroes\n›\nGuestfire Cloak\nLIKELY UPGRADE\nRare · Armor · Level 5+\nPristine · 100% durability\nUpgrade for 2 heroes\n›\nMoonbell Ring\nLIKELY UPGRADE\nRare · Accessory 1 · Level 6+\nPristine · 100% durability\nUpgrade for 5 heroes\n›\nSapphire Lamellar\nLIKELY UPGRADE\nUncommon · Armor · Level 4+\nPristine · 100% durability\nUpgrade for 3 heroes\n›\nMirrorsteel Helm\nLIKELY UPGRADE\nUncommon · Helmet · Level 4+\nPristine · 100% durability\nUpgrade for 4 heroes\n›\nVenomsteel Spear\nLIKELY UPGRADE\nUncommon · Weapon · Level 3+\nPristine · 100% durability\nUpgrade for 3 heroes\n›\nCinder-Edge Axe\nLIKELY UPGRADE\nUncommon · Weapon · Level 3+\nPristine · 100% durability\nUpgrade for 2 heroes\n›\nEmberglass Wand\nLIKELY UPGRADE\nUncommon · Weapon · Level 3+\nPristine · 100% durability\nUpgrade for 2 heroes\n›\nFrostwood Bow\nLIKELY UPGRADE\nUncommon · Weapon · Level 3+\nPristine · 100% durability\nUpgrade for 1 hero\n›\nBarbed War Pick\nLIKELY UPGRADE\nUncommon · Weapon · Level 3+\nPristine · 100% durability\nUpgrade for 3 heroes\n›\nRuneguard Robes\nLIKELY UPGRADE\nUncommon · Armor · Level 3+\nPristine · 100% durability\nUpgrade for 2 heroes\n›\nWard-Thread Boots\nLIKELY UPGRADE\nUncommon · Boots · Level 3+\nPristine · 100% durability\nUpgrade for 11 heroes\n›\nAntivenom Band\nLIKELY UPGRADE\nUncommon · Accessory 1 · Level 3+\nPristine · 100% durability\nUpgrade for 11 heroes\n›\nCinderheart Charm\nLIKELY UPGRADE\nUncommon · Accessory 2 · Level 3+\nPristine · 100% durability\nUpgrade for 3 heroes\n›\nVigilant Trail Coat\nLIKELY UPGRADE\nUncommon · Armor · Level 3+\nPristine · 100% durability\nUpgrade for 2 heroes\n›\nQuilted Travel Coat\nLIKELY UPGRADE\nCommon · Armor · Level 1+\nPristine · 100% durability\nUpgrade for 7 heroes\n›\nIron Skullcap\nLIKELY UPGRADE\nCommon · Helmet · Level 1+\nPristine · 100% durability\nUpgrade for 4 heroes\n›\nSoft Leather Boots\nLIKELY UPGRADE\nCommon · Boots · Level 1+\nPristine · 100% durability\nUpgrade for 11 heroes\n›\nSimple Iron Band\nLIKELY UPGRADE\nCommon · Accessory 1 · Level 1+\nPristine · 100% durability\nUpgrade for 11 heroes\n›\nBrass Focus Charm\nLIKELY UPGRADE\nCommon · Accessory 2 · Level 1+\nPristine · 100% durability\nUpgrade for 11 heroes\n›\nPale-Echo Lance\nNO ELIGIBLE HERO\nEpic · Weapon · Level 6+\nPristine · 100% durability\n›\nMilitia Handaxe\nSIDEGRADE\nCommon · Weapon · Level 1+\nPristine · 100% durability\n›\nYew Shortbow\nSIDEGRADE\nCommon · Weapon · Level 1+\nPristine · 100% durability\n›\nPilgrim Rod\nSIDEGRADE\nCommon · Weapon · Level 1+\nPristine · 100% durability\n›\n1\nGuild\nQuests\nWorld\n2\nHeroes\nInventory",
+    "checks": [
+      "Upgrade filter selects",
+      "Upgrade filter clears",
+      "Empty search offers filter reset",
+      "Search clear button removes query",
+      "Filter reset clears search",
+      "Filter reset returns to All",
+      "Upgrade summary applies upgrade filter"
+    ]
+  },
+  {
+    "name": "GuildScreen--Large--320",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Flocations/guild-hall-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/temple.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/recruitment.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/temple.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/management.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 10
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "1",
+          "font": 10
+        },
+        {
+          "text": "2D",
+          "font": 10
+        },
+        {
+          "text": "GUILD HALL · WAR TABLE",
+          "font": 9
+        },
+        {
+          "text": "GUILD DAY",
+          "font": 7
+        },
+        {
+          "text": "The Fellowship of the Amber Lantern · Guildhaven",
+          "font": 10
+        },
+        {
+          "text": "TREASURY",
+          "font": 7
+        },
+        {
+          "text": "REPUTATION",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 7
+        },
+        {
+          "text": "GUILDMASTER",
+          "font": 8
+        },
+        {
+          "text": "0 / 100 XP · 0 skill points",
+          "font": 10
+        },
+        {
+          "text": "LEADERSHIP TREE ›",
+          "font": 8
+        },
+        {
+          "text": "IMMEDIATE ACTION",
+          "font": 8
+        },
+        {
+          "text": "1/2 BUSY",
+          "font": 8
+        },
+        {
+          "text": "A ready hero can use downtime to gain XP and develop toward the current campaign progressi",
+          "font": 10
+        },
+        {
+          "text": "ASSIGN TRAINING ›",
+          "font": 8
+        },
+        {
+          "text": "RECRUIT",
+          "font": 9
+        },
+        {
+          "text": "Tavern Board",
+          "font": 7
+        },
+        {
+          "text": "TRAIN",
+          "font": 9
+        },
+        {
+          "text": "Training Hall",
+          "font": 7
+        },
+        {
+          "text": "TEMPLE",
+          "font": 9
+        },
+        {
+          "text": "Recovery",
+          "font": 7
+        },
+        {
+          "text": "MANAGE",
+          "font": 9
+        },
+        {
+          "text": "Guild Services",
+          "font": 7
+        },
+        {
+          "text": "NEXT MILESTONE",
+          "font": 8
+        },
+        {
+          "text": "+10% MAX HP",
+          "font": 7
+        },
+        {
+          "text": "+25 READINESS",
+          "font": 7
+        },
+        {
+          "text": "+48 GOLD",
+          "font": 7
+        },
+        {
+          "text": "1",
+          "font": 10
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 10
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1383,
+      "viewport": 659
+    },
+    "text": "The Fellowship of the Amber Lantern\n3\nDAY 42 · GUILDHAVEN\n1.2B\n123.5K\n1\n987.7K\nTRAINING · 1\n2D\n›\nGUILD HALL · WAR TABLE\nCommand Center\nGUILD DAY\n42\nThe Fellowship of the Amber Lantern · Guildhaven\nTREASURY\n1.2B G\nREPUTATION\n987.7K\nFIELD READY\n9/11\nGUILDMASTER\nLV 1\n0 / 100 XP · 0 skill points\nLEADERSHIP TREE ›\nCURRENT ORDER\nIMMEDIATE ACTION\nAttend to the Fallen\n1 hero is awaiting revival at the Temple of Renewal.\nOpen Temple\nGUILD ORDERS · 1\n1/2 BUSY\n›\n1 Training Slot Open\nA ready hero can use downtime to gain XP and develop toward the current campaign progression cap.\nASSIGN TRAINING ›\nGUILD FACILITIES\nRECRUIT\nTavern Board\nTRAIN\nTraining Hall\nTEMPLE\nRecovery\nMANAGE\nGuild Services\nCALENDAR WATCH\nNEXT MILESTONE\nDay 44 · +2 days\nD43\nNorri Embermantle completed training and is available again.\n+10% MAX HP\n+25 READINESS\n+48 GOLD\nEnd Day\nOpen 7-Day Planner\nRECENT PARTY\nNo recent party\nAssemble a party from a quest and your latest adventurers will appear here.\nView heroes\n1\nGuild\nQuests\nWorld\n2\nHeroes\nInventory",
+    "checks": [
+      "Large gold total is compact",
+      "Full resource amount stays accessible"
+    ]
+  },
+  {
+    "name": "HeroesScreen--HighContrast--390",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Forc%2Fspellbow/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fveilborn%2Fmonk/male-v2.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fstoneborn%2Fberserker/female-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Felf%2Fbulwark/female-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Ftiefling%2Fpaladin/male-v4.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fdwarf%2Fsummoner/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "3",
+          "font": 10
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "1",
+          "font": 10
+        },
+        {
+          "text": "2D",
+          "font": 10
+        },
+        {
+          "text": "11 / 8 roster slots",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FALLEN",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "TRAINING",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "1",
+          "font": 10
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 10
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 3148,
+      "viewport": 659
+    },
+    "text": "The Wayfarers\n3\nDAY 42 · GUILDHAVEN\n6,080\n35\n1\n180\nTRAINING · 1\n2D\n›\nAdventurers\n11 / 8 roster slots\nRoster full\n9 ready · 11 need attention\n+\n1 fallen · View heroes needing revival ›\nSort: Level +\nAll\nAvailable\nInjured\nFallen\n11 heroes shown · Tap to inspect\nAzhra Wolf-Breaker\nOrc · Mage · Level 7\nFIELD READY\nAvailable for quests\nHP\n272/272\nReadiness\n100/100\n3 skill choices\nInspect ›\nGwen Wainwright\nHuman · Bard · Level 7\nFIELD READY\nAvailable for quests\nHP\n282/282\nReadiness\n100/100\n3 skill choices\nInspect ›\nDaelis Moonshadow\nElf · Ranger · Level 6\nFIELD READY\nAvailable for quests\nHP\n290/290\nReadiness\n100/100\n3 skill choices\nInspect ›\nKrothu Skullcleaver\nOrc · Spellbow · Level 6\nFIELD READY\nAvailable for quests\nHP\n282/282\nReadiness\n100/100\n3 skill choices\nInspect ›\nOrris Starless\nVeilborn · Monk · Level 6\nFIELD READY\nAvailable for quests\nHP\n305/305\nReadiness\n100/100\n3 skill choices\nInspect ›\nAlma Stonewake\nStoneborn · Berserker · Level 5\nFALLEN\nRequires revival at the Temple\nHP\n0/352\nReadiness\n100/100\n2 skill choices\nInspect ›\nElaria Willowmere\nElf · Bulwark · Level 5\nFIELD READY\nAvailable for quests\nHP\n314/314\nReadiness\n100/100\n2 skill choices\nInspect ›\nSolveig Flintmantle\nDwarf · Cleric · Level 5\nFIELD READY\nAvailable for quests\nHP\n119/341\nReadiness\n100/100\n2 skill choices\nInspect ›\nMordai Redspire\nTiefling · Paladin · Level 4\nFIELD READY\nAvailable for quests\nHP\n284/284\nReadiness\n100/100\n2 skill choices\nInspect ›\nNorri Embermantle\nDwarf · Summoner · Level 4\nTRAINING\nAdventuring Fundamentals · 2 days remaining\nHP\n288/288\nReadiness\n100/100\n2 skill choices\nInspect ›\nPercival Fairwind\nHuman · Warrior · Level 4\nFIELD READY\nAvailable for quests\nHP\n293/293\nReadiness\n100/100\n2 skill choices\nInspect ›\n1\nGuild\nQuests\nWorld\n2\nHeroes\nInventory",
+    "checks": [
+      "First hero begins above 550px",
+      "Summary expands",
+      "Sort expands",
+      "Sort collapses after choice",
+      "Name sort applied",
+      "Revival warning opens Fallen filter",
+      "Empty search offers filter reset",
+      "Search clear button removes query",
+      "Filter reset clears search",
+      "Filter reset returns to All"
+    ]
+  }
+]

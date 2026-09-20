@@ -1,0 +1,42 @@
+[
+  [
+    "Temple care filter",
+    "The Temple opens on heroes who need treatment. Show all heroes remains available, with care and fallen counts."
+  ],
+  [
+    "Clear treatment availability",
+    "Healthy heroes show Health full or No ailments; insufficient funds show the gold shortfall. Shared buttons replace faded custom controls."
+  ],
+  [
+    "Accessible treatment feedback",
+    "Treatment messages announce updates and have a 44-pixel dismiss target. Revival still requires confirmation."
+  ],
+  [
+    "Full trainee names",
+    "Training hero names wrap instead of truncating. Selected trainees expose their selected state to assistive technology."
+  ],
+  [
+    "Readable locked training",
+    "Locked programs keep readable descriptions and costs, with explicit level requirements and disabled state."
+  ],
+  [
+    "Lighter training projections",
+    "Level, XP, readiness and cost use open columns with dividers; program rewards lose their individual box borders."
+  ],
+  [
+    "Training typography",
+    "Small training labels are raised to 11 pixels, supporting type is lighter, and the introduction is shorter."
+  ],
+  [
+    "Workshop navigation",
+    "Workshop tabs and recipe filters use softer backgrounds and gold underlines, with selected-state accessibility. Summary totals are unboxed."
+  ],
+  [
+    "Material source rows",
+    "Material rows use larger touch targets, descriptive accessible labels and a simple warning rail for missing materials."
+  ],
+  [
+    "Recipe readability",
+    "Unavailable recipe and enchantment details retain full contrast. Redundant undiscovered badges no longer squeeze recipe titles."
+  ]
+]

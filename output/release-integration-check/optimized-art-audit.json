@@ -1,0 +1,2932 @@
+[
+  {
+    "name": "GuildScreen",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Flocations/guild-hall-v1.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/temple.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/recruitment.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/temple.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/management.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "4",
+          "font": 10
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "1",
+          "font": 10
+        },
+        {
+          "text": "2D",
+          "font": 10
+        },
+        {
+          "text": "GUILD HALL · WAR TABLE",
+          "font": 9
+        },
+        {
+          "text": "GUILD DAY",
+          "font": 7
+        },
+        {
+          "text": "The Wayfarers · Guildhaven",
+          "font": 10
+        },
+        {
+          "text": "TREASURY",
+          "font": 7
+        },
+        {
+          "text": "REPUTATION",
+          "font": 7
+        },
+        {
+          "text": "FIELD READY",
+          "font": 7
+        },
+        {
+          "text": "GUILDMASTER",
+          "font": 8
+        },
+        {
+          "text": "0 / 100 XP · 0 skill points",
+          "font": 10
+        },
+        {
+          "text": "LEADERSHIP TREE ›",
+          "font": 8
+        },
+        {
+          "text": "IMMEDIATE ACTION",
+          "font": 8
+        },
+        {
+          "text": "1/2 BUSY",
+          "font": 8
+        },
+        {
+          "text": "A ready hero can use downtime to gain XP and develop toward the current campaign progressi",
+          "font": 10
+        },
+        {
+          "text": "ASSIGN TRAINING ›",
+          "font": 8
+        },
+        {
+          "text": "RECRUIT",
+          "font": 9
+        },
+        {
+          "text": "Tavern Board",
+          "font": 7
+        },
+        {
+          "text": "TRAIN",
+          "font": 9
+        },
+        {
+          "text": "Training Hall",
+          "font": 7
+        },
+        {
+          "text": "TEMPLE",
+          "font": 9
+        },
+        {
+          "text": "Recovery",
+          "font": 7
+        },
+        {
+          "text": "MANAGE",
+          "font": 9
+        },
+        {
+          "text": "Guild Services",
+          "font": 7
+        },
+        {
+          "text": "NEXT MILESTONE",
+          "font": 8
+        },
+        {
+          "text": "+10% MAX HP",
+          "font": 7
+        },
+        {
+          "text": "+35 READINESS",
+          "font": 7
+        },
+        {
+          "text": "+43 GOLD",
+          "font": 7
+        },
+        {
+          "text": "2",
+          "font": 10
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 10
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1301,
+      "viewport": 659
+    },
+    "text": "The Wayfarers\n4\nDAY 42 · GUILDHAVEN\n6,130\n35\n1\n180\nTRAINING · 1\n2D\n›\nGUILD HALL · WAR TABLE\nCommand Center\nGUILD DAY\n42\nThe Wayfarers · Guildhaven\nTREASURY\n6,130 G\nREPUTATION\n180\nFIELD READY\n9/11\nGUILDMASTER\nLV 1\n0 / 100 XP · 0 skill points\nLEADERSHIP TREE ›\nCURRENT ORDER\nIMMEDIATE ACTION\nAttend to the Fallen\n1 hero is awaiting revival at the Temple of Renewal.\nOpen Temple\nGUILD ORDERS · 1\n1/2 BUSY\n›\n1 Training Slot Open\nA ready hero can use downtime to gain XP and develop toward the current campaign progression cap.\nASSIGN TRAINING ›\nGUILD FACILITIES\nRECRUIT\nTavern Board\nTRAIN\nTraining Hall\nTEMPLE\nRecovery\nMANAGE\nGuild Services\nCALENDAR WATCH\nNEXT MILESTONE\nDay 44 · +2 days\nD43\nNorri Embermantle completed training and is available again.\n+10% MAX HP\n+35 READINESS\n+43 GOLD\nEnd Day\nOpen 7-Day Planner\nRECENT PARTY\nNo recent party\nAssemble a party from a quest and your latest adventurers will appear here.\nView heroes\n2\nGuild\nQuests\nWorld\n2\nHeroes\nInventory"
+  },
+  {
+    "name": "HeroesScreen",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/female-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Forc%2Fspellbow/male-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fveilborn%2Fmonk/male-v2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fstoneborn%2Fberserker/female-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Felf%2Fbulwark/female-v1.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Ftiefling%2Fpaladin/male-v4.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fdwarf%2Fsummoner/male-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "4",
+          "font": 10
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "1",
+          "font": 10
+        },
+        {
+          "text": "2D",
+          "font": 10
+        },
+        {
+          "text": "11 / 8 roster slots",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "3 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FALLEN",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "TRAINING",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "HP",
+          "font": 10
+        },
+        {
+          "text": "Readiness",
+          "font": 10
+        },
+        {
+          "text": "2 skill choices",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 10
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 10
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 3148,
+      "viewport": 659
+    },
+    "text": "The Wayfarers\n4\nDAY 42 · GUILDHAVEN\n6,130\n35\n1\n180\nTRAINING · 1\n2D\n›\nAdventurers\n11 / 8 roster slots\nRoster full\n9 ready · 11 need attention\n+\n1 fallen · View heroes needing revival ›\nSort: Level +\nAll\nAvailable\nInjured\nFallen\n11 heroes shown · Tap to inspect\nAzhra Wolf-Breaker\nOrc · Mage · Level 7\nFIELD READY\nAvailable for quests\nHP\n272/272\nReadiness\n100/100\n3 skill choices\nInspect ›\nGwen Wainwright\nHuman · Bard · Level 7\nFIELD READY\nAvailable for quests\nHP\n282/282\nReadiness\n100/100\n3 skill choices\nInspect ›\nDaelis Moonshadow\nElf · Ranger · Level 6\nFIELD READY\nAvailable for quests\nHP\n290/290\nReadiness\n100/100\n3 skill choices\nInspect ›\nKrothu Skullcleaver\nOrc · Spellbow · Level 6\nFIELD READY\nAvailable for quests\nHP\n282/282\nReadiness\n100/100\n3 skill choices\nInspect ›\nOrris Starless\nVeilborn · Monk · Level 6\nFIELD READY\nAvailable for quests\nHP\n305/305\nReadiness\n100/100\n3 skill choices\nInspect ›\nAlma Stonewake\nStoneborn · Berserker · Level 5\nFALLEN\nRequires revival at the Temple\nHP\n0/352\nReadiness\n100/100\n2 skill choices\nInspect ›\nElaria Willowmere\nElf · Bulwark · Level 5\nFIELD READY\nAvailable for quests\nHP\n314/314\nReadiness\n100/100\n2 skill choices\nInspect ›\nSolveig Flintmantle\nDwarf · Cleric · Level 5\nFIELD READY\nAvailable for quests\nHP\n119/341\nReadiness\n100/100\n2 skill choices\nInspect ›\nMordai Redspire\nTiefling · Paladin · Level 4\nFIELD READY\nAvailable for quests\nHP\n284/284\nReadiness\n100/100\n2 skill choices\nInspect ›\nNorri Embermantle\nDwarf · Summoner · Level 4\nTRAINING\nAdventuring Fundamentals · 2 days remaining\nHP\n288/288\nReadiness\n100/100\n2 skill choices\nInspect ›\nPercival Fairwind\nHuman · Warrior · Level 4\nFIELD READY\nAvailable for quests\nHP\n293/293\nReadiness\n100/100\n2 skill choices\nInspect ›\n2\nGuild\nQuests\nWorld\n2\nHeroes\nInventory"
+  },
+  {
+    "name": "HeroDetailScreen--Skills",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.webp",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "ADVENTURER CHARACTER SHEET",
+          "font": 10
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FRONTLINE FIGHTER",
+          "font": 9
+        },
+        {
+          "text": "Scholar · Age 43",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "★ 2 SKILL PTS",
+          "font": 10
+        },
+        {
+          "text": "Available for quests",
+          "font": 9
+        },
+        {
+          "text": "CLASS PROGRESSION",
+          "font": 8
+        },
+        {
+          "text": "INSPECT",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1124,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nADVENTURER CHARACTER SHEET\nLEVEL\n4\nPercival Fairwind\nFRONTLINE FIGHTER\nHuman · Warrior\nScholar · Age 43\nFIELD READY\n★ 2 SKILL PTS\nAvailable for quests\nSheet\nGear\nSkills\nStats\nStory\nCLASS PROGRESSION\n2 CLASS SKILL POINTS AVAILABLE\nLevel 1 heroes begin with one basic skill. Permanent class choices unlock at Levels 2, 4, 6, and 8.\nCHOOSE SKILLS / CLASS PATH\nD20 PROFICIENCIES\nCurrent proficiency bonus: +2\nAthletics\nClimb, jump, swim, shove, and grapple. · STRENGTH\n+2\nIntimidation\nInfluence through threats or force of presence. · CHARISMA\n+2\nHistory\nRecall peoples, wars, places, and customs. · INTELLIGENCE\n+2\nInvestigation\nDeduce meaning from physical clues. · INTELLIGENCE\n+2\nCOMBAT SKILLS\nSword Strike\nINSPECT\nBASIC ATTACK • Range 1"
+  },
+  {
+    "name": "HeroDetailScreen--Story",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.webp",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "ADVENTURER CHARACTER SHEET",
+          "font": 10
+        },
+        {
+          "text": "LEVEL",
+          "font": 7
+        },
+        {
+          "text": "FRONTLINE FIGHTER",
+          "font": 9
+        },
+        {
+          "text": "Scholar · Age 43",
+          "font": 10
+        },
+        {
+          "text": "FIELD READY",
+          "font": 10
+        },
+        {
+          "text": "★ 2 SKILL PTS",
+          "font": 10
+        },
+        {
+          "text": "Available for quests",
+          "font": 9
+        },
+        {
+          "text": "Traits, beliefs, relationships and deeds live here so combat management stays separate fro",
+          "font": 10
+        },
+        {
+          "text": "+15% Magic Power",
+          "font": 10
+        },
+        {
+          "text": "-8% Max HP",
+          "font": 10
+        },
+        {
+          "text": "+10% Physical Defense",
+          "font": 10
+        },
+        {
+          "text": "-5% Recovery Duration",
+          "font": 10
+        },
+        {
+          "text": "QUESTS",
+          "font": 10
+        },
+        {
+          "text": "DEFEATED",
+          "font": 10
+        },
+        {
+          "text": "DEEDS",
+          "font": 10
+        },
+        {
+          "text": "ACHIEVEMENTS",
+          "font": 8
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1709,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nADVENTURER CHARACTER SHEET\nLEVEL\n4\nPercival Fairwind\nFRONTLINE FIGHTER\nHuman · Warrior\nScholar · Age 43\nFIELD READY\n★ 2 SKILL PTS\nAvailable for quests\nSheet\nGear\nSkills\nStats\nStory\nPERSONAL RECORD\nTraits, beliefs, relationships and deeds live here so combat management stays separate from character history.\nBACKGROUND & CHARACTER\nScholar\nFormal study provides a keen mind and a disciplined approach to training.\nPersonality · Blunt\nSays the difficult thing directly, even when tact would be safer.\nIdeal · Honor\nA promise freely given should survive fear, loss and inconvenience.\nBond · A Fallen Companion\nKeeps one lost companion's token and refuses to forget how they died.\nFlaw · Proud\nFinds it painfully difficult to admit weakness or ask for help.\nTRAITS\nArcane-Touched · COMBAT\nChannels unusually potent magic through a fragile body.\n+15% Magic Power\n-8% Max HP\nBattle-Hardened · COMBAT\nOld scars and practiced instincts reduce both harm and recovery time.\n+10% Physical Defense\n-5% Recovery Duration\nRELATIONSHIPS\nNo meaningful bonds yet. Shared quests and difficult choices will shape them.\nCAREER RECORD\n0\nQUESTS\n0\nDEFEATED\n0\nDEEDS\nACHIEVEMENTS\nNone yet\nGUILD LEGACY\nRequires Level 6.\nHERO CHRONICLE\nNo deeds have been recorded yet."
+  },
+  {
+    "name": "RecruitmentScreen",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Flocations/tavern-v1.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fhuman%2Franger/female-v4.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fdwarf%2Franger/female-v4.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Felf%2Fpaladin/male-v3.webp",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "GUILDHAVEN TAVERN",
+          "font": 10
+        },
+        {
+          "text": "RECRUITMENT BOARD",
+          "font": 9
+        },
+        {
+          "text": "DAY 42",
+          "font": 10
+        },
+        {
+          "text": "ROSTER",
+          "font": 7
+        },
+        {
+          "text": "TREASURY",
+          "font": 7
+        },
+        {
+          "text": "PAYROLL",
+          "font": 7
+        },
+        {
+          "text": "Next free refresh · 7 DAYS",
+          "font": 10
+        },
+        {
+          "text": "Manual refresh · 150 gold",
+          "font": 10
+        },
+        {
+          "text": "RANGED",
+          "font": 10
+        },
+        {
+          "text": "NOTABLE",
+          "font": 10
+        },
+        {
+          "text": "ROSTER DEPTH",
+          "font": 10
+        },
+        {
+          "text": "LEAVES IN 7D",
+          "font": 10
+        },
+        {
+          "text": "SIGNING FEE",
+          "font": 10
+        },
+        {
+          "text": "SALARY",
+          "font": 10
+        },
+        {
+          "text": "Scouted potential · 61–97",
+          "font": 10
+        },
+        {
+          "text": "You already have 3 living ranged heroes.",
+          "font": 10
+        },
+        {
+          "text": "TRAITS · Battle-Hardened",
+          "font": 10
+        },
+        {
+          "text": "CONTRACT AFFORDABLE NOW",
+          "font": 10
+        },
+        {
+          "text": "After min. fee: 5672 G · Payroll after hire: 923–969 G/week · 24 weeks",
+          "font": 9
+        },
+        {
+          "text": "RANGED",
+          "font": 10
+        },
+        {
+          "text": "RARE",
+          "font": 10
+        },
+        {
+          "text": "ROSTER DEPTH",
+          "font": 10
+        },
+        {
+          "text": "LEAVES IN 7D",
+          "font": 10
+        },
+        {
+          "text": "SIGNING FEE",
+          "font": 10
+        },
+        {
+          "text": "SALARY",
+          "font": 10
+        },
+        {
+          "text": "Scouted potential · 65–100",
+          "font": 10
+        },
+        {
+          "text": "You already have 3 living ranged heroes.",
+          "font": 10
+        },
+        {
+          "text": "TRAITS · Wanderer · Perceptive",
+          "font": 10
+        },
+        {
+          "text": "CONTRACT AFFORDABLE NOW",
+          "font": 10
+        },
+        {
+          "text": "After min. fee: 5628 G · Payroll after hire: 923–969 G/week · 12 weeks",
+          "font": 9
+        },
+        {
+          "text": "FRONTLINE",
+          "font": 10
+        },
+        {
+          "text": "NOTABLE",
+          "font": 10
+        },
+        {
+          "text": "ROSTER DEPTH",
+          "font": 10
+        },
+        {
+          "text": "LEAVES IN 7D",
+          "font": 10
+        },
+        {
+          "text": "SIGNING FEE",
+          "font": 10
+        },
+        {
+          "text": "SALARY",
+          "font": 10
+        },
+        {
+          "text": "Scouted potential · 58–82",
+          "font": 10
+        },
+        {
+          "text": "You already have 4 living frontline heroes.",
+          "font": 10
+        },
+        {
+          "text": "TRAITS · Silver-Tongued · Observant",
+          "font": 10
+        },
+        {
+          "text": "CONTRACT AFFORDABLE NOW",
+          "font": 10
+        },
+        {
+          "text": "After min. fee: 5248 G · Payroll after hire: 1040–1118 G/week · 24 weeks",
+          "font": 9
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 2020,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nGUILDHAVEN TAVERN\nAdventurers for Hire\nInspect each adventurer’s skills and contract before hiring.\nRECRUITMENT BOARD\n3 adventurers available\nDAY 42\nROSTER\n11/8\nTREASURY\n6,130 G\nPAYROLL\n850/WK\nParty role coverage +\nNew arrivals\nNext free refresh · 7 DAYS\nManual refresh · 150 gold\nRefresh · 150G\nRegional scouting · Locked\n+\nCANDIDATES\nCatrin Fairwind\nHuman · Ranger · Lv 3\nRANGED\nNOTABLE\nROSTER DEPTH\nLEAVES IN 7D\nSIGNING FEE\n458–734 G\nSALARY\n73–119/WK\nScouted potential · 61–97\nYou already have 3 living ranged heroes.\nTRAITS · Battle-Hardened\nCONTRACT AFFORDABLE NOW\nAfter min. fee: 5672 G · Payroll after hire: 923–969 G/week · 24 weeks\nInspect\nRoster full\nCOMPARE\nPASS\nSigrid Coalbrow\nDwarf · Ranger · Lv 3\nRANGED\nRARE\nROSTER DEPTH\nLEAVES IN 7D\nSIGNING FEE\n502–802 G\nSALARY\n73–119/WK\nScouted potential · 65–100\nYou already have 3 living ranged heroes.\nTRAITS · Wanderer · Perceptive\nCONTRACT AFFORDABLE NOW\nAfter min. fee: 5628 G · Payroll after hire: 923–969 G/week · 12 weeks\nInspect\nRoster full\nCOMPARE\nPASS\nCelemir Dawnwhisper\nElf · Paladin · Lv 4\nFRONTLINE\nNOTABLE\nROSTER DEPTH\nLEAVES IN 7D\nSIGNING FEE\n882–1244 G\nSALARY\n190–268/WK\nScouted potential · 58–82\nYou already have 4 living frontline heroes.\nTRAITS · Silver-Tongued · Observant\nCONTRACT AFFORDABLE NOW\nAfter min. fee: 5248 G · Payroll after hire: 1040–1118 G/week · 24 weeks\nInspect\nRoster full\nCOMPARE\nPASS"
+  },
+  {
+    "name": "WorldMapScreen",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fworld/eldoria-world-map-v2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fworld%2Ficons/world-map-icon-atlas.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "4",
+          "font": 10
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "1",
+          "font": 10
+        },
+        {
+          "text": "2D",
+          "font": 10
+        },
+        {
+          "text": "REGIONS OPEN",
+          "font": 7
+        },
+        {
+          "text": "SETTLEMENTS",
+          "font": 7
+        },
+        {
+          "text": "RATIONS",
+          "font": 7
+        },
+        {
+          "text": "NEXT CAMPAIGN STOP",
+          "font": 10
+        },
+        {
+          "text": "NEXT LEG · IRON HILLS · 3d · 12 rations",
+          "font": 9
+        },
+        {
+          "text": "CURRENT",
+          "font": 8
+        },
+        {
+          "text": "DOUBLE TAP · OPEN",
+          "font": 6
+        },
+        {
+          "text": "Guildhaven",
+          "font": 7
+        },
+        {
+          "text": "BOSS",
+          "font": 8
+        },
+        {
+          "text": "CAMPAIGN",
+          "font": 6
+        },
+        {
+          "text": "OPEN",
+          "font": 8
+        },
+        {
+          "text": "OPEN",
+          "font": 8
+        },
+        {
+          "text": "BOSS",
+          "font": 8
+        },
+        {
+          "text": "CURRENT",
+          "font": 8
+        },
+        {
+          "text": "CAMPAIGN",
+          "font": 8
+        },
+        {
+          "text": "BOSS",
+          "font": 8
+        },
+        {
+          "text": "LOCKED",
+          "font": 8
+        },
+        {
+          "text": "Tap a flag to inspect · Double tap the same flag to open its regional map",
+          "font": 9
+        },
+        {
+          "text": "TRAVEL PARTY · 4/4",
+          "font": 9
+        },
+        {
+          "text": "EDIT",
+          "font": 9
+        },
+        {
+          "text": "Selected heroes determine ration cost and become the remembered party for road encounters.",
+          "font": 9
+        },
+        {
+          "text": "+ SHOW REGIONAL INTELLIGENCE",
+          "font": 10
+        },
+        {
+          "text": "Guildhaven",
+          "font": 9
+        },
+        {
+          "text": "Highcourt",
+          "font": 9
+        },
+        {
+          "text": "Brambleford",
+          "font": 9
+        },
+        {
+          "text": "Tidewatch",
+          "font": 9
+        },
+        {
+          "text": "Stonegate",
+          "font": 9
+        },
+        {
+          "text": "Kharum-Deep",
+          "font": 9
+        },
+        {
+          "text": "Flintwatch",
+          "font": 9
+        },
+        {
+          "text": "Skyvault Embassy",
+          "font": 9
+        },
+        {
+          "text": "Northwatch",
+          "font": 9
+        },
+        {
+          "text": "Silverbough Enclaves",
+          "font": 9
+        },
+        {
+          "text": "Emberfall",
+          "font": 9
+        },
+        {
+          "text": "Red Mesa Clanroads",
+          "font": 9
+        },
+        {
+          "text": "Cinderwell Oasis",
+          "font": 9
+        },
+        {
+          "text": "Blackwater",
+          "font": 9
+        },
+        {
+          "text": "Mirewatch",
+          "font": 9
+        },
+        {
+          "text": "2",
+          "font": 10
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 10
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1708,
+      "viewport": 659
+    },
+    "text": "The Wayfarers\n4\nDAY 42 · GUILDHAVEN\n6,130\n35\n1\n180\nTRAINING · 1\n2D\n›\n‹ BACK\nEldoria\nCampaign Chapter 2 · Current: Greenveil\n5/5\nREGIONS OPEN\n15/15\nSETTLEMENTS\n48\nRATIONS\nNEXT CAMPAIGN STOP\nCouncil of Splinters\nStonegate · Iron Hills\nNEXT LEG · IRON HILLS · 3d · 12 rations\nFocus Next Leg on Map\nGreenveil\nCURRENT\nDOUBLE TAP · OPEN\nGuildhaven\nIron Hills\nBOSS\nCAMPAIGN\nAshlands\nOPEN\nFrostmarch\nOPEN\nShadowfen\nBOSS\nCURRENT\nCAMPAIGN\nBOSS\nLOCKED\nTap a flag to inspect · Double tap the same flag to open its regional map\nGreenveil\nRecommended level 1–15\nCurrent\nThe Crownroad Garden: river cities, chartered freeholds, orchard country, deep woods, and a storm-facing western coast held together by trade, reputation, and guild-patrolled roads.\nSettlement: Guildhaven, Highcourt, Brambleford, Tidewatch\nTRAVEL PARTY · 4/4\nEDIT\nPercival Fairwind · Solveig Flintmantle · Daelis Moonshadow · Azhra Wolf-Breaker\nSelected heroes determine ration cost and become the remembered party for road encounters.\n+ SHOW REGIONAL INTELLIGENCE\nOpen Region Map\nBuy 8 rations · 40g\nView Regional Quest\nCampaign\nDISCOVERED SETTLEMENTS\nGuildhaven\nHighcourt\nBrambleford\nTidewatch\nStonegate\nKharum-Deep\nFlintwatch\nSkyvault Embassy\nNorthwatch\nSilverbough Enclaves\nEmberfall\nRed Mesa Clanroads\nCinderwell Oasis\nBlackwater\nMirewatch\n2\nGuild\nQuests\nWorld\n2\nHeroes\nInventory"
+  },
+  {
+    "name": "CombatScreen--Battle",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_archer.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_brute.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/weapon.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fenemies%2Fgoblins/goblin_scout.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fcombat/terrain-tiles-atlas-v1.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fskills%2Fwarrior/sword-strike.webp",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "▶",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Percival Fairwind",
+          "font": 10
+        },
+        {
+          "text": "02",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Azhra Wolf-Breaker",
+          "font": 10
+        },
+        {
+          "text": "03",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Daelis Moonshadow",
+          "font": 10
+        },
+        {
+          "text": "04",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Goblin Brute",
+          "font": 10
+        },
+        {
+          "text": "05",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Goblin Archer",
+          "font": 10
+        },
+        {
+          "text": "06",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Goblin Scout",
+          "font": 10
+        },
+        {
+          "text": "07",
+          "font": 9
+        },
+        {
+          "text": "ALLY",
+          "font": 7
+        },
+        {
+          "text": "Solveig Flintmantle",
+          "font": 10
+        },
+        {
+          "text": "MISSION OBJECTIVE",
+          "font": 9
+        },
+        {
+          "text": "TACTICAL CAMERA",
+          "font": 9
+        },
+        {
+          "text": "Fit board",
+          "font": 9
+        },
+        {
+          "text": "FIT",
+          "font": 10
+        },
+        {
+          "text": "QUICK SKILLS · Percival Fairwind",
+          "font": 10
+        },
+        {
+          "text": "PHYS",
+          "font": 6
+        },
+        {
+          "text": "Sword Strike",
+          "font": 9
+        },
+        {
+          "text": "END TURN",
+          "font": 10
+        },
+        {
+          "text": "Tap a skill icon, then choose a highlighted target.",
+          "font": 10
+        },
+        {
+          "text": "REACTIONS · 4/4 allies ready · Leaving melee reach can trigger an attack.",
+          "font": 9
+        },
+        {
+          "text": "PHYS",
+          "font": 9
+        },
+        {
+          "text": "vs AC + physical defense",
+          "font": 9
+        },
+        {
+          "text": "MAG",
+          "font": 9
+        },
+        {
+          "text": "vs MDS + magic defense",
+          "font": 9
+        },
+        {
+          "text": "TRUE",
+          "font": 9
+        },
+        {
+          "text": "bypasses mitigation",
+          "font": 9
+        },
+        {
+          "text": "PARTY STATUS · 4/4 STANDING",
+          "font": 10
+        },
+        {
+          "text": "ENEMY DETAILS · 3 ALIVE",
+          "font": 10
+        },
+        {
+          "text": "COMBAT LOG · 0 EVENTS",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 1193,
+      "viewport": 844
+    },
+    "text": "Goblin Chieftain\nExit\nEncounter 1 / 2 · Round 1 · Turn 1\n▶\nALLY\nPercival Fairwind\n02\nALLY\nAzhra Wolf-Breaker\n03\nALLY\nDaelis Moonshadow\n04\nALLY\nGoblin Brute\n05\nALLY\nGoblin Archer\n06\nALLY\nGoblin Scout\n07\nALLY\nSolveig Flintmantle\nYOUR TURN · Percival Fairwind\nDeep Forest · 9×7\nDense forest · cost 2 · blocks sight; several open lanes remain\nMISSION OBJECTIVE\nDefeat all enemies.\n3 enemies remain\nTACTICAL CAMERA\nFit board\n−\nFIT\n+\nQUICK SKILLS · Percival Fairwind\nPHYS\nSword Strike\nEND TURN\nTap a skill icon, then choose a highlighted target.\nREACTIONS · 4/4 allies ready · Leaving melee reach can trigger an attack.\nPHYS\nvs AC + physical defense\nMAG\nvs MDS + magic defense\nTRUE\nbypasses mitigation\nPotions, Stats & Full Skills\nPARTY STATUS · 4/4 STANDING\n+\nENEMY DETAILS · 3 ALIVE\n+\nCOMBAT LOG · 0 EVENTS\n+"
+  },
+  {
+    "name": "CraftingScreen",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/blacksmith.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/iron-chainmail.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/iron-guard-helm.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/iron-skullcap.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/barbed-war-pick.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/silver_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/iron-longsword.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/oak_timber.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/iron-warhammer.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/oak_timber.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/iron-sabatons.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/wolf_pelt.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/blessed-mace.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/silver_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/oak_timber.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/arcane_dust.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/battle-harness.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/wolf_pelt.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/steel-greatsword.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/silver_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/oak_timber.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/steel-greathelm.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/silver_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/silver-tongue-rapier.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/silver_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/practice-rapier.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/drowned-hide-bulwark.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/crocodile_recipe_fragment.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/armored_scute.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/ancient_hide.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/crocodile_tooth.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/wardplate.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/silver_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/arcane_dust.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/militia-handaxe.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/iron_ore.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/coal.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fmaterials%2Fcomplete/oak_timber.webp",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "LEVEL 2 · STEELWORKS · OPERATIONAL",
+          "font": 9
+        },
+        {
+          "text": "ALL EQUIPMENT IS IN GOOD REPAIR",
+          "font": 9
+        },
+        {
+          "text": "SLOT",
+          "font": 8
+        },
+        {
+          "text": "All",
+          "font": 9
+        },
+        {
+          "text": "weapon",
+          "font": 9
+        },
+        {
+          "text": "armor",
+          "font": 9
+        },
+        {
+          "text": "helmet",
+          "font": 9
+        },
+        {
+          "text": "boots",
+          "font": 9
+        },
+        {
+          "text": "accessory 1",
+          "font": 9
+        },
+        {
+          "text": "accessory 2",
+          "font": 9
+        },
+        {
+          "text": "CLASS",
+          "font": 8
+        },
+        {
+          "text": "All",
+          "font": 9
+        },
+        {
+          "text": "Warrior",
+          "font": 9
+        },
+        {
+          "text": "Ranger",
+          "font": 9
+        },
+        {
+          "text": "Mage",
+          "font": 9
+        },
+        {
+          "text": "Cleric",
+          "font": 9
+        },
+        {
+          "text": "Paladin",
+          "font": 9
+        },
+        {
+          "text": "Berserker",
+          "font": 9
+        },
+        {
+          "text": "Monk",
+          "font": 9
+        },
+        {
+          "text": "Bard",
+          "font": 9
+        },
+        {
+          "text": "Spellbow",
+          "font": 9
+        },
+        {
+          "text": "Bulwark",
+          "font": 9
+        },
+        {
+          "text": "Summoner",
+          "font": 9
+        },
+        {
+          "text": "SORT",
+          "font": 8
+        },
+        {
+          "text": "16 visible recipes",
+          "font": 9
+        },
+        {
+          "text": "UPGRADE FOR 4 HEROES",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 7",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 3",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE FOR 4 HEROES",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 4",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE FOR 4 HEROES",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE FOR 3 HEROES",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 6",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "Silver Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE FOR 3 HEROES",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 5",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "Seasoned Oak",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE FOR 3 HEROES",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 5",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "Seasoned Oak",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE FOR 3 HEROES",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 4",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "Dire Wolf Pelt",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE FOR 2 HEROES",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 4",
+          "font": 10
+        },
+        {
+          "text": "Silver Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "Seasoned Oak",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "Arcane Dust",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE FOR 2 HEROES",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 5",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "Dire Wolf Pelt",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE FOR 1 HERO",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 10",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 6",
+          "font": 10
+        },
+        {
+          "text": "Silver Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "Seasoned Oak",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE FOR 1 HERO",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 7",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 4",
+          "font": 10
+        },
+        {
+          "text": "Silver Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE FOR 1 HERO",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 4",
+          "font": 10
+        },
+        {
+          "text": "Silver Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "UPGRADE FOR 1 HERO",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "NO CURRENT HERO UPGRADE",
+          "font": 9
+        },
+        {
+          "text": "Floodgate Pattern",
+          "font": 10
+        },
+        {
+          "text": "12 / 3",
+          "font": 10
+        },
+        {
+          "text": "Armored Scute",
+          "font": 10
+        },
+        {
+          "text": "12 / 8",
+          "font": 10
+        },
+        {
+          "text": "Ancient Hide",
+          "font": 10
+        },
+        {
+          "text": "12 / 5",
+          "font": 10
+        },
+        {
+          "text": "Crocodile Tooth",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 5",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 3",
+          "font": 10
+        },
+        {
+          "text": "NO CURRENT HERO UPGRADE",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 12",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 7",
+          "font": 10
+        },
+        {
+          "text": "Silver Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 3",
+          "font": 10
+        },
+        {
+          "text": "Arcane Dust",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "NO CURRENT HERO UPGRADE",
+          "font": 9
+        },
+        {
+          "text": "Iron Ore",
+          "font": 10
+        },
+        {
+          "text": "12 / 2",
+          "font": 10
+        },
+        {
+          "text": "Forge Coal",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        },
+        {
+          "text": "Seasoned Oak",
+          "font": 10
+        },
+        {
+          "text": "12 / 1",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 6361,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nArtisan District\nGuild Day 42\nA Guildmaster charter only grants permission. Every workshop must still be funded with gold and takes several in-game days to construct or upgrade.\nblacksmith\ntailor\njeweler\nBlacksmith\nLEVEL 2 · STEELWORKS · OPERATIONAL\nWeaponsmith and armorsmith\nLike a D&D smithy or MMORPG forge, the Blacksmith turns ore, coal, and steelwork into frontline weapons, plate, helmets, and reinforced boots.\nUpgrade to Master Forge\n1,900 gold · 4 days · Requires Masterwork District\nUnlock Masterwork District in the Guildmaster skill tree first.\nGuildmaster Skill Required\nREPAIR BENCH\nEquipment maintenance\nDamage suffered in battle has a small chance to reduce one equipped item's durability. Durability scales its numerical bonuses; broken equipment provides none until repaired.\nALL EQUIPMENT IS IN GOOD REPAIR\nRECIPE FILTERS\nSLOT\nAll\nWeapon\nArmor\nHelmet\nBoots\nAccessory 1\nAccessory 2\nCLASS\nAll\nWarrior\nRanger\nMage\nCleric\nPaladin\nBerserker\nMonk\nBard\nSpellbow\nBulwark\nSummoner\nSORT\nUpgrades\nLevel\nRarity\nCost\nShow Craftable Now\n16 visible recipes\nRECIPES\n21 undiscovered patterns\nSide quests can reveal regional patterns. Elite roguelite clears may reveal class rings, while Boss clears may reveal rare class weapons.\nIron Chainmail\nUNCOMMON · armor · Workshop Lv 1\nUPGRADE FOR 4 HEROES\nInterlocking iron rings offering sturdy frontline defense.\n100 gold\nIron Ore\n12 / 7\nForge Coal\n12 / 3\nCraft Item\nIron Guard Helm\nUNCOMMON · helmet · Workshop Lv 1\nUPGRADE FOR 4 HEROES\nA practical helm for heroes expected to hold a formation.\n60 gold\nIron Ore\n12 / 4\nForge Coal\n12 / 1\nCraft Item\nIron Skullcap\nCOMMON · helmet · Workshop Lv 1\nUPGRADE FOR 4 HEROES\nA compact iron cap fitted beneath a hood or coif.\n24 gold\nIron Ore\n12 / 2\nForge Coal\n12 / 1\nCraft Item\nBarbed War Pick\nUNCOMMON · weapon · Workshop Lv 1\nUPGRADE FOR 3 HEROES\nA cruelly hooked pick designed to open bleeding wounds.\nBloodletting Barbs\nPhysical hits have a 12% chance to inflict bleeding for 3 turns.\n118 gold\nIron Ore\n12 / 6\nForge Coal\n12 / 2\nSilver Ore\n12 / 1\nCraft Item\nIron Longsword\nUNCOMMON · weapon · Workshop Lv 1\nUPGRADE FOR 3 HEROES\nA dependable martial blade similar to the standard longsword of tabletop adventurers.\n80 gold\nIron Ore\n12 / 5\nForge Coal\n12 / 2\nSeasoned Oak\n12 / 1\nCraft Item\nIron Warhammer\nUNCOMMON · weapon · Workshop Lv 1\nUPGRADE FOR 3 HEROES\nA weight-forward hammer for breaking shields and heavy armor.\n85 gold\nIron Ore\n12 / 5\nForge Coal\n12 / 2\nSeasoned Oak\n12 / 1\nCraft Item\nIron Sabatons\nUNCOMMON · boots · Workshop Lv 1\nUPGRADE FOR 3 HEROES\nHeavy articulated boots that trade a little speed for protection.\n65 gold\nIron Ore\n12 / 4\nForge Coal\n12 / 1\nDire Wolf Pelt\n12 / 1\nCraft Item\nBlessed Mace\nUNCOMMON · weapon · Workshop Lv 1\nUPGRADE FOR 2 HEROES\nA silver-inlaid mace balanced for divine warriors and battle clerics.\n95 gold\nIron Ore\n12 / 4\nSilver Ore\n12 / 1\nSeasoned Oak\n12 / 1\nArcane Dust\n12 / 1\nCraft Item\nBattle Harness\nUNCOMMON · armor · Workshop Lv 1\nUPGRADE FOR 2 HEROES\nOverlapping plates on a flexible harness for aggressive frontliners.\n95 gold\nIron Ore\n12 / 5\nForge Coal\n12 / 2\nDire Wolf Pelt\n12 / 2\nCraft Item\nSteel Greatsword\nRARE · weapon · Workshop Lv 2\nUPGRADE FOR 1 HERO\nA two-handed high-tier blade requiring controlled heat and extensive finishing.\n230 gold\nIron Ore\n12 / 10\nForge Coal\n12 / 6\nSilver Ore\n12 / 1\nSeasoned Oak\n12 / 2\nCraft Item\nSteel Greathelm\nRARE · helmet · Workshop Lv 2\nUPGRADE FOR 1 HERO\nA full helm made for heroes who must survive the first enemy charge.\n175 gold\nIron Ore\n12 / 7\nForge Coal\n12 / 4\nSilver Ore\n12 / 1\nCraft Item\nSilver-Tongue Rapier\nUNCOMMON · weapon · Workshop Lv 1\nUPGRADE FOR 1 HERO\nA resonant rapier that carries a Bard's verse through every strike.\n90 gold\nIron Ore\n12 / 4\nSilver Ore\n12 / 2\nForge Coal\n12 / 2\nCraft Item\nPractice Rapier\nCOMMON · weapon · Workshop Lv 1\nUPGRADE FOR 1 HERO\nA light stage-and-street blade tuned for a Bard's cutting cadence.\n28 gold\nIron Ore\n12 / 2\nForge Coal\n12 / 1\nCraft Item\nDrowned-Hide Bulwark\nRARE · armor · Workshop Lv 2\nNO CURRENT HERO UPGRADE\nRivet the ancient crocodile's scutes over waterproof hide to form a punishing suit of heavy armor.\nSewerborn Guard\nGain +1 Armor Class while the hide's overlapping scutes turn aside blows.\n480 gold\nFloodgate Pattern\n12 / 3\nArmored Scute\n12 / 8\nAncient Hide\n12 / 5\nCrocodile Tooth\n12 / 2\nIron Ore\n12 / 5\nForge Coal\n12 / 3\nCraft Item\nWardplate Cuirass\nRARE · armor · Workshop Lv 2\nNO CURRENT HERO UPGRADE\nA reinforced cuirass etched with protective Wardstone geometry.\n270 gold\nIron Ore\n12 / 12\nForge Coal\n12 / 7\nSilver Ore\n12 / 3\nArcane Dust\n12 / 2\nCraft Item\nMilitia Handaxe\nCOMMON · weapon · Workshop Lv 1\nNO CURRENT HERO UPGRADE\nA cheap sidearm for a newly chartered martial recruit.\n28 gold\nIron Ore\n12 / 2\nForge Coal\n12 / 1\nSeasoned Oak\n12 / 1\nCraft Item"
+  },
+  {
+    "name": "InventoryScreen",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/gold.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/jeweler.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/victory.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/training.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/militia-handaxe.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/yew-shortbow.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/pilgrim-rod.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/quilted-travel-coat.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/iron-skullcap.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/soft-leather-boots.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/simple-iron-band.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/brass-focus-charm.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/venomsteel-spear.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/cinder-edge-axe.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/emberglass-wand.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/frostwood-bow.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/barbed-war-pick.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/sapphire-lamellar.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/runeguard-robes.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/mirrorsteel-helm.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/ward-thread-boots.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/antivenom-band.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/cinderheart-charm.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/vigilant-trail-coat.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/guestfire-cloak.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/moonbell-ring.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/pale-echo-lance.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fimages%2Fequipment%2Fcomplete/ferrymans-lantern.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/guild.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/quests.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/world.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/heroes.png",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2F..%2F..%2F..%2F..%2F..%2F..%2F.codex%2Fworktrees%2Fguildmaster-release-redesign%2FGuildmaster%2Fassets%2Fartwork-v2%2Ficons%2Fgame-transparent/inventory.png",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "4",
+          "font": 10
+        },
+        {
+          "text": "DAY 42 · GUILDHAVEN",
+          "font": 9
+        },
+        {
+          "text": "1",
+          "font": 10
+        },
+        {
+          "text": "2D",
+          "font": 10
+        },
+        {
+          "text": "COMMON | weapon | Requirement Lv 1",
+          "font": 10
+        },
+        {
+          "text": "3 HEROES CAN EQUIP · Warrior, Paladin, Berserker",
+          "font": 9
+        },
+        {
+          "text": "COMMON | weapon | Requirement Lv 1",
+          "font": 10
+        },
+        {
+          "text": "1 HERO CAN EQUIP · Ranger",
+          "font": 9
+        },
+        {
+          "text": "COMMON | weapon | Requirement Lv 1",
+          "font": 10
+        },
+        {
+          "text": "2 HEROES CAN EQUIP · Cleric, Paladin",
+          "font": 9
+        },
+        {
+          "text": "COMMON | armor | Requirement Lv 1",
+          "font": 10
+        },
+        {
+          "text": "9 HEROES GET AN UPGRADE · All classes",
+          "font": 9
+        },
+        {
+          "text": "COMMON | helmet | Requirement Lv 1",
+          "font": 10
+        },
+        {
+          "text": "4 HEROES GET AN UPGRADE · Warrior, Cleric, Paladin, Berserker",
+          "font": 9
+        },
+        {
+          "text": "COMMON | boots | Requirement Lv 1",
+          "font": 10
+        },
+        {
+          "text": "11 HEROES GET AN UPGRADE · All classes",
+          "font": 9
+        },
+        {
+          "text": "COMMON | accessory1 | Requirement Lv 1",
+          "font": 10
+        },
+        {
+          "text": "11 HEROES GET AN UPGRADE · All classes",
+          "font": 9
+        },
+        {
+          "text": "COMMON | accessory2 | Requirement Lv 1",
+          "font": 10
+        },
+        {
+          "text": "11 HEROES GET AN UPGRADE · All classes",
+          "font": 9
+        },
+        {
+          "text": "UNCOMMON | weapon | Requirement Lv 3",
+          "font": 10
+        },
+        {
+          "text": "3 HEROES GET AN UPGRADE · Warrior, Ranger, Paladin",
+          "font": 9
+        },
+        {
+          "text": "UNCOMMON | weapon | Requirement Lv 3",
+          "font": 10
+        },
+        {
+          "text": "2 HEROES GET AN UPGRADE · Warrior, Berserker",
+          "font": 9
+        },
+        {
+          "text": "UNCOMMON | weapon | Requirement Lv 3",
+          "font": 10
+        },
+        {
+          "text": "2 HEROES GET AN UPGRADE · Mage, Cleric",
+          "font": 9
+        },
+        {
+          "text": "UNCOMMON | weapon | Requirement Lv 3",
+          "font": 10
+        },
+        {
+          "text": "1 HERO GET AN UPGRADE · Ranger",
+          "font": 9
+        },
+        {
+          "text": "UNCOMMON | weapon | Requirement Lv 3",
+          "font": 10
+        },
+        {
+          "text": "3 HEROES GET AN UPGRADE · Warrior, Paladin, Berserker",
+          "font": 9
+        },
+        {
+          "text": "UNCOMMON | armor | Requirement Lv 4",
+          "font": 10
+        },
+        {
+          "text": "3 HEROES GET AN UPGRADE · Warrior, Cleric, Paladin",
+          "font": 9
+        },
+        {
+          "text": "UNCOMMON | armor | Requirement Lv 3",
+          "font": 10
+        },
+        {
+          "text": "2 HEROES GET AN UPGRADE · Mage, Cleric",
+          "font": 9
+        },
+        {
+          "text": "UNCOMMON | helmet | Requirement Lv 4",
+          "font": 10
+        },
+        {
+          "text": "4 HEROES GET AN UPGRADE · Warrior, Cleric, Paladin, Berserker",
+          "font": 9
+        },
+        {
+          "text": "UNCOMMON | boots | Requirement Lv 3",
+          "font": 10
+        },
+        {
+          "text": "11 HEROES GET AN UPGRADE · All classes",
+          "font": 9
+        },
+        {
+          "text": "UNCOMMON | accessory1 | Requirement Lv 3",
+          "font": 10
+        },
+        {
+          "text": "11 HEROES GET AN UPGRADE · All classes",
+          "font": 9
+        },
+        {
+          "text": "UNCOMMON | accessory2 | Requirement Lv 3",
+          "font": 10
+        },
+        {
+          "text": "3 HEROES GET AN UPGRADE · Mage, Cleric, Paladin",
+          "font": 9
+        },
+        {
+          "text": "UNCOMMON | armor | Requirement Lv 3",
+          "font": 10
+        },
+        {
+          "text": "2 HEROES GET AN UPGRADE · Ranger, Berserker",
+          "font": 9
+        },
+        {
+          "text": "RARE | armor | Requirement Lv 5",
+          "font": 10
+        },
+        {
+          "text": "8 HEROES GET AN UPGRADE · All classes",
+          "font": 9
+        },
+        {
+          "text": "RARE | accessory1 | Requirement Lv 6",
+          "font": 10
+        },
+        {
+          "text": "5 HEROES CAN EQUIP · All classes",
+          "font": 9
+        },
+        {
+          "text": "EPIC | weapon | Requirement Lv 6",
+          "font": 10
+        },
+        {
+          "text": "NO HERO READY · Warrior, Paladin",
+          "font": 9
+        },
+        {
+          "text": "RARE | accessory2 | Requirement Lv 6",
+          "font": 10
+        },
+        {
+          "text": "5 HEROES GET AN UPGRADE · All classes",
+          "font": 9
+        },
+        {
+          "text": "2",
+          "font": 10
+        },
+        {
+          "text": "Guild",
+          "font": 10
+        },
+        {
+          "text": "Quests",
+          "font": 10
+        },
+        {
+          "text": "World",
+          "font": 10
+        },
+        {
+          "text": "2",
+          "font": 10
+        },
+        {
+          "text": "Heroes",
+          "font": 10
+        },
+        {
+          "text": "Inventory",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 3415,
+      "viewport": 659
+    },
+    "text": "The Wayfarers\n4\nDAY 42 · GUILDHAVEN\n6,130\n35\n1\n180\nTRAINING · 1\n2D\n›\nInventory\n24 stored gear · 22 equipped · 264 materials · 12 potions\nEquipped items remain attached to heroes and appear in each Hero Equipment screen.\nWorkshops\nExpeditions\nPotions\nAll\nWeapons\nArmor\nAccessories\nMaterials\n24\nMilitia Handaxe\nCOMMON | weapon | Requirement Lv 1\n3 HEROES CAN EQUIP · Warrior, Paladin, Berserker\nValue 34 | \n›\nYew Shortbow\nCOMMON | weapon | Requirement Lv 1\n1 HERO CAN EQUIP · Ranger\nValue 35 | \n›\nPilgrim Rod\nCOMMON | weapon | Requirement Lv 1\n2 HEROES CAN EQUIP · Cleric, Paladin\nValue 34 | \n›\nQuilted Travel Coat\nCOMMON | armor | Requirement Lv 1\n9 HEROES GET AN UPGRADE · All classes\nValue 29 | +4% Physical Defense\n›\nIron Skullcap\nCOMMON | helmet | Requirement Lv 1\n4 HEROES GET AN UPGRADE · Warrior, Cleric, Paladin, Berserker\nValue 27 | +4% Physical Defense\n›\nSoft Leather Boots\nCOMMON | boots | Requirement Lv 1\n11 HEROES GET AN UPGRADE · All classes\nValue 26 | +2% Speed | +2% Speed\n›\nSimple Iron Band\nCOMMON | accessory1 | Requirement Lv 1\n11 HEROES GET AN UPGRADE · All classes\nValue 36 | +1.5% Magic Defense\n›\nBrass Focus Charm\nCOMMON | accessory2 | Requirement Lv 1\n11 HEROES GET AN UPGRADE · All classes\nValue 39 | +3% Magic Defense\n›\nVenomsteel Spear\nUNCOMMON | weapon | Requirement Lv 3\n3 HEROES GET AN UPGRADE · Warrior, Ranger, Paladin\nValue 185 | +4% Physical Attack | +1 Attack Roll\n›\nCinder-Edge Axe\nUNCOMMON | weapon | Requirement Lv 3\n2 HEROES GET AN UPGRADE · Warrior, Berserker\nValue 190 | +5% Physical Attack | +1 Attack Roll\n›\nEmberglass Wand\nUNCOMMON | weapon | Requirement Lv 3\n2 HEROES GET AN UPGRADE · Mage, Cleric\nValue 192 | +5% Magic Power | +1 Attack Roll\n›\nFrostwood Bow\nUNCOMMON | weapon | Requirement Lv 3\n1 HERO GET AN UPGRADE · Ranger\nValue 188 | +4% Physical Attack | +1 Attack Roll\n›\nBarbed War Pick\nUNCOMMON | weapon | Requirement Lv 3\n3 HEROES GET AN UPGRADE · Warrior, Paladin, Berserker\nValue 182 | +0.01 Critical Chance | +1 Attack Roll\n›\nSapphire Lamellar\nUNCOMMON | armor | Requirement Lv 4\n3 HEROES GET AN UPGRADE · Warrior, Cleric, Paladin\nValue 230 | +7.000000000000001% Magic Defense | +6% Physical Defense\n›\nRuneguard Robes\nUNCOMMON | armor | Requirement Lv 3\n2 HEROES GET AN UPGRADE · Mage, Cleric\nValue 198 | +5% Magic Defense | +8% Physical Defense\n›\nMirrorsteel Helm\nUNCOMMON | helmet | Requirement Lv 4\n4 HEROES GET AN UPGRADE · Warrior, Cleric, Paladin, Berserker\nValue 176 | +6% Physical Defense\n›\nWard-Thread Boots\nUNCOMMON | boots | Requirement Lv 3\n11 HEROES GET AN UPGRADE · All classes\nValue 155 | +4% Magic Defense | +4% Speed\n›\nAntivenom Band\nUNCOMMON | accessory1 | Requirement Lv 3\n11 HEROES GET AN UPGRADE · All classes\nValue 168 | +4.5% Magic Defense\n›\nCinderheart Charm\nUNCOMMON | accessory2 | Requirement Lv 3\n3 HEROES GET AN UPGRADE · Mage, Cleric, Paladin\nValue 180 | +4% Magic Power | +3% Magic Defense\n›\nVigilant Trail Coat\nUNCOMMON | armor | Requirement Lv 3\n2 HEROES GET AN UPGRADE · Ranger, Berserker\nValue 186 | +3% Speed | +8% Physical Defense\n›\nGuestfire Cloak\nRARE | armor | Requirement Lv 5\n8 HEROES GET AN UPGRADE · All classes\nValue 760 | +10% Max HP | +10% Magic Defense\n›\nMoonbell Ring\nRARE | accessory1 | Requirement Lv 6\n5 HEROES CAN EQUIP · All classes\nValue 820 | +2 Magic Defense Score | +1 Initiative\n›\nPale-Echo Lance\nEPIC | weapon | Requirement Lv 6\nNO HERO READY · Warrior, Paladin\nValue 1180 | +1 Attack Roll | +14.000000000000002% Physical Damage | +10% Magic Damage\n›\nFerryman's Lantern\nRARE | accessory2 | Requirement Lv 6\n5 HEROES GET AN UPGRADE · All classes\nValue 920 | +2 Initiative | +10% Magic Defense\n›\n2\nGuild\nQuests\nWorld\n2\nHeroes\nInventory"
+  },
+  {
+    "name": "TempleScreen",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Ftiefling%2Fpaladin/male-v4.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fveilborn%2Fmonk/male-v2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/female-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fdwarf%2Fsummoner/male-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Felf%2Fbulwark/female-v1.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Forc%2Fspellbow/male-v3.webp",
+          "loaded": true
+        }
+      ],
+      "smallText": [],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 3095,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nGUILDHAVEN · HEALING SERVICES\nTemple of Renewal\nRestore wounded adventurers with guild gold. Fallen heroes require rare soul gems before ordinary treatment can continue.\n◆ 6,130 gold\n◇ 35 gems\nTreatment\nRevival\nPercival Fairwind\nHP 293 / 293\nNo treatable conditions\nHeal to 50% · ◆0\nHeal Full · ◆0\nCure · ◆0\nFull treatment · ◆0\nSolveig Flintmantle\nHP 119 / 341\nNo treatable conditions\nHeal to 50% · ◆47\nHeal Full · ◆200\nCure · ◆0\nFull treatment · ◆200\nDaelis Moonshadow\nHP 290 / 290\nNo treatable conditions\nHeal to 50% · ◆0\nHeal Full · ◆0\nCure · ◆0\nFull treatment · ◆0\nAzhra Wolf-Breaker\nHP 272 / 272\nNo treatable conditions\nHeal to 50% · ◆0\nHeal Full · ◆0\nCure · ◆0\nFull treatment · ◆0\nMordai Redspire\nHP 284 / 284\nNo treatable conditions\nHeal to 50% · ◆0\nHeal Full · ◆0\nCure · ◆0\nFull treatment · ◆0\nOrris Starless\nHP 305 / 305\nNo treatable conditions\nHeal to 50% · ◆0\nHeal Full · ◆0\nCure · ◆0\nFull treatment · ◆0\nGwen Wainwright\nHP 282 / 282\nNo treatable conditions\nHeal to 50% · ◆0\nHeal Full · ◆0\nCure · ◆0\nFull treatment · ◆0\nNorri Embermantle\nHP 288 / 288\nNo treatable conditions\nHeal to 50% · ◆0\nHeal Full · ◆0\nCure · ◆0\nFull treatment · ◆0\nElaria Willowmere\nHP 314 / 314\nNo treatable conditions\nHeal to 50% · ◆0\nHeal Full · ◆0\nCure · ◆0\nFull treatment · ◆0\nKrothu Skullcleaver\nHP 282 / 282\nNo treatable conditions\nHeal to 50% · ◆0\nHeal Full · ◆0\nCure · ◆0\nFull treatment · ◆0"
+  },
+  {
+    "name": "TrainingGroundsScreen",
+    "errors": [],
+    "failed": [],
+    "metrics": {
+      "images": [
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fdwarf%2Fsummoner/male-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fdwarf%2Fcleric/female-v4.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Felf%2Franger/male-v2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Forc%2Fmage/female-v2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Ftiefling%2Fpaladin/male-v4.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fveilborn%2Fmonk/male-v2.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fhuman%2Fbard/female-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Felf%2Fbulwark/female-v1.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Forc%2Fspellbow/male-v3.webp",
+          "loaded": true
+        },
+        {
+          "src": "http://127.0.0.1:8099/assets/?unstable_path=.%2Fassets-runtime%2Fartwork-v2%2Fheroes%2Fhuman%2Fwarrior/male-v3.webp",
+          "loaded": true
+        }
+      ],
+      "smallText": [
+        {
+          "text": "DAY 42 · 6,130 GOLD",
+          "font": 10
+        },
+        {
+          "text": "1/2 SLOTS",
+          "font": 10
+        },
+        {
+          "text": "+1 SLOT",
+          "font": 10
+        },
+        {
+          "text": "2D LEFT",
+          "font": 10
+        },
+        {
+          "text": "+136 XP",
+          "font": 10
+        },
+        {
+          "text": "1D",
+          "font": 10
+        },
+        {
+          "text": "2D",
+          "font": 10
+        },
+        {
+          "text": "3D",
+          "font": 10
+        },
+        {
+          "text": "HALL LV 3",
+          "font": 10
+        },
+        {
+          "text": "READY",
+          "font": 10
+        },
+        {
+          "text": "TRAINING CAP · LEVEL 5",
+          "font": 10
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "scroll": {
+      "height": 2098,
+      "viewport": 844
+    },
+    "text": "‹ BACK\nGUILDHAVEN FACILITY\nGuild Training Yard\nDAY 42 · 6,130 GOLD\n1/2 SLOTS\nTrain reserves while the field team adventures. Earn XP up to the campaign and roster cap; attributes stay unchanged.\nTRAINING HALL\nLEVEL 2\nVeteran Training Hall\n2 concurrent training slots · 0 completed programs\nNEXT FACILITY LEVEL\nTraining Hall Level 3\n+1 SLOT\n1,800 gold · 5 days · capacity becomes 3\nBEGIN UPGRADE · 1,800G\nACTIVE TRAINING\nSLOT 1 · TRAINING\nNorri Embermantle\nAdventuring Fundamentals\n2D LEFT\n+136 XP\nReadiness on return · 100\nReady Day 44\nSLOT 2\nAVAILABLE\nAssign an available hero below.\nOPEN GUILD CALENDAR\nSELECT HERO\nPercival Fairwind\nLV 4\nReadiness 100\nPotential 50–67\nSolveig Flintmantle\nLV 5\nReadiness 100\nPotential 87–100\nDaelis Moonshadow\nLV 6\nReadiness 100\nPotential 67–91\nAzhra Wolf-Breaker\nLV 7\nReadiness 100\nPotential 50–65\nMordai Redspire\nLV 4\nReadiness 100\nPotential 61–83\nOrris Starless\nLV 6\nReadiness 100\nPotential 50–67\nGwen Wainwright\nLV 7\nReadiness 100\nPotential 50–72\nElaria Willowmere\nLV 5\nReadiness 100\nPotential 80–100\nKrothu Skullcleaver\nLV 6\nReadiness 100\nPotential 50–66\nCHOOSE PROGRAM\nSparring Drills\nA short catch-up course that grants XP but never attributes.\n1D\n50G\n+68 XP\nXP ONLY\nAdventuring Fundamentals\nA two-day XP course for inexperienced recruits returning to field readiness.\n2D\n110G\n+105 XP\nXP ONLY\nClass Instruction\nVeteran tutors grant catch-up XP without increasing attributes.\n3D\n190G\n+184 XP\nXP ONLY\nHeroic Curriculum\nThe hall's strongest catch-up course. It grants levels through XP only.\nHALL LV 3\n360G\n+315 XP\nXP ONLY\nTRAINING ORDER\nSELECTED TRAINEE\nPercival Fairwind\nSparring Drills · returns Day 43\nREADY\nLEVEL\n4\nXP REWARD\n+68\nREADINESS\n100 → 100\nCOST\n50G\nCURRENT XP · 0 / 4751\nAFTER TRAINING · 68 / 4751\nTRAINING CAP · LEVEL 5\nTraining can catch this hero toward the campaign and strongest-roster limit, but cannot overtake current progression.\nDaily calendar recovery still applies while training, so readiness can improve before the hero returns. Training never grants permanent attributes.\nBEGIN SPARRING DRILLS · READY DAY 43"
+  }
+]

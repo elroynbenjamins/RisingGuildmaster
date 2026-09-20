@@ -1,0 +1,90 @@
+[
+  {
+    "name": "GuildScreen--Narrow--320",
+    "folder": "final-phones",
+    "errors": [],
+    "failed": [],
+    "images": 16,
+    "horizontalOverflow": false
+  },
+  {
+    "name": "GuildScreen--HighContrast--390",
+    "folder": "final-phones",
+    "errors": [],
+    "failed": [],
+    "images": 16,
+    "horizontalOverflow": false
+  },
+  {
+    "name": "HeroesScreen--Narrow--320",
+    "folder": "final-phones",
+    "errors": [],
+    "failed": [],
+    "images": 20,
+    "horizontalOverflow": false
+  },
+  {
+    "name": "RecruitmentScreen--Narrow--320",
+    "folder": "final-phones",
+    "errors": [],
+    "failed": [],
+    "images": 4,
+    "horizontalOverflow": false
+  },
+  {
+    "name": "InventoryScreen--Narrow--320",
+    "folder": "final-phones",
+    "errors": [],
+    "failed": [],
+    "images": 33,
+    "horizontalOverflow": false
+  },
+  {
+    "name": "HeroDetailScreen--Narrow--320",
+    "folder": "final-phones",
+    "errors": [],
+    "failed": [],
+    "images": 3,
+    "horizontalOverflow": false
+  },
+  {
+    "name": "ItemDetailScreen--Narrow--320",
+    "folder": "final-phones",
+    "errors": [],
+    "failed": [],
+    "images": 4,
+    "horizontalOverflow": false
+  },
+  {
+    "name": "QuestSelectionScreen--Narrow--320",
+    "folder": "final-followup",
+    "errors": [],
+    "failed": [],
+    "images": 9,
+    "horizontalOverflow": false
+  },
+  {
+    "name": "WorldMapScreen--Narrow--320",
+    "folder": "final-followup",
+    "errors": [],
+    "failed": [],
+    "images": 37,
+    "horizontalOverflow": false
+  },
+  {
+    "name": "CandidateDetailScreen--Narrow--320",
+    "folder": "final-followup",
+    "errors": [],
+    "failed": [],
+    "images": 1,
+    "horizontalOverflow": false
+  },
+  {
+    "name": "SettingsScreen--HighContrast--390",
+    "folder": "final-phones",
+    "errors": [],
+    "failed": [],
+    "images": 0,
+    "horizontalOverflow": false
+  }
+]

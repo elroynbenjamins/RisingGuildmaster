@@ -19,9 +19,16 @@ export interface EncounterEnemyGroup {
   spawnPositions: GridPosition[];
 }
 
+export type EncounterObjectiveDefinition =
+  | { type: "eliminate_all"; label?: string }
+  | { type: "eliminate_targets"; enemyDefinitionIds: string[]; label?: string }
+  | { type: "survive_rounds"; rounds: number; label?: string; allowEliminationVictory?: boolean }
+  | { type: "reach_zone"; positions: GridPosition[]; requiredHeroes?: number; label?: string };
+
 export interface EncounterDefinition {
   id: string;
   battlefieldId: string;
+  objective?: EncounterObjectiveDefinition;
   /** Roguelite-only progression gate. Ordinary quest encounters ignore this field. */
   minimumRoguelitePartyLevel?: number;
   heroSpawnPositions: GridPosition[];

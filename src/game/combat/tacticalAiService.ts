@@ -12,7 +12,7 @@ import { getEffectiveMovementRange } from "./conditionResolver";
 import { hasLineOfSight } from "./grid/lineOfSight";
 import { leavesMeleeReach } from "./opportunityAttackService";
 import type { EnemyAiLevel } from "../difficulty/difficultyTypes";
-import { getTile } from "./grid/gridTypes";
+import { getTile, positionKey } from "./grid/gridTypes";
 import { orthogonalNeighbors } from "./grid/distanceCalculator";
 
 function targetPriorityScore(actor: CombatUnit, target: CombatUnit, behavior: TacticalBehavior): number {
@@ -72,6 +72,7 @@ export function countPathReactionRisks(path: readonly GridPosition[], reactionTh
 export function chooseEnemyDestination(board: CombatBoardState, actor: CombatUnit, target: CombatUnit, behavior: TacticalBehavior, reactionThreats: readonly CombatUnit[] = [], aiLevel: EnemyAiLevel = "tactical"): GridPosition {
   const currentDistance = manhattanDistance(actor.position, target.position);
   const candidates = [actor.position, ...getReachablePositions(board, actor.position, getEffectiveMovementRange(actor), actor.ignoredTerrainMovementCosts)];
+  const trapKeys = new Set(board.tiles.filter((tile) => tile.terrainType === "trap").map((tile) => positionKey(tile.position)));
   const retreating = behavior.retreatRange !== undefined && currentDistance < behavior.retreatRange;
   const lowHealthCaution = (1 - actor.currentHP / Math.max(1, actor.maxHP)) * 20;
   const score = (position: GridPosition): number => {
@@ -80,7 +81,7 @@ export function chooseEnemyDestination(board: CombatBoardState, actor: CombatUni
     const reactions = countPathReactionRisks(path, reactionThreats);
     const awareness = aiLevel === "trained" ? .45 : aiLevel === "ruthless" ? 1.35 : 1;
     const reactionPenalty = reactions * ((behavior.reactionRiskWeight ?? 35) + lowHealthCaution) * awareness;
-    const trapCount = path.slice(1).filter((step) => getTile(board, step)?.terrainType === "trap").length;
+    const trapCount = trapKeys.size ? path.slice(1).filter((step) => trapKeys.has(positionKey(step))).length : 0;
     const trapPenalty = trapCount * (aiLevel === "trained" ? 12 : aiLevel === "ruthless" ? 52 : 38);
     const rangePenalty = retreating && distance < (behavior.retreatRange ?? 0)
       ? ((behavior.retreatRange ?? 0) - distance) * 24

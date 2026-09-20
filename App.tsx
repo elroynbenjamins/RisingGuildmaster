@@ -26,6 +26,7 @@ import { DungeonScreen } from "./src/screens/Dungeon/DungeonScreen";
 import { TrainingGroundsScreen } from "./src/screens/Training/TrainingGroundsScreen";
 import { getDungeonCombatSetup, resolveDungeonCombat } from "./src/game/dungeons/dungeonRunService";
 import { isChapterOneComplete } from "./src/game/dungeons/rogueliteRotationService";
+import { DUNGEON_UNLOCK_HERO_COUNT } from "./src/game/dungeons/dungeonDraftService";
 import { MainMenuScreen } from "./src/screens/MainMenu/MainMenuScreen";
 import { TutorialScreen } from "./src/screens/Tutorial/TutorialScreen";
 import { beginTutorial, hasSeenContextualTutorial, markContextualTutorialSeen, skipTutorial } from "./src/game/onboarding/tutorialService";
@@ -112,7 +113,7 @@ function Game() {
       id = "idle_missions";
       title = "Idle Mission Progress";
       message = "Idle Missions award their listed XP plus a guaranteed 5% of each assigned hero’s next-level requirement. The mission screen previews that progress before deployment.";
-    } else if (route.name === "dungeon" && guild.heroes.length >= 6 && isChapterOneComplete(guild)) {
+    } else if (route.name === "dungeon" && guild.heroes.length >= DUNGEON_UNLOCK_HERO_COUNT && isChapterOneComplete(guild)) {
       id = "roguelite_expeditions";
       title = "Roguelite Expeditions";
       eyebrow = "MODE UNLOCKED";

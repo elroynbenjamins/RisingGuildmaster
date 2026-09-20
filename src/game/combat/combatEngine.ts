@@ -9,6 +9,7 @@ import { HERO_SKILLS } from "../../data/skills/heroSkills";
 import type { RandomSource } from "../../utils/random";
 import type { EnemyInstance } from "../enemies/enemyTypes";
 import type { Hero } from "../heroes/types";
+import type { EncounterObjectiveDefinition } from "../quests/questTypes";
 import { createQuestEncounter } from "../quests/encounterFactory";
 import { advanceCombatConditions, getEffectiveMovementRange, resolveStartOfTurnConditions } from "./conditionResolver";
 import { advanceCooldowns } from "./cooldownService";
@@ -21,6 +22,7 @@ import { rollInitiative } from "./turnOrder";
 import { resolveEnemyTurn } from "./turnResolver";
 import { createCombatBoard, setOccupant } from "./grid/boardFactory";
 import { ensureConnectedBattlefield } from "./grid/boardConnectivity";
+import { validateEncounterReachability } from "./grid/encounterReachability";
 import type { CombatBoardState, GridPosition } from "./grid/gridTypes";
 import { getTile, positionKey } from "./grid/gridTypes";
 import { getElevationAttackRollModifier } from "./grid/elevationService";
@@ -39,6 +41,7 @@ import type { EnemyAiLevel, GameDifficultyId } from "../difficulty/difficultyTyp
 import { getDifficulty } from "../../data/difficulty/difficulties";
 import type { RaidCombatMechanicState } from "../raids/raidTypes";
 import { initializeRaidMechanics, resolveRaidRoundStart } from "../raids/raidCombatMechanicService";
+import { getEncounterObjective, isEncounterObjectiveComplete } from "./combatObjectiveService";
 
 export interface HeroCombatant { hero: Hero; instance: HeroCombatInstance; unit: CombatUnit }
 export interface EnemyCombatant { instance: EnemyInstance; unit: CombatUnit }
@@ -55,6 +58,7 @@ export interface CombatState {
   spentReactionIds: string[];
   enemyAiLevel: EnemyAiLevel;
   raidMechanic: RaidCombatMechanicState | null;
+  objective: EncounterObjectiveDefinition;
 }
 
 export function createCombatState(questId: string, encounterIndex: number, heroes: readonly Hero[], random: RandomSource, carried?: readonly HeroCombatInstance[], setup?: QuestCombatSetup, relationships: readonly HeroRelationship[] = [], difficultyId: GameDifficultyId = "standard", enemyLevelModifier = 0): CombatState {
@@ -62,6 +66,7 @@ export function createCombatState(questId: string, encounterIndex: number, heroe
   const encounterIds = setup?.encounterIds ?? quest.encounterIds;
   const encounterId = encounterIds[encounterIndex]; const encounter = encounterId ? QUEST_ENCOUNTERS[encounterId] : undefined;
   if (!encounterId || !encounter) throw new Error(`Unknown quest encounter at index ${encounterIndex}`);
+  const objective = getEncounterObjective(encounter);
   const battlefield = BATTLEFIELDS[encounter.battlefieldId]; if (!battlefield) throw new Error(`Unknown battlefield: ${encounter.battlefieldId}`);
   const environment = battlefield.combatModifiers ?? {};
   const carriedById = new Map((carried ?? []).map((instance) => [instance.heroId, instance]));
@@ -82,10 +87,11 @@ export function createCombatState(questId: string, encounterIndex: number, heroe
     return { ...item, instance: { ...item.instance, movementRange }, unit: { ...item.unit, movementRange, stats: { ...item.unit.stats, physicalDamage: item.unit.stats.physicalDamage * physicalMultiplier, magicDamage: item.unit.stats.magicDamage * magicMultiplier, initiativeBonus: item.unit.stats.initiativeBonus + (setup?.enemyInitiativeModifier ?? 0) + (environment.enemyInitiativeModifier ?? 0) }, activeModifiers: [...item.unit.activeModifiers, ...((setup?.enemyAttackRollModifier ?? 0) ? [{ stat: "attackRollModifier", operation: "flat" as const, value: setup!.enemyAttackRollModifier!, durationTurns: -1, sourceSkillId: "quest_difficulty" }] : []), ...((setup?.enemyOpeningAttackRollModifier ?? 0) ? [{ stat: "attackRollModifier", operation: "flat" as const, value: setup!.enemyOpeningAttackRollModifier, durationTurns: 2, sourceSkillId: "quest_preparation" }] : [])] } };
   });
   let board = ensureConnectedBattlefield(createCombatBoard(encounter.obstaclePositions, battlefield.boardSizeId, battlefield.terrainPlacements, battlefield.id));
+  validateEncounterReachability(board, encounter);
   board = spawnOccupants(board, [...heroCombatants.map((item) => ({ occupantId: item.unit.combatantId, position: item.unit.position })), ...enemies.map((item) => ({ occupantId: item.unit.combatantId, position: item.unit.position }))]);
   const units = [...heroCombatants.map((item) => item.unit), ...enemies.map((item) => item.unit)];
   const initiative = rollInitiative(units, random);
-  return { questId, encounterIndex, encounterIds, ...(setup?.label ? { setupLabel: setup.label } : {}), round: 1, turn: 1, heroes: heroCombatants, enemies, board, initiativeRolls: initiative.map(({ combatantId, d20, modifier, total }) => ({ combatantId, d20, modifier, total })), combatStarted: false, turnOrderIds: initiative.map((entry) => entry.combatantId), turnCursor: 0, awaitingHeroId: null, actions: { movementUsed: false, combatActionUsed: false }, status: "active", log: [], lastRoll: null, lastVisualEvent:null, relationships: [...relationships], spentReactionIds: [], enemyAiLevel: difficulty.enemyAiLevel, raidMechanic: null };
+  return { questId, encounterIndex, encounterIds, ...(setup?.label ? { setupLabel: setup.label } : {}), round: 1, turn: 1, heroes: heroCombatants, enemies, board, initiativeRolls: initiative.map(({ combatantId, d20, modifier, total }) => ({ combatantId, d20, modifier, total })), combatStarted: false, turnOrderIds: initiative.map((entry) => entry.combatantId), turnCursor: 0, awaitingHeroId: null, actions: { movementUsed: false, combatActionUsed: false }, status: "active", log: [], lastRoll: null, lastVisualEvent:null, relationships: [...relationships], spentReactionIds: [], enemyAiLevel: difficulty.enemyAiLevel, raidMechanic: null, objective };
 }
 
 export function beginCombat(state: CombatState, random: RandomSource, automaticTurnLimit = Number.POSITIVE_INFINITY): CombatState {
@@ -94,8 +100,14 @@ export function beginCombat(state: CombatState, random: RandomSource, automaticT
 }
 
 function withOutcome(state: CombatState): CombatState {
-  if (state.enemies.every((item) => !item.unit.isAlive)) return { ...state, status: "victory", awaitingHeroId: null };
   if (state.heroes.every((item) => !item.unit.isAlive)) return { ...state, status: "defeat", awaitingHeroId: null };
+  const objectiveComplete = isEncounterObjectiveComplete(
+    state.objective,
+    state.round,
+    state.heroes.map((item) => ({ isAlive: item.unit.isAlive, position: item.unit.position })),
+    state.enemies.map((item) => ({ isAlive: item.unit.isAlive, enemyDefinitionId: item.instance.enemyDefinitionId })),
+  );
+  if (objectiveComplete) return { ...state, status: "victory", awaitingHeroId: null };
   return state;
 }
 function replaceUnits<T extends { unit: CombatUnit }>(items: T[], updates: readonly CombatUnit[]): T[] { const byId = new Map(updates.map((unit) => [unit.combatantId, unit])); return items.map((item) => byId.has(item.unit.combatantId) ? { ...item, unit: byId.get(item.unit.combatantId)! } : item); }
@@ -235,7 +247,7 @@ export function moveCurrentHero(state: CombatState, destination: GridPosition, r
   if (!path) throw new Error("Destination is not reachable");
   const moved = applyOpportunityMovement(state, combatant.unit.combatantId, path, random);
   const terrainType=getTile(moved.state.board,destination)?.terrainType;const lastVisualEvent:CombatVisualEvent={id:moved.state.log.length+1+state.turn*1000,kind:"movement",actionId:"move",actorId:combatant.hero.id,range:moved.travelledTiles,fromPosition:combatant.unit.position,toPosition:destination,terrainType,effects:[]};
-  const result = { ...moved.state, actions: { ...state.actions, movementUsed: true }, log: [...moved.state.log, { turn: state.turn, actorId: combatant.hero.id, actionId: "move", targetIds: [], message: `${combatant.hero.name} moved ${moved.travelledTiles} tiles${moved.state.heroes[index]?.unit.isAlive ? "." : " before being defeated."}` }],lastVisualEvent };
+  const result = withOutcome({ ...moved.state, actions: { ...state.actions, movementUsed: true }, log: [...moved.state.log, { turn: state.turn, actorId: combatant.hero.id, actionId: "move", targetIds: [], message: `${combatant.hero.name} moved ${moved.travelledTiles} tiles${moved.state.heroes[index]?.unit.isAlive ? "." : " before being defeated."}` }],lastVisualEvent });
   return result.status === "active" && !result.heroes[index]?.unit.isAlive ? endCurrentHeroTurn(result, random, automaticTurnLimit) : result;
 }
 

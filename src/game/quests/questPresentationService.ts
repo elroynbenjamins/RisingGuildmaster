@@ -9,6 +9,8 @@ export interface QuestTypePresentation {
   heading: string;
   summary: string;
   completionNote: string;
+  briefingLabel: string;
+  debriefLabel: string;
 }
 
 const PRESENTATION: Record<QuestType, QuestTypePresentation> = {
@@ -17,24 +19,32 @@ const PRESENTATION: Record<QuestType, QuestTypePresentation> = {
     heading: "Campaign Mission",
     summary: "Advances Eldoria's main story, chapter progression, and world state.",
     completionNote: "The outcome becomes part of the campaign record.",
+    briefingLabel: "CHAPTER SCENE",
+    debriefLabel: "CHAPTER AFTERMATH",
   },
   side: {
     badge: "LOCAL STORY",
     heading: "Side Quest",
     summary: "A one-time optional story tied to a place, person, or regional problem.",
     completionNote: "Optional, but its people and discoveries can echo into later stories.",
+    briefingLabel: "LOCAL SCENE",
+    debriefLabel: "LOCAL AFTERMATH",
   },
   contract: {
     badge: "GUILD WORK",
     heading: "Contract",
     summary: "Repeatable professional work that builds the guild through practical field experience.",
     completionNote: "Designed as repeatable guild work rather than a major story chapter.",
+    briefingLabel: "CONTRACT BRIEF",
+    debriefLabel: "GUILD REPORT",
   },
   boss: {
     badge: "MAJOR THREAT",
     heading: "Boss Mission",
     summary: "A named enemy or decisive confrontation with higher tactical stakes.",
     completionNote: "Expect a defining encounter and a larger story consequence.",
+    briefingLabel: "CONFRONTATION",
+    debriefLabel: "BATTLE AFTERMATH",
   },
 };
 

@@ -10,3 +10,6 @@ export function createCombatBoard(obstacles: readonly GridPosition[] = [], sizeI
   return { sizeId, environmentId, width: size.width, height: size.height, tiles };
 }
 export function setOccupant(board: CombatBoardState, position: GridPosition, occupantId: string | null): CombatBoardState { return { ...board, tiles: board.tiles.map((tile) => tile.position.x === position.x && tile.position.y === position.y ? { ...tile, occupantId } : tile) }; }
+export function setTerrainType(board: CombatBoardState, position: GridPosition, terrainType: TerrainType, elevation = 0): CombatBoardState {
+  return { ...board, tiles: board.tiles.map((tile) => tile.position.x === position.x && tile.position.y === position.y ? { ...tile, terrainType, elevation, ...TERRAIN_RULES[terrainType] } : tile) };
+}

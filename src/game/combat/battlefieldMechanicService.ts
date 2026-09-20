@@ -55,14 +55,14 @@ function resolveOutcome(state: CombatState): CombatState {
 function explode(state: CombatState, interactive: BattlefieldInteractiveState): CombatState {
   const radius = Math.max(1, interactive.radius ?? 1);
   const ratio = Math.max(.01, interactive.damageMaxHpRatio ?? .12);
-  const hitIds: string[] = [];
+  const hitEffects: Array<{ targetId: string; damage: number }> = [];
   let board = state.board;
 
   const heroes = state.heroes.map((hero) => {
     if (!hero.unit.isAlive || manhattanDistance(hero.unit.position, interactive.position) > radius) return hero;
     const damage = Math.max(1, Math.round(hero.unit.maxHP * ratio));
     const currentHP = Math.max(0, hero.unit.currentHP - damage);
-    hitIds.push(hero.unit.combatantId);
+    hitEffects.push({ targetId: hero.unit.combatantId, damage });
     if (currentHP === 0) board = setOccupant(board, hero.unit.position, null);
     return {
       ...hero,
@@ -75,7 +75,7 @@ function explode(state: CombatState, interactive: BattlefieldInteractiveState): 
     if (!enemy.unit.isAlive || manhattanDistance(enemy.unit.position, interactive.position) > radius) return enemy;
     const damage = Math.max(1, Math.round(enemy.unit.maxHP * ratio));
     const currentHP = Math.max(0, enemy.unit.currentHP - damage);
-    hitIds.push(enemy.unit.combatantId);
+    hitEffects.push({ targetId: enemy.unit.combatantId, damage });
     if (currentHP === 0) board = setOccupant(board, enemy.unit.position, null);
     return {
       ...enemy,
@@ -95,7 +95,7 @@ function explode(state: CombatState, interactive: BattlefieldInteractiveState): 
       actionId: "battlefield_explosion",
       actorId: interactive.id,
       range: radius,
-      effects: hitIds.map((targetId) => ({ targetId, hit: true, critical: false, damage: 0, healing: 0, conditionIds: [] })),
+      effects: hitEffects.map(({ targetId, damage }) => ({ targetId, hit: true, critical: false, damage, healing: 0, conditionIds: [] })),
     },
   };
   next = clearTerrain(next, [interactive.position, ...(interactive.linkedPositions ?? [])]);

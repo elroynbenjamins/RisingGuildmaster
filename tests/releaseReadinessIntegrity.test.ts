@@ -12,6 +12,7 @@ import { completeCampaignNode, getAvailableCampaignNodes, getLatestCampaignChapt
 import { createWorldState } from "../src/game/world/worldState";
 import { getQuestStartBlocker } from "../src/game/quests/questAvailability";
 import { testHero } from "./testHero";
+import { unlockRegionalThreats } from "../src/game/world/regionalThreatService";
 
 function hasUnlockedPath(fromRegionId: string, destinationRegionId: string, unlockedRegionIds: readonly string[]): boolean {
   if (fromRegionId === destinationRegionId) return true;
@@ -84,6 +85,11 @@ describe("release readiness content integrity", () => {
     const levelThree = levelOne.map((hero) => ({ ...hero, level: 3 }));
     const remoteWorld = { ...world, unlockedRegionIds: [...new Set([...world.unlockedRegionIds, "iron_hills"])] };
     expect(getQuestStartBlocker(QUESTS.highcourt_silent_charter!, remoteWorld, levelThree)).toMatch(/prerequisites|Travel/i);
+
+    let crisisWorld = unlockRegionalThreats(createWorldState());
+    crisisWorld = { ...crisisWorld, currentRegionId: "shadowfen", currentSettlementId: "blackwater", unlockedRegionIds: [...new Set([...crisisWorld.unlockedRegionIds, "shadowfen"])], regionThreat: { shadowfen: 4 }, regionCrisisDays: { shadowfen: 80 } };
+    const blackwaterQuest = { ...QUESTS.highcourt_silent_charter!, regionId: "shadowfen", settlementIds: ["blackwater"] };
+    expect(getQuestStartBlocker(blackwaterQuest, crisisWorld, levelThree)).toMatch(/closed.*regional crisis/i);
   });
 
   it("keeps every campaign node and chapter reference valid", () => {

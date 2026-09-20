@@ -6,7 +6,7 @@ import { advanceConditions } from "../conditions/conditionService";
 import type { GuildState } from "../guild/types";
 import { contractDepartureDay, getContractStatus } from "../recruitment/contractService";
 import { completeTavernUpgrade, getTavernIncomeModifier } from "./tavernService";
-import { purgeExpiredCandidates } from "../recruitment/recruitmentService";
+import { FORMER_MEMBER_RETURN_COOLDOWN_DAYS, purgeExpiredCandidates } from "../recruitment/recruitmentService";
 import { advanceRegionalThreats, areRegionalThreatsUnlocked, canUnlockRegionalThreats, unlockRegionalThreats } from "../world/regionalThreatService";
 import type { GuildDayEvent, GuildDayPreview, GuildDayResolution, GuildTimeAdvanceResult } from "./economyTypes";
 import { resolveTrainingGroundDay } from "../training/trainingService";
@@ -39,10 +39,21 @@ function processContractDepartures(guild: GuildState, day: number): { guild: Gui
   const departing = new Set(departingIds);
   const events: GuildDayEvent[] = [];
   const returnedEquipment: string[] = [];
-  for (const hero of guild.heroes.filter((entry) => departing.has(entry.id))) {
+  const newFormerMembers = guild.heroes.filter((entry) => departing.has(entry.id)).map((hero) => {
+    const contract = guild.heroContracts.find((entry) => entry.heroId === hero.id)!;
     returnedEquipment.push(...Object.values(hero.equipment).filter((key): key is string => Boolean(key)));
-    events.push({ type: "contract_departure", text: hero.name + " left the guild after their contract ended. Equipped items were returned to inventory." });
-  }
+    events.push({ type: "contract_departure", text: hero.name + " left the guild after their contract ended. Equipped items were returned to inventory; they may be invited back later." });
+    return {
+      hero: { ...hero, equipment: { weapon:null, armor:null, helmet:null, boots:null, accessory1:null, accessory2:null } },
+      departedDay: day,
+      eligibleReturnDay: day + FORMER_MEMBER_RETURN_COOLDOWN_DAYS,
+      lastWeeklySalary: contract.weeklySalary,
+      rehireCount: hero.history.events.filter((event) => event.tags?.includes("returning_hero")).length,
+      relationships: guild.relationships.filter((relationship) => relationship.heroIdA === hero.id || relationship.heroIdB === hero.id),
+    };
+  });
+  const existingFormer = guild.recruitment.formerMembers.filter((member) => !departing.has(member.hero.id));
+  const formerMembers = [...existingFormer, ...newFormerMembers].sort((a,b)=>b.departedDay-a.departedDay);
   return {
     events,
     guild: {
@@ -53,6 +64,7 @@ function processContractDepartures(guild: GuildState, day: number): { guild: Gui
       relationships: guild.relationships.filter((relationship) => !departing.has(relationship.heroIdA) && !departing.has(relationship.heroIdB)),
       recentPartyHeroIds: guild.recentPartyHeroIds.filter((id) => !departing.has(id)),
       partyPresets: guild.partyPresets.map((preset) => ({ ...preset, heroIds: preset.heroIds.filter((id) => !departing.has(id)) })),
+      recruitment: { ...guild.recruitment, formerMembers },
       finance: { ...guild.finance, salaryArrearsByHeroId: Object.fromEntries(Object.entries(guild.finance.salaryArrearsByHeroId).filter(([id]) => !departing.has(id))) },
     },
   };

@@ -21,6 +21,15 @@ describe("progression and retention systems", () => {
     expect(migrated.seenUnlockSummaryIds).toContain("region:greenveil");
   });
 
+  it("migrates v4 saves with an empty Former Members archive", () => {
+    const payload=JSON.parse(serializeGuild(createGuild()));
+    payload.saveVersion=4;
+    delete payload.recruitment.formerMembers;
+    const migrated=deserializeGuild(JSON.stringify(payload));
+    expect(migrated.saveVersion).toBe(CURRENT_SAVE_VERSION);
+    expect(migrated.recruitment.formerMembers).toEqual([]);
+  });
+
   it("claims completed achievements once and grants small gem rewards", () => {
     const guild = createGuild();
     guild.heroes = [{ ...testHero(), id: "a" }, { ...testHero(), id: "b" }];

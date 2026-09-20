@@ -1,6 +1,7 @@
 import type { Hero } from "../heroes/types";
 import type { ClassId, RaceId } from "../heroes/types";
 import type { AttributeKey } from "../attributes/types";
+import type { HeroRelationship } from "../relationships/relationshipTypes";
 
 export type RecruitmentArchetype = "prospect" | "standard" | "veteran" | "elite";
 export type ScoutingLevel = 0 | 1 | 2 | 3;
@@ -37,6 +38,14 @@ export interface RecruitmentCandidate {
   sourceLocationName: string | null;
 }
 
+export interface FormerGuildMember {
+  hero: Hero;
+  departedDay: number;
+  eligibleReturnDay: number;
+  lastWeeklySalary: number;
+  rehireCount: number;
+  relationships: HeroRelationship[];
+}
 export interface RecruitmentState {
   candidateIds: string[];
   candidates: RecruitmentCandidate[];
@@ -46,6 +55,7 @@ export interface RecruitmentState {
   nextFreeRefreshDay: number;
   manualRefreshCost: number;
   regionalScoutMission: RegionalScoutMission | null;
+  formerMembers: FormerGuildMember[];
 }
 
 export interface RegionalScoutMission {

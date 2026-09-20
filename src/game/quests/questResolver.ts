@@ -83,6 +83,12 @@ export function getQuestEquipmentDropChance(quest: ReturnType<typeof getQuestDef
   return .60;
 }
 
+export function getQuestGoldModifier(guild: GuildState, quest: ReturnType<typeof getQuestDefinition>, partyHeroes: readonly Hero[]): number {
+  const traitBonus = partyHeroes.reduce((sum, hero) => sum + getTraitPercentage(hero, "questGold"), 0);
+  if (quest.questType !== "contract") return traitBonus;
+  return traitBonus + getGuildRank(guild.reputation).benefits.contractGoldModifier + getRegionThreatEffects(guild.world, quest.regionId).contractGoldModifier;
+}
+
 export function isCombatVictory(enemies: readonly { isAlive: boolean }[]): boolean { return enemies.every((enemy) => !enemy.isAlive); }
 export function isCombatDefeat(heroes: readonly { isAlive: boolean }[]): boolean { return heroes.every((hero) => !hero.isAlive); }
 export function advanceToNextEncounter(activeQuest: ActiveQuest, instances: readonly HeroCombatInstance[]): { activeQuest: ActiveQuest; heroInstances: HeroCombatInstance[]; complete: boolean } {
@@ -140,8 +146,7 @@ function persistHeroOutcome(hero: Hero, instance: HeroCombatInstance, xp: number
 
 export function resolveQuestVictory(activeQuest: ActiveQuest, party: Party, guild: GuildState, instances: readonly HeroCombatInstance[], random: RandomSource): { activeQuest: ActiveQuest; guild: GuildState } {
   const quest = getQuestDefinition(activeQuest.questDefinitionId); const partyHeroes = guild.heroes.filter((hero) => party.heroIds.includes(hero.id));
-  const regionalThreatBonus = quest.questType === "contract" ? getRegionThreatEffects(guild.world, quest.regionId).contractGoldModifier : 0;
-  const goldModifier = partyHeroes.reduce((sum, hero) => sum + getTraitPercentage(hero, "questGold"), 0) + (quest.questType === "contract" ? getGuildRank(guild.reputation).benefits.contractGoldModifier : 0) + regionalThreatBonus;
+  const goldModifier = getQuestGoldModifier(guild, quest, partyHeroes);
   const gold = Math.max(0, Math.round(rollQuestGold(quest, random) * (1 + goldModifier) * getDifficulty(guild.difficultyId).questGoldMultiplier));
   const byId = new Map(instances.map((instance) => [instance.heroId, instance]));
   const heroes = guild.heroes.map((hero) => {

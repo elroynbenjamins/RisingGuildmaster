@@ -3,7 +3,25 @@ import type { BattlefieldInteractiveDefinition, BattlefieldInteractiveState } fr
 import { isEncounterObjectiveComplete } from "./combatObjectiveService";
 import { setOccupant, setTerrainType } from "./grid/boardFactory";
 import { manhattanDistance } from "./grid/distanceCalculator";
-import { positionKey } from "./grid/gridTypes";
+import { getTile, isPositionInBounds, positionKey, type CombatBoardState } from "./grid/gridTypes";
+import { orthogonalNeighbors } from "./grid/distanceCalculator";
+
+export function validateBattlefieldInteractives(board: CombatBoardState, definitions: readonly BattlefieldInteractiveDefinition[] = []): void {
+  const ids = new Set<string>();
+  for (const definition of definitions) {
+    if (ids.has(definition.id)) throw new Error(`Duplicate battlefield interactive id: ${definition.id}`);
+    ids.add(definition.id);
+    if (!isPositionInBounds(definition.position, board)) throw new Error(`Battlefield object ${definition.id} is out of bounds`);
+    const usableFrom = [definition.position, ...orthogonalNeighbors(definition.position)].some((position) => {
+      const tile = getTile(board, position);
+      return Boolean(tile && !tile.blocksMovement);
+    });
+    if (!usableFrom) throw new Error(`Battlefield object ${definition.id} has no usable adjacent tile`);
+    for (const linked of definition.linkedPositions ?? []) {
+      if (!isPositionInBounds(linked, board)) throw new Error(`Battlefield object ${definition.id} links out of bounds`);
+    }
+  }
+}
 
 export function initializeBattlefieldInteractives(definitions: readonly BattlefieldInteractiveDefinition[] = []): BattlefieldInteractiveState[] {
   return definitions.map((definition) => ({

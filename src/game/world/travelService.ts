@@ -11,6 +11,7 @@ import type { TravelEventTier, WorldEventDefinition, WorldState } from "./worldT
 import type { GuildmasterProfile } from "../guildmaster/guildmasterTypes";
 import { hasGuildmasterSkill } from "../guildmaster/guildmasterProgression";
 import { createGuildLegacyState, displayedTrophyBonus } from "../renown/guildLegacyService";
+import { isSettlementAvailable } from "./regionalThreatService";
 
 export const TRAVEL_EVENT_CHANCE = .45;
 export interface TravelResult { state: WorldState; event: WorldEventDefinition | null; d100Roll?: number; tier?: TravelEventTier | null }
@@ -26,22 +27,37 @@ export function rollTravelEvent(regionId: string, random: RandomSource): WorldEv
   const total = available.reduce((sum, event) => sum + event.weight, 0); let weighted = random.next() * total;
   for (const event of available) { weighted -= event.weight; if (weighted <= 0) return event; } return available.at(-1) ?? null;
 }
-function destinationSettlement(regionId: string): string | null { return REGIONS[regionId]?.settlementIds.find((id) => Boolean(SETTLEMENTS[id])) ?? null; }
+function destinationSettlement(state: WorldState, regionId: string): string | null {
+  return REGIONS[regionId]?.settlementIds.find((id) => Boolean(SETTLEMENTS[id]) && isSettlementAvailable(state, id)) ?? null;
+}
 export function travelToRegion(state: WorldState, destinationRegionId: string, random: RandomSource): TravelResult {
   if (!REGIONS[destinationRegionId]) throw new Error("Unknown destination region");
   if (!canTravel(state, destinationRegionId)) throw new Error("Destination must be unlocked and directly connected");
   const d100Roll = random.int(1, 100); const tier = getTravelTier(d100Roll); const available = tier ? [...Object.values(WORLD_EVENTS).filter((event) => event.regionIds.includes(destinationRegionId) && (event.tier ?? "common") === tier), ...getTravelContractEvents(destinationRegionId, tier)] : [];
   const event = available.length ? random.pick(available) : null;
-  return { state: { ...state, currentRegionId: destinationRegionId, currentSettlementId: destinationSettlement(destinationRegionId) }, event, d100Roll, tier };
+  const currentSettlementId = destinationSettlement(state, destinationRegionId);
+  return { state: { ...state, currentRegionId: destinationRegionId, currentSettlementId, discoveredSettlementIds: currentSettlementId ? [...new Set([...state.discoveredSettlementIds, currentSettlementId])] : state.discoveredSettlementIds }, event, d100Roll, tier };
 }
 export function travelGuildToRegion(guild: GuildState, destinationRegionId: string, partySize: number, random: RandomSource): GuildTravelResult {
   const days = getRegionalTravelDays(guild.world.currentRegionId, destinationRegionId); const rationCost = getTravelRationCost(days, partySize, guild.guildmaster);
   if (guild.rations < rationCost) throw new Error(`Not enough rations. This ${days}-day journey needs ${rationCost}.`);
-  const travelled = travelToRegion(guild.world, destinationRegionId, random); const advanced = advanceGuildTime({ ...guild, rations: guild.rations - rationCost }, days).guild;
-  return { ...travelled, guild: { ...advanced, world: travelled.state }, days, rationCost };
+  if (!REGIONS[destinationRegionId]) throw new Error("Unknown destination region");
+  if (!canTravel(guild.world, destinationRegionId)) throw new Error("Destination must be unlocked and directly connected");
+  const d100Roll = random.int(1, 100); const tier = getTravelTier(d100Roll); const available = tier ? [...Object.values(WORLD_EVENTS).filter((event) => event.regionIds.includes(destinationRegionId) && (event.tier ?? "common") === tier), ...getTravelContractEvents(destinationRegionId, tier)] : [];
+  const event = available.length ? random.pick(available) : null;
+  const advanced = advanceGuildTime({ ...guild, rations: guild.rations - rationCost }, days).guild;
+  const currentSettlementId = destinationSettlement(advanced.world, destinationRegionId);
+  const world = {
+    ...advanced.world,
+    currentRegionId: destinationRegionId,
+    currentSettlementId,
+    discoveredSettlementIds: currentSettlementId ? [...new Set([...advanced.world.discoveredSettlementIds, currentSettlementId])] : advanced.world.discoveredSettlementIds,
+  };
+  return { state: world, event, d100Roll, tier, guild: { ...advanced, world }, days, rationCost };
 }
 export function visitSettlement(guild: GuildState, settlementId: string, partySize: number): GuildState {
   const settlement = SETTLEMENTS[settlementId]; if (!settlement || settlement.regionId !== guild.world.currentRegionId) throw new Error("Settlement is outside the current region");
+  if (!isSettlementAvailable(guild.world, settlementId)) throw new Error("Settlement is currently unavailable because of a regional crisis");
   if (guild.world.currentSettlementId === settlementId) return guild;
   const rationCost = getTravelRationCost(1, partySize, guild.guildmaster); if (guild.rations < rationCost) throw new Error(`Local travel needs ${rationCost} rations.`);
   const advanced = advanceGuildTime({ ...guild, rations: guild.rations - rationCost }, 1).guild;

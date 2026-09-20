@@ -22,6 +22,8 @@ import { getAvailableCampaignNodes } from "../../game/campaign/campaignService";
 import { getCampaignNodeLocationRequirement, isAtCampaignLocation } from "../../game/campaign/campaignLocationService";
 import { getCampaignTravelStep } from "../../game/campaign/campaignTravelService";
 import { getDefaultTravelPartyHeroIds, getEligibleTravelHeroes, normalizeTravelPartyHeroIds, toggleTravelPartyHeroId, travelGuildPartyToRegion } from "../../game/world/travelPartyService";
+import { QUESTS } from "../../data/quests/quests";
+import { isQuestAvailableForGuild, isQuestBoardCategoryUnlocked } from "../../game/quests/questAvailability";
 
 interface WorldMapProps {
   guild: GuildState;
@@ -47,7 +49,17 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
   const travelAllowed = canTravel(guild.world, selectedId);
   const homelandContacts = Object.values(RACE_HOMELANDS).filter((homeland) => homeland.regionId === selectedId);
   const averageLevel = guild.heroes.length ? guild.heroes.reduce((sum, hero) => sum + hero.level, 0) / guild.heroes.length : 0;
-  const completedRegionQuests = selected.questPoolIds.filter((id) => guild.world.completedQuestIds.includes(id)).length;
+  const highestHeroLevel = Math.max(1, ...guild.heroes.map((hero) => hero.level));
+  const regionalQuestIds = selected.questPoolIds.filter((id) => QUESTS[id]?.regionId === selectedId);
+  const completedRegionQuests = regionalQuestIds.filter((id) => guild.world.completedQuestIds.includes(id)).length;
+  const availableRegionalQuestId = regionalQuestIds.find((id) => {
+    const quest = QUESTS[id];
+    return Boolean(quest
+      && !quest.hiddenFromQuestBoard
+      && (quest.repeatable || !guild.world.completedQuestIds.includes(id))
+      && isQuestBoardCategoryUnlocked(quest.questType, guild.world, highestHeroLevel)
+      && isQuestAvailableForGuild(quest, guild.world, guild.heroes));
+  });
   const threatsUnlocked = areRegionalThreatsUnlocked(guild.world);
   const selectedThreat = threatsUnlocked ? guild.world.regionThreat?.[selectedId] ?? 0 : 0;
   const nextCampaignNode = getAvailableCampaignNodes(guild.world)[0];
@@ -178,8 +190,8 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
         {showRegionIntel && <View style={styles.intelBlock}>
           <Text style={styles.detail}>Enemy factions: {selected.enemyFactionIds.join(", ") || "Unknown"}</Text>
           {homelandContacts.length > 0 && <Text style={styles.detail}>Recruitment homeland: {homelandContacts.map((homeland) => `${RACES[homeland.raceId].name} · ${homeland.locationName}`).join(", ")}</Text>}
-          <Text style={styles.detail}>Possible quests and road encounters: {selected.questPoolIds.length}</Text>
-          <Text style={styles.detail}>Regional progress: {completedRegionQuests}/{selected.questPoolIds.length} listed quests complete</Text>
+          <Text style={styles.detail}>Possible quests and road encounters: {regionalQuestIds.length}</Text>
+          <Text style={styles.detail}>Regional progress: {completedRegionQuests}/{regionalQuestIds.length} listed quests complete</Text>
           {selectedThreat > 0 && <Text style={styles.threat}>Regional threat {selectedThreat}/4 · {["", "Unrest", "Danger", "Severe", "Crisis"][selectedThreat] ?? "Danger"} · Delaying unresolved dangers can strengthen enemies and disrupt settlements.</Text>}
           {selected.bossQuestId && <Text style={styles.boss}>! Regional boss: {guild.world.completedQuestIds.includes(selected.bossQuestId) ? "Defeated" : "Available through campaign"}</Text>}
           <Text style={styles.roadTitle}>DIRECT ROADS</Text>
@@ -189,7 +201,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
           <ActionButton label="Open Region Map" onPress={() => openRegion(selectedId)} />
           {!current && unlocked && <ActionButton label={`Travel · ${travelDays}d · ${rationCost} rations`} disabled={Boolean(travelBlocker)} onPress={travel} />}
           {current && guild.world.currentSettlementId && <ActionButton label={`Buy ${getRationBundleAmount(guild)} rations · ${GAME_CONFIG.rationBundleGoldCost}g`} onPress={() => { try { const before = guild.rations; const next = buyRations(guild); updateGuild(next); setMessage(`Bought ${next.rations - before} rations.`); } catch (error) { setMessage(error instanceof Error ? error.message : "Purchase failed"); } }} />}
-          {unlocked && selected.questPoolIds[0] && <ActionButton label="View Contract" onPress={() => openQuest(selected.questPoolIds[0]!)} />}
+          {unlocked && availableRegionalQuestId && <ActionButton label="View Regional Quest" onPress={() => openQuest(availableRegionalQuestId)} />}
           <ActionButton label="Campaign" onPress={openCampaign} />
         </View>
         {message && <Text style={styles.message}>{message}</Text>}

@@ -25,7 +25,7 @@ export function isEncounterObjectiveComplete(
     return round > objective.rounds || (objective.allowEliminationVictory !== false && allEnemiesDefeated);
   }
   const zone = new Set(objective.positions.map(positionKey));
-  const requiredHeroes = Math.max(1, objective.requiredHeroes ?? 1);
+  const requiredHeroes = Math.min(Math.max(1, objective.requiredHeroes ?? 1), Math.max(1, heroes.length));
   return heroes.filter((hero) => hero.isAlive && zone.has(positionKey(hero.position))).length >= requiredHeroes;
 }
 
@@ -55,6 +55,6 @@ export function getEncounterObjectiveProgress(
   if (objective.type === "survive_rounds") return `Round ${Math.min(round, objective.rounds)} / ${objective.rounds}`;
   const zone = new Set(objective.positions.map(positionKey));
   const inside = heroes.filter((hero) => hero.isAlive && zone.has(positionKey(hero.position))).length;
-  const required = Math.max(1, objective.requiredHeroes ?? 1);
+  const required = Math.min(Math.max(1, objective.requiredHeroes ?? 1), Math.max(1, heroes.length));
   return `${inside} / ${required} heroes in the zone`;
 }

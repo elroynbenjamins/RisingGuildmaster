@@ -14,16 +14,40 @@ import { isQuestAvailable, isQuestAvailableAtCurrentLocation } from "../src/game
 import { resolveCampaignChoice } from "../src/game/campaign/campaignChoiceResolver";
 import { createGuild } from "../src/game/guild/guildService";
 import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
-import { canTravel, rollTravelEvent, travelToRegion } from "../src/game/world/travelService";
+import { canTravel, getRegionalTravelDays, rollTravelEvent, travelGuildToRegion, travelToRegion, visitSettlement } from "../src/game/world/travelService";
 import { describeEventOutcomes, resolveAbilityCheck, resolveEventChoice, resolveGuildEventChoice } from "../src/game/world/worldEventResolver";
 import { createWorldState } from "../src/game/world/worldState";
 import { sequenceRandom } from "./combatTestUtils";
 import { testHero } from "./testHero";
+import { unlockRegionalThreats } from "../src/game/world/regionalThreatService";
 
 describe("persistent world and campaign", () => {
   it("turns contracts into travel-only opportunities with an accept route", () => { const greenveil = getTravelContractEvents("greenveil"); expect(greenveil.map((event) => event.choices.find((choice) => choice.questId)?.questId)).toEqual(expect.arrayContaining(["orchard_road_patrol", "spider_nest", "goblin_cave_hideout"])); expect(getTravelContractEvents("shadowfen")).toEqual([]); });
   it("defines Eldoria's five connected regions and expanded settlements", () => { expect(Object.keys(REGIONS)).toHaveLength(5); expect(Object.keys(SETTLEMENTS)).toHaveLength(15); expect(REGIONS.greenveil?.connectedRegionIds).toEqual(["iron_hills", "shadowfen"]); expect(REGIONS.iron_hills?.connectedRegionIds).toEqual(["greenveil", "frostmarch", "ashlands"]); });
   it("rejects locked travel, then permits direct travel after Chapter 1", () => { let world = createWorldState(); expect(canTravel(world, "iron_hills")).toBe(false); expect(() => travelToRegion(world, "iron_hills", sequenceRandom([.9]))).toThrow(); for (const id of CHAPTER_1.nodeIds) world = completeCampaignNode(world, id).worldState; expect(world.unlockedRegionIds).toEqual(expect.arrayContaining(["greenveil", "iron_hills", "shadowfen"])); expect(travelToRegion(world, "iron_hills", sequenceRandom([.9])).state.currentRegionId).toBe("iron_hills"); expect(() => travelToRegion(world, "ashlands", sequenceRandom([.9]))).toThrow(); });
+  it("preserves day-based world changes during regional travel", () => {
+    const guild = createGuild();
+    guild.world = unlockRegionalThreats({ ...guild.world, unlockedRegionIds: [...guild.world.unlockedRegionIds, "shadowfen"], regionCrisisDays: { shadowfen: 19 }, regionThreat: { shadowfen: 0 } });
+    const days = getRegionalTravelDays("greenveil", "shadowfen");
+    const result = travelGuildToRegion(guild, "shadowfen", 2, sequenceRandom([.4, .9, .9, .9]));
+    expect(result.guild.currentDay).toBe(guild.currentDay + days);
+    expect(result.guild.world.regionCrisisDays?.shadowfen).toBe(19 + days);
+    expect(result.guild.world.regionThreat?.shadowfen).toBe(Math.floor((19 + days) / 20));
+    expect(result.guild.world.currentRegionId).toBe("shadowfen");
+    expect(result.guild.world.discoveredSettlementIds).toContain(result.guild.world.currentSettlementId);
+  });
+
+  it("enforces regional-crisis settlement closures through every travel path", () => {
+    let world = unlockRegionalThreats(createWorldState());
+    world = { ...world, unlockedRegionIds: [...world.unlockedRegionIds, "shadowfen"], regionThreat: { shadowfen: 4 }, regionCrisisDays: { shadowfen: 80 } };
+    const arrived = travelToRegion(world, "shadowfen", sequenceRandom([.4, .9]));
+    expect(arrived.state.currentSettlementId).toBe("mirewatch");
+
+    const guild = createGuild();
+    guild.world = arrived.state;
+    expect(() => visitSettlement(guild, "blackwater", 2)).toThrow("regional crisis");
+  });
+
   it("uses a tiered regional d100 travel table", () => { expect(rollTravelEvent("greenveil", sequenceRandom([.55, 0]))?.tier).toBe("common"); expect(rollTravelEvent("greenveil", sequenceRandom([.54]))).toBeNull(); expect(rollTravelEvent("shadowfen", sequenceRandom([.99, 0]))?.tier).toBe("legendary"); });
   it("uses the standard D&D ability modifier for non-combat checks", () => { const hero = { ...testHero(), baseAttributes: { ...testHero().baseAttributes, strength: 16 } }; expect(resolveAbilityCheck({ attribute: "strength", difficultyClass: 12 }, [hero], sequenceRandom([.4]))).toMatchObject({ diceRoll: 9, modifier: 3, total: 12, success: true }); });
   it("applies explicit travel event outcomes", () => { const hero = { ...testHero(), baseAttributes: { ...testHero().baseAttributes, strength: 16 } }; const choice = WORLD_EVENTS.broken_caravan!.choices[0]!; const result = resolveEventChoice(choice, [hero], createWorldState(), sequenceRandom([.4])); expect(result.goldDelta).toBe(40); expect(result.worldState.factionReputation.merchants).toBe(2); });

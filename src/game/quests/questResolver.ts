@@ -118,7 +118,7 @@ export function getQuestXpForHero(hero: Hero, quest: ReturnType<typeof getQuestD
   // is not represented by the number of enemies killed.
   const developmentBase = sharedEnemyXp + Math.max(0, quest.xpRewardPerHero);
   const potentialXp = Math.round(developmentBase * potentialMultiplier(hero.potential));
-  if (quest.questType !== "contract" || quest.recommendedLevelMax === undefined || hero.level <= quest.recommendedLevelMax) return potentialXp;
+  if (!quest.repeatable || quest.recommendedLevelMax === undefined || hero.level <= quest.recommendedLevelMax) return potentialXp;
   const levelsAbove = hero.level - quest.recommendedLevelMax;
   return Math.max(1, Math.round(potentialXp * Math.max(.1, 1 - levelsAbove * .25)));
 }

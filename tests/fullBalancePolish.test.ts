@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { QUESTS } from "../src/data/quests/quests";
 import { createGuild } from "../src/game/guild/guildService";
-import { getQuestEquipmentDropChance, getQuestGoldModifier } from "../src/game/quests/questResolver";
+import { getQuestEquipmentDropChance, getQuestGoldModifier, getQuestXpForHero } from "../src/game/quests/questResolver";
 import { advanceRegionalThreats, unlockRegionalThreats } from "../src/game/world/regionalThreatService";
 import { xpRequiredForNextLevel } from "../src/game/progression/xpSystem";
+import { testHero } from "./testHero";
 
 const goldMidpoint = (id: keyof typeof QUESTS) => {
   const quest = QUESTS[id]!;
@@ -14,6 +15,19 @@ describe("full balance polish safeguards", () => {
   it("keeps the established 10-percent-faster XP curve intact", () => {
     expect(xpRequiredForNextLevel(1)).toBe(900);
     expect(xpRequiredForNextLevel(2)).toBe(2068);
+  });
+
+  it("reduces overlevel XP on repeatable hunts but never penalizes one-time stories", () => {
+    const hero = testHero();
+    const hunt = QUESTS.coils_of_the_sunken_grove!;
+    const inRange = getQuestXpForHero({ ...hero, level: hunt.recommendedLevelMax! }, hunt, 4);
+    const overlevel = getQuestXpForHero({ ...hero, level: hunt.recommendedLevelMax! + 4 }, hunt, 4);
+    expect(overlevel).toBe(Math.max(1, Math.round(inRange * .10)));
+
+    const oneTime = QUESTS.hunt_spider_queen!;
+    const oneTimeInRange = getQuestXpForHero({ ...hero, level: oneTime.recommendedLevelMax! }, oneTime, 4);
+    const oneTimeLate = getQuestXpForHero({ ...hero, level: oneTime.recommendedLevelMax! + 6 }, oneTime, 4);
+    expect(oneTimeLate).toBe(oneTimeInRange);
   });
 
   it("guarantees story-quest equipment but reduces repeatable gear flooding", () => {

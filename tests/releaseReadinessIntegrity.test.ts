@@ -10,6 +10,8 @@ import { SETTLEMENTS } from "../src/data/world/settlements";
 import { getCampaignNodeLocationRequirement } from "../src/game/campaign/campaignLocationService";
 import { completeCampaignNode, getAvailableCampaignNodes, getLatestCampaignChapter } from "../src/game/campaign/campaignService";
 import { createWorldState } from "../src/game/world/worldState";
+import { getQuestStartBlocker } from "../src/game/quests/questAvailability";
+import { testHero } from "./testHero";
 
 function hasUnlockedPath(fromRegionId: string, destinationRegionId: string, unlockedRegionIds: readonly string[]): boolean {
   if (fromRegionId === destinationRegionId) return true;
@@ -66,6 +68,22 @@ describe("release readiness content integrity", () => {
     expect(getLatestCampaignChapter().chapterNumber).toBe(9);
     expect(world.campaignChapter).toBe(10);
     expect(getAvailableCampaignNodes(world)).toEqual([]);
+  });
+
+  it("blocks every direct quest-start bypass until the same progression rules are met", () => {
+    let world = createWorldState();
+    const levelOne = [{ ...testHero(), id: "one", level: 1 }, { ...testHero(), id: "two", level: 1 }];
+
+    expect(getQuestStartBlocker(QUESTS.goblin_patrol!, world, levelOne)).toMatch(/prerequisites/i);
+    expect(getQuestStartBlocker(QUESTS.orchard_road_patrol!, world, levelOne)).toMatch(/Level 2/i);
+    expect(getQuestStartBlocker(QUESTS.goblin_chieftain_boss!, world, levelOne)).toMatch(/Chapter 1/i);
+
+    world = completeCampaignNode(world, "founding_the_guild").worldState;
+    expect(getQuestStartBlocker(QUESTS.guildhaven_cellar_slimes!, world, levelOne)).toBeNull();
+
+    const levelThree = levelOne.map((hero) => ({ ...hero, level: 3 }));
+    const remoteWorld = { ...world, unlockedRegionIds: [...new Set([...world.unlockedRegionIds, "iron_hills"])] };
+    expect(getQuestStartBlocker(QUESTS.highcourt_silent_charter!, remoteWorld, levelThree)).toMatch(/prerequisites|Travel/i);
   });
 
   it("keeps every campaign node and chapter reference valid", () => {

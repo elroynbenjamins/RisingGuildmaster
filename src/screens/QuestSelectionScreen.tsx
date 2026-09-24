@@ -15,6 +15,7 @@ import { formatGameId } from "../ui/textFormat";
 import { hasCompletedQuestOnce } from "../game/quests/questCompletionService";
 import { DUNGEON_UNLOCK_HERO_COUNT } from "../game/dungeons/dungeonDraftService";
 import { GUILD_OPERATION_TEAM_SIZE, isGuildOperationsUnlocked } from "../game/operations/guildOperationService";
+import { STARTER_JOURNEY } from "../game/onboarding/starterJourneyService";
 
 export const QUEST_SCREEN_TABS: QuestTab[] = ["Campaign", "Side Quests", "Bosses"];
 const TABS = QUEST_SCREEN_TABS;
@@ -43,7 +44,9 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
   const highestHeroLevel = Math.max(1, ...guild.heroes.map((hero) => hero.level));
   const fieldHeroes = [...guild.heroes].sort((a, b) => b.level - a.level).slice(0, 4);
   const fieldLevel = fieldHeroes.length ? fieldHeroes.reduce((sum, hero) => sum + hero.level, 0) / fieldHeroes.length : 1;
-  const categoryUnlocked = isQuestBoardCategoryUnlocked(categoryType, guild.world, highestHeroLevel);
+  const baseCategoryUnlocked = isQuestBoardCategoryUnlocked(categoryType, guild.world, highestHeroLevel);
+  const starterSideQuestReady = tab === "Side Quests" && guild.world.worldFlags.starter_brambleway_road_ambush_complete === true && guild.world.worldFlags.starter_brambleford_side_quest_complete !== true;
+  const categoryUnlocked = baseCategoryUnlocked || starterSideQuestReady;
   const chapterOneComplete = guild.world.completedCampaignNodeIds.includes("broken_wardstone");
   const dungeonUnlocked = chapterOneComplete && guild.heroes.length >= DUNGEON_UNLOCK_HERO_COUNT;
   const operationHeroRequirement = GUILD_OPERATION_TEAM_SIZE * 2;
@@ -55,7 +58,7 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
   const completionFilter = tab === "Side Quests" ? [] : guild.world.completedQuestIds;
   const availableCategoryQuests = categoryUnlocked
     ? filterQuests(Object.values(QUESTS), tab, completionFilter)
-      .filter((quest) => !quest.hiddenFromQuestBoard && guild.world.unlockedRegionIds.includes(quest.regionId) && isQuestAvailableForGuild(quest, guild.world, guild.heroes))
+      .filter((quest) => !quest.hiddenFromQuestBoard && (!starterSideQuestReady || baseCategoryUnlocked || quest.id === STARTER_JOURNEY.sideQuestId) && guild.world.unlockedRegionIds.includes(quest.regionId) && isQuestAvailableForGuild(quest, guild.world, guild.heroes))
     : [];
   const quests = sortQuestsForRoster(availableCategoryQuests.filter((quest) => isQuestAvailableAtCurrentLocation(quest, guild.world)), fieldLevel)
     .sort((a, b) => Number(hasCompletedQuestOnce(guild, a.id)) - Number(hasCompletedQuestOnce(guild, b.id)));

@@ -38,8 +38,8 @@ describe("Training Hall", () => {
     expect(result.days[0]?.events.some((event) => event.type === "training_complete")).toBe(true);
   });
 
-  it("uses potential and training modifiers in the quoted result", () => {
-    const ordinary = testHero(); const gifted = { ...testHero(), potential: 100, backgroundId: "scholar" as const };
+  it("uses training modifiers in the quoted result", () => {
+    const ordinary = testHero(); const gifted = { ...testHero(), backgroundId: "scholar" as const };
     expect(calculateTrainingQuote(gifted, "sparring_drills").xpReward).toBeGreaterThan(calculateTrainingQuote(ordinary, "sparring_drills").xpReward);
   });
 

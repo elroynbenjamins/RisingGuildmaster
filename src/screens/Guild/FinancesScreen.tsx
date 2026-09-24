@@ -5,7 +5,7 @@ import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { GameIcon } from "../../components/icons/GameIcon";
-import { ActionButton, BackButton, EmptyState, Panel, SecondaryButton, SectionTitle, StatusChip, colors } from "../../components/ui";
+import { ActionButton, BackButton, EmptyState, Panel, SecondaryButton, SectionTitle, SegmentedTabs, StatusChip, colors } from "../../components/ui";
 import {
   advanceGuildTime,
   dailyTavernIncome,
@@ -73,6 +73,7 @@ export function FinancesScreen({ onBack }: { onBack(): void }) {
   const nextEvent = useMemo(() => findNextGuildPlannerEvent(guild, 30), [guild]);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [lastAdvance, setLastAdvance] = useState<GuildDayResolution[]>([]);
+  const [tab,setTab]=useState<"Calendar"|"Treasury"|"Contracts">("Calendar");
   const selectedDay = planner[Math.min(selectedDayIndex, Math.max(0, planner.length - 1))];
   const selectedPresentation = selectedDay ? getGuildPlannerDayPresentation(selectedDay) : null;
   const arrears = totalSalaryArrears(guild);
@@ -159,7 +160,7 @@ export function FinancesScreen({ onBack }: { onBack(): void }) {
     </View>
     {arrears > 0 && <ActionButton label={`PAY SALARY ARREARS · UP TO ${Math.min(arrears, guild.gold)} GOLD`} disabled={guild.gold <= 0} onPress={settle} />}
 
-    <SectionTitle>7-DAY COMMAND CALENDAR</SectionTitle>
+    <SegmentedTabs values={["Calendar","Treasury","Contracts"] as const} value={tab} onChange={setTab}/>{tab==="Calendar"&&<><SectionTitle>7-DAY COMMAND CALENDAR</SectionTitle>
     <Panel style={styles.calendarFrame}>
       <View style={styles.calendarHeader}>
         <View><Text style={styles.calendarEyebrow}>GUILD WEEK</Text><Text style={styles.calendarRange}>DAY {planner[0]?.day ?? guild.currentDay + 1} — {planner[planner.length - 1]?.day ?? guild.currentDay + 7}</Text></View>
@@ -215,9 +216,9 @@ export function FinancesScreen({ onBack }: { onBack(): void }) {
       </Panel>
     </>}
 
-    <SectionTitle>GUILD HALL & TAVERN</SectionTitle>
+    </>}{tab==="Treasury"&&<><SectionTitle>GUILD HALL & TAVERN</SectionTitle>
     <Panel style={styles.hall}><View style={styles.hallHead}><View style={styles.flex}><Text style={styles.hallName}>LEVEL {guild.finance.tavernLevel} · {currentHall.name}</Text><Text style={styles.hallMeta}>Daily income now {dailyTavernIncome(guild)} gold · +{Math.round(currentHall.incomeModifier*100)}% hall income · +{currentHall.recruitmentSlots} board slot{currentHall.recruitmentSlots===1?"":"s"}</Text></View></View>{guild.finance.tavernUpgrade?<><Text style={styles.warning}>UPGRADING TO LEVEL {guild.finance.tavernUpgrade.targetLevel} · READY DAY {guild.finance.tavernUpgrade.completionDay}</Text></>:nextHall?<><Text style={styles.hallMeta}>Next: {nextHall.name} · {nextHall.goldCost} gold · {nextHall.durationDays} days · requires {nextHall.reputationRequired} reputation</Text><Text style={styles.hallBenefit}>Benefit: +{Math.round(nextHall.incomeModifier*100)}% hall income · +{nextHall.recruitmentSlots} recruitment slot{nextHall.recruitmentSlots===1?"":"s"} · stronger candidate pool</Text><ActionButton label={"Upgrade Guild Hall · "+nextHall.goldCost+" Gold"} disabled={guild.gold<nextHall.goldCost||guild.reputation<nextHall.reputationRequired} onPress={upgradeHall}/></>:<Text style={styles.active}>MAXIMUM GUILD HALL LEVEL</Text>}</Panel>
-    <SectionTitle>ROSTER & CONTRACTS</SectionTitle>
+    <SectionTitle>RECENT LEDGER</SectionTitle><Panel>{guild.finance.transactions.length ? guild.finance.transactions.slice(-10).reverse().map((transaction) => <View key={transaction.id} style={styles.ledger}><View style={styles.flex}><Text style={styles.ledgerNote}>{transaction.note}</Text><Text style={styles.ledgerDay}>Day {transaction.day}</Text></View><Text style={styles.outflow}>{transaction.amount.toLocaleString()}</Text></View>) : <Text style={styles.emptyLedger}>No payroll transactions recorded.</Text>}</Panel></>}{tab==="Contracts"&&<><SectionTitle>ROSTER & CONTRACTS</SectionTitle>
     {guild.heroContracts.length ? guild.heroContracts.map((contract) => {
       const hero = guild.heroes.find((item) => item.id === contract.heroId);
       const owed = guild.finance.salaryArrearsByHeroId[contract.heroId] ?? 0;
@@ -240,9 +241,7 @@ export function FinancesScreen({ onBack }: { onBack(): void }) {
       </Panel>;
     }) : <EmptyState title="No hero contracts" message="Recruit a hero to create the guild's first salary obligation." />}
 
-    <SectionTitle>RECENT LEDGER</SectionTitle>
-    <Panel>{guild.finance.transactions.length ? guild.finance.transactions.slice(-10).reverse().map((transaction) => <View key={transaction.id} style={styles.ledger}><View style={styles.flex}><Text style={styles.ledgerNote}>{transaction.note}</Text><Text style={styles.ledgerDay}>Day {transaction.day}</Text></View><Text style={styles.outflow}>{transaction.amount.toLocaleString()}</Text></View>) : <Text style={styles.emptyLedger}>No payroll transactions recorded.</Text>}</Panel>
-  </ScrollView>;
+    </>}\n  </ScrollView>;
 }
 
 const styles = StyleSheet.create({  hall:{gap:8},hallHead:{alignItems:"center",flexDirection:"row",gap:8},hallName:{color:colors.text,fontSize:16,fontWeight:"900"},hallMeta:{color:colors.muted,fontSize:10,lineHeight:15,marginTop:3},hallBenefit:{color:colors.green,fontSize:10,fontWeight:"800",lineHeight:15},

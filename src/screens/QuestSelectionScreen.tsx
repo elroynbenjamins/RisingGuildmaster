@@ -65,7 +65,7 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
     <View style={styles.boardHeader}>
 
       <Text style={styles.boardEyebrow}>GUILD NOTICE BOARD</Text>
-      <View style={styles.boardTitleRow}><Text style={styles.title}>Quest Board</Text><View style={styles.locationPlate}><Text style={styles.locationLabel}>POSTING</Text><Text numberOfLines={1} style={styles.locationValue}>{currentLocation}</Text></View></View>
+      <View style={styles.boardTitleRow}><View style={styles.boardIdentity}><GameIcon id="quests" size={30} framed={false}/><Text style={styles.title}>Quest Board</Text></View><View style={styles.locationPlate}><Text style={styles.locationLabel}>POSTING</Text><Text numberOfLines={1} style={styles.locationValue}>{currentLocation}</Text></View></View>
       <View style={styles.fieldStrip}><Text style={styles.fieldLabel}>FIELD TEAM</Text><Text style={styles.fieldValue}>TOP 4 AVG · LV {fieldLevel.toFixed(1)}</Text><Text style={styles.fieldRoster}>{fieldHeroes.length}/4 HEROES</Text></View>
     </View>
 
@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
   boardHeader: {backgroundColor: "#1d1b17", borderColor: "#76613a", marginBottom: 11, marginTop: 8, padding: 13, position: "relative", borderWidth: 0, borderRadius: 10},
   boardEyebrow: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: 1.5 },
   boardTitleRow: { alignItems: "center", flexDirection: "row", gap: 10, justifyContent: "space-between", marginTop: 2 },
+  boardIdentity:{alignItems:"center",flexDirection:"row",gap:8},
   title: { color: colors.text, fontSize: 29, fontWeight: "900" },
   locationPlate: { alignItems: "flex-end", flex: 1, minWidth: 0 },
   locationLabel: { color: colors.muted, fontSize: 7, fontWeight: "900", letterSpacing: .8 },

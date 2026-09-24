@@ -4,7 +4,7 @@ Recruitment owns a persistent, save-backed candidate pool rather than regenerati
 
 Prospect, standard, veteran, and elite archetypes control age, level, trait count, costs, and estimate uncertainty. Candidate levels use the normal hero-generation and class-weighted attribute-growth pipeline rather than a separate hidden progression stat. Guild reputation gradually increases the chance of elite candidates within the configured cap.
 
-Candidate quality is a public presentation score derived from the hero's current level, trait mix, and attributes. It is descriptive only: there is no hidden hero Potential value or Potential-based XP multiplier.
+Candidate quality is a public presentation score derived from the hero's current level, trait mix, and attributes. It is descriptive only and does not change that hero's XP gain.
 
 The recruitment service owns refresh timing and cost, expiration, reservation, scouting payments, rejection, capacity validation, recruitment resolution, history entries, and contract creation. The UI works from the same candidate data used when the hero joins the guild.
 

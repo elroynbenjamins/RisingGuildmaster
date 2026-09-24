@@ -135,9 +135,9 @@ function Game() {
     if (!notices.length) return;
     updateGuild(acknowledgeUnlockNotices(guild, notices.map((notice) => notice.id)));
     showDialog({
-      title: notices.length === 1 ? "New Guild Unlock" : `${notices.length} New Guild Unlocks`,
-      eyebrow: "PROGRESSION",
-      message: notices.map((notice) => `• ${notice.title}\n  ${notice.detail}`).join("\n\n"),
+      title: notices.length === 1 ? notices[0]!.title : `${notices.length} Guild Milestones Unlocked`,
+      eyebrow: notices.length === 1 ? "NEW UNLOCK" : "PROGRESSION MILESTONE",
+      message: notices.length === 1 ? `UNLOCKED · ${notices[0]!.title.toUpperCase()}\n\n${notices[0]!.detail}\n\nThis is now available from its normal guild screen.` : notices.map((notice) => `UNLOCKED · ${notice.title.toUpperCase()}\n${notice.detail}`).join("\n\n"),
       tone: "success",
     });
   }, [gameStarted, isHydrated, isDialogOpen, guild, route.name, updateGuild, showDialog]);

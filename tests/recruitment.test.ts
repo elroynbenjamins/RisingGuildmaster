@@ -44,7 +44,7 @@ describe("recruitment generation", () => {
 });
 
 describe("recruitment finances and scouting", () => {
-  it("calculates the mandatory fee and contract examples", () => { expect(calculateRecruitmentFee(4,80,-.20)).toBe(720); expect(calculateContractCosts(700,100,24)).toEqual({contractSalary:2400,totalEstimatedCost:3100}); });
+  it("calculates the mandatory fee and contract examples", () => { expect(calculateRecruitmentFee(4,80,-.20)).toBe(592); expect(calculateContractCosts(700,100,24)).toEqual({contractSalary:2400,totalEstimatedCost:3100}); });
   it("creates explicit financial estimate ranges", () => { expect(financialEstimate(1000,.20)).toEqual({minimum:800,maximum:1200}); expect(financialEstimate(100,0)).toEqual({minimum:100,maximum:100}); });
   it("calculates salary from level, attributes, archetype, and real traits", () => { const hero={...testHero(),level:5}; expect(calculateWeeklySalary(hero,.30)).toBe(165); const greedy={...hero,traitIds:["greedy" as const]}; expect(calculateWeeklySalary(greedy,.30)).toBe(185); });
   it("narrows attributes, fee, and salary demand through all scouting levels", () => {

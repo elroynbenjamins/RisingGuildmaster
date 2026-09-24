@@ -91,6 +91,7 @@ describe("end-to-end player journey guarantees", () => {
   it("brings Operations, Roguelite Expeditions, and Regional Threat readiness together at six Level-2 heroes", () => {
     const guild = chapterOneGuild(6);
 
+    expect(getGuildCommandOrders(guild).map((order) => order.id)).toContain("strategic_modes_ready");
     expect(getEligibleOperationHeroIds(guild)).toHaveLength(6);
     expect(canUnlockRegionalThreats(guild.heroes)).toBe(true);
 

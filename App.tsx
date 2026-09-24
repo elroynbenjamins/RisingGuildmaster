@@ -21,6 +21,7 @@ import { QuestExplorationScreen } from "./src/screens/QuestExploration/QuestExpl
 import { QuestDecisionScreen } from "./src/screens/QuestDecision/QuestDecisionScreen";
 import { CraftingScreen } from "./src/screens/Crafting/CraftingScreen";
 import { GatheringScreen } from "./src/screens/Gathering/GatheringScreen";
+import { IDLE_MISSION_UNLOCK_HERO_COUNT } from "./src/game/gathering/gatheringService";
 import { RegionMapScreen } from "./src/screens/Region/RegionMapScreen";
 import { GuildmasterSkillTreeScreen } from "./src/screens/Guildmaster/GuildmasterSkillTreeScreen";
 import { FinancesScreen } from "./src/screens/Guild/FinancesScreen";
@@ -112,7 +113,7 @@ function Game() {
       id = "combat_basics";
       title = "Tactical Turn";
       message = "Select a skill to preview targets. You can then double tap an empty teal tile to move; the skill stays queued and valid targets update from your new position. Enemy turns use the speed selected in Settings.";
-    } else if (route.name === "gathering") {
+    } else if (route.name === "gathering" && guild.heroes.length >= IDLE_MISSION_UNLOCK_HERO_COUNT) {
       id = "idle_missions";
       title = "Idle Mission Progress";
       message = "Idle Missions award their listed XP plus a guaranteed 5% of each assigned hero’s next-level requirement. The mission screen previews that progress before deployment.";

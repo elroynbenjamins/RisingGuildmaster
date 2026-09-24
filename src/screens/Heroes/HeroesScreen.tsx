@@ -16,7 +16,7 @@ import { heroHasSkillChoice } from "../../ui/actionNotifications";
 import { useTheme } from "../../theme/theme";
 
 const FILTERS: HeroFilter[] = ["All", "Available", "Injured", "Fallen"];
-const SORTS: HeroSort[] = ["Level", "Name", "Class", "Potential"];
+const SORTS: HeroSort[] = ["Level", "Attention", "Name", "Class"];
 
 function averageTopFour(heroes: readonly Hero[]): number {
   const top = [...heroes].sort((a, b) => b.level - a.level).slice(0, 4);

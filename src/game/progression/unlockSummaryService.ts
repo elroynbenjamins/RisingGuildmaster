@@ -44,6 +44,9 @@ export function getCurrentUnlockNotices(guild: GuildState): UnlockNotice[] {
     if (isRaidUnlocked(raid, guild.world.campaignChapter, guild.heroes.length)) notices.push({ id:`raid:${raid.id}`, title:raid.name, detail:"Guild Raid unlocked.", iconId:"boss" });
   }
 
+  if (guild.trainingGround.level > 1) notices.push({ id:`facility:training:${guild.trainingGround.level}`, title:`Training Hall Level ${guild.trainingGround.level}`, detail:`Facility upgrade complete. ${guild.trainingGround.level} training slots are now available.`, iconId:"training" });
+  if (guild.finance.tavernLevel > 1) notices.push({ id:`facility:tavern:${guild.finance.tavernLevel}`, title:`Guild Hall & Tavern Level ${guild.finance.tavernLevel}`, detail:"Facility upgrade complete. Tavern income and recruitment capacity have improved.", iconId:"management" });
+
   for (const [artisanId,state] of Object.entries(guild.artisans)) {
     if (!state.recruited || state.level <= 0) continue;
     notices.push({ id:`workshop:${artisanId}:${state.level}`, title:`${artisanId.replace(/_/g," ")} Level ${state.level}`, detail:"Workshop tier is operational.", iconId:artisanId==="blacksmith"?"blacksmith":artisanId==="tailor"?"tailor":"jeweler" });

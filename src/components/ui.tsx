@@ -22,7 +22,7 @@ export function Panel(props: ViewProps) {
 
 export function SectionTitle({ children }: React.PropsWithChildren) {
   const { colors: c } = useTheme();
-  return <View style={styles.sectionHeading}><Text style={[styles.sectionTitle, { color: c.text }]}>{children}</Text></View>;
+  return <View style={styles.sectionHeading}><View style={[styles.sectionAccent,{backgroundColor:c.gold}]}/><Text style={[styles.sectionTitle, { color: c.gold }]}>{children}</Text><View style={[styles.sectionRule,{backgroundColor:c.border}]}/></View>;
 }
 
 export function ActionButton({ label, onPress, disabled = false, iconId, guardMs = 0 }: { label: string; onPress(): void; disabled?: boolean; iconId?: GameIconId; guardMs?: number }) {
@@ -92,8 +92,10 @@ export function HeroCard({ hero, onPress, subtitle, notification = false, loyalt
 
 const styles = StyleSheet.create({
   panel: { backgroundColor: colors.panel, borderColor: colors.border, borderWidth: 1, borderRadius: 12, padding: 15 },
-  sectionHeading: { alignItems: "center", flexDirection: "row", gap: 8, marginBottom: 10, marginTop: 18 },
-  sectionTitle: {color: colors.gold, fontWeight: "700", letterSpacing: .6, fontSize: 13},
+  sectionHeading: { alignItems: "center", flexDirection: "row", gap: 7, marginBottom: 10, marginTop: 18 },
+  sectionAccent:{borderRadius:2,height:12,width:3},
+  sectionTitle: {color: colors.gold, fontWeight: "900", letterSpacing: .8, fontSize: 12},
+  sectionRule:{flex:1,height:1,opacity:.75},
   button: { paddingHorizontal: 14, paddingVertical: 12, alignItems: "center", minHeight: 44, justifyContent: "center", borderWidth: 0, borderRadius: 10, },
   secondaryButton: { paddingHorizontal: 13, paddingVertical: 10, alignItems: "center", minHeight: 44, justifyContent: "center", borderWidth: 0, borderRadius: 10, },
   secondaryText: {color: colors.gold, flexShrink:1, fontSize: 13, fontWeight: "600", textAlign: "center", letterSpacing: 0},

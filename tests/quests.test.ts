@@ -15,7 +15,7 @@ const instance = (values: Partial<HeroCombatInstance> = {}): HeroCombatInstance 
 describe("quest loop", () => {
   it("generates every leveled encounter", () => { for (const encounter of Object.values(QUEST_ENCOUNTERS)) expect(createQuestEncounter(encounter.id, createSeededRandom(2))).toHaveLength(encounter.enemies.reduce((sum, entry) => sum + entry.count, 0)); });
   it("recognizes victory and defeat", () => { expect(isCombatVictory([{ isAlive: false }])).toBe(true); expect(isCombatDefeat([{ isAlive: false }])).toBe(true); });
-  it("combines shared enemy and objective XP, then applies potential", () => { const quest = QUESTS.goblin_patrol!; expect(getQuestEnemyXpPool(quest)).toBe(300); expect(getQuestXpForHero({ ...testHero(), potential: 50 }, quest, 2)).toBe(450); expect(getQuestXpForHero({ ...testHero(), potential: 100 }, quest, 2)).toBe(675); });
+  it("combines shared enemy and objective XP consistently per hero", () => { const quest = QUESTS.goblin_patrol!; expect(getQuestEnemyXpPool(quest)).toBe(300); expect(getQuestXpForHero(testHero(), quest, 2)).toBe(450); });
   it("boosts level-three side quest authored XP by twenty five percent", () => {
     expect(QUESTS.echoes_of_mosswatch).toMatchObject({ questType: "side", recommendedLevelMin: 3, xpRewardPerHero: 875 });
     expect(QUESTS.brambleway_caravan?.xpRewardPerHero).toBe(800);

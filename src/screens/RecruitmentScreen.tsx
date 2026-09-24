@@ -98,7 +98,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
     return () => pulse.stop();
   }, [tutorialRefresh, refreshPulse]);
 
-  return <ScrollView ref={scrollRef} contentContainerStyle={styles.content}>
+  return <ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={styles.content}>
     <BackButton onPress={leaveRecruitment} />
     <LocationArtwork location="tavern" />
     <View style={styles.titleRow}><GameIcon id="recruitment" size={34}/><View style={styles.flex}><Text style={styles.eyebrow}>GUILDHAVEN TAVERN</Text><Text style={styles.title}>Adventurers for Hire</Text></View></View>
@@ -121,7 +121,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
 
     {section==="Candidates"&&<><SectionTitle>CANDIDATES</SectionTitle>
     {!tutorial && <View style={styles.candidateTools}>
-      <TextInput accessibilityLabel="Search recruits" placeholder="Search recruits by name, race, or class" placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} style={styles.searchInput} />
+      <TextInput accessibilityLabel="Search recruits" placeholder="Search recruits by name, race, or class" placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} autoCorrect={false} autoCapitalize="none" returnKeyType="done" submitBehavior="blurAndSubmit" style={styles.searchInput} />
       <Pressable accessibilityRole="button" accessibilityLabel="Recruitment filters and sorting" accessibilityState={{ expanded: showCandidateTools }} aria-expanded={showCandidateTools} onPress={() => setShowCandidateTools(value => !value)} style={({pressed})=>[styles.toolDisclosure,pressed&&styles.pressed]}>
         <View style={styles.flex}><Text style={styles.toolLabel}>FILTER & SORT</Text><Text numberOfLines={1} style={styles.toolSummary}>{sourceFilter} candidates · {sort} first · {displayedCandidates.length} shown</Text></View><Text style={styles.toolChevron}>{showCandidateTools ? "−" : "+"}</Text>
       </Pressable>

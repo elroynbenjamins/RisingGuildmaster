@@ -243,6 +243,7 @@ export function migrateGuildState(value: unknown): GuildState {
     raidProgress: saved.raidProgress ?? createRaidProgressState(),
     activeDungeonRun: migrateActiveDungeonRun(saved.activeDungeonRun ?? null),
     activeRogueliteRun: saved.activeRogueliteRun ?? null,
+    pendingQuestResult: saved.pendingQuestResult ?? null,
     recruitment: {
       ...migratedRecruitment,
       candidates,

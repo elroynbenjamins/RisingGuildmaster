@@ -4,6 +4,7 @@ import type { GemTransaction } from "./gemTypes";
 
 export const CONTENT_UNLOCK_COST = 50;
 export const DAILY_LOGIN_GEMS = 10;
+export const REMOVE_ADS_DAILY_BONUS_GEMS = 5;
 export const BASE_CLASS_IDS: ClassId[] = ["warrior", "ranger", "mage", "cleric", "paladin", "berserker"];
 export const BASE_RACE_IDS: RaceId[] = ["human", "elf", "dwarf", "orc"];
 export type PremiumContentId = "monk" | "bard" | "spellbow" | "bulwark" | "summoner" | "tiefling";
@@ -24,11 +25,16 @@ export const createDailyLoginState = (): DailyLoginState => ({ lastClaimDate: nu
 export const calendarDateKey = (date = new Date()): string => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 export const canClaimDailyLogin = (guild: GuildState, date = new Date()): boolean => guild.dailyLogin.lastClaimDate !== calendarDateKey(date);
 
+export function getDailyLoginGemReward(guild: GuildState): number {
+  return DAILY_LOGIN_GEMS + (guild.entitlements.adsRemoved ? REMOVE_ADS_DAILY_BONUS_GEMS : 0);
+}
+
 export function claimDailyLogin(guild: GuildState, date = new Date()): GuildState {
   if (!canClaimDailyLogin(guild, date)) throw new Error("Daily login reward already claimed today");
   const dateKey = calendarDateKey(date);
-  const transaction: GemTransaction = { id: `daily-login-${dateKey}`, type: "daily_login", amount: DAILY_LOGIN_GEMS, day: guild.currentDay, note: `Daily login reward (${dateKey})` };
-  return { ...guild, gems: guild.gems + DAILY_LOGIN_GEMS, dailyLogin: { lastClaimDate: dateKey, totalClaims: guild.dailyLogin.totalClaims + 1 }, gemTransactions: [...guild.gemTransactions, transaction] };
+  const reward = getDailyLoginGemReward(guild);
+  const transaction: GemTransaction = { id: `daily-login-${dateKey}`, type: "daily_login", amount: reward, day: guild.currentDay, note: guild.entitlements.adsRemoved ? `Daily login reward + Remove Ads bonus (${dateKey})` : `Daily login reward (${dateKey})` };
+  return { ...guild, gems: guild.gems + reward, dailyLogin: { lastClaimDate: dateKey, totalClaims: guild.dailyLogin.totalClaims + 1 }, gemTransactions: [...guild.gemTransactions, transaction] };
 }
 
 export function unlockPremiumContent(guild: GuildState, contentId: PremiumContentId): GuildState {

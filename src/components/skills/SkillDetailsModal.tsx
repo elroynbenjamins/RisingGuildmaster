@@ -4,13 +4,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../theme/theme";
 
 /** Keep the tree's scroll position while inspecting any node. */
-export function SkillDetailsModal({ visible, onClose, children }: React.PropsWithChildren<{ visible: boolean; onClose(): void }>) {
+export function SkillDetailsModal({ visible, onClose, children, title = "SKILL DETAILS", closeLabel = "Close details" }: React.PropsWithChildren<{ visible: boolean; onClose(): void; title?: string; closeLabel?: string }>) {
   const { colors } = useTheme();
   return <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
     <SafeAreaView style={[styles.backdrop, { backgroundColor: colors.backdrop }]}>
-      <Pressable style={StyleSheet.absoluteFill} accessibilityLabel="Close skill details" onPress={onClose} />
+      <Pressable style={StyleSheet.absoluteFill} accessibilityLabel={closeLabel} onPress={onClose} />
       <View accessibilityViewIsModal style={[styles.card, { backgroundColor: colors.panel, borderColor: colors.gold }]}>
-        <View style={styles.header}><Text accessibilityRole="header" style={{ color: colors.gold, fontWeight: "900" }}>SKILL DETAILS</Text><Pressable accessibilityRole="button" accessibilityLabel="Close skill details" onPress={onClose} style={styles.close}><Text style={{ color: colors.text, fontWeight: "800" }}>Close ✕</Text></Pressable></View>
+        <View style={styles.header}><Text accessibilityRole="header" style={{ color: colors.gold, fontWeight: "900" }}>{title}</Text><Pressable accessibilityRole="button" accessibilityLabel={closeLabel} onPress={onClose} style={styles.close}><Text style={{ color: colors.text, fontWeight: "800" }}>Close ✕</Text></Pressable></View>
         <ScrollView contentContainerStyle={styles.content}>{children}</ScrollView>
       </View>
     </SafeAreaView>

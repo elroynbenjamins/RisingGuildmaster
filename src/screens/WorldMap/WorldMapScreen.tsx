@@ -25,6 +25,7 @@ import { getDefaultTravelPartyHeroIds, getEligibleTravelHeroes, normalizeTravelP
 import { QUESTS } from "../../data/quests/quests";
 import { isQuestAvailableForGuild, isQuestBoardCategoryUnlocked } from "../../game/quests/questAvailability";
 import { triggerTactileFeedback } from "../../ui/tactileFeedback";
+import { useGameToast } from "../../components/feedback/GameToast";
 
 interface WorldMapProps {
   guild: GuildState;
@@ -39,7 +40,7 @@ interface WorldMapProps {
 
 export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, openRegion, openCampaign, openEvent }: WorldMapProps) {
   const [selectedId, setSelectedId] = useState(guild.world.currentRegionId);
-  const [message, setMessage] = useState<string>();
+  const { showToast } = useGameToast();
   const [showRegionIntel, setShowRegionIntel] = useState(false);
   const [showTravelParty, setShowTravelParty] = useState(false);
   const [travelPartyIds, setTravelPartyIds] = useState<string[]>(() => getDefaultTravelPartyHeroIds(guild));
@@ -90,7 +91,6 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
     lastRegionTap.current = doubleTapped ? null : { targetKey: regionId, timestamp };
     setSelectedId(regionId);
     if (regionId !== selectedId) setShowRegionIntel(false);
-    setMessage(undefined);
     if (doubleTapped) openRegion(regionId);
   };
 
@@ -100,11 +100,11 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
       const world = discoverRegionSettlements(result.guild.world, selectedId);
       updateGuild({ ...result.guild, world, recentPartyHeroIds: travelPartyIds });
       triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");
-      setMessage(`ARRIVED · ${selected.name} · Day ${guild.currentDay} → ${result.guild.currentDay} · Rations -${result.rationCost}${result.tier ? ` · ${result.tier.toUpperCase()} road event` : " · Safe journey"}`);
+      showToast({title:`Arrived in ${selected.name}`,message:`Day ${guild.currentDay} → ${result.guild.currentDay} · Rations -${result.rationCost}${result.tier ? ` · ${result.tier.toUpperCase()} road event` : " · Safe journey"}`,tone:result.tier?"gold":"success"});
       if (result.event) openEvent(result.event);
     } catch (error) {
       triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");
-      setMessage(error instanceof Error ? error.message : "Travel failed");
+      showToast({title:"Travel Failed",message:error instanceof Error ? error.message : "Travel failed",tone:"danger"});
     }
   };
 
@@ -203,7 +203,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
         <View style={styles.buttons}>
           <ActionButton label="Open Region Map" onPress={() => openRegion(selectedId)} />
           {!current && unlocked && <ActionButton guardMs={700} label={`Travel · ${travelDays}d · ${rationCost} rations`} disabled={Boolean(travelBlocker)} onPress={travel} />}
-          {current && guild.world.currentSettlementId && <ActionButton guardMs={500} label={`Buy ${getRationBundleAmount(guild)} rations · ${GAME_CONFIG.rationBundleGoldCost}g`} onPress={() => { try { const before = guild.rations; const next = buyRations(guild); updateGuild(next); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); setMessage(`Bought ${next.rations - before} rations.`); } catch (error) { triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning"); setMessage(error instanceof Error ? error.message : "Purchase failed"); } }} />}
+          {current && guild.world.currentSettlementId && <ActionButton guardMs={500} label={`Buy ${getRationBundleAmount(guild)} rations · ${GAME_CONFIG.rationBundleGoldCost}g`} onPress={() => { try { const before = guild.rations; const next = buyRations(guild); updateGuild(next); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); showToast({title:"Rations Restocked",message:`+${next.rations-before} rations · ${GAME_CONFIG.rationBundleGoldCost} gold spent`,tone:"success"}); } catch (error) { triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning"); showToast({title:"Purchase Failed",message:error instanceof Error ? error.message : "Purchase failed",tone:"danger"}); } }} />}
           {unlocked && availableRegionalQuestId && <ActionButton label="View Regional Quest" onPress={() => openQuest(availableRegionalQuestId)} />}
           <ActionButton label="Campaign" onPress={openCampaign} />
         </View>

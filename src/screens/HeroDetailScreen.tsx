@@ -368,8 +368,6 @@ export function HeroDetailScreen({
         </Panel>
       </>}
 
-      <SectionTitle>POTENTIAL</SectionTitle>
-      <Panel style={styles.sheetPanel}><View style={styles.row}><Text style={[styles.entryName, { color: c.text }]}>Scouted Potential</Text><Text style={[styles.potentialValue, { color: accent }]}>{liveHero.potentialEstimateMin}–{liveHero.potentialEstimateMax}</Text></View><Text style={[styles.hint, { color: c.muted }]}>Estimated scouting range. True potential remains hidden.</Text></Panel>
     </>}
 
     {tab === "Gear" && <>
@@ -484,7 +482,6 @@ const styles = StyleSheet.create({
   contractStateRow: { alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: 7, marginTop: 9 },
   contractDetail: { fontSize: 9, fontWeight: "700" },
   loyaltyRecent: { fontSize: 9, fontWeight: "800", marginTop: 7 },
-  potentialValue: { fontSize: 18, fontWeight: "900" },
   tabIntro: { marginBottom: 4, paddingHorizontal: 2 },
   tabTitle: { fontSize: 18, fontWeight: "900" },
   tabDescription: { fontSize: 10, lineHeight: 15, marginTop: 3 },

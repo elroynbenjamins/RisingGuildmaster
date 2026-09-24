@@ -74,6 +74,6 @@ export const QUESTS: Record<string, QuestDefinition> = Object.fromEntries(Object
   const localized = LOCAL_SIDE_QUESTS[id] ? { ...quest, settlementIds: LOCAL_SIDE_QUESTS[id] } : quest;
   if (EARLY_CHAPTER_ONE.has(id)) return [id, { ...localized, minPartySize: 2, maxPartySize: 4 }];
   if (localized.questType === "contract" && !localized.hiddenFromQuestBoard) return [id, { ...localized, minPartySize: Math.max(2, localized.minPartySize), maxPartySize: 4 }];
-  if (localized.questType === "side" && !localized.hiddenFromQuestBoard) { const recommendedLevelMin = Math.max(3, localized.recommendedLevelMin ?? 3); const baseXp = CHAPTER_ONE_SIDE_XP[id] ?? localized.xpRewardPerHero; return [id, { ...localized, repeatable: false, recommendedLevelMin, xpRewardPerHero: Math.round(baseXp * (recommendedLevelMin === 3 ? 1.25 : 1)), minPartySize: Math.max(3, localized.minPartySize), maxPartySize: 4 }]; }
+  if (localized.questType === "side" && !localized.hiddenFromQuestBoard) { const recommendedLevelMin = id === "brambleway_caravan" ? (localized.recommendedLevelMin ?? 2) : Math.max(3, localized.recommendedLevelMin ?? 3); const baseXp = CHAPTER_ONE_SIDE_XP[id] ?? localized.xpRewardPerHero; return [id, { ...localized, repeatable: false, recommendedLevelMin, xpRewardPerHero: Math.round(baseXp * (recommendedLevelMin === 3 ? 1.25 : 1)), minPartySize: Math.max(3, localized.minPartySize), maxPartySize: 4 }]; }
   return [id, localized];
 }));

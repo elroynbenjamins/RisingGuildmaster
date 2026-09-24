@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useMemo, useRef, useStat
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { colors } from "../ui";
 import { useTheme } from "../../theme/theme";
+import { GuidedTutorialProvider } from '../tutorial/GuidedTutorialProvider';
 
 export type GameDialogTone = "default" | "success" | "danger";
 export type GameDialogActionTone = "primary" | "secondary" | "danger";
@@ -32,12 +33,14 @@ const GameDialogContext = createContext<GameDialogContextValue | null>(null);
 export function GameDialogProvider({ children }: React.PropsWithChildren) {
   const {colors:themeColors}=useTheme();
   const [dialog, setDialog] = useState<GameDialogOptions | null>(null);
+  const [guideVisible, setGuideVisible] = useState(false);
   const choosingRef = useRef(false);
   const dismissDialog = useCallback(() => setDialog(null), []);
   const showDialog = useCallback((options: GameDialogOptions) => { choosingRef.current = false; setDialog(options); }, []);
   const actions = dialog?.actions?.length ? dialog.actions : [{ label: "Continue", tone: "primary" as const }];
   const canDismiss = actions.some((action) => action.tone === "secondary");
-  const value = useMemo(() => ({ showDialog, dismissDialog, isDialogOpen: dialog !== null, canDismissDialog: canDismiss }), [dismissDialog, showDialog, dialog, canDismiss]);
+  // Automatic notices wait for a guide; explicit confirmations can still interrupt it safely.
+  const value = useMemo(() => ({ showDialog, dismissDialog, isDialogOpen: dialog !== null || guideVisible, canDismissDialog: canDismiss }), [dismissDialog, showDialog, dialog, canDismiss, guideVisible]);
 
   const choose = (action: GameDialogAction) => {
     if (choosingRef.current) return;
@@ -47,7 +50,7 @@ export function GameDialogProvider({ children }: React.PropsWithChildren) {
   };
 
   return <GameDialogContext.Provider value={value}>
-    {children}
+    <GuidedTutorialProvider blocked={dialog !== null} onVisibilityChange={setGuideVisible}>{children}</GuidedTutorialProvider>
     <Modal visible={dialog !== null} transparent animationType="fade" statusBarTranslucent onRequestClose={() => { if (canDismiss) dismissDialog(); }}>
       <View style={[styles.backdrop,{backgroundColor:themeColors.backdrop}]} accessibilityViewIsModal>
         <Pressable style={StyleSheet.absoluteFill} onPress={() => { if (canDismiss) dismissDialog(); }} accessibilityLabel={canDismiss ? "Close dialog" : undefined} />

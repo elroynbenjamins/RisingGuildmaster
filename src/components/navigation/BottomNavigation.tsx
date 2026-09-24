@@ -8,25 +8,26 @@ import type { GameIconId } from "../../data/ui/gameIcons";
 import { useTheme } from "../../theme/theme";
 import { NotificationBadge } from "./NotificationBadge";
 import { useActionNotifications } from "../../state/useActionNotifications";
+import { useGuideTarget } from '../tutorial/GuidedTutorialContext';
 
 const ICONS: Record<MainTab, GameIconId> = { Guild: "guild", Quests: "quests", World: "world", Heroes: "heroes", Inventory: "inventory" };
 
+function NavigationTab({ tab, active, onSelect, notice }: { tab: MainTab; active: MainTab; notice: ReturnType<typeof useActionNotifications>["tabs"][MainTab]; onSelect(tab: MainTab, questTab?: QuestTab): void }) {
+  const { colors: c } = useTheme();
+  const guideRef = useGuideTarget(`nav.${tab}`);
+  const selected = active === tab;
+  return <Pressable ref={guideRef} collapsable={false} accessibilityRole="tab" accessibilityLabel={notice ? `${tab}. ${notice.label}` : tab} accessibilityState={{ selected }} aria-selected={selected} onPress={() => onSelect(tab, tab === "Quests" ? notice?.preferredQuestTab : undefined)} style={({ pressed }: { pressed: boolean }) => [styles.tab, { borderColor: selected ? c.gold : c.border, backgroundColor: selected ? c.panel2 : "transparent" }, pressed && styles.pressed]}>
+    {selected ? <View style={[styles.selectedPlate, { backgroundColor: c.gold }]} /> : null}
+    {notice ? <View style={styles.notice}><NotificationBadge count={notice.count} tone={notice.tone} label={`${tab}: ${notice.label}`} /></View> : null}
+    <GameIcon id={ICONS[tab]} size={29} framed={false} />
+    <Text style={[styles.label, { color: selected ? c.gold : c.muted }]}>{tab}</Text>
+  </Pressable>;
+}
 export function BottomNavigation({ active, onSelect }: { active: MainTab; onSelect(tab: MainTab, questTab?: QuestTab): void }) {
   const { colors: c } = useTheme();
   const notices = useActionNotifications();
-  return <View style={[styles.bar, { backgroundColor: c.panel, borderColor: c.border }]}>{MAIN_TABS.map((tab) => {
-    const selected = active === tab;
-    const notice = notices.tabs[tab];
-    return <Pressable key={tab} accessibilityRole="tab" accessibilityLabel={notice ? `${tab}. ${notice.label}` : tab} accessibilityState={{ selected }} aria-selected={selected} onPress={() => onSelect(tab, tab === "Quests" ? notice?.preferredQuestTab : undefined)} style={({ pressed }: { pressed: boolean }) => [styles.tab, { borderColor: selected ? c.gold : c.border, backgroundColor: selected ? c.panel2 : "transparent" }, pressed && styles.pressed]}>
-      {selected ? <View style={[styles.selectedPlate, { backgroundColor: c.gold }]} /> : null}
-      {notice ? <View style={styles.notice}><NotificationBadge count={notice.count} tone={notice.tone} label={`${tab}: ${notice.label}`} /></View> : null}
-      <GameIcon id={ICONS[tab]} size={29} framed={false} />
-      <Text style={[styles.label, { color: selected ? c.gold : c.muted }]}>{tab}</Text>
-
-    </Pressable>;
-  })}</View>;
+  return <View style={[styles.bar, { backgroundColor: c.panel, borderColor: c.border }]}>{MAIN_TABS.map(tab => <NavigationTab key={tab} tab={tab} active={active} onSelect={onSelect} notice={notices.tabs[tab]} />)}</View>;
 }
-
 const styles = StyleSheet.create({
   bar: { flexDirection: "row", borderTopWidth: 1, borderColor: colors.border, backgroundColor: colors.panel, paddingTop: 4, paddingBottom: 5, paddingHorizontal: 8, gap: 3 },
   tab: { flex: 1, alignItems: "center", minHeight: 61, justifyContent: "center", position: "relative", borderWidth: 0, borderRadius: 12, },

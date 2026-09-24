@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useContext, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { ActionButton, BackButton, EmptyState, Panel, SecondaryButton, SegmentedTabs, StatusChip, colors } from "../components/ui";
 import { GameIcon } from "../components/icons/GameIcon";
 import { QUEST_ENCOUNTERS } from "../data/encounters/questEncounters";
@@ -16,6 +16,8 @@ import { hasCompletedQuestOnce } from "../game/quests/questCompletionService";
 import { DUNGEON_UNLOCK_HERO_COUNT } from "../game/dungeons/dungeonDraftService";
 import { GUILD_OPERATION_TEAM_SIZE, isGuildOperationsUnlocked } from "../game/operations/guildOperationService";
 import { STARTER_JOURNEY } from "../game/onboarding/starterJourneyService";
+import { GuidedScrollView } from '../components/tutorial/GuidedScrollView';
+import { GuidedTutorialContext } from '../components/tutorial/GuidedTutorialContext';
 
 export const QUEST_SCREEN_TABS: QuestTab[] = ["Campaign", "Side Quests", "Bosses"];
 const TABS = QUEST_SCREEN_TABS;
@@ -37,6 +39,8 @@ function RewardToken({ icon, label }: { icon: "gold" | "xp" | "loot"; label: str
 
 export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDungeons, openOperations, openRaids, initialTab = "Campaign" }: { onBack?: () => void; selectQuest(id: string): void; openCampaign?(): void; openDungeons?(): void; openOperations?(): void; openRaids?(): void; initialTab?: QuestTab }) {
   const { guild } = useGuild();
+  const guide = useContext(GuidedTutorialContext);
+  const prepareStory = () => { if (openCampaign) { openCampaign(); guide?.finishNavigation('quests'); } };
   const [showQuestDetails, setShowQuestDetails] = useState(!guild.uiPreferences.compactQuestCards);
   const [tab, setTab] = useState<QuestTab>(initialTab === "Contracts" ? "Campaign" : initialTab);
   const [showActivities, setShowActivities] = useState(false);
@@ -67,7 +71,7 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
     ? quest.settlementIds.map((id) => SETTLEMENTS[id]?.name ?? formatGameId(id))
     : [REGIONS[quest.regionId]?.name ?? formatGameId(quest.regionId)]))];
 
-  return <ScrollView contentContainerStyle={styles.content}>
+  return <GuidedScrollView contentContainerStyle={styles.content}>
     {onBack && <BackButton onPress={onBack} />}
 
     <View style={styles.boardHeader}>
@@ -84,11 +88,11 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
       {openRaids && <View style={styles.raid}><View style={styles.activityHeading}><GameIcon id="boss" size={34} framed={false} /><View style={styles.flex}><Text style={styles.raidTitle}>GUILD RAIDS · 8 HEROES</Text><Text style={styles.expeditionText}>Two squads · largest arenas · bespoke multi-phase objectives · weekly prestige</Text></View></View><ActionButton iconId="boss" label="Open Guild Raids" onPress={openRaids} /></View>}
     </View>}
 
-    <SegmentedTabs values={TABS} value={tab} onChange={setTab} />
+    <SegmentedTabs values={TABS} value={tab} onChange={setTab} guideIds={{ Campaign: 'quests.campaign' }} />
     <View style={styles.boardControls}><Text style={[styles.boardCount, quests.length ? {color:colors.gold}:undefined]}>{quests.length ? `${quests.length} POSTING${quests.length===1?"":"S"} HERE · BEST MATCH FIRST` : "NO LOCAL POSTINGS"}</Text><SecondaryButton label={showQuestDetails ? "Compact Cards" : "Show Intel"} onPress={() => setShowQuestDetails((value) => !value)} /></View>
 
     {tab === "Campaign" && openCampaign && <Panel style={styles.campaign}>
-      <View style={styles.campaignRail} /><View style={styles.campaignBody}><Text style={styles.campaignStamp}>STORY ORDER · CHAPTER {guild.world.campaignChapter}</Text><Text style={styles.campaignName}>{nextCampaignNode?.title ?? "Campaign Timeline"}</Text><Text style={styles.detail}>{nextCampaignNode?.description ?? "Review completed chapters and the next available story objective."}</Text><View style={styles.campaignAction}><ActionButton iconId="quests" label={nextCampaignNode?.questId ? "Prepare Story Mission" : "Open Campaign Timeline"} onPress={openCampaign} /></View></View>
+      <View style={styles.campaignRail} /><View style={styles.campaignBody}><Text style={styles.campaignStamp}>STORY ORDER · CHAPTER {guild.world.campaignChapter}</Text><Text style={styles.campaignName}>{nextCampaignNode?.title ?? "Campaign Timeline"}</Text><Text style={styles.detail}>{nextCampaignNode?.description ?? "Review completed chapters and the next available story objective."}</Text><View style={styles.campaignAction}><ActionButton guideId="quests.story" iconId="quests" label={nextCampaignNode?.questId ? "Prepare Story Mission" : "Open Campaign Timeline"} onPress={prepareStory} /></View></View>
     </Panel>}
 
     {quests.map((quest, index) => {
@@ -134,7 +138,7 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
     })}
 
     {!quests.length && <EmptyState title={categoryUnlocked ? remoteQuests.length ? `${tab} available elsewhere` : tab === "Campaign" && nextCampaignNode && openCampaign ? "No additional local missions" : `No ${tab.toLowerCase()} available` : `${tab} locked`} message={categoryUnlocked ? remoteQuests.length ? `Travel to ${remoteSettlements.join(", ")} to access ${remoteQuests.length} available quest${remoteQuests.length === 1 ? "" : "s"}.` : tab === "Campaign" && nextCampaignNode && openCampaign ? "Your next story objective is shown above. Continue there, or browse side quests and bosses." : "Progress the campaign, unlock more regions, or check another category." : tab === "Side Quests" ? `Reach Level 3 or advance to the Goblin Chieftain to unlock side quests. Highest level: ${highestHeroLevel}.` : "Complete Chapter 1 before optional boss quests appear."} />}
-  </ScrollView>;
+  </GuidedScrollView>;
 }
 
 const styles = StyleSheet.create({

@@ -94,9 +94,9 @@ export function resolveDungeonUtilityNode(guild: GuildState, random: RandomSourc
 export function resolveDungeonCombat(guild: GuildState, status: "victory" | "defeat", instances: HeroCombatInstance[], random: RandomSource): DungeonNodeResolution {
   const run = activeRun(guild); const node = DUNGEON_NODES[run.currentNodeId]; if (!node || !["combat", "elite", "boss"].includes(node.type)) throw new Error("Current dungeon node is not combat");
   if (run.resolvedNodeIds.includes(node.id)) throw new Error("Dungeon node has already been resolved");
-  if (status === "defeat") { const defeatedRun = { ...run, heroInstances: instances, status: "defeat" as const, lastResolutionText: "The expedition was defeated in the depths." }; const next = syncHeroes(updateRun(guild, defeatedRun), instances); return { guild: next, check: null, text: defeatedRun.lastResolutionText, goldDelta: 0, recipeId: null }; }
+  if (status === "defeat") { const defeatedRun = { ...run, heroInstances: instances, combatState: null, combatRandomState: null, status: "defeat" as const, lastResolutionText: "The expedition was defeated in the depths." }; const next = syncHeroes(updateRun(guild, defeatedRun), instances); return { guild: next, check: null, text: defeatedRun.lastResolutionText, goldDelta: 0, recipeId: null }; }
   const goldDelta = scaledGold(guild, node.goldReward ?? 0); const xp = node.xpRewardPerHero ?? 0; const text = `${node.title} cleared. ${goldDelta} gold and up to ${xp} XP per surviving hero.`;
-  let resolvedRun = markDungeonNodeResolved({ ...run, heroInstances: instances }, text);
+  let resolvedRun = markDungeonNodeResolved({ ...run, heroInstances: instances, combatState: null, combatRandomState: null }, text);
   resolvedRun = { ...resolvedRun, goldEarned: resolvedRun.goldEarned + goldDelta, xpEarnedPerHero: resolvedRun.xpEarnedPerHero + xp };
   if (node.type !== "boss") resolvedRun = offerDungeonBoonChoices(resolvedRun, random);
   let next = syncHeroes(updateRun({ ...guild, gold: guild.gold + goldDelta }, resolvedRun), instances, xp, DUNGEONS[run.dungeonId]!.recommendedLevelMax);

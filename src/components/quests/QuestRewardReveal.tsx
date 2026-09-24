@@ -79,7 +79,7 @@ export function QuestRewardReveal({ summary, quest, openLoot, openHeroSkills, op
       <SectionTitle>LOOT REVEAL</SectionTitle>
       {equipmentRewards.map((reward, index) => <RewardStage key={`${reward.inventoryKey}-${index}`} delay={120 + index * 90} reducedMotion={reducedMotion}>
         <Pressable accessibilityRole="button" accessibilityLabel={`Inspect ${reward.name}, ${reward.rarityLabel}`} onPress={() => openLoot(reward.inventoryKey)}>
-          <Panel style={[styles.lootCard, { borderColor: RARITY_COLORS[reward.rarity] }, reward.rarity === "legendary" && styles.legendaryLoot]}>
+          <Panel style={[styles.lootCard, { borderColor: RARITY_COLORS[reward.rarity], backgroundColor: `${RARITY_COLORS[reward.rarity]}12` }, reward.rarity === "legendary" && styles.legendaryLoot]}>
             <EquipmentIcon equipmentKey={reward.inventoryKey} label={reward.name} size={52} />
             <View style={styles.flex}>
               <Text style={[styles.rarity, { color: RARITY_COLORS[reward.rarity] }]}>{reward.rarityLabel} DROP</Text>
@@ -130,7 +130,7 @@ function RewardStage({ children, delay, reducedMotion }: React.PropsWithChildren
 
 function RewardResource({ icon, value, label, tone }: { icon: "gold" | "victory" | "guild" | "xp"; value: number; label: string; tone: "gold" | "blue" }) {
   const toneColor = tone === "gold" ? colors.gold : colors.blue;
-  return <View style={[styles.resource, { borderColor: toneColor }]}><GameIcon id={icon} size={26} framed={false} /><Text style={[styles.resourceValue, { color: toneColor }]}>{Math.max(0, Math.round(value)).toLocaleString()}</Text><Text style={styles.resourceLabel}>{label}</Text></View>;
+  return <View style={[styles.resource, { borderColor: toneColor, backgroundColor: `${toneColor}14` }]}><GameIcon id={icon} size={26} framed={false} /><Text style={[styles.resourceValue, { color: toneColor }]}>{Math.max(0, Math.round(value)).toLocaleString()}</Text><Text style={styles.resourceLabel}>{label}</Text></View>;
 }
 
 function HeroProgressionRewardCard({ outcome, delay, reducedMotion, openSkills }: { outcome: QuestResultSummary["heroOutcomes"][number]; delay: number; reducedMotion: boolean; openSkills(): void }) {

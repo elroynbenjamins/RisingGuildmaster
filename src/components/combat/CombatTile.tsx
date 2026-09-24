@@ -39,7 +39,7 @@ export function CombatTile({ tile, columns, rows, nearWall = false, reachable, a
   return <Pressable accessibilityRole="button" accessibilityLabel={`Tile ${tile.position.x},${tile.position.y}, ${tile.terrainType}, height ${tile.elevation}${reachable ? ", reachable" : ""}${targetable ? ", targetable" : ""}${hazard?", hazard":""}${safe?", safe zone":""}${objective?", objective":""}`} onPress={onPress} style={[styles.tile, getCombatTileLayout(tile.position, columns, rows)]}>
     <View style={styles.contents}>
       {tile.terrainType === "normal" || tile.terrainType === "shallow_water" ? <AmbientGround tile={tile} nearWall={nearWall}/> : <Image fadeDuration={0} resizeMode="stretch" source={TERRAIN_ATLAS} style={{ position:"absolute",width:"400%",height:"400%",left:`${-art.column*100}%`,top:`${-art.row*100}%`,opacity:.88 }}/>}
-      <View pointerEvents="none" style={[styles.grid,reachable && styles.reachable,safe && styles.safe,affected && styles.affected,hazard && styles.hazard,(targetable || autoAttackable) && styles.targetable,objective && styles.objective,selected && styles.selected,strongerContrast&&reachable&&styles.reachableStrong,strongerContrast&&safe&&styles.safeStrong,strongerContrast&&affected&&styles.affectedStrong,strongerContrast&&hazard&&styles.hazardStrong,strongerContrast&&targetable&&styles.targetableStrong,strongerContrast&&objective&&styles.objectiveStrong,strongerContrast&&selected&&styles.selectedStrong]}/>
+      <View pointerEvents="none" style={[styles.grid,reachable && styles.reachable,safe && styles.safe,affected && styles.affected,hazard && styles.hazard,targetable && styles.targetable,autoAttackable && styles.autoAttackBorder,objective && styles.objective,selected && styles.selected,strongerContrast&&reachable&&styles.reachableStrong,strongerContrast&&safe&&styles.safeStrong,strongerContrast&&affected&&styles.affectedStrong,strongerContrast&&hazard&&styles.hazardStrong,strongerContrast&&targetable&&styles.targetableStrong,strongerContrast&&autoAttackable&&styles.autoAttackBorderStrong,strongerContrast&&objective&&styles.objectiveStrong,strongerContrast&&selected&&styles.selectedStrong]}/>
       {reachable && movementBoundary ? <View pointerEvents="none" style={[styles.movementBoundary, movementBoundary.top&&styles.boundaryTop, movementBoundary.right&&styles.boundaryRight, movementBoundary.bottom&&styles.boundaryBottom, movementBoundary.left&&styles.boundaryLeft]}/> : null}
       {hazard ? <Text style={styles.raidMark}>!</Text> : null}
       {objective ? <Text style={styles.objectiveMark}>◆</Text> : null}
@@ -65,7 +65,8 @@ const styles = StyleSheet.create({
   affected:{backgroundColor:"rgba(255,196,102,.18)"},
   hazard:{backgroundColor:"rgba(180,45,54,.35)",borderColor:"#ff665f",borderWidth:2},
   targetable:{backgroundColor:"rgba(210,71,65,.2)",borderColor:"#ff827a",borderWidth:2,borderStyle:"dashed"},
-  autoAttackBorder:{position:"absolute",left:0,right:0,top:0,bottom:0,borderColor:"#ff4038",borderWidth:2,zIndex:5},
+  autoAttackBorder:{position:"absolute",left:0,right:0,top:0,bottom:0,borderColor:"#ff4038",borderWidth:2,borderStyle:"solid",zIndex:5},
+  autoAttackBorderStrong:{borderColor:"#ff4b42",borderWidth:3,borderStyle:"solid"},
   objective:{borderColor:"#d7a9ff",borderWidth:2,borderStyle:"dashed"},
   selected:{borderColor:"#ffe18a",borderWidth:2,borderStyle:"solid"},
   reachableStrong:{backgroundColor:"rgba(38,220,184,.34)",borderColor:"#54f0d1",borderWidth:2},

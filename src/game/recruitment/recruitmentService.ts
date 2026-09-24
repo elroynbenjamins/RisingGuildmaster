@@ -37,7 +37,7 @@ export function recruitCandidate(guild: GuildState, candidateId: string): GuildS
   const errors = validateCandidateRecruitment(guild, candidate);
   if (errors.length) throw new Error(errors.join(". "));
   const recommendation = getRecruitmentRecommendation(guild, candidate);
-  const baseHero = { ...candidate.heroPreview, potential: candidate.truePotential, recruitmentCost: candidate.recruitmentFee, salary: candidate.weeklySalary, isAvailable: true, history: { ...candidate.heroPreview.history, importantEvents: [...candidate.heroPreview.history.importantEvents, `Joined the guild on Day ${guild.currentDay}.`] } };
+  const baseHero = { ...candidate.heroPreview, recruitmentCost: candidate.recruitmentFee, salary: candidate.weeklySalary, isAvailable: true, history: { ...candidate.heroPreview.history, importantEvents: [...candidate.heroPreview.history.importantEvents, `Joined the guild on Day ${guild.currentDay}.`] } };
   const hero = appendHeroHistoryEvent(baseHero, {
     day: guild.currentDay,
     type: "recruitment",

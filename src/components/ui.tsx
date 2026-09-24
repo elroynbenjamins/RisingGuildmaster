@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   panel: { backgroundColor: colors.panel, borderColor: colors.border, borderWidth: 1, borderRadius: 12, padding: 15 },
   sectionHeading: { alignItems: "center", flexDirection: "row", gap: 7, marginBottom: 10, marginTop: 18 },
   sectionAccent:{borderRadius:2,height:12,width:3},
-  sectionTitle: {color: colors.gold, fontWeight: "900", letterSpacing: .8, fontSize: 12},
+  sectionTitle: {color: colors.gold, flexShrink: 1, fontWeight: "900", letterSpacing: .8, fontSize: 12},
   sectionRule:{flex:1,height:1,opacity:.75},
   button: { paddingHorizontal: 14, paddingVertical: 12, alignItems: "center", minHeight: 44, justifyContent: "center", borderWidth: 0, borderRadius: 10, },
   secondaryButton: { paddingHorizontal: 13, paddingVertical: 10, alignItems: "center", minHeight: 44, justifyContent: "center", borderWidth: 1, borderRadius: 10, },

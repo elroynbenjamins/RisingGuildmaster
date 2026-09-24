@@ -5,6 +5,7 @@ import { WORLD_EVENTS } from "../../data/world/worldEvents";
 import { getTravelContractEvents } from "../../data/world/travelContractEvents";
 import { GAME_CONFIG } from "../../config/gameConfig";
 import type { RandomSource } from "../../utils/random";
+import { needsStarterRoadEncounter, starterBramblewayEvent } from "../onboarding/starterJourneyService";
 import { advanceGuildTime } from "../economy/guildCalendarService";
 import type { GuildState } from "../guild/types";
 import type { TravelEventTier, WorldEventDefinition, WorldState } from "./worldTypes";
@@ -65,6 +66,7 @@ export function visitSettlement(guild: GuildState, settlementId: string, partySi
 }
 export function visitSettlementWithEvent(guild: GuildState, settlementId: string, partySize: number, random: RandomSource): LocalTravelResult {
   const nextGuild = visitSettlement(guild, settlementId, partySize);
+  if (needsStarterRoadEncounter(nextGuild)) return { guild: nextGuild, event: starterBramblewayEvent() };
   return { guild: nextGuild, event: rollTravelEvent(nextGuild.world.currentRegionId, random) };
 }
 export function getRationBundleAmount(guild: GuildState): number { return Math.round(GAME_CONFIG.rationBundleSize * (hasGuildmasterSkill(guild.guildmaster, "quartermaster_network") ? 1.5 : 1) * (1 + displayedTrophyBonus(guild.legacy ?? createGuildLegacyState(), "ration_bundle"))); }

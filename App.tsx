@@ -122,7 +122,7 @@ function Game() {
     });
   }, [gameStarted, isHydrated, guild, route.name, isDialogOpen, updateGuild, showDialog]);
   useEffect(() => {
-    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active || (guild.pendingQuestResult || guild.activeQuestCombat)) return;
+    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active || guild.pendingQuestResult || (guild.activeQuestCombat && route.name !== "combat")) return;
     let id: "campaign_travel" | "combat_basics" | "idle_missions" | "roguelite_expeditions" | null = null;
     let title = "";
     let eyebrow = "QUICK GUIDE";

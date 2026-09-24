@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { colors } from "../ui";
 import { useTheme } from "../../theme/theme";
 
@@ -52,11 +52,13 @@ export function GameDialogProvider({ children }: React.PropsWithChildren) {
       <View style={[styles.backdrop,{backgroundColor:themeColors.backdrop}]} accessibilityViewIsModal>
         <Pressable style={StyleSheet.absoluteFill} onPress={() => { if (canDismiss) dismissDialog(); }} accessibilityLabel={canDismiss ? "Close dialog" : undefined} />
         {dialog && <View style={[styles.card,{backgroundColor:themeColors.panel,borderColor:themeColors.gold}, dialog.tone === "danger" && styles.dangerCard, dialog.tone === "success" && styles.successCard]}>
-          <View style={styles.crest}><Text style={styles.crestText}>{dialog.tone === "danger" ? "!" : dialog.tone === "success" ? "✓" : "◆"}</Text></View>
-          <Text style={[styles.eyebrow, dialog.tone === "danger" && styles.dangerText, dialog.tone === "success" && styles.successText]}>{dialog.eyebrow ?? (dialog.tone === "danger" ? "GUILD WARNING" : dialog.tone === "success" ? "GUILD RECORD" : "GUILD NOTICE")}</Text>
-          <Text style={[styles.title,{color:themeColors.text}]}>{dialog.title}</Text>
-          <View style={styles.rule} />
-          <Text style={[styles.message,{color:themeColors.muted}]}>{dialog.message}</Text>
+          <ScrollView style={styles.bodyScroll} contentContainerStyle={styles.bodyContent} showsVerticalScrollIndicator={false} bounces={false}>
+            <View style={styles.crest}><Text style={styles.crestText}>{dialog.tone === "danger" ? "!" : dialog.tone === "success" ? "✓" : "◆"}</Text></View>
+            <Text style={[styles.eyebrow, dialog.tone === "danger" && styles.dangerText, dialog.tone === "success" && styles.successText]}>{dialog.eyebrow ?? (dialog.tone === "danger" ? "GUILD WARNING" : dialog.tone === "success" ? "GUILD RECORD" : "GUILD NOTICE")}</Text>
+            <Text style={[styles.title,{color:themeColors.text}]}>{dialog.title}</Text>
+            <View style={styles.rule} />
+            <Text style={[styles.message,{color:themeColors.muted}]}>{dialog.message}</Text>
+          </ScrollView>
           <View style={[styles.actions,actions.length>2&&styles.actionStack]}>{actions.map((action) => <Pressable key={action.label} accessibilityRole="button" onPress={() => choose(action)} style={({ pressed }) => [styles.action,{borderColor:themeColors.border}, action.tone === "primary" && {backgroundColor:themeColors.gold,borderColor:themeColors.gold}, action.tone === "danger" && styles.dangerAction, pressed && styles.pressed]}><Text style={[styles.actionText,{color:themeColors.text}, action.tone === "primary" && {color:themeColors.buttonText}, action.tone === "danger" && styles.dangerActionText]}>{action.label}</Text></Pressable>)}</View>
         </View>}
       </View>
@@ -72,7 +74,9 @@ export function useGameDialog() {
 
 const styles = StyleSheet.create({
   backdrop: { alignItems: "center", backgroundColor: "rgba(3, 7, 8, 0.82)", flex: 1, justifyContent: "center", padding: 22 },
-  card: { backgroundColor: colors.panel, borderColor: colors.gold, borderRadius: 14, borderWidth: 2, elevation: 18, maxWidth: 440, padding: 20, shadowColor: "#000", shadowOffset: { width: 0, height: 9 }, shadowOpacity: 0.55, shadowRadius: 18, width: "100%" },
+  card: { backgroundColor: colors.panel, borderColor: colors.gold, borderRadius: 14, borderWidth: 2, elevation: 18, maxHeight: "88%", maxWidth: 440, padding: 20, shadowColor: "#000", shadowOffset: { width: 0, height: 9 }, shadowOpacity: 0.55, shadowRadius: 18, width: "100%" },
+  bodyScroll: { flexShrink: 1 },
+  bodyContent: { paddingBottom: 2 },
   dangerCard: { borderColor: colors.danger }, successCard: { borderColor: colors.green },
   crest: { alignItems: "center", alignSelf: "center", backgroundColor: colors.panel2, borderColor: colors.gold, borderRadius: 10, borderWidth: 2, height: 44, justifyContent: "center", marginBottom: 10, width: 44 },
   crestText: { color: colors.gold, fontSize: 21, fontWeight: "900" },

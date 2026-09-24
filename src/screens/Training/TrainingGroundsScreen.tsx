@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { ActionButton, BackButton, EmptyState, MiniMeter, Panel, Portrait, SecondaryButton, SectionTitle, SegmentedTabs, StatusChip, colors } from "../../components/ui";
 import { TRAINING_PROGRAMS } from "../../data/training/trainingPrograms";
+import { CLASSES } from "../../data/classes/classes";
 import { TRAINING_GROUND_CONFIG } from "../../config/trainingConfig";
 import { getTrainingGoldCost, calculateTrainingQuote, startHeroTraining, startTrainingGroundUpgrade, trainingCapacity } from "../../game/training/trainingService";
 import { getTrainingCatchupAdvice, getTrainingQuotePresentation, getTrainingSessionPresentation } from "../../game/training/trainingPresentationService";
@@ -94,7 +95,7 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
     {sessions.length > 0 && <SecondaryButton label="OPEN GUILD CALENDAR" onPress={openCalendar}/>}</>}
 
     {tab==="Train"&&<><SectionTitle>SELECT HERO</SectionTitle>
-    {available.length ? <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.heroRow}>{available.map((entry) => <Pressable key={entry.id} accessibilityRole="button" accessibilityLabel={`Select ${entry.name} for training`} accessibilityState={{ selected: heroId === entry.id }} aria-pressed={heroId === entry.id} onPress={() => setHeroId(entry.id)} style={({pressed})=>pressed&&styles.pressed}><Panel style={[styles.hero, heroId === entry.id && styles.selected, heroId === entry.id && styles.selectedPop]}><Portrait hero={entry} size={58}/><Text style={[styles.heroName, { color: getRaceNameColor(entry.raceId) }]}>{entry.name}</Text><Text style={styles.heroLevel}>LV {entry.level}</Text><Text style={styles.heroMeta}>Readiness {Math.round(entry.adventureStamina)}</Text><Text style={styles.heroMeta}>Potential {entry.potentialEstimateMin}–{entry.potentialEstimateMax}</Text></Panel></Pressable>)}</ScrollView> : <EmptyState title="No heroes available" message="Heroes who are fallen, away on guild work, or already training cannot begin another program."/>}
+    {available.length ? <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.heroRow}>{available.map((entry) => <Pressable key={entry.id} accessibilityRole="button" accessibilityLabel={`Select ${entry.name} for training`} accessibilityState={{ selected: heroId === entry.id }} aria-pressed={heroId === entry.id} onPress={() => setHeroId(entry.id)} style={({pressed})=>pressed&&styles.pressed}><Panel style={[styles.hero, heroId === entry.id && styles.selected, heroId === entry.id && styles.selectedPop]}><Portrait hero={entry} size={58}/><Text style={[styles.heroName, { color: getRaceNameColor(entry.raceId) }]}>{entry.name}</Text><Text style={styles.heroLevel}>LV {entry.level}</Text><Text style={styles.heroMeta}>Readiness {Math.round(entry.adventureStamina)}</Text><Text style={styles.heroMeta}>{CLASSES[entry.classId].name}</Text></Panel></Pressable>)}</ScrollView> : <EmptyState title="No heroes available" message="Heroes who are fallen, away on guild work, or already training cannot begin another program."/>}
 
     <SectionTitle>CHOOSE PROGRAM</SectionTitle>
     {Object.values(TRAINING_PROGRAMS).map((entry) => {

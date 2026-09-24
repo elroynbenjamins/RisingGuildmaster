@@ -6,7 +6,6 @@ import { RACES } from "../../data/races/races";
 import { calculateHero } from "./heroCalculator";
 import type { ClassId, EquipmentSlots, Hero, RaceId } from "./types";
 import type { RandomSource } from "../../utils/random";
-import { generateWeightedPotential } from "../progression/potentialGenerator";
 import { applyLevelAttributeGrowth } from "../progression/attributeGrowth";
 import { BACKGROUNDS } from "../../data/backgrounds/backgrounds";
 import type { BackgroundId } from "./types";
@@ -29,13 +28,11 @@ function startingEquipment(classId: ClassId): EquipmentSlots {
   return { weapon, armor, helmet: null, boots: null, accessory1: null, accessory2: null };
 }
 
-export interface HeroGenerationOptions { raceId?: RaceId; classId?: ClassId; gender?: HeroGender; backgroundId?: BackgroundId; age?: number; level?: number; potential?: number; traitCount?: number }
+export interface HeroGenerationOptions { raceId?: RaceId; classId?: ClassId; gender?: HeroGender; backgroundId?: BackgroundId; age?: number; level?: number; traitCount?: number }
 
 export function generateHero(random: RandomSource, options: HeroGenerationOptions = {}): Hero {
   const raceId = options.raceId ?? random.pick(RACE_IDS);
   const classId = options.classId ?? random.pick(CLASS_IDS);
-  const potential = options.potential ?? generateWeightedPotential(random);
-  const estimateVariance = random.int(8, 20);
   const gender = options.gender ?? random.pick(["female", "male"] as const);
   const portraitVariant = random.int(1, 4) as 1 | 2 | 3 | 4;
   const traitCount = options.traitCount ?? random.int(1, 2);
@@ -48,9 +45,7 @@ export function generateHero(random: RandomSource, options: HeroGenerationOption
     portraitKey: `${raceId}-${classId}-${gender}-v${portraitVariant}`,
     raceId, classId, subclassId: null, masteryId: null, learnedSkillIds: [], skillProficiencyIds: generateSkillProficiencies(classId, backgroundId), skillExpertiseIds: [], backgroundId, roleplayProfile: generateRoleplayProfile(random, backgroundId),
     baseAttributes: generateDndAttributes(random, CLASSES[classId].attributePriorities),
-    level: 1, xp: 0, potential,
-    potentialEstimateMin: Math.max(GAME_CONFIG.potentialMin, potential - estimateVariance),
-    potentialEstimateMax: Math.min(100, potential + estimateVariance),
+    level: 1, xp: 0,
     traitIds: traits, conditions: [], equipment: startingEquipment(classId), currentHP: 9999,
     history: createHeroHistory(),
     recruitmentCost: random.int(300, 750), salary: random.int(30, 85),

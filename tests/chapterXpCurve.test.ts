@@ -7,8 +7,8 @@ import { getQuestXpForHero } from "../src/game/quests/questResolver";
 import { testHero } from "./testHero";
 
 describe("campaign and roguelite XP curve", () => {
-  it("keeps an average-potential four-hero core aligned through every released chapter", () => {
-    let hero = { ...testHero(), level: 1, xp: 0, potential: 75 };
+  it("keeps a four-hero core aligned through every released chapter", () => {
+    let hero = { ...testHero(), level: 1, xp: 0 };
     const endLevels: number[] = [];
     for (const chapter of Object.values(CAMPAIGN_CHAPTERS)) {
       const campaignQuestIds = chapter.nodeIds.map((id) => CAMPAIGN_NODES[id]?.questId).filter((id): id is string => Boolean(id));

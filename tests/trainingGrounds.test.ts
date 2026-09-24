@@ -38,13 +38,13 @@ describe("Training Hall", () => {
     expect(result.days[0]?.events.some((event) => event.type === "training_complete")).toBe(true);
   });
 
-  it("uses potential and training modifiers in the quoted result", () => {
-    const ordinary = testHero(); const gifted = { ...testHero(), potential: 100, backgroundId: "scholar" as const };
+  it("uses training modifiers in the quoted result", () => {
+    const ordinary = testHero(); const gifted = { ...testHero(), backgroundId: "scholar" as const, traitIds: ["genius" as const] };
     expect(calculateTrainingQuote(gifted, "sparring_drills").xpReward).toBeGreaterThan(calculateTrainingQuote(ordinary, "sparring_drills").xpReward);
   });
 
   it("upgrades capacity after construction days", () => {
-    let guild = startTrainingGroundUpgrade(createGuild()); expect(guild.trainingGround.upgrade).toMatchObject({ targetLevel: 2, completionDay: 4 });
+    let guild = startTrainingGroundUpgrade(createGuild()); expect(guild.trainingGround.upgrade).toMatchObject({ targetLevel: 2, completionDay: 4, goldCost: 250 });
     guild = advanceGuildTime(guild, 3).guild; expect(guild.trainingGround.level).toBe(2); expect(trainingCapacity(guild)).toBe(2); expect(guild.trainingGround.upgrade).toBeNull();
   });
 

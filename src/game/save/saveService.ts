@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { GuildState } from "../guild/types";
 import { applyContentEntitlements, applyStoryRaceUnlocks } from "../monetization/contentUnlockService";
 import { loadAccountContentEntitlements, saveAccountContentEntitlements } from "../monetization/accountEntitlementService";
+import { accountGemWalletFromGuild, applyAccountGemWallet, loadAccountGemWallet, saveAccountGemWallet, type AccountGemWallet } from "../monetization/accountGemWalletService";
 import { migrateGuildState } from "./guildStateMigration";
 import { UnsupportedSaveSchemaError, decodePersistedSave, serializePersistedGuild } from "./saveSchema";
 
@@ -67,6 +68,7 @@ async function saveGuildImmediate(guild: GuildState, slotId: SaveSlotId): Promis
   await importHistoricalSlot(slotId);
   const entitlementAwareGuild = applyStoryRaceUnlocks(guild);
   await saveAccountContentEntitlements(entitlementAwareGuild.entitlements);
+  await saveAccountGemWallet(accountGemWalletFromGuild(entitlementAwareGuild));
 
   const next = serializePersistedGuild(entitlementAwareGuild);
   // Validate the exact payload before it can replace a known-good primary.
@@ -102,13 +104,14 @@ export async function saveGuild(guild: GuildState, slotId: SaveSlotId = 1): Prom
 
 type AccountEntitlements = Awaited<ReturnType<typeof loadAccountContentEntitlements>>;
 
-async function prepareLoadedGuild(value: string, accountEntitlements: AccountEntitlements): Promise<{
+async function prepareLoadedGuild(value: string, accountEntitlements: AccountEntitlements, accountWallet: AccountGemWallet | null): Promise<{
   guild: GuildState;
   needsSchemaRewrite: boolean;
 }> {
   const decoded = decodePersistedSave(value);
   const migrated = applyStoryRaceUnlocks(migrateDomain(JSON.stringify(migrateGuildState(decoded.guild))));
-  const guild = applyContentEntitlements(migrated, accountEntitlements);
+  const entitlementGuild = applyContentEntitlements(migrated, accountEntitlements);
+  const guild = accountWallet ? applyAccountGemWallet(entitlementGuild, accountWallet) : entitlementGuild;
   await saveAccountContentEntitlements(guild.entitlements);
   return { guild, needsSchemaRewrite: decoded.migrated };
 }
@@ -117,11 +120,12 @@ async function loadFromKeys(
   primaryKey: string,
   backupKey: string,
   accountEntitlements: AccountEntitlements,
+  accountWallet: AccountGemWallet | null,
 ): Promise<GuildState | null> {
   const primary = await AsyncStorage.getItem(primaryKey);
   if (primary !== null) {
     try {
-      const loaded = await prepareLoadedGuild(primary, accountEntitlements);
+      const loaded = await prepareLoadedGuild(primary, accountEntitlements, accountWallet);
       if (loaded.needsSchemaRewrite) {
         // Upgrade old raw/v1 payloads in place only after they have loaded and
         // normalized successfully. The old primary becomes the recovery copy.
@@ -143,7 +147,7 @@ async function loadFromKeys(
     return null;
   }
 
-  const recovered = await prepareLoadedGuild(backup, accountEntitlements);
+  const recovered = await prepareLoadedGuild(backup, accountEntitlements, accountWallet);
   // Recovery always writes a fresh current-schema primary, even if the backup
   // was already current, so a corrupt/interrupted primary is fully repaired.
   await AsyncStorage.setItem(primaryKey, serializePersistedGuild(recovered.guild));
@@ -155,16 +159,25 @@ export async function loadGuild(slotId: SaveSlotId = 1): Promise<GuildState | nu
   await saveQueues[slotId];
   await importHistoricalSlot(slotId);
   const accountEntitlements = await loadAccountContentEntitlements();
+  const existingWallet = await loadAccountGemWallet();
   const keys = SAVE_SLOT_KEYS[slotId];
-  const saved = await loadFromKeys(keys.primary, keys.backup, accountEntitlements);
-  if (saved) return saved;
+  const saved = await loadFromKeys(keys.primary, keys.backup, accountEntitlements, existingWallet);
+  if (saved) {
+    if (existingWallet) return saved;
+    const wallet = accountGemWalletFromGuild(saved);
+    await saveAccountGemWallet(wallet);
+    return applyAccountGemWallet(saved, wallet);
+  }
   if (slotId !== 1) return null;
 
   // One-time compatibility bridge: old single-save installs become Slot 1.
-  const legacy = await loadFromKeys(LEGACY_SAVE_KEY, LEGACY_BACKUP_SAVE_KEY, accountEntitlements);
+  const legacy = await loadFromKeys(LEGACY_SAVE_KEY, LEGACY_BACKUP_SAVE_KEY, accountEntitlements, existingWallet);
   if (!legacy) return null;
-  await saveGuild(legacy, 1);
-  return legacy;
+  const wallet = existingWallet ?? accountGemWalletFromGuild(legacy);
+  if (!existingWallet) await saveAccountGemWallet(wallet);
+  const synchronized = applyAccountGemWallet(legacy, wallet);
+  await saveGuild(synchronized, 1);
+  return synchronized;
 }
 
 function saveSlotIssue(slotId: SaveSlotId, error: unknown): SaveSlotLoadIssue {
@@ -195,7 +208,9 @@ export async function loadGuildSaveSlotsDetailed(): Promise<SaveSlotsLoadResult>
       return { guild: null, issue: saveSlotIssue(slotId, error) };
     }
   };
-  const [slot1, slot2] = await Promise.all([loadOne(1), loadOne(2)]);
+  // Load sequentially so a legacy per-save wallet migrates deterministically before the second slot is read.
+  const slot1 = await loadOne(1);
+  const slot2 = await loadOne(2);
   return {
     guilds: { 1: slot1.guild, 2: slot2.guild },
     issues: { 1: slot1.issue, 2: slot2.issue },

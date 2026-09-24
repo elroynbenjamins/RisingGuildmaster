@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { ActionButton, BackButton, EmptyState, MiniMeter, Panel, Portrait, SecondaryButton, SectionTitle, SegmentedTabs, StatusChip, colors } from "../../components/ui";
 import { TRAINING_PROGRAMS } from "../../data/training/trainingPrograms";
+import { CLASSES } from "../../data/classes/classes";
 import { TRAINING_GROUND_CONFIG } from "../../config/trainingConfig";
 import { getTrainingGoldCost, calculateTrainingQuote, startHeroTraining, startTrainingGroundUpgrade, trainingCapacity } from "../../game/training/trainingService";
 import { getTrainingCatchupAdvice, getTrainingQuotePresentation, getTrainingSessionPresentation } from "../../game/training/trainingPresentationService";

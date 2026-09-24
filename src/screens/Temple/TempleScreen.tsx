@@ -23,7 +23,7 @@ export function TempleScreen({ onBack, openWorld }: { onBack(): void; openWorld(
   const fallen = guild.heroes.filter((hero) => hero.currentHP <= 0);
   const act = (action: () => ReturnType<typeof fullyTreatHero>, success: string) => { try { updateGuild(action()); setMessage(success); } catch (error) { setMessage(error instanceof Error ? error.message : "Temple service failed"); } };
 
-  if (!localHealingAvailable) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack}/><Text style={styles.eyebrow}>LOCAL SERVICES</Text><Text style={styles.title}>Healing Unavailable</Text><Panel style={styles.unavailable}><Text style={styles.panelTitle}>{currentSettlement?.name ?? "Wilderness"}</Text><Text style={styles.intro}>This location has no Temple or healer. Travel to a settlement with healing services before treating, healing, or reviving heroes.</Text><ActionButton label="Open World Map" onPress={openWorld}/></Panel></ScrollView>;
+  if (!localHealingAvailable) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack}/><Text style={styles.eyebrow}>LOCAL SERVICES</Text><Text style={styles.title}>Healing Unavailable</Text><Panel style={styles.unavailable}><Text style={styles.panelTitle}>{currentSettlement?.name ?? "Wilderness"}</Text><Text style={styles.intro}>This location has no Temple or healer. Travel to a settlement with healing services before treating, healing, or reviving heroes.</Text><ActionButton iconId="world" label="Open World Map" onPress={openWorld}/></Panel></ScrollView>;
 
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} />

@@ -207,7 +207,6 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
           {unlocked && availableRegionalQuestId && <ActionButton label="View Regional Quest" onPress={() => openQuest(availableRegionalQuestId)} />}
           <ActionButton label="Campaign" onPress={openCampaign} />
         </View>
-        {message && <Text style={styles.message}>{message}</Text>}
       </Panel>
 
       <SectionTitle>DISCOVERED SETTLEMENTS</SectionTitle>

@@ -6,6 +6,7 @@ import { getAllAchievementProgress, claimAchievement } from "../../game/achievem
 import type { AchievementCategory } from "../../game/achievements/achievementTypes";
 import { useGuild } from "../../state/GuildContext";
 import { triggerTactileFeedback } from "../../ui/tactileFeedback";
+import { useGameToast } from "../../components/feedback/GameToast";
 
 const CATEGORIES: ("All"|AchievementCategory)[] = ["All","Guild","Heroes","Adventures","Collection","Crafting"];
 
@@ -20,13 +21,13 @@ export function AchievementsScreen({onBack}:{onBack():void}) {
   const hiddenClaimed=categoryProgress.filter((entry)=>entry.claimed).length;
   const complete=progress.filter((entry)=>entry.complete).length;
   const claimed=progress.filter((entry)=>entry.claimed).length;
-  const claim=(id:string)=>{try{const entry=progress.find((item)=>item.definition.id===id);const before=guild.gems;const next=claimAchievement(guild,id);updateGuild(next);triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");setMessage(`${entry?.definition.title ?? "Achievement"} complete · +${next.gems-before} Gems · ${before} → ${next.gems}`);}catch{triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");}};
+  const claim=(id:string)=>{try{const entry=progress.find((item)=>item.definition.id===id);const before=guild.gems;const next=claimAchievement(guild,id);const gained=next.gems-before;updateGuild(next);triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");showToast({title:"Achievement Reward Claimed",message:`${entry?.definition.title ?? "Achievement"} · +${gained} gems · ${before} → ${next.gems}`,tone:"success"});}catch(error){triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");showToast({title:"Claim Failed",message:error instanceof Error?error.message:"Achievement reward could not be claimed.",tone:"danger"});}};
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack}/>
     <Text style={styles.eyebrow}>GUILD MILESTONES</Text><Text style={styles.title}>Achievements</Text>
     <Text style={styles.intro}>Achievements celebrate long-term progress across the guild. Rewards are deliberately small gem grants; no achievement grants direct combat power.</Text>
     <View style={styles.summary}><Panel style={styles.summaryCard}><Text style={styles.summaryValue}>{complete}/{progress.length}</Text><Text style={styles.summaryLabel}>COMPLETED</Text></Panel><Panel style={styles.summaryCard}><Text style={styles.summaryValue}>{claimed}</Text><Text style={styles.summaryLabel}>CLAIMED</Text></Panel><Panel style={styles.summaryCard}><Text style={styles.summaryValue}>{progress.filter((entry)=>entry.complete&&!entry.claimed).length}</Text><Text style={styles.summaryLabel}>READY</Text></Panel></View>
-    {message&&<Panel style={styles.claimNotice}><Text style={styles.claimNoticeTitle}>REWARD CLAIMED</Text><Text style={styles.claimNoticeText}>{message}</Text></Panel>}<SegmentedTabs values={CATEGORIES} value={category} onChange={setCategory}/>
+<SegmentedTabs values={CATEGORIES} value={category} onChange={setCategory}/>
     <View style={styles.listTools}><View style={styles.flex}><Text style={styles.listLabel}>{visible.length} MILESTONE{visible.length===1?"":"S"} SHOWN</Text><Text style={styles.listHint}>Ready rewards are kept at the top{!showClaimed&&hiddenClaimed?` · ${hiddenClaimed} claimed hidden`:""}.</Text></View>{hiddenClaimed>0?<SecondaryButton label={showClaimed?"Hide Claimed":"Show Claimed"} onPress={()=>setShowClaimed(value=>!value)}/>:null}</View>
     {visible.map((entry)=>{
       const pct=Math.min(100,entry.current/Math.max(1,entry.target)*100);

@@ -22,6 +22,7 @@ export async function loadAccountGemWallet(): Promise<AccountGemWallet | null> {
 }
 
 let pendingWalletWrite: Promise<void> = Promise.resolve();
+let pendingWalletInitialization: Promise<void> = Promise.resolve();
 
 export function saveAccountGemWallet(wallet: AccountGemWallet): Promise<void> {
   const normalized: AccountGemWallet = {
@@ -33,6 +34,22 @@ export function saveAccountGemWallet(wallet: AccountGemWallet): Promise<void> {
   );
   pendingWalletWrite = write;
   return write;
+}
+
+export async function initializeAccountGemWallet(fallback: AccountGemWallet): Promise<AccountGemWallet> {
+  let resolved: AccountGemWallet = fallback;
+  const operation = pendingWalletInitialization.catch(() => undefined).then(async () => {
+    const existing = await loadAccountGemWallet();
+    if (existing) {
+      resolved = existing;
+      return;
+    }
+    await saveAccountGemWallet(fallback);
+    resolved = fallback;
+  });
+  pendingWalletInitialization = operation;
+  await operation;
+  return resolved;
 }
 
 export function accountGemWalletFromGuild(guild: GuildState): AccountGemWallet {

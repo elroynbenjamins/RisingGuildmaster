@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { EmptyState, Panel, SegmentedTabs, SecondaryButton } from "../../components/ui";
 import { HeroRosterCard } from "../../components/heroes/HeroRosterCard";
+import { GameIcon } from "../../components/icons/GameIcon";
 import { CLASSES } from "../../data/classes/classes";
 import { RACES } from "../../data/races/races";
 import { RECRUITMENT_CONFIG } from "../../data/recruitment/recruitmentBalance";
@@ -55,7 +56,7 @@ export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void
 
   return <ScrollView keyboardShouldPersistTaps="handled" style={{ backgroundColor: themeColors.background }} contentContainerStyle={styles.content}>
     <View style={styles.rosterBanner}>
-      <Text style={[styles.title, { color: themeColors.text }]}>Adventurers</Text>
+      <View style={styles.titleRow}><GameIcon id="heroes" size={34}/><Text style={[styles.title, { color: themeColors.text }]}>Adventurers</Text></View>
       <View style={styles.compactRow}>
         <Text style={[styles.count, { color: themeColors.muted, flex: 1 }]}>{guild.heroes.length} / {RECRUITMENT_CONFIG.heroCapacity} roster slots</Text>
         {capacityReached ? <Text style={{ color: themeColors.muted }}>Roster full</Text> : <SecondaryButton label="Recruit" onPress={recruit} />}
@@ -108,6 +109,7 @@ const styles = StyleSheet.create({
   summaryToggle: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", minHeight: 44 },
   sortToggle: { minHeight: 44, justifyContent: "center", paddingHorizontal: 6 },
   content: { padding: 14, paddingBottom: 38 },
+  titleRow:{alignItems:"center",flexDirection:"row",gap:9},
   rosterBanner: {justifyContent: "space-between", borderWidth: 0, borderRadius: 12, flexDirection: "column", alignItems: "stretch", padding: 0, minHeight: 0, gap: 2, marginBottom: 4},
   title: {fontWeight: "900", letterSpacing: .4, marginTop: 2, fontSize: 25, lineHeight: 31},
   count: { fontSize: 10, fontWeight: "800", marginTop: 3 },

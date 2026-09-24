@@ -101,7 +101,7 @@ describe("permanent ad removal", () => {
     expect(canUseFreeDailyRevive(first, today)).toBe(false);
     expect(canUseFreeDailyRevive(first, tomorrow)).toBe(true);
     const second = reviveHero(first, fallenB.id, today);
-    expect(second.gems).toBe(first.gems - 3);
+    expect(second.gems).toBe(first.gems - 5);
   });
 
 describe("action notification dots", () => {

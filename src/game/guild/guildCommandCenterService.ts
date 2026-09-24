@@ -1,6 +1,8 @@
 import { REGIONS } from "../../data/world/regions";
 import type { GameIconId } from "../../data/ui/gameIcons";
 import { getCampaignLevelGuidance } from "../campaign/campaignReadinessService";
+import { isChapterOneComplete } from "../dungeons/rogueliteRotationService";
+import { REGIONAL_THREAT_MIN_HERO_LEVEL, REGIONAL_THREAT_REQUIRED_HERO_COUNT, areRegionalThreatsUnlocked } from "../world/regionalThreatService";
 import { payrollDueOnDay, totalSalaryArrears } from "../economy/guildCalendarService";
 import { getHeroLoyalty } from "../heroes/heroLoyaltyService";
 import { getContractStatus } from "../recruitment/contractService";
@@ -180,6 +182,34 @@ export function getGuildCommandOrders(guild: GuildState): GuildCommandOrder[] {
       tone: today ? "urgent" : "warning",
       badge: today ? "LAST CHANCE" : "1 DAY",
     }, today ? 25 : 5));
+  }
+
+  if (isChapterOneComplete(guild) && guild.heroes.length < REGIONAL_THREAT_REQUIRED_HERO_COUNT) {
+    const missing = REGIONAL_THREAT_REQUIRED_HERO_COUNT - guild.heroes.length;
+    orders.push(order({
+      id: "strategic_roster_expansion",
+      title: `Expand the Guild to ${REGIONAL_THREAT_REQUIRED_HERO_COUNT} Heroes`,
+      description: `Recruit ${missing} more hero${missing === 1 ? "" : "es"} to staff Crisis Operations and Roguelite Expeditions. Regional Threats begin only after six heroes reach Level ${REGIONAL_THREAT_MIN_HERO_LEVEL}.`,
+      actionLabel: "OPEN RECRUITMENT",
+      destination: "recruitment",
+      iconId: "recruitment",
+      tone: "opportunity",
+      badge: `${guild.heroes.length}/${REGIONAL_THREAT_REQUIRED_HERO_COUNT} HEROES`,
+    }, 25));
+  } else if (isChapterOneComplete(guild) && !areRegionalThreatsUnlocked(guild.world)) {
+    const readyCount = guild.heroes.filter((hero) => hero.level >= REGIONAL_THREAT_MIN_HERO_LEVEL).length;
+    if (readyCount < REGIONAL_THREAT_REQUIRED_HERO_COUNT) {
+      orders.push(order({
+        id: "strategic_roster_training",
+        title: "Prepare the Six-Hero Strategic Roster",
+        description: `${readyCount}/${REGIONAL_THREAT_REQUIRED_HERO_COUNT} heroes are Level ${REGIONAL_THREAT_MIN_HERO_LEVEL}+. Training or field work will finish the roster; Regional Threats remain dormant until then.`,
+        actionLabel: "OPEN TRAINING",
+        destination: "training",
+        iconId: "training",
+        tone: "opportunity",
+        badge: `${readyCount}/${REGIONAL_THREAT_REQUIRED_HERO_COUNT} AT LV ${REGIONAL_THREAT_MIN_HERO_LEVEL}`,
+      }, 15));
+    }
   }
 
   const levelGuidance = getCampaignLevelGuidance(guild);

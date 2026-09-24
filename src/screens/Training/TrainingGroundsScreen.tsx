@@ -9,6 +9,7 @@ import { getTrainingCatchupAdvice, getTrainingQuotePresentation, getTrainingSess
 import type { TrainingProgramId } from "../../game/training/trainingTypes";
 import { useGuild } from "../../state/GuildContext";
 import { getRaceNameColor } from "../../ui/raceColors";
+import { GameIcon } from "../../components/icons/GameIcon";
 
 export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: { onBack(): void; openCalendar(): void; openSideQuests?(): void }) {
   const { showDialog } = useGameDialog();
@@ -55,7 +56,7 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
 
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} />
-    <View style={styles.header}><View style={styles.flex}><Text style={styles.eyebrow}>GUILDHAVEN FACILITY</Text><Text style={styles.title}>Guild Training Yard</Text><Text style={styles.day}>DAY {guild.currentDay} · {guild.gold.toLocaleString()} GOLD</Text></View><StatusChip label={`${guild.trainingGround.sessions.length}/${capacity} SLOTS`} tone={guild.trainingGround.sessions.length >= capacity ? "gold" : "good"} /></View>
+    <View style={styles.header}><View style={styles.headerIcon}><GameIcon id="training" size={34}/></View><View style={styles.flex}><Text style={styles.eyebrow}>GUILDHAVEN FACILITY</Text><Text style={styles.title}>Guild Training Yard</Text><Text style={styles.day}>DAY {guild.currentDay} · {guild.gold.toLocaleString()} GOLD</Text></View><StatusChip label={`${guild.trainingGround.sessions.length}/${capacity} SLOTS`} tone={guild.trainingGround.sessions.length >= capacity ? "gold" : "good"} /></View>
     <Text style={styles.intro}>Train reserves while the field team adventures. Earn XP up to the campaign and roster cap; attributes stay unchanged.</Text>
 
     {!tutorialSeen && <Panel style={styles.tutorial}>
@@ -115,7 +116,7 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
 
 const styles = StyleSheet.create({
   content: { padding: 18, paddingBottom: 55 },
-  header: { alignItems: "center", flexDirection: "row", gap: 9, marginTop: 7 },
+  headerIcon:{alignItems:"center",justifyContent:"center",width:38},header: { alignItems: "center", flexDirection: "row", gap: 9, marginTop: 7 },
   flex: { flex: 1 },
   eyebrow: { color: colors.gold, fontSize: 11, fontWeight: "600", letterSpacing: 1.5 },
   title: { color: colors.text, fontSize: 26, fontWeight: "700", marginTop: 2 },

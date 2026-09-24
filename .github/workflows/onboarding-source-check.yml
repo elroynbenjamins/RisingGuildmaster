@@ -9,10 +9,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Package tracked source only
-        run: git archive --format=tar HEAD App.tsx src tests scripts docs package.json pnpm-lock.yaml tsconfig.json .github > review-source.tar
+        with:
+          ref: f429d7b92bcf25565d5e710978485b6643d6ece0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Package source and validation dependencies
+        run: |
+          git archive --format=tar HEAD App.tsx src tests scripts docs package.json pnpm-lock.yaml tsconfig.json app.json .github > review-source.tar
+          tar -czf review-dependencies.tar.gz node_modules
       - uses: actions/upload-artifact@v4
         with:
-          name: onboarding-review-source
-          path: review-source.tar
+          name: onboarding-review-current
+          path: |
+            review-source.tar
+            review-dependencies.tar.gz
           retention-days: 1

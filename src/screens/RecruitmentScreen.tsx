@@ -19,14 +19,15 @@ import { getDifficulty } from "../data/difficulty/difficulties";
 import { canUsePaidRecruitmentRefresh } from "../game/onboarding/starterJourneyService";
 import { GameIcon } from "../components/icons/GameIcon";
 import { triggerTactileFeedback } from "../ui/tactileFeedback";
+import { useGameToast } from "../components/feedback/GameToast";
 
 const range = (min: number, max: number) => min === max ? `${min}` : `${min}–${max}`;
 const toneColor = (tone: RecruitmentUiTone) => tone === "good" ? colors.green : tone === "gold" ? colors.gold : tone === "danger" ? colors.danger : tone === "blue" ? colors.blue : colors.border;
 
 export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign }: { onBack(): void; inspect(candidate: RecruitmentCandidate): void; openCalendar(): void; openCampaign(): void }) {
   const { showDialog } = useGameDialog();
+  const { showToast } = useGameToast();
   const { candidates, guild, refreshCandidates, recruitCandidate, rejectCandidate, updateGuild } = useGuild();
-  const [message, setMessage] = useState<string>();
   const [query, setQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState<"All" | "Board" | "Scout">("All");
   const [section,setSection]=useState<"Candidates"|"Scouting"|"Alumni">("Candidates");
@@ -45,7 +46,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
   const confirmRehire = (heroId:string) => {
     const member=guild.recruitment.formerMembers.find((entry)=>entry.hero.id===heroId); if(!member||member.departureKind==="retired")return;
     const fee=formerMemberRehireFee(member); const salary=formerMemberRehireSalary(member);
-    showDialog({ title:`Invite ${member.hero.name} Back?`, message:`Level ${member.hero.level} ${CLASSES[member.hero.classId].name}\nSigning bonus: ${fee} gold\nNew salary: ${salary} gold/week\nContract: 12 weeks\n\nThey keep their level, XP, skills, traits, potential and personal history. Their old equipment remains in guild inventory.`, eyebrow:"FORMER GUILD MEMBER", actions:[{label:"Cancel",tone:"secondary"},{label:"Rehire",tone:"primary",onPress:()=>{try{updateGuild(rehireFormerMember(guild,heroId));triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");setMessage(member.hero.name+" returned to the guild.");}catch(error){triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");setMessage(error instanceof Error?error.message:"Could not rehire hero");}}}]});
+    showDialog({ title:`Invite ${member.hero.name} Back?`, message:`Level ${member.hero.level} ${CLASSES[member.hero.classId].name}\nSigning bonus: ${fee} gold\nNew salary: ${salary} gold/week\nContract: 12 weeks\n\nThey keep their level, XP, skills, traits, potential and personal history. Their old equipment remains in guild inventory.`, eyebrow:"FORMER GUILD MEMBER", actions:[{label:"Cancel",tone:"secondary"},{label:"Rehire",tone:"primary",onPress:()=>{try{updateGuild(rehireFormerMember(guild,heroId));triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");showToast({title:"Hero Rehired",message:`${member.hero.name} returned · ${fee} gold signing bonus · ${salary} gold/week`,tone:"success"});}catch(error){triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");showToast({title:"Rehire Failed",message:error instanceof Error?error.message:"Could not rehire hero",tone:"danger"});}}}]});
   };
 
   const freeReady = guild.currentDay >= guild.recruitment.nextFreeRefreshDay;
@@ -68,7 +69,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
               : null;
   const leaveRecruitment = () => { if (tutorial === "party_complete") updateGuild(completeTutorial(guild)); onBack(); };
   const beginCampaign = () => { updateGuild(completeTutorial(guild)); openCampaign(); };
-  const act = (action: () => string | null, success: string) => { const error = action(); if(error){triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");setMessage(error);return;} triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); setMessage(success); };
+  const act = (action: () => string | null, success: string) => { const error = action(); if(error){triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");showToast({title:"Recruitment Action Failed",message:error,tone:"danger"});return;} triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); showToast({title:success.includes("joined")?"Contract Signed":success.includes("arrived")?"Recruitment Board Refreshed":success.includes("left")?"Candidate Passed":"Recruitment Updated",message:success,tone:success.includes("left")?"info":"success"}); };
   const confirmRecruit = (candidate: RecruitmentCandidate) => {
     const presentation = getCandidateRecruitmentPresentation(candidate, livingHeroes, guild.currentDay, guild.gold, currentPayroll);
     showDialog({
@@ -117,7 +118,6 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
 
     <SegmentedTabs values={["Candidates","Scouting","Alumni"] as const} value={section} onChange={setSection}/>
     {section==="Scouting"&&<RegionalScoutPanel openCalendar={openCalendar} />}
-    {message && <Panel style={styles.messagePanel}><Text style={styles.message}>{message}</Text></Panel>}
 
     {section==="Candidates"&&<><SectionTitle>CANDIDATES</SectionTitle>
     {!tutorial && <View style={styles.candidateTools}>

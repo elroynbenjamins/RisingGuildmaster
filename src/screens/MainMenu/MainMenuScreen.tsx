@@ -42,8 +42,8 @@ export function MainMenuScreen({
     <View style={styles.slots}>{([1,2] as SaveSlotId[]).map((slotId)=>{
       const slot=saveSlots.find((entry)=>entry.slotId===slotId)??{slotId,exists:false};
       return <Panel key={slotId} style={[styles.slot,slot.exists&&styles.occupiedSlot]}>
-        <View style={styles.slotHead}><Text style={styles.slotLabel}>SAVE SLOT {slotId}</Text><Text style={slot.exists?styles.occupied:styles.empty}>{slot.exists?"GUILD FOUND":"EMPTY"}</Text></View>
-        {slot.issue ? <Text style={{color: colors.danger}}>{slot.issue.message}</Text> : slot.exists ? <>
+        <View style={styles.slotHead}><Text style={styles.slotLabel}>SAVE SLOT {slotId}</Text><Text style={slot.issue?styles.issueBadge:slot.exists?styles.occupied:styles.empty}>{slot.issue?"SAVE PROTECTED":slot.exists?"GUILD FOUND":"EMPTY"}</Text></View>
+        {slot.issue ? <><Text style={styles.issueText}>{slot.issue.message}</Text><Text style={styles.issueHelp}>{slot.issue.kind==="unsupported"?"This save was created by a newer Guildmaster version. Update the app before trying to load it. You can still deliberately delete or replace this slot.":"The damaged slot is protected from automatic overwrite. Delete it or deliberately replace it when you are ready."}</Text><View style={styles.slotActions}><View style={styles.flex}><SecondaryButton disabled={Boolean(busy)} label="Replace with New Guild" onPress={()=>start(slot)}/></View><View style={styles.flex}><SecondaryButton disabled={Boolean(busy)} label={busy?.slotId===slotId&&busy.action==="delete"?"Deleting…":"Delete Protected Save"} onPress={()=>remove(slot)}/></View></View></> : slot.exists ? <>
           <View style={styles.guildRow}><GuildCrest crestId={slot.guildCrestId ?? "crownroad"} size={44}/><View style={styles.flex}><Text style={styles.guildName}>{slot.guildName}</Text><Text style={styles.meta}>Day {slot.currentDay} · {String(slot.difficultyId).replace(/_/g," ")} · {slot.heroCount} heroes</Text></View></View>
           <Text style={styles.lastPlayed}>{lastPlayedLabel(slot.lastPlayedAt)}</Text>
           <ActionButton guardMs={800} disabled={Boolean(busy)} label={busy?.slotId===slotId&&busy.action==="continue"?"Loading Guild…":"Continue Guild"} onPress={()=>{void runSaveAction(slotId,"continue",onContinue);}}/>
@@ -70,7 +70,7 @@ const styles=StyleSheet.create({
   slotHead:{alignItems:"center",flexDirection:"row",justifyContent:"space-between"},
   slotLabel:{color:colors.gold,fontSize:9,fontWeight:"900",letterSpacing:1.2},
   occupied:{color:colors.green,fontSize:8,fontWeight:"900"},
-  empty:{color:colors.muted,fontSize:8,fontWeight:"900"},
+  empty:{color:colors.muted,fontSize:8,fontWeight:"900"},issueBadge:{color:colors.danger,fontSize:8,fontWeight:"900"},issueText:{color:colors.danger,fontSize:11,fontWeight:"800",lineHeight:16},issueHelp:{color:colors.muted,fontSize:10,lineHeight:15},
   guildRow:{alignItems:"center",flexDirection:"row",gap:9},guildName:{color:colors.text,fontSize:20,fontWeight:"900"},
   meta:{color:colors.gold,fontSize:10,fontWeight:"800",textTransform:"capitalize"},
   lastPlayed:{color:colors.muted,fontSize:9},

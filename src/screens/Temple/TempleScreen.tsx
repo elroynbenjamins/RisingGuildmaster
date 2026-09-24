@@ -30,7 +30,7 @@ export function TempleScreen({ onBack, openWorld }: { onBack(): void; openWorld(
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} />
     <View style={styles.titleRow}><GameIcon id="temple" size={36}/><View style={styles.heroInfo}><Text style={styles.eyebrow}>{(currentSettlement?.name ?? "Local").toUpperCase()} · HEALING SERVICES</Text><Text style={styles.title}>Temple of Renewal</Text></View></View>
-    <Text style={styles.intro}>Restore wounded adventurers with guild gold. Fallen heroes require rare soul gems before ordinary treatment can continue.</Text>
+    <Text style={styles.intro}>Restore wounded adventurers with guild gold. Reviving a fallen hero costs 5 gems, or uses today’s free revive when Remove Ads is owned.</Text>
     <View style={styles.wallet}><Text style={styles.gold}>◆ {guild.gold.toLocaleString()} gold</Text><Text style={styles.gems}>◇ {guild.gems} gems</Text></View>
     <SegmentedTabs values={["Treatment", "Revival"] as const} value={tab} onChange={setTab} />{tab==="Revival"&&guild.entitlements.adsRemoved&&<Text style={canUseFreeDailyRevive(guild)?styles.freeRevive:styles.conditions}>{canUseFreeDailyRevive(guild)?"REMOVE ADS BENEFIT · 1 FREE REVIVE READY":"REMOVE ADS BENEFIT · Today’s free revive has been used"}</Text>}
     {tab === "Treatment" ? (living.length ? living.map((hero) => {

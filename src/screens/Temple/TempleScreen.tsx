@@ -10,19 +10,20 @@ import { useGuild } from "../../state/GuildContext";
 import { getRaceNameColor } from "../../ui/raceColors";
 import { GameIcon } from "../../components/icons/GameIcon";
 import { triggerTactileFeedback } from "../../ui/tactileFeedback";
+import { useGameToast } from "../../components/feedback/GameToast";
 
 type Tab = "Treatment" | "Revival";
 export function TempleScreen({ onBack, openWorld }: { onBack(): void; openWorld(): void }) {
   const { guild, updateGuild } = useGuild();
+  const { showToast } = useGameToast();
   const [tab, setTab] = useState<Tab>("Treatment");
-  const [message, setMessage] = useState<string | null>(null);
   const [confirmHeroId, setConfirmHeroId] = useState<string | null>(null);
   const [expandedHeroId,setExpandedHeroId]=useState<string | null>(null);
   const currentSettlement = guild.world.currentSettlementId ? SETTLEMENTS[guild.world.currentSettlementId] : undefined;
   const localHealingAvailable = hasLocalHealingService(guild.world);
   const living = guild.heroes.filter((hero) => hero.currentHP > 0);
   const fallen = guild.heroes.filter((hero) => hero.currentHP <= 0);
-  const act = (action: () => ReturnType<typeof fullyTreatHero>, success: string) => { try { updateGuild(action()); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); setMessage(success); } catch (error) { triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning"); setMessage(error instanceof Error ? error.message : "Temple service failed"); } };
+  const act = (action: () => ReturnType<typeof fullyTreatHero>, success: string) => { try { const next=action(); const goldSpent=Math.max(0,guild.gold-next.gold); const gemsSpent=Math.max(0,guild.gems-next.gems); updateGuild(next); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); showToast({title:success.includes("brink")?"Revival Complete":"Temple Service Complete",message:`${success}${goldSpent?` · -${goldSpent} gold`:""}${gemsSpent?` · -${gemsSpent} gems`:""}`,tone:"success"}); } catch (error) { triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning"); showToast({title:"Temple Service Failed",message:error instanceof Error ? error.message : "Temple service failed",tone:"danger"}); } };
 
   if (!localHealingAvailable) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack}/><Text style={styles.eyebrow}>LOCAL SERVICES</Text><Text style={styles.title}>Healing Unavailable</Text><Panel style={styles.unavailable}><Text style={styles.panelTitle}>{currentSettlement?.name ?? "Wilderness"}</Text><Text style={styles.intro}>This location has no Temple or healer. Travel to a settlement with healing services before treating, healing, or reviving heroes.</Text><ActionButton iconId="world" label="Open World Map" onPress={openWorld}/></Panel></ScrollView>;
 
@@ -31,7 +32,6 @@ export function TempleScreen({ onBack, openWorld }: { onBack(): void; openWorld(
     <View style={styles.titleRow}><GameIcon id="temple" size={36}/><View style={styles.heroInfo}><Text style={styles.eyebrow}>{(currentSettlement?.name ?? "Local").toUpperCase()} · HEALING SERVICES</Text><Text style={styles.title}>Temple of Renewal</Text></View></View>
     <Text style={styles.intro}>Restore wounded adventurers with guild gold. Fallen heroes require rare soul gems before ordinary treatment can continue.</Text>
     <View style={styles.wallet}><Text style={styles.gold}>◆ {guild.gold.toLocaleString()} gold</Text><Text style={styles.gems}>◇ {guild.gems} gems</Text></View>
-    {message ? <Panel style={styles.message}><Text style={styles.messageText}>{message}</Text><Pressable accessibilityRole="button" style={styles.dismissButton} onPress={() => setMessage(null)}><Text style={styles.dismiss}>Dismiss</Text></Pressable></Panel> : null}
     <SegmentedTabs values={["Treatment", "Revival"] as const} value={tab} onChange={setTab} />{tab==="Revival"&&guild.entitlements.adsRemoved&&<Text style={canUseFreeDailyRevive(guild)?styles.freeRevive:styles.conditions}>{canUseFreeDailyRevive(guild)?"REMOVE ADS BENEFIT · 1 FREE REVIVE READY":"REMOVE ADS BENEFIT · Today’s free revive has been used"}</Text>}
     {tab === "Treatment" ? (living.length ? living.map((hero) => {
       const maxHP = calculateHero(hero).stats.maxHP; const halfHealingCost = getHalfHealingCost(hero); const healingCost = getHealingCost(hero); const conditionCost = getConditionTreatmentCost(hero); const fullCost = getFullTreatmentCost(hero); const ailments = hero.conditions.filter((item) => item.conditionId !== "inspired");

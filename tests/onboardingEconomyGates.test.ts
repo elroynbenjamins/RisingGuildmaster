@@ -6,7 +6,7 @@ import { advanceGuildTime } from "../src/game/economy/guildCalendarService";
 import { createGuild } from "../src/game/guild/guildService";
 import { recoverAdventureStamina, spendPartyAdventureStamina } from "../src/game/heroes/adventureStaminaService";
 import { creditVerifiedGems, exchangeGemsForGold } from "../src/game/monetization/gemService";
-import { beginTutorial, completeTutorial, getTutorialResumeDestination, recordTutorialCandidateTab, recordTutorialRecruit, recordTutorialRefresh } from "../src/game/onboarding/tutorialService";
+import { beginTutorial, completeTutorial, getCombatTutorialStep, getTutorialResumeDestination, recordCombatTutorialAction, recordTutorialCandidateTab, recordTutorialRecruit, recordTutorialRefresh } from "../src/game/onboarding/tutorialService";
 import { isQuestBoardCategoryUnlocked } from "../src/game/quests/questAvailability";
 import { generateHero } from "../src/game/heroes/heroGenerator";
 import { createSeededRandom } from "../src/utils/random";
@@ -21,6 +21,25 @@ describe("new-game onboarding and progression gates", () => {
     expect(advanceCombatTutorial("end_turn", "used_basic_attack")).toBe("end_turn");
     expect(advanceCombatTutorial("end_turn", "ended_turn")).toBe("complete");
     expect(advanceCombatTutorial("complete", "moved")).toBe("complete");
+  });
+
+  it("persists the live combat tutorial until move, basic attack, and end turn all succeed", () => {
+    let guild = createGuild();
+    expect(getCombatTutorialStep(guild)).toBe("move");
+
+    guild = recordCombatTutorialAction(guild, "ended_turn");
+    expect(getCombatTutorialStep(guild)).toBe("move");
+
+    guild = recordCombatTutorialAction(guild, "moved");
+    expect(guild.tutorial.combatStep).toBe("basic_attack");
+    expect(guild.tutorial.contextualSeen.combat_basics).not.toBe(true);
+
+    guild = recordCombatTutorialAction(guild, "used_basic_attack");
+    expect(getCombatTutorialStep(guild)).toBe("end_turn");
+
+    guild = recordCombatTutorialAction(guild, "ended_turn");
+    expect(getCombatTutorialStep(guild)).toBe("complete");
+    expect(guild.tutorial.contextualSeen.combat_basics).toBe(true);
   });
 
   it("guides two recruits without comparison through one mandatory free refresh", () => {

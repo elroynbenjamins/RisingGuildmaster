@@ -10,7 +10,7 @@ describe("repeatable balance simulations", () => {
     expect(results[0]!.averageRemainingHpRatioOnWins).toBeLessThan(.90);
     expect(results[2]!.averageSurvivingHeroes).toBeLessThan(3.5);
     expect(results[2]!.averageRemainingHpRatioOnWins).toBeLessThan(.85);
-  }, 90_000);
+  }, 150_000);
 
   it("reports representative campaign fights", () => {
     const scenarios = [

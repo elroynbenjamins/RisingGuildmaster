@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { RECRUITMENT_ARCHETYPES, RECRUITMENT_CLASS_WEIGHTS, RECRUITMENT_CONFIG, RECRUITMENT_RACE_WEIGHTS } from "../src/data/recruitment/recruitmentBalance";
 import { createGuild } from "../src/game/guild/guildService";
-import { generateRecruitmentCandidate, generateRecruitmentPool, getArchetypeWeights, reputationPotentialBonus } from "../src/game/recruitment/candidateGenerator";
+import { generateRecruitmentCandidate, generateRecruitmentPool, getArchetypeWeights } from "../src/game/recruitment/candidateGenerator";
 import { calculateContractCosts, calculateRecruitmentFee, calculateWeeklySalary } from "../src/game/recruitment/recruitmentCostCalculator";
 import { calculateRenewalSalary, createHeroContract, getContractStatus } from "../src/game/recruitment/contractService";
 import { createRecruitmentState, formerMemberRehireFee, formerMemberRehireSalary, freeRefreshRecruitment, initializeRecruitment, manualRefreshRecruitment, purgeExpiredCandidates, recruitCandidate, rejectCandidate, rehireFormerMember, reserveCandidate, scoutRecruitmentCandidate } from "../src/game/recruitment/recruitmentService";
-import { financialEstimate, potentialEstimate, scoutCandidate } from "../src/game/recruitment/scoutingService";
+import { financialEstimate, scoutCandidate } from "../src/game/recruitment/scoutingService";
 import { validateCandidateRecruitment } from "../src/game/recruitment/recruitmentValidator";
 import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
 import { createSeededRandom } from "../src/utils/random";
@@ -18,9 +18,9 @@ import { advanceGuildTime } from "../src/game/economy/guildCalendarService";
 
 describe("recruitment generation", () => {
   it("uses normalized race and class probabilities", () => { expect(Object.values(RECRUITMENT_RACE_WEIGHTS).reduce((a,b)=>a+b,0)).toBeCloseTo(1); expect(Object.values(RECRUITMENT_CLASS_WEIGHTS).reduce((a,b)=>a+b,0)).toBeCloseTo(1); });
-  it.each(["prospect","standard","veteran","elite"] as const)("generates level-one %s candidates inside archetype ranges", (archetype) => { const candidate = generateRecruitmentCandidate(createSeededRandom(42), 5, 0, archetype); const balance = RECRUITMENT_ARCHETYPES[archetype]; expect(candidate.archetype).toBe(archetype); expect(candidate.heroPreview.age).toBeGreaterThanOrEqual(balance.ageMin); expect(candidate.heroPreview.age).toBeLessThanOrEqual(balance.ageMax); expect(candidate.heroPreview.level).toBe(1); expect(candidate.heroPreview.xp).toBe(0); expect(candidate.truePotential).toBeGreaterThanOrEqual(Math.max(50,balance.potentialMin)); expect(candidate.truePotential).toBeLessThanOrEqual(balance.potentialMax); expect(candidate.expiresAtDay).toBe(12); });
-  it("generates three deterministic, diverse candidates", () => { const first = generateRecruitmentPool(createSeededRandom(77), 1); const second = generateRecruitmentPool(createSeededRandom(77), 1); expect(first).toEqual(second); expect(first).toHaveLength(3); expect(new Set(first.map((item)=>item.candidateId)).size).toBe(3); expect(first.every((item)=>item.truePotential>=50&&item.truePotential<=100)).toBe(true); });
-  it("raises elite chance and potential with reputation", () => { expect(reputationPotentialBonus(0)).toBe(0); expect(reputationPotentialBonus(60)).toBe(6); expect(reputationPotentialBonus(999)).toBe(10); expect(getArchetypeWeights(60).elite).toBeCloseTo(.08); expect(getArchetypeWeights(999).elite).toBeCloseTo(.10); expect(Object.values(getArchetypeWeights(60)).reduce((a,b)=>a+b,0)).toBeCloseTo(1); });
+  it.each(["prospect","standard","veteran","elite"] as const)("generates level-one %s candidates inside archetype ranges", (archetype) => { const candidate = generateRecruitmentCandidate(createSeededRandom(42), 5, 0, archetype); const balance = RECRUITMENT_ARCHETYPES[archetype]; expect(candidate.archetype).toBe(archetype); expect(candidate.heroPreview.age).toBeGreaterThanOrEqual(balance.ageMin); expect(candidate.heroPreview.age).toBeLessThanOrEqual(balance.ageMax); expect(candidate.heroPreview.level).toBe(1); expect(candidate.heroPreview.xp).toBe(0); expect(candidate.expiresAtDay).toBe(12); });
+  it("generates three deterministic, diverse candidates", () => { const first = generateRecruitmentPool(createSeededRandom(77), 1); const second = generateRecruitmentPool(createSeededRandom(77), 1); expect(first).toEqual(second); expect(first).toHaveLength(3); expect(new Set(first.map((item)=>item.candidateId)).size).toBe(3); expect(first.every((item)=>item.rarityScore>=0&&item.rarityScore<=100)).toBe(true); });
+  it("raises elite recruitment chance with reputation", () => { expect(getArchetypeWeights(60).elite).toBeCloseTo(.08); expect(getArchetypeWeights(999).elite).toBeCloseTo(.10); expect(Object.values(getArchetypeWeights(60)).reduce((a,b)=>a+b,0)).toBeCloseTo(1); });
   it("actually generates higher-level board candidates once the guild has progressed", () => {
     const guild=createGuild(); guild.world.campaignChapter=3; guild.heroes=[7,7,6,6].map((level,index)=>({...testHero(),id:"veteran-core-"+index,level}));
     const initialized=initializeRecruitment(guild,createSeededRandom(44));
@@ -47,7 +47,22 @@ describe("recruitment finances and scouting", () => {
   it("calculates the mandatory fee and contract examples", () => { expect(calculateRecruitmentFee(4,80,-.20)).toBe(720); expect(calculateContractCosts(700,100,24)).toEqual({contractSalary:2400,totalEstimatedCost:3100}); });
   it("creates explicit financial estimate ranges", () => { expect(financialEstimate(1000,.20)).toEqual({minimum:800,maximum:1200}); expect(financialEstimate(100,0)).toEqual({minimum:100,maximum:100}); });
   it("calculates salary from level, attributes, archetype, and real traits", () => { const hero={...testHero(),level:5}; expect(calculateWeeklySalary(hero,.30)).toBe(165); const greedy={...hero,traitIds:["greedy" as const]}; expect(calculateWeeklySalary(greedy,.30)).toBe(185); });
-  it("narrows potential, attributes, fee, and salary demand through all scouting levels", () => { expect(potentialEstimate(80,15)).toEqual({minimum:65,maximum:95}); const generated=generateRecruitmentCandidate(createSeededRandom(1),1,0,"standard"); let candidate={...generated,truePotential:80,potentialEstimateMin:65,potentialEstimateMax:95,heroPreview:{...generated.heroPreview,potential:80,potentialEstimateMin:65,potentialEstimateMax:95}}; const initialFeeWidth=candidate.recruitmentFeeEstimateMax-candidate.recruitmentFeeEstimateMin; const strength = candidate.heroPreview.baseAttributes.strength; expect(candidate.attributeEstimates.strength).toEqual({ minimum: Math.max(3, strength - 3), maximum: Math.min(20, strength + 3) }); candidate=scoutCandidate(candidate); expect([candidate.potentialEstimateMin,candidate.potentialEstimateMax]).toEqual([70,90]); expect(candidate.attributeEstimates.strength).toEqual({ minimum: Math.max(3, strength - 2), maximum: Math.min(20, strength + 2) }); expect(candidate.recruitmentFeeEstimateMax-candidate.recruitmentFeeEstimateMin).toBeLessThan(initialFeeWidth); candidate=scoutCandidate(candidate); expect([candidate.potentialEstimateMin,candidate.potentialEstimateMax]).toEqual([75,85]); expect(candidate.attributeEstimates.strength).toEqual({ minimum: Math.max(3, strength - 1), maximum: Math.min(20, strength + 1) }); candidate=scoutCandidate(candidate); expect([candidate.potentialEstimateMin,candidate.potentialEstimateMax]).toEqual([80,80]); expect(candidate.attributeEstimates.strength).toEqual({ minimum: strength, maximum: strength }); expect([candidate.recruitmentFeeEstimateMin,candidate.recruitmentFeeEstimateMax]).toEqual([candidate.recruitmentFee,candidate.recruitmentFee]); expect([candidate.weeklySalaryEstimateMin,candidate.weeklySalaryEstimateMax]).toEqual([candidate.weeklySalary,candidate.weeklySalary]); });
+  it("narrows attributes, fee, and salary demand through all scouting levels", () => {
+    const generated=generateRecruitmentCandidate(createSeededRandom(1),1,0,"standard");
+    let candidate=generated;
+    const initialFeeWidth=candidate.recruitmentFeeEstimateMax-candidate.recruitmentFeeEstimateMin;
+    const strength = candidate.heroPreview.baseAttributes.strength;
+    expect(candidate.attributeEstimates.strength).toEqual({ minimum: Math.max(3, strength - 3), maximum: Math.min(20, strength + 3) });
+    candidate=scoutCandidate(candidate);
+    expect(candidate.attributeEstimates.strength).toEqual({ minimum: Math.max(3, strength - 2), maximum: Math.min(20, strength + 2) });
+    expect(candidate.recruitmentFeeEstimateMax-candidate.recruitmentFeeEstimateMin).toBeLessThan(initialFeeWidth);
+    candidate=scoutCandidate(candidate);
+    expect(candidate.attributeEstimates.strength).toEqual({ minimum: Math.max(3, strength - 1), maximum: Math.min(20, strength + 1) });
+    candidate=scoutCandidate(candidate);
+    expect(candidate.attributeEstimates.strength).toEqual({ minimum: strength, maximum: strength });
+    expect([candidate.recruitmentFeeEstimateMin,candidate.recruitmentFeeEstimateMax]).toEqual([candidate.recruitmentFee,candidate.recruitmentFee]);
+    expect([candidate.weeklySalaryEstimateMin,candidate.weeklySalaryEstimateMax]).toEqual([candidate.weeklySalary,candidate.weeklySalary]);
+  });
   it("creates and updates contract timing", () => { const contract=createHeroContract(testHero(),100,12,5); expect(contract.endDay).toBe(89); expect(getContractStatus(contract,75)).toBe("expiring"); expect(getContractStatus(contract,89)).toBe("expired"); expect(calculateRenewalSalary(contract,6)).toBe(115); });
 });
 
@@ -107,7 +122,7 @@ describe("regional scout expeditions", () => {
     expect(result.recruitment.candidates).toHaveLength(5);
     expect(result.recruitment.candidates.every((candidate) => candidate.heroPreview.raceId === raceId)).toBe(true);
     expect(result.recruitment.candidates.every((candidate) => candidate.source === "regional_scout" && candidate.sourceRegionId === homeland.regionId && candidate.sourceLocationName === homeland.locationName)).toBe(true);
-    expect(result.recruitment.candidates.every((candidate) => candidate.scoutingLevel === 1 && candidate.potentialEstimateMax - candidate.potentialEstimateMin <= 20)).toBe(true);
+    expect(result.recruitment.candidates.every((candidate) => candidate.scoutingLevel === 1 && Object.values(candidate.attributeEstimates).every((estimate) => estimate.maximum - estimate.minimum <= 4))).toBe(true);
     expect(result.gemTransactions.at(-1)).toMatchObject({ type: "scouting", amount: -10 });
     expect(result.world.worldFlags[homeland.loreUnlockFlag]).toBe(true);
     expect(result.recruitment.regionalScoutMission).toBeNull();

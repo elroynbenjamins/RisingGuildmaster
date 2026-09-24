@@ -37,7 +37,7 @@ export function CraftingScreen({ onBack, openCalendar, targetHeroId, initialSlot
   const [expandedRecipeId,setExpandedRecipeId]=useState<string>();
   const [showWorkshopInfo,setShowWorkshopInfo]=useState(false);
   const artisan = ARTISANS[tab]; const state = guild.artisans[tab]; const nextTier = getNextArtisanBuildingTier(guild, tab);
-  const act = (action: () => typeof guild, message: string) => { try { updateGuild(action()); showDialog({ title: "Workshop order complete", message, tone: "success" }); } catch (error) { showDialog({ title: "Cannot complete", message: error instanceof Error ? error.message : "Workshop action failed", tone: "danger" }); } };
+  const act = (action: () => typeof guild, message: string) => { try { const beforeGold=guild.gold; const beforeInventory=guild.inventory.length; const next=action(); updateGuild(next); const goldSpent=Math.max(0,beforeGold-next.gold); const itemAdded=next.inventory.length>beforeInventory; showDialog({ title: itemAdded ? "Craft Complete" : "Workshop Order Complete", message: `${message}${goldSpent?`\n\nTreasury: ${beforeGold.toLocaleString()} → ${next.gold.toLocaleString()} gold`:""}`, eyebrow:itemAdded?"ITEM CREATED":"WORKSHOP UPDATED", tone: "success" }); } catch (error) { showDialog({ title: "Cannot complete", message: error instanceof Error ? error.message : "Workshop action failed", tone: "danger" }); } };
   const artisanRecipes = Object.values(CRAFTING_RECIPES).filter((recipe) => recipe.artisanType === tab);
   const recipes = artisanRecipes.filter((recipe) => !recipe.unlockSource || (guild.unlockedRecipeIds ?? []).includes(recipe.id));
   const lockedRecipeCount = artisanRecipes.length - recipes.length;

@@ -7,9 +7,9 @@ import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
 
 describe("artisan building progression", () => {
   it.each([
-    ["blacksmith", 1, 990], ["blacksmith", 2, 1710],
-    ["tailor", 1, 810], ["tailor", 2, 1440],
-    ["jeweler", 1, 1170], ["jeweler", 2, 1980],
+    ["blacksmith", 1, 750], ["blacksmith", 2, 750],
+    ["tailor", 1, 750], ["tailor", 2, 750],
+    ["jeweler", 1, 750], ["jeweler", 2, 750],
   ] as const)("charges the reduced %s level %i upgrade price", (type, level, cost) => {
     const guild = createGuild();
     guild.gold = cost;
@@ -31,8 +31,8 @@ describe("artisan building progression", () => {
   it("charges gold and completes the Guild Forge after two in-game days", () => {
     const guild = createGuild(); guild.guildmaster = { level: 3, xp: 0, skillPoints: 0, unlockedSkillIds: ["workshop_planning", "forge_charter"] };
     const started = startArtisanConstruction(guild, "blacksmith");
-    expect(started.gold).toBe(guild.gold - 720);
-    expect(started.artisans.blacksmith).toMatchObject({ level: 0, recruited: false, construction: { targetLevel: 1, startDay: 1, completionDay: 3, goldCost: 720 } });
+    expect(started.gold).toBe(guild.gold - 500);
+    expect(started.artisans.blacksmith).toMatchObject({ level: 0, recruited: false, construction: { targetLevel: 1, startDay: 1, completionDay: 3, goldCost: 500 } });
     const dayTwo = advanceGuildDays(started);
     expect(dayTwo.artisans.blacksmith.level).toBe(0);
     const complete = advanceGuildDays(dayTwo);
@@ -45,7 +45,7 @@ describe("artisan building progression", () => {
     guild.guildmaster.unlockedSkillIds.push("advanced_workshops");
     const upgrade = startArtisanConstruction(guild, "blacksmith");
     expect(upgrade.artisans.blacksmith.construction).toMatchObject({ targetLevel: 2, completionDay: 4 });
-    expect(upgrade.gold).toBe(guild.gold - 990);
+    expect(upgrade.gold).toBe(guild.gold - 750);
   });
 
   it("persists active multi-day construction projects", () => {

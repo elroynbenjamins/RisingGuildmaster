@@ -31,6 +31,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
   const [sourceFilter, setSourceFilter] = useState<"All" | "Board" | "Scout">("All");
   const [section,setSection]=useState<"Candidates"|"Scouting"|"Alumni">("Candidates");
   const [sort, setSort] = useState<"Potential" | "Fee" | "Salary" | "Expiry">("Potential");
+  const [showCandidateTools, setShowCandidateTools] = useState(false);
   const displayedCandidates = candidates.filter(candidate => sourceFilter === "All" || candidate.source === (sourceFilter === "Scout" ? "regional_scout" : "guild_board")).filter(candidate => `${candidate.heroPreview.name} ${RACES[candidate.heroPreview.raceId].name} ${CLASSES[candidate.heroPreview.classId].name}`.toLowerCase().includes(query.trim().toLowerCase())).sort((a,b) => sort === "Fee" ? a.recruitmentFeeEstimateMin - b.recruitmentFeeEstimateMin : sort === "Salary" ? a.weeklySalaryEstimateMin - b.weeklySalaryEstimateMin : sort === "Expiry" ? a.expiresAtDay - b.expiresAtDay : b.potentialEstimateMax - a.potentialEstimateMax);
   const [showPartyFit, setShowPartyFit] = useState(false);
   const [compareIds, setCompareIds] = useState<string[]>([]);
@@ -119,7 +120,14 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
     {message && <Panel style={styles.messagePanel}><Text style={styles.message}>{message}</Text></Panel>}
 
     {section==="Candidates"&&<><SectionTitle>CANDIDATES</SectionTitle>
-    {!tutorial && <View style={{gap: 8, marginBottom: 12}}><TextInput accessibilityLabel="Search recruits" placeholder="Search recruits by name, race, or class" placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} style={{color:colors.text, backgroundColor:colors.panel2, borderRadius:12, padding:12}} /><SegmentedTabs values={["All", "Board", "Scout"] as const} value={sourceFilter} onChange={setSourceFilter} /><SegmentedTabs values={["Potential", "Fee", "Salary", "Expiry"] as const} value={sort} onChange={setSort} />{!displayedCandidates.length && <Text style={styles.meta}>No adventurers match these filters.</Text>}</View>}
+    {!tutorial && <View style={styles.candidateTools}>
+      <TextInput accessibilityLabel="Search recruits" placeholder="Search recruits by name, race, or class" placeholderTextColor={colors.muted} value={query} onChangeText={setQuery} style={styles.searchInput} />
+      <Pressable accessibilityRole="button" accessibilityLabel="Recruitment filters and sorting" accessibilityState={{ expanded: showCandidateTools }} aria-expanded={showCandidateTools} onPress={() => setShowCandidateTools(value => !value)} style={styles.toolDisclosure}>
+        <View style={styles.flex}><Text style={styles.toolLabel}>FILTER & SORT</Text><Text numberOfLines={1} style={styles.toolSummary}>{sourceFilter} candidates · {sort} first · {displayedCandidates.length} shown</Text></View><Text style={styles.toolChevron}>{showCandidateTools ? "−" : "+"}</Text>
+      </Pressable>
+      {showCandidateTools && <View style={styles.toolPanel}><SegmentedTabs values={["All", "Board", "Scout"] as const} value={sourceFilter} onChange={setSourceFilter} /><SegmentedTabs values={["Potential", "Fee", "Salary", "Expiry"] as const} value={sort} onChange={setSort} /></View>}
+      {!displayedCandidates.length && <Text style={styles.meta}>No adventurers match these filters.</Text>}
+    </View>}
     {displayedCandidates.map((candidate) => {
       const hero = candidate.heroPreview;
       const reserved = guild.recruitment.reservedCandidateId === candidate.candidateId;
@@ -166,6 +174,13 @@ const styles = StyleSheet.create({ cost: {color: colors.text, fontWeight: "800",
   tutorialTarget: { borderColor: colors.green, borderWidth: 2 },
   refresh: {gap: 10, justifyContent: "space-between", marginBottom: 12, flexDirection: "row", alignItems: "center"},
   refreshButtons: { minWidth: 0, maxWidth: 130},
+  candidateTools: { gap: 8, marginBottom: 12 },
+  searchInput: { color: colors.text, backgroundColor: colors.panel2, borderRadius: 12, minHeight: 46, paddingHorizontal: 12 },
+  toolDisclosure: { alignItems: "center", backgroundColor: colors.panel, borderRadius: 12, flexDirection: "row", gap: 10, minHeight: 48, paddingHorizontal: 12, paddingVertical: 7 },
+  toolLabel: { color: colors.gold, fontSize: 8, fontWeight: "900", letterSpacing: .8 },
+  toolSummary: { color: colors.muted, fontSize: 10, marginTop: 2 },
+  toolChevron: { color: colors.gold, fontSize: 20, fontWeight: "900" },
+  toolPanel: { gap: 7 },
   panelEyebrow: { color: colors.muted, fontSize: 8, fontWeight: "500", letterSpacing: .3 },
   name: { color: colors.text, fontSize: 18, fontWeight: "900", marginTop: 2 },
   meta: { color: colors.muted, fontSize: 10, marginTop: 3 },

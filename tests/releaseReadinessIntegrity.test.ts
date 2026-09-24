@@ -8,7 +8,7 @@ import { STORY_SCENES } from "../src/data/story/guildOrigin";
 import { REGIONS } from "../src/data/world/regions";
 import { SETTLEMENTS } from "../src/data/world/settlements";
 import { getCampaignNodeLocationRequirement } from "../src/game/campaign/campaignLocationService";
-import { completeCampaignNode, getAvailableCampaignNodes, getLatestCampaignChapter } from "../src/game/campaign/campaignService";
+import { campaignNodeRequiresPostBattleChoice, completeCampaignNode, getAvailableCampaignNodes, getLatestCampaignChapter } from "../src/game/campaign/campaignService";
 import { createWorldState } from "../src/game/world/worldState";
 import { getQuestStartBlocker } from "../src/game/quests/questAvailability";
 import { testHero } from "./testHero";
@@ -91,6 +91,19 @@ describe("release readiness content integrity", () => {
     crisisWorld = { ...crisisWorld, currentRegionId: "shadowfen", currentSettlementId: "blackwater", unlockedRegionIds: [...new Set([...crisisWorld.unlockedRegionIds, "shadowfen"])], regionThreat: { shadowfen: 4 }, regionCrisisDays: { shadowfen: 80 } };
     const blackwaterQuest = { ...QUESTS.highcourt_silent_charter!, regionId: "shadowfen", settlementIds: ["blackwater"] };
     expect(getQuestStartBlocker(blackwaterQuest, crisisWorld, levelThree)).toMatch(/closed.*regional crisis/i);
+  });
+
+  it("only defers boss completion when an authored post-battle choice exists", () => {
+    expect(campaignNodeRequiresPostBattleChoice("goblin_chieftain")).toBe(true);
+    expect(campaignNodeRequiresPostBattleChoice("chainbreaker_boss")).toBe(true);
+    expect(campaignNodeRequiresPostBattleChoice("hollow_warden_boss")).toBe(true);
+    expect(campaignNodeRequiresPostBattleChoice("hroth_iceblood_boss")).toBe(false);
+    expect(campaignNodeRequiresPostBattleChoice("vaelith_boss")).toBe(false);
+    expect(campaignNodeRequiresPostBattleChoice("drowned_archivist_boss")).toBe(false);
+
+    for (const node of Object.values(CAMPAIGN_NODES).filter((entry) => entry.type === "boss")) {
+      expect(campaignNodeRequiresPostBattleChoice(node.id), node.id).toBe(Boolean(node.choiceIds?.length));
+    }
   });
 
   it("keeps every campaign node and chapter reference valid", () => {

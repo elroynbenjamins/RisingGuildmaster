@@ -10,7 +10,8 @@ import { getEligibleOperationHeroIds, isGuildOperationsUnlocked } from "../src/g
 import { createGuildmasterProfile, grantGuildmasterXp, unlockGuildmasterSkill } from "../src/game/guildmaster/guildmasterProgression";
 import { getCurrentUnlockNotices } from "../src/game/progression/unlockSummaryService";
 import { completeTutorial } from "../src/game/onboarding/tutorialService";
-import { getAvailableCampaignNodes } from "../src/game/campaign/campaignService";
+import { completeCampaignNode, getAvailableCampaignNodes } from "../src/game/campaign/campaignService";
+import { resolveCampaignChoice } from "../src/game/campaign/campaignChoiceResolver";
 import { getQuestStartBlocker } from "../src/game/quests/questAvailability";
 import { isRaidUnlocked } from "../src/game/raids/raidService";
 import { canUnlockRegionalThreats } from "../src/game/world/regionalThreatService";
@@ -37,7 +38,7 @@ function chapterOneGuild(heroCount: number, level = 2) {
 }
 
 describe("end-to-end player journey guarantees", () => {
-  it("hands completed guided recruitment directly into a startable opening Campaign quest", () => {
+  it("hands completed guided recruitment into the founding choice and then a startable opening Campaign quest", () => {
     let guild = createGuild();
     guild.heroes = roster(2, 1);
     guild = completeTutorial(guild);
@@ -45,9 +46,20 @@ describe("end-to-end player journey guarantees", () => {
     const priority = getGuildPriority(guild);
     expect(priority.destination).toBe("campaign");
 
-    const firstNode = getAvailableCampaignNodes(guild.world)[0]!;
-    expect(firstNode.questId).toBeTruthy();
-    const quest = QUESTS[firstNode.questId!]!;
+    const foundingNode = getAvailableCampaignNodes(guild.world)[0]!;
+    expect(foundingNode.id).toBe("founding_the_guild");
+    expect(foundingNode.questId).toBeUndefined();
+    expect(foundingNode.choiceIds?.length).toBeGreaterThan(0);
+
+    const choiceId = foundingNode.choiceIds![0]!;
+    const chosenWorld = resolveCampaignChoice(guild.world, choiceId);
+    const foundingResult = completeCampaignNode(chosenWorld, foundingNode.id);
+    guild = { ...guild, world: foundingResult.worldState };
+
+    const firstQuestNode = getAvailableCampaignNodes(guild.world)[0]!;
+    expect(firstQuestNode.id).toBe("guildhaven_cellar_slimes");
+    expect(firstQuestNode.questId).toBeTruthy();
+    const quest = QUESTS[firstQuestNode.questId!]!;
     expect(quest.minPartySize).toBeLessThanOrEqual(guild.heroes.length);
     expect(getQuestStartBlocker(quest, guild.world, guild.heroes)).toBeNull();
   });

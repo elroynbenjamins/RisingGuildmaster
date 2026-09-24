@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   row: { gap: 5, paddingHorizontal: 8 },
   card: {alignItems: "center", flexDirection: "row", gap: 6, paddingHorizontal: 8, paddingVertical: 4, position: "relative", borderWidth: 0, borderRadius: 10, minHeight: 44, minWidth: 150},
   rail: { bottom: 0, left: 0, position: "absolute", top: 0, width: 3 },
-  label: { fontSize: 11, fontWeight: "600", letterSpacing: 0},
-  detail: {marginTop: 1, fontSize: 10, fontWeight: "500", letterSpacing: 0},
+  label: { fontSize: 11, fontWeight: "800", letterSpacing: 0},
+  detail: {marginTop: 1, fontSize: 10, fontWeight: "700", letterSpacing: 0},
   pressed: { opacity: .68, transform: [{ translateY: 1 }] },
 });

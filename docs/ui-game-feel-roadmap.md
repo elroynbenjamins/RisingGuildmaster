@@ -81,7 +81,7 @@ This establishes the layout language to reuse on Quests and Heroes next: **banne
 
 ## Hero Roster implementation — Pass 10
 
-The Heroes screen now follows the game-first UI hierarchy rather than a database/list hierarchy. Each adventurer is represented by a portrait-led card with a class accent, Level plate, visible field condition, HP/readiness/XP meters, loyalty, contract state, potential, and skill-choice notification. Training/injury/fallen states are readable before opening the detail sheet, while secondary character-sheet information remains behind Inspect. The roster header also exposes recruitment and a compact command summary so this screen functions as a party-management hub rather than a passive index.
+The Heroes screen now follows the game-first UI hierarchy rather than a database/list hierarchy. Each adventurer is represented by a portrait-led card with a class accent, Level plate, visible field condition, HP/readiness/XP meters, loyalty, contract state, and skill-choice notification. Training/injury/fallen states are readable before opening the detail sheet, while secondary character-sheet information remains behind Inspect. The roster header also exposes recruitment and a compact command summary so this screen functions as a party-management hub rather than a passive index.
 
 ## Combat implementation — Pass 11
 
@@ -113,7 +113,7 @@ Quest preparation now bridges the Notice Board and tactical combat as a proper *
 
 ## Recruitment / Tutorial implementation — Pass 18
 
-Recruitment now reads like a fantasy guild tavern rather than a data table. The board shows the guild's roster shape and payroll before the candidates, and every adventurer card answers the important RPG questions first: **what role do they play, do we need that role, how promising are they, what do they cost now, what will they add to weekly payroll, and how long before they leave?** Candidate inspection uses an Adventurer Dossier with Guild Fit, scouting uncertainty, and contract forecasting so long-term economy is part of the decision instead of an afterthought.
+Recruitment now reads like a fantasy guild tavern rather than a data table. The board shows the guild's roster shape and payroll before the candidates, and every adventurer card answers the important RPG questions first: **what role do they play, do we need that role, how promising are they, what do they cost now, what will they add to weekly payroll, and how long before they leave?** Candidate inspection uses an Adventurer Dossier with compact role/fit chips, scouting uncertainty, and contract forecasting so long-term economy is part of the decision without a separate Guild Fit modal.
 
 Tutorials were upgraded alongside the newer UI rather than left behind. The first-run recruitment tutorial now teaches role balance, contracts, and batch refreshes; first-time War Table, Deployment Check, and Guild Planner primers explain the renewed management interfaces; combat guidance already uses the yellow-move / solid-red-basic-attack convention; and a permanent **Guildmaster Handbook** in Settings records the current rules for Side Quests, End Day healing, Mission Intel, rewards, travel, archives, dungeons, and Raids. The intent is for contextual onboarding to stay brief while all details remain reviewable later.
 

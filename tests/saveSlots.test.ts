@@ -12,6 +12,9 @@ vi.mock("@react-native-async-storage/async-storage", () => ({
 
 import { createGuild } from "../src/game/guild/guildService";
 import { deleteGuildSave, listSaveSlots, loadGuild, saveGuild } from "../src/game/save/saveService";
+import { createCombatState } from "../src/game/combat/combatEngine";
+import { createSeededRandom } from "../src/utils/random";
+import { testHero } from "./testHero";
 
 describe("two save slots", () => {
   beforeEach(() => store.clear());
@@ -50,6 +53,40 @@ describe("two save slots", () => {
     expect(recovered).toMatchObject({ guildName: "Backup Banner", currentDay: 4 });
     expect(() => JSON.parse(store.get("guildmaster.guild.slot.1.v2")!)).not.toThrow();
     expect((await loadGuild(2))?.guildName).toBe("Other Slot");
+  });
+
+  it("persists exact active quest combat state and RNG checkpoint", async () => {
+    const guild = createGuild("Interrupted Battle");
+    const heroes = [
+      { ...testHero(), id: "combat-a", name: "Combat A" },
+      { ...testHero(), id: "combat-b", name: "Combat B" },
+    ];
+    guild.heroes = heroes;
+    const party = { id: "combat-party", heroIds: heroes.map((hero) => hero.id) };
+    const random = createSeededRandom(246813579);
+    const state = createCombatState("guildhaven_cellar_slimes", 0, heroes, random);
+    guild.activeQuestCombat = {
+      questId: "guildhaven_cellar_slimes",
+      party,
+      randomState: random.getState(),
+      state: { ...state, combatStarted: true, turn: 7, round: 2 },
+    };
+
+    await saveGuild(guild, 1);
+    const loaded = await loadGuild(1);
+    expect(loaded?.activeQuestCombat).toMatchObject({
+      questId: "guildhaven_cellar_slimes",
+      party: { heroIds: ["combat-a", "combat-b"] },
+      randomState: guild.activeQuestCombat.randomState,
+      state: {
+        questId: "guildhaven_cellar_slimes",
+        combatStarted: true,
+        turn: 7,
+        round: 2,
+      },
+    });
+    expect(loaded?.activeQuestCombat?.state?.board.environmentId).toBe(state.board.environmentId);
+    expect(loaded?.activeQuestCombat?.state?.initiativeRolls).toEqual(state.initiativeRolls);
   });
 
   it("persists a mandatory post-battle result so its choice can resume after reload", async () => {

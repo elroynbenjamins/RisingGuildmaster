@@ -23,6 +23,35 @@ describe("repeatable balance simulations", () => {
     expect(results.every((result) => result.stalled === 0)).toBe(true);
   }, 30_000);
 
+  it("reports early, mid and late guild economies with production salaries", () => {
+    const stages = [
+      { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },
+      { id: "mid", heroCount: 6, heroLevel: 6, questsPerWeek: 3, days: 42, questId: "ghorak_chainbreaker_boss", fieldCost: 85, reserve: 1710 },
+      { id: "late", heroCount: 8, heroLevel: 10, questsPerWeek: 4, days: 56, questId: "vaelith_pale_echo_boss", fieldCost: 120, reserve: 5200 },
+    ] as const;
+    const results = stages.flatMap((stage, stageIndex) => (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>
+      simulateEconomyScenario({
+        id: `${stage.id}-${difficultyId}`,
+        questId: stage.questId,
+        difficultyId,
+        heroCount: stage.heroCount,
+        heroLevel: stage.heroLevel,
+        questsPerWeek: stage.questsPerWeek,
+        days: stage.days,
+        travelGoldCostPerQuest: Math.round(stage.fieldCost * .30),
+        healingGoldCostPerQuest: Math.round(stage.fieldCost * .40),
+        repairGoldCostPerQuest: Math.round(stage.fieldCost * .10),
+        rationGoldCostPerQuest: stage.fieldCost - Math.round(stage.fieldCost * .30) - Math.round(stage.fieldCost * .40) - Math.round(stage.fieldCost * .10),
+        facilityReserve: stage.reserve,
+        seed: 9100 + stageIndex * 100,
+      })));
+    console.table(results);
+    expect(results.every((result) => Number.isFinite(result.breakEvenQuestsPerWeek))).toBe(true);
+    expect(results.filter((result) => result.scenarioId.startsWith("early-standard")).every((result) => result.arrears === 0)).toBe(true);
+    expect(results.filter((result) => result.scenarioId.startsWith("mid-standard")).every((result) => result.arrears === 0)).toBe(true);
+    expect(results.filter((result) => result.scenarioId.startsWith("late-standard")).every((result) => result.arrears === 0)).toBe(true);
+  });
+
   it("reports 28-day guild cash flow at multiple activity levels", () => {
     const salaryParty = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 1, 8100);
     const representativeSalary = Math.round(salaryParty.reduce((sum, hero) => sum + calculateWeeklySalary(hero), 0) / salaryParty.length);

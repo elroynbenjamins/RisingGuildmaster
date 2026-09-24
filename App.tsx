@@ -49,6 +49,7 @@ import { resolveCampConversation } from "./src/game/relationships/campConversati
 import { LORE_ENTRIES } from "./src/data/world/lore";
 import { LoreJournalScreen } from "./src/screens/LoreJournal/LoreJournalScreen";
 import { GameDialogProvider, useGameDialog } from "./src/components/dialogs/GameDialog";
+import { GameToastProvider } from "./src/components/feedback/GameToast";
 import { NewGameSetupScreen } from "./src/screens/MainMenu/NewGameSetupScreen";
 import { QuestBriefingScreen } from "./src/screens/QuestDialogue/QuestBriefingScreen";
 import { areRegionalThreatsUnlocked, REGIONAL_THREAT_INTRO_SEEN_FLAG, resolveRegionalThreatForQuest } from "./src/game/world/regionalThreatService";
@@ -257,7 +258,7 @@ function Game() {
   else screen = <InventoryScreen openItem={(item) => setRoute({ name: "item", itemId: item.inventoryKey })} openCrafting={() => setRoute({ name: "crafting" })} openGathering={() => setRoute({ name: "gathering" })} openCraftingForMaterial={(materialId)=>setRoute({name:"crafting",materialFilter:materialId})} openGatheringForMaterial={(materialId)=>setRoute({name:"gathering",targetMaterialId:materialId})} openPotions={() => setRoute({ name: "alchemy" })} />;
   return <ManagementShell onOpenActivity={(destination) => setRoute(destination === "training" ? {name: "training"} : destination === "gathering" ? {name: "gathering"} : destination === "recruitment" ? {name: "recruitment"} : {name: "dungeon"})} onOpenGems={() => setRoute({ name: "gemsSupport" })} guild={guild} active={tab} onSelect={main}>{screen}</ManagementShell>;
 }
-function ThemedFrame(){const theme=useTheme();useEffect(()=>{void initializeAdMobPrivacy().catch(()=>{ /* Ads retry when the player requests one. */ });},[]);return <SafeAreaView style={[styles.safe,{backgroundColor:theme.colors.background}]} edges={["top","right","bottom","left"]}><StatusBar barStyle={theme.statusBar} backgroundColor={theme.colors.background}/><GameDialogProvider><Game/></GameDialogProvider></SafeAreaView>}
+function ThemedFrame(){const theme=useTheme();useEffect(()=>{void initializeAdMobPrivacy().catch(()=>{ /* Ads retry when the player requests one. */ });},[]);return <SafeAreaView style={[styles.safe,{backgroundColor:theme.colors.background}]} edges={["top","right","bottom","left"]}><StatusBar barStyle={theme.statusBar} backgroundColor={theme.colors.background}/><GameToastProvider><GameDialogProvider><Game/></GameDialogProvider></GameToastProvider></SafeAreaView>}
 function SavedTheme(){const{guild}=useGuild();return <ThemeProvider themeId={guild.uiPreferences.themeId??"guild_dark"}><ThemedFrame/></ThemeProvider>}
 export default function App() { return <SafeAreaProvider><GuildProvider><SavedTheme/></GuildProvider></SafeAreaProvider>; }
 const styles = StyleSheet.create({ safe: { flex: 1, backgroundColor: colors.background }, loading: { flex: 1, alignItems: "center", justifyContent: "center" }, loadingTitle: { color: colors.gold, fontSize: 25, fontWeight: "900", letterSpacing: 3 }, loadingText: { color: colors.muted, marginTop: 10 } });

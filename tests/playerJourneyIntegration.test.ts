@@ -1,13 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { CAMPAIGN_CHAPTERS } from "../src/data/campaign/chapter1";
+import { CAMPAIGN_CHAPTERS, CAMPAIGN_NODES } from "../src/data/campaign/chapter1";
+import { QUESTS } from "../src/data/quests/quests";
 import { RAIDS } from "../src/data/raids/raids";
 import { createDungeonDraft } from "../src/game/dungeons/dungeonDraftService";
 import { createGuild } from "../src/game/guild/guildService";
 import { getGuildCommandOrders } from "../src/game/guild/guildCommandCenterService";
 import { getEligibleOperationHeroIds, isGuildOperationsUnlocked } from "../src/game/operations/guildOperationService";
+import { createGuildmasterProfile, grantGuildmasterXp, unlockGuildmasterSkill } from "../src/game/guildmaster/guildmasterProgression";
 import { getCurrentUnlockNotices } from "../src/game/progression/unlockSummaryService";
 import { isRaidUnlocked } from "../src/game/raids/raidService";
 import { canUnlockRegionalThreats } from "../src/game/world/regionalThreatService";
+import { fullyTreatHero, getFullTreatmentCost, hasLocalHealingService, reviveHero } from "../src/game/temple/templeService";
 import { createSeededRandom } from "../src/utils/random";
 import { testHero } from "./testHero";
 
@@ -29,7 +32,41 @@ function chapterOneGuild(heroCount: number, level = 2) {
   return guild;
 }
 
-describe("end-to-end roster progression handoffs", () => {
+describe("end-to-end player journey guarantees", () => {
+  it("earns enough Chapter 1 Guildmaster progression to open one workshop path", () => {
+    const questIds = CAMPAIGN_CHAPTERS[1]!.nodeIds
+      .map((nodeId) => CAMPAIGN_NODES[nodeId]?.questId)
+      .filter((questId): questId is string => Boolean(questId));
+    const guildmasterXp = questIds.reduce((sum, questId) => sum + QUESTS[questId]!.difficulty * 35, 0);
+
+    let profile = grantGuildmasterXp(createGuildmasterProfile(), guildmasterXp);
+    expect(profile.level).toBeGreaterThanOrEqual(3);
+    expect(profile.skillPoints).toBeGreaterThanOrEqual(2);
+
+    profile = unlockGuildmasterSkill(profile, "workshop_planning");
+    profile = unlockGuildmasterSkill(profile, "forge_charter");
+    expect(profile.unlockedSkillIds).toEqual(expect.arrayContaining(["workshop_planning", "forge_charter"]));
+  });
+
+  it("keeps a first early-game death recoverable with the starting Temple economy", () => {
+    const guild = createGuild();
+    expect(hasLocalHealingService(guild.world)).toBe(true);
+    guild.heroes = [{ ...testHero(), id: "fallen-journey", currentHP: 0, isAvailable: false }];
+
+    const revived = reviveHero(guild, "fallen-journey", new Date("2026-09-24T12:00:00Z"));
+    expect(revived.gems).toBe(0);
+    expect(revived.heroes[0]!.currentHP).toBeGreaterThan(0);
+
+    const treatmentCost = getFullTreatmentCost(revived.heroes[0]!);
+    expect(treatmentCost).toBeGreaterThan(0);
+    expect(treatmentCost).toBeLessThan(revived.gold);
+
+    const recovered = fullyTreatHero(revived, "fallen-journey");
+    expect(recovered.gold).toBe(revived.gold - treatmentCost);
+    expect(recovered.heroes[0]).toMatchObject({ isAvailable: true, conditions: [] });
+  });
+
+
   it("keeps post-Chapter-1 strategic modes informative but not falsely announced with four heroes", () => {
     const guild = chapterOneGuild(4);
 

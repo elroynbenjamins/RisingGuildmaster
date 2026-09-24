@@ -9,8 +9,6 @@ export const GAME_CONFIG = {
   recruitmentCandidateCount: 3,
   baseAttributeMin: 1,
   baseAttributeMax: 20,
-  potentialMin: 50,
-  potentialMax: 100,
   baseHeroCapacity: 8,
   rewardedAdGems: 5,
   goldPerGem: 250,

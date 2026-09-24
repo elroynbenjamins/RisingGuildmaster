@@ -39,8 +39,8 @@ export function CampaignScreen({ guild, updateGuild, onBack, startQuest, openWor
   const leader = IRON_LAUREL_CHARACTERS[IRON_LAUREL.leaderCharacterId]!; const champion = IRON_LAUREL_CHARACTERS[IRON_LAUREL.championCharacterId]!;
   const standing = getRivalryStanding(guild.reputation, IRON_LAUREL);
   const hasFoundingVow = ["founding_vow_protection", "founding_vow_justice", "founding_vow_ambition"].some((flag) => guild.world.worldFlags[flag]);
-  const guideFoundingChoice = guild.tutorial.completed && !guild.world.completedCampaignNodeIds.includes("founding_the_guild");
-  const guideFirstQuest = guild.tutorial.completed && guild.world.completedCampaignNodeIds.includes("founding_the_guild") && !guild.world.completedCampaignNodeIds.includes("guildhaven_cellar_slimes");
+  const guideFoundingChoice = guild.tutorial.completed && guild.tutorial.freeRefreshUsed && !guild.world.completedCampaignNodeIds.includes("founding_the_guild");
+  const guideFirstQuest = guild.tutorial.completed && guild.tutorial.freeRefreshUsed && guild.world.completedCampaignNodeIds.includes("founding_the_guild") && !guild.world.completedCampaignNodeIds.includes("guildhaven_cellar_slimes");
   const completedCount = chapter.nodeIds.filter((id) => guild.world.completedCampaignNodeIds.includes(id)).length;
   const visibleNodeIds = showCompleted ? chapter.nodeIds : chapter.nodeIds.filter((id) => !guild.world.completedCampaignNodeIds.includes(id) || (id === "founding_the_guild" && !hasFoundingVow));
   const nextNode = chapter.nodeIds.map((id) => CAMPAIGN_NODES[id]!).find((node) => available.has(node.id));

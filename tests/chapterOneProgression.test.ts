@@ -23,6 +23,10 @@ describe("Chapter 1 progression path", () => {
     const [released] = releaseBankedCampaignXp([capped], { ...world, completedQuestIds: ["goblin_chieftain_boss"] });
     expect(released).toMatchObject({ level: 5, xp: 450 });
   });
+  it("keeps the mandatory Brambleway preparation step below the Chieftain ceiling", () => {
+    expect(QUESTS.brambleway_road_ambush).toMatchObject({ recommendedLevelMin: 2, recommendedLevelMax: 3, minPartySize: 3, maxPartySize: 3 });
+    expect(QUESTS.brambleway_caravan).toMatchObject({ difficulty: 3, recommendedLevelMin: 2, recommendedLevelMax: 3, minPartySize: 3, maxPartySize: 4 });
+  });
   it("makes the Chieftain a Level 2, three-to-four hero boss", () => {
     expect(QUESTS.goblin_chieftain_boss).toMatchObject({ recommendedLevelMin: 2, recommendedLevelMax: 2, minimumPartyAverageLevel: 2, minPartySize: 3, maxPartySize: 4 });
     expect(QUESTS.goblin_chieftain_boss?.preparationNotes).toEqual(expect.arrayContaining([expect.stringContaining("Recommended: frontline"), expect.stringContaining("Optional: common gear")]));

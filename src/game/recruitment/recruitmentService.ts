@@ -1,4 +1,4 @@
-import { canUsePaidRecruitmentRefresh } from "../onboarding/starterJourneyService";
+import { canUsePaidRecruitmentRefresh, markFourthHeroReady } from "../onboarding/starterJourneyService";
 import { RECRUITMENT_CONFIG } from "../../data/recruitment/recruitmentBalance";
 import type { GuildState } from "../guild/types";
 import type { RandomSource } from "../../utils/random";
@@ -57,7 +57,7 @@ export function recruitCandidate(guild: GuildState, candidateId: string): GuildS
     tags: ["recruitment", "recommendation"],
   }) : entry) : guild.heroes;
   const candidates = guild.recruitment.candidates.filter((item) => item.candidateId !== candidateId);
-  return { ...guild, gold: guild.gold - candidate.recruitmentFee, heroes: [...heroes, hero], heroContracts: [...guild.heroContracts, createHeroContract(hero, candidate.weeklySalary, candidate.contractLengthWeeks, guild.currentDay)], recruitment: { ...withCandidates(guild.recruitment, candidates), batchRecruitmentUsed: true, reservedCandidateId: guild.recruitment.reservedCandidateId === candidateId ? null : guild.recruitment.reservedCandidateId, reservationExpiresAtDay: guild.recruitment.reservedCandidateId === candidateId ? null : guild.recruitment.reservationExpiresAtDay } };
+  return markFourthHeroReady({ ...guild, gold: guild.gold - candidate.recruitmentFee, heroes: [...heroes, hero], heroContracts: [...guild.heroContracts, createHeroContract(hero, candidate.weeklySalary, candidate.contractLengthWeeks, guild.currentDay)], recruitment: { ...withCandidates(guild.recruitment, candidates), batchRecruitmentUsed: true, reservedCandidateId: guild.recruitment.reservedCandidateId === candidateId ? null : guild.recruitment.reservedCandidateId, reservationExpiresAtDay: guild.recruitment.reservedCandidateId === candidateId ? null : guild.recruitment.reservationExpiresAtDay } });
 }
 export function rejectCandidate(guild: GuildState, candidateId: string, random: RandomSource): GuildState { let candidates = guild.recruitment.candidates.filter((item) => item.candidateId !== candidateId); if (!candidates.length) candidates = unlockedPool(guild, random); return { ...guild, recruitment: withCandidates(guild.recruitment, candidates) }; }
 
@@ -101,12 +101,12 @@ export function rehireFormerMember(guild: GuildState, heroId: string): GuildStat
   });
   const activeIds = new Set([...guild.heroes.map((hero) => hero.id), recovered.id]);
   const restoredRelationships = member.relationships.filter((relationship) => activeIds.has(relationship.heroIdA) && activeIds.has(relationship.heroIdB));
-  return {
+  return markFourthHeroReady({
     ...guild,
     gold:guild.gold-fee,
     heroes:[...guild.heroes,recovered],
     heroContracts:[...guild.heroContracts,createHeroContract(recovered,salary,12,guild.currentDay)],
     relationships:[...guild.relationships,...restoredRelationships.filter((relationship)=>!guild.relationships.some((existing)=>(existing.heroIdA===relationship.heroIdA&&existing.heroIdB===relationship.heroIdB)||(existing.heroIdA===relationship.heroIdB&&existing.heroIdB===relationship.heroIdA)))],
     recruitment:{...guild.recruitment,formerMembers:guild.recruitment.formerMembers.filter((entry)=>entry.hero.id!==heroId)},
-  };
+  });
 }

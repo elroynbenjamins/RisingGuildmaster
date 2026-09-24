@@ -5,9 +5,13 @@ import { RAIDS } from "../src/data/raids/raids";
 import { createDungeonDraft } from "../src/game/dungeons/dungeonDraftService";
 import { createGuild } from "../src/game/guild/guildService";
 import { getGuildCommandOrders } from "../src/game/guild/guildCommandCenterService";
+import { getGuildPriority } from "../src/game/guild/guildPriorityService";
 import { getEligibleOperationHeroIds, isGuildOperationsUnlocked } from "../src/game/operations/guildOperationService";
 import { createGuildmasterProfile, grantGuildmasterXp, unlockGuildmasterSkill } from "../src/game/guildmaster/guildmasterProgression";
 import { getCurrentUnlockNotices } from "../src/game/progression/unlockSummaryService";
+import { completeTutorial } from "../src/game/onboarding/tutorialService";
+import { getAvailableCampaignNodes } from "../src/game/campaign/campaignService";
+import { getQuestStartBlocker } from "../src/game/quests/questAvailability";
 import { isRaidUnlocked } from "../src/game/raids/raidService";
 import { canUnlockRegionalThreats } from "../src/game/world/regionalThreatService";
 import { fullyTreatHero, getFullTreatmentCost, hasLocalHealingService, reviveHero } from "../src/game/temple/templeService";
@@ -33,6 +37,21 @@ function chapterOneGuild(heroCount: number, level = 2) {
 }
 
 describe("end-to-end player journey guarantees", () => {
+  it("hands completed guided recruitment directly into a startable opening Campaign quest", () => {
+    let guild = createGuild();
+    guild.heroes = roster(2, 1);
+    guild = completeTutorial(guild);
+
+    const priority = getGuildPriority(guild);
+    expect(priority.destination).toBe("campaign");
+
+    const firstNode = getAvailableCampaignNodes(guild.world)[0]!;
+    expect(firstNode.questId).toBeTruthy();
+    const quest = QUESTS[firstNode.questId!]!;
+    expect(quest.minPartySize).toBeLessThanOrEqual(guild.heroes.length);
+    expect(getQuestStartBlocker(quest, guild.world, guild.heroes)).toBeNull();
+  });
+
   it("earns enough Chapter 1 Guildmaster progression to open one workshop path", () => {
     const questIds = CAMPAIGN_CHAPTERS[1]!.nodeIds
       .map((nodeId) => CAMPAIGN_NODES[nodeId]?.questId)

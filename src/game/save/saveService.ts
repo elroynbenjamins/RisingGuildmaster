@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { GuildState } from "../guild/types";
 import { applyContentEntitlements, applyStoryRaceUnlocks } from "../monetization/contentUnlockService";
 import { loadAccountContentEntitlements, saveAccountContentEntitlements } from "../monetization/accountEntitlementService";
+import { accountGemWalletFromGuild, applyAccountGemWallet, initializeAccountGemWallet, saveAccountGemWallet } from "../monetization/accountGemWalletService";
 import { migrateGuildState } from "./guildStateMigration";
 import { UnsupportedSaveSchemaError, decodePersistedSave, serializePersistedGuild } from "./saveSchema";
 
@@ -67,6 +68,7 @@ async function saveGuildImmediate(guild: GuildState, slotId: SaveSlotId): Promis
   await importHistoricalSlot(slotId);
   const entitlementAwareGuild = applyStoryRaceUnlocks(guild);
   await saveAccountContentEntitlements(entitlementAwareGuild.entitlements);
+  await saveAccountGemWallet(accountGemWalletFromGuild(entitlementAwareGuild));
 
   const next = serializePersistedGuild(entitlementAwareGuild);
   // Validate the exact payload before it can replace a known-good primary.
@@ -108,7 +110,9 @@ async function prepareLoadedGuild(value: string, accountEntitlements: AccountEnt
 }> {
   const decoded = decodePersistedSave(value);
   const migrated = applyStoryRaceUnlocks(migrateDomain(JSON.stringify(migrateGuildState(decoded.guild))));
-  const guild = applyContentEntitlements(migrated, accountEntitlements);
+  const entitlementAwareGuild = applyContentEntitlements(migrated, accountEntitlements);
+  const accountWallet = await initializeAccountGemWallet(accountGemWalletFromGuild(entitlementAwareGuild));
+  const guild = applyAccountGemWallet(entitlementAwareGuild, accountWallet);
   await saveAccountContentEntitlements(guild.entitlements);
   return { guild, needsSchemaRewrite: decoded.migrated };
 }

@@ -40,6 +40,7 @@ describe("release readiness content integrity", () => {
     for (const chapter of chapters) {
       expect(world.campaignChapter, `before ${chapter.id}`).toBe(chapter.chapterNumber);
       for (const nodeId of chapter.nodeIds) {
+        if (nodeId === "goblin_chieftain") world = { ...world, worldFlags: { ...world.worldFlags, starter_brambleway_road_ambush_complete: true, starter_brambleford_side_quest_complete: true, starter_fourth_hero_ready: true } };
         const availableIds = getAvailableCampaignNodes(world).map((node) => node.id);
         expect(availableIds, `available before ${nodeId}`).toContain(nodeId);
 

@@ -10,6 +10,7 @@ import type { TrainingProgramId } from "../../game/training/trainingTypes";
 import { useGuild } from "../../state/GuildContext";
 import { getRaceNameColor } from "../../ui/raceColors";
 import { GameIcon } from "../../components/icons/GameIcon";
+import { triggerTactileFeedback } from "../../ui/tactileFeedback";
 
 export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: { onBack(): void; openCalendar(): void; openSideQuests?(): void }) {
   const { showDialog } = useGameDialog();
@@ -33,10 +34,12 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
     if (!hero || !quote) return;
     try {
       updateGuild(startHeroTraining(guild, hero.id, programId));
+      triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");
       showDialog({ title: "Training Started", message: `${hero.name} begins ${program.name}. Projected reward: +${quote.xpReward} XP. Cost: ${quote.goldCost} gold. Returns Day ${quote.completionDay}.`, tone: "success" });
       const nextHero = available.find((entry) => entry.id !== hero.id);
       setHeroId(nextHero?.id);
     } catch (error) {
+      triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");
       showDialog({ title: "Cannot train", message: error instanceof Error ? error.message : "Training could not begin", tone: "danger" });
     }
   };
@@ -44,8 +47,10 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
     try {
       const next = startTrainingGroundUpgrade(guild);
       updateGuild(next);
+      triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");
       showDialog({ title: "Training Hall Upgrade Started", message: `Level ${guild.trainingGround.level} to ${guild.trainingGround.level + 1}. ${upgrade?.goldCost.toLocaleString() ?? 0} gold committed. Completes Day ${guild.currentDay + (upgrade?.durationDays ?? 0)} and adds one training slot.`, tone: "success" });
     } catch (error) {
+      triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");
       showDialog({ title: "Cannot upgrade", message: error instanceof Error ? error.message : "Upgrade could not begin", tone: "danger" });
     }
   };
@@ -68,7 +73,7 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
     <Panel style={styles.facility}>
       <View style={styles.facilityHead}><View style={styles.levelPlate}><Text style={styles.levelSmall}>TRAINING HALL</Text><Text style={styles.level}>LEVEL {guild.trainingGround.level}</Text></View><View style={styles.flex}><Text style={styles.facilityName}>{guild.trainingGround.level === 1 ? "Guild Practice Yard" : guild.trainingGround.level === 2 ? "Veteran Training Hall" : "Master Adventurer Academy"}</Text><Text style={styles.meta}>{capacity} concurrent training slot{capacity === 1 ? "" : "s"} · {guild.trainingGround.completedTrainingCount} completed program{guild.trainingGround.completedTrainingCount === 1 ? "" : "s"}</Text></View></View>
       {facilityUpgrade ? <View style={styles.upgradeBox}><View style={styles.line}><View style={styles.flex}><Text style={styles.panelLabel}>FACILITY UPGRADE ACTIVE</Text><Text style={styles.panelTitle}>Training Hall Level {facilityUpgrade.targetLevel}</Text></View><StatusChip label={`DAY ${facilityUpgrade.completionDay}`} tone="gold" /></View><Text style={styles.meta}>{Math.max(0, facilityUpgrade.completionDay - guild.currentDay)} day(s) remaining</Text><MiniMeter value={facilityProgress} max={facilityDuration} color={colors.green} height={8}/><SecondaryButton iconId="calendar" label="OPEN GUILD CALENDAR" onPress={openCalendar}/></View>
-        : upgrade ? <View style={styles.upgradeBox}><View style={styles.line}><View style={styles.flex}><Text style={styles.panelLabel}>NEXT FACILITY LEVEL</Text><Text style={styles.panelTitle}>Training Hall Level {guild.trainingGround.level + 1}</Text></View><StatusChip label={`+1 SLOT`} tone="blue" /></View><Text style={styles.meta}>{upgrade.goldCost.toLocaleString()} gold · {upgrade.durationDays} days · capacity becomes {TRAINING_GROUND_CONFIG.capacityByLevel[guild.trainingGround.level + 1]}</Text>{guild.gold < upgrade.goldCost && <Text style={styles.warning}>Need {(upgrade.goldCost - guild.gold).toLocaleString()} more gold.</Text>}<ActionButton iconId="training" label={`BEGIN UPGRADE · ${upgrade.goldCost.toLocaleString()}G`} disabled={guild.gold < upgrade.goldCost} onPress={improve}/></View>
+        : upgrade ? <View style={styles.upgradeBox}><View style={styles.line}><View style={styles.flex}><Text style={styles.panelLabel}>NEXT FACILITY LEVEL</Text><Text style={styles.panelTitle}>Training Hall Level {guild.trainingGround.level + 1}</Text></View><StatusChip label={`+1 SLOT`} tone="blue" /></View><Text style={styles.meta}>{upgrade.goldCost.toLocaleString()} gold · {upgrade.durationDays} days · capacity becomes {TRAINING_GROUND_CONFIG.capacityByLevel[guild.trainingGround.level + 1]}</Text>{guild.gold < upgrade.goldCost && <Text style={styles.warning}>Need {(upgrade.goldCost - guild.gold).toLocaleString()} more gold.</Text>}<ActionButton guardMs={600} iconId="training" label={`BEGIN UPGRADE · ${upgrade.goldCost.toLocaleString()}G`} disabled={guild.gold < upgrade.goldCost} onPress={improve}/></View>
         : <Text style={styles.mastered}>★ MASTER FACILITY · MAXIMUM TRAINING CAPACITY</Text>}
     </Panel>
 
@@ -108,7 +113,7 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
         <View style={styles.capBox}><Text style={styles.cap}>TRAINING CAP · LEVEL {quote.levelCap}</Text><Text style={styles.capDetail}>Training can catch this hero toward the campaign and strongest-roster limit, but cannot overtake current progression.</Text></View>
         {quote.blockers.map((blocker) => <Text key={blocker.id} style={[styles.blocker, blocker.tone === "danger" && styles.danger]}>• {blocker.label}</Text>)}
         <Text style={styles.quoteNote}>Daily calendar recovery still applies while training, so readiness can improve before the hero returns. Training never grants permanent attributes.</Text>
-        <ActionButton iconId="training" label={quote.canBegin ? `BEGIN ${program.name.toUpperCase()} · READY DAY ${quote.completionDay}` : "TRAINING REQUIREMENTS NOT MET"} disabled={!quote.canBegin} onPress={begin}/>
+        <ActionButton guardMs={600} iconId="training" label={quote.canBegin ? `BEGIN ${program.name.toUpperCase()} · READY DAY ${quote.completionDay}` : "TRAINING REQUIREMENTS NOT MET"} disabled={!quote.canBegin} onPress={begin}/>
       </Panel>
     </> : null}</>}
   </ScrollView>;

@@ -46,7 +46,7 @@ function parseGuildShape(value: unknown): PersistedGuildShape {
   return value as PersistedGuildShape;
 }
 
-function stripLegacyPotential<T extends object>(value: T): T {
+function stripLegacyHeroProgressionFields<T extends object>(value: T): T {
   const cleaned = { ...value } as T & Record<string, unknown>;
   delete cleaned.potential;
   delete cleaned.potentialEstimateMin;
@@ -87,7 +87,7 @@ export function migrateGuildState(value: unknown): GuildState {
     const portraitVariant = candidate.heroPreview.portraitVariant ?? 0;
 
     return {
-      ...stripLegacyPotential(candidate),
+      ...stripLegacyHeroProgressionFields(candidate),
       source: candidate.source ?? "guild_board",
       sourceRaceId: candidate.sourceRaceId ?? null,
       sourceRegionId: candidate.sourceRegionId ?? null,
@@ -98,7 +98,7 @@ export function migrateGuildState(value: unknown): GuildState {
       weeklySalaryEstimateMin: candidate.weeklySalaryEstimateMin ?? salary.minimum,
       weeklySalaryEstimateMax: candidate.weeklySalaryEstimateMax ?? salary.maximum,
       heroPreview: {
-        ...stripLegacyPotential(candidate.heroPreview),
+        ...stripLegacyHeroProgressionFields(candidate.heroPreview),
         gender,
         portraitVariant,
         portraitKey: `${candidate.heroPreview.raceId}-${candidate.heroPreview.classId}-${gender}-v${portraitVariant}`,
@@ -153,7 +153,7 @@ export function migrateGuildState(value: unknown): GuildState {
     const gender = migrateGender(hero.gender);
     const portraitVariant = hero.portraitVariant ?? 0;
     return {
-      ...stripLegacyPotential(hero),
+      ...stripLegacyHeroProgressionFields(hero),
       gender,
       portraitVariant,
       portraitKey: `${hero.raceId}-${hero.classId}-${gender}-v${portraitVariant}`,
@@ -254,7 +254,7 @@ export function migrateGuildState(value: unknown): GuildState {
       reservedCandidateId: recruitment.reservedCandidateId ?? null,
       reservationExpiresAtDay: recruitment.reservationExpiresAtDay ?? null,
       regionalScoutMission: recruitment.regionalScoutMission ?? null,
-      formerMembers: (recruitment.formerMembers ?? []).map((member) => ({ ...member, hero: stripLegacyPotential(member.hero) })),
+      formerMembers: (recruitment.formerMembers ?? []).map((member) => ({ ...member, hero: stripLegacyHeroProgressionFields(member.hero) })),
     },
     heroes: migratedHeroes,
   };

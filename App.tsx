@@ -27,7 +27,7 @@ import { GuildmasterSkillTreeScreen } from "./src/screens/Guildmaster/Guildmaste
 import { FinancesScreen } from "./src/screens/Guild/FinancesScreen";
 import { DungeonScreen } from "./src/screens/Dungeon/DungeonScreen";
 import { TrainingGroundsScreen } from "./src/screens/Training/TrainingGroundsScreen";
-import { getDungeonCombatSetup, resolveDungeonCombat } from "./src/game/dungeons/dungeonRunService";
+import { beginDungeonCombatCheckpoint, checkpointDungeonCombat, getDungeonCombatSetup, resolveDungeonCombat } from "./src/game/dungeons/dungeonRunService";
 import { isChapterOneComplete } from "./src/game/dungeons/rogueliteRotationService";
 import { DUNGEON_UNLOCK_HERO_COUNT } from "./src/game/dungeons/dungeonDraftService";
 import { MainMenuScreen } from "./src/screens/MainMenu/MainMenuScreen";
@@ -106,6 +106,12 @@ function Game() {
     const recovery = guild.activeQuestCombat;
     setRoute({ name: "combat", questId: recovery.questId, party: recovery.party, campaignNodeId: recovery.campaignNodeId, combatSetup: recovery.combatSetup, combatSeed: recovery.randomState, resume: true });
   }, [gameStarted, isHydrated, guild.pendingQuestResult, guild.activeQuestCombat, route.name]);
+  useEffect(() => {
+    if (!gameStarted || !isHydrated || guild.pendingQuestResult || guild.activeQuestCombat || route.name !== "main") return;
+    const run = guild.activeDungeonRun;
+    if (!run || run.status !== "active" || run.combatRandomState == null) return;
+    setRoute({ name: "dungeonCombat" });
+  }, [gameStarted, isHydrated, guild.pendingQuestResult, guild.activeQuestCombat, guild.activeDungeonRun, route.name]);
   useEffect(() => {
     if (!gameStarted || !isHydrated || (guild.pendingQuestResult || guild.activeQuestCombat)) return;
     if (!areRegionalThreatsUnlocked(guild.world)) { threatIntroPromptedRef.current = false; return; }
@@ -189,13 +195,13 @@ function Game() {
         onDelete={async (slotId) => { try { await deleteSaveSlot(slotId); } catch (error) { showDialog({ title: "Could not delete save", message: error instanceof Error ? error.message : "Delete failed", tone: "danger" }); } }}
       />;
   if (guild.tutorial.active && guild.tutorial.step === "welcome") return <TutorialScreen onBegin={() => { updateGuild(beginTutorial(guild)); setRoute({ name: "recruitment" }); }} onSkip={() => updateGuild(skipTutorial(guild))} />;
-  if (isHydrated && route.name === "dungeon") return <DungeonScreen guild={guild} random={worldRandom.current} updateGuild={updateGuild} onBack={() => main("Quests")} startCombat={() => setRoute({ name: "dungeonCombat" })}/>;
+  if (isHydrated && route.name === "dungeon") return <DungeonScreen guild={guild} random={worldRandom.current} updateGuild={updateGuild} onBack={() => main("Quests")} startCombat={() => { try { const seed=randomSeed(); updateGuild(beginDungeonCombatCheckpoint(guild, seed)); setRoute({ name: "dungeonCombat" }); } catch(error) { showDialog({title:"Dungeon Combat Unavailable",message:error instanceof Error?error.message:"This room cannot start combat.",tone:"danger"}); } }}/>;
   if (isHydrated && route.name === "dungeonCombat") {
     const run = guild.activeDungeonRun;
-    if (!run || run.status !== "active") return <DungeonScreen guild={guild} random={worldRandom.current} updateGuild={updateGuild} onBack={() => main("Quests")} startCombat={() => setRoute({ name: "dungeonCombat" })}/>;
+    if (!run || run.status !== "active") return <DungeonScreen guild={guild} random={worldRandom.current} updateGuild={updateGuild} onBack={() => main("Quests")} startCombat={() => { try { const seed=randomSeed(); updateGuild(beginDungeonCombatCheckpoint(guild, seed)); setRoute({ name: "dungeonCombat" }); } catch(error) { showDialog({title:"Dungeon Combat Unavailable",message:error instanceof Error?error.message:"This room cannot start combat.",tone:"danger"}); } }}/>;
     const participants = guild.heroes.filter((hero) => run.partyHeroIds.includes(hero.id));
     const finish = (status: "victory" | "defeat", instances: HeroCombatInstance[]) => { const result = resolveDungeonCombat(guild, status, instances, createSeededRandom(randomSeed())); updateGuild(result.guild); setRoute({ name: "dungeon" }); };
-    return <CombatScreen questId="wardstone_depths_expedition" heroes={participants} initialHeroInstances={run.heroInstances} combatSetup={getDungeonCombatSetup(guild)} onEnemiesEncountered={(ids) => updateGuild(discoverEnemies(guild, ids))} onQuestEnd={finish} onExit={() => setRoute({ name: "dungeon" })}/>;
+    return <CombatScreen questId="wardstone_depths_expedition" heroes={participants} initialHeroInstances={run.heroInstances} combatSetup={getDungeonCombatSetup(guild)} initialCombatState={run.combatState ?? undefined} initialRandomState={run.combatRandomState ?? undefined} onCombatCheckpoint={(state,randomState)=>updateGuild((current)=>current.activeDungeonRun?.id===run.id?checkpointDungeonCombat(current,state,randomState):current)} onEnemiesEncountered={(ids) => updateGuild((current)=>discoverEnemies(current, ids))} onQuestEnd={finish} onExit={() => setRoute({ name: "dungeon" })}/>;
   }
   if (route.name === "tutorialGuide") return <TutorialGuideScreen onBack={() => setRoute({name: "settings"})} />;
   if (route.name === "recruitment") return <RecruitmentScreen openCampaign={() => setRoute({name: "campaign"})} onBack={() => main("Guild")} inspect={(candidate) => setRoute({ name: "candidate", candidateId: candidate.candidateId })} openCalendar={() => setRoute({ name: "finances" })} />;

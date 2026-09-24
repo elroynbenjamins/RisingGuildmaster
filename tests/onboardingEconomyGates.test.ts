@@ -6,7 +6,7 @@ import { advanceGuildTime } from "../src/game/economy/guildCalendarService";
 import { createGuild } from "../src/game/guild/guildService";
 import { recoverAdventureStamina, spendPartyAdventureStamina } from "../src/game/heroes/adventureStaminaService";
 import { creditVerifiedGems, exchangeGemsForGold } from "../src/game/monetization/gemService";
-import { beginTutorial, completeTutorial, recordTutorialCandidateTab, recordTutorialRecruit, recordTutorialRefresh } from "../src/game/onboarding/tutorialService";
+import { beginTutorial, completeTutorial, getTutorialResumeDestination, recordTutorialCandidateTab, recordTutorialRecruit, recordTutorialRefresh } from "../src/game/onboarding/tutorialService";
 import { isQuestBoardCategoryUnlocked } from "../src/game/quests/questAvailability";
 import { generateHero } from "../src/game/heroes/heroGenerator";
 import { createSeededRandom } from "../src/utils/random";
@@ -40,6 +40,15 @@ describe("new-game onboarding and progression gates", () => {
     expect(guild.tutorial).toMatchObject({ step: "party_complete", active: true, completed: false });
     guild = completeTutorial(guild);
     expect(guild.tutorial).toMatchObject({ step: "complete", active: false, completed: true });
+  });
+
+  it("resumes every interrupted guided recruitment step in Recruitment", () => {
+    const base = beginTutorial(createGuild());
+    for (const step of ["inspect_candidate", "recruit_first", "refresh_board", "recruit_second", "party_complete"] as const) {
+      expect(getTutorialResumeDestination({ ...base, tutorial: { ...base.tutorial, step } })).toBe("recruitment");
+    }
+    expect(getTutorialResumeDestination(createGuild())).toBeNull();
+    expect(getTutorialResumeDestination(completeTutorial(base))).toBeNull();
   });
 
   it("accepts Traits as the alternative core candidate review", () => {

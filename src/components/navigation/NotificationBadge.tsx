@@ -15,5 +15,5 @@ export function NotificationBadge({ count, tone = "urgent", label }: { count: nu
 
 const styles = StyleSheet.create({
   badge: { alignItems: "center", borderWidth: 1, justifyContent: "center", minHeight: 18, minWidth: 18, paddingHorizontal: 3, borderRadius: 10, },
-  text: { fontSize: 10, fontWeight: "700", lineHeight: 13 },
+  text: { fontSize: 10, fontWeight: "900", lineHeight: 13 },
 });

@@ -1,6 +1,7 @@
 import { DUNGEONS, DUNGEON_NODES, DUNGEON_RUN_MODIFIERS } from "../../data/dungeons/dungeons";
 import type { RandomSource } from "../../utils/random";
 import type { HeroCombatInstance, QuestCombatSetup } from "../combat/combatTypes";
+import type { CombatState } from "../combat/combatEngine";
 import { createHeroCombatInstance } from "../combat/heroCombatFactory";
 import type { GuildState } from "../guild/types";
 import { grantHeroXp } from "../progression/levelSystem";
@@ -49,6 +50,18 @@ export function beginDungeonExpedition(guild: GuildState, dungeonId: string, par
   const withRoguelite = startRogueliteRun(guild, run.id);
   const record = guild.rogueliteRotation.records[dungeonId] ?? createRogueliteDungeonRecord();
   return { ...withRoguelite, recentPartyHeroIds: partyHeroIds, rogueliteRotation: { ...guild.rogueliteRotation, selectedDungeonId: dungeonId, records: { ...guild.rogueliteRotation.records, [dungeonId]: { ...record, attempts: record.attempts + 1 } } }, activeDungeonRun: run };
+}
+
+export function beginDungeonCombatCheckpoint(guild: GuildState, randomState: number): GuildState {
+  const run = activeRun(guild); const node = DUNGEON_NODES[run.currentNodeId];
+  if (!node || !["combat", "elite", "boss"].includes(node.type)) throw new Error("Current dungeon node is not a combat encounter");
+  return updateRun(guild, { ...run, combatState: null, combatRandomState: randomState });
+}
+
+export function checkpointDungeonCombat(guild: GuildState, state: CombatState, randomState: number): GuildState {
+  const run = activeRun(guild);
+  if (state.questId !== "wardstone_depths_expedition") throw new Error("Dungeon combat checkpoint belongs to another combat");
+  return updateRun(guild, { ...run, combatState: state, combatRandomState: randomState });
 }
 
 export function getDungeonCombatSetup(guild: GuildState): QuestCombatSetup {

@@ -44,6 +44,8 @@ import { NotificationDot } from "../components/navigation/NotificationDot";
 import { getHeroLoyalty, getHeroLoyaltyBand, HERO_LOYALTY_LABELS } from "../game/heroes/heroLoyaltyService";
 import { getHeroContractPresentation, getHeroDutyStatus, HERO_CLASS_ACCENTS, HERO_COMBAT_ROLES, type HeroUiTone } from "../ui/heroPresentation";
 import { useTheme } from "../theme/theme";
+import { useGameToast } from "../components/feedback/GameToast";
+import { triggerTactileFeedback } from "../ui/tactileFeedback";
 
 function toneColor(tone: HeroUiTone, c: ReturnType<typeof useTheme>["colors"]): string {
   if (tone === "danger") return c.danger;
@@ -113,7 +115,7 @@ function EquipmentPaperDoll({ hero }: { hero: Hero }) {
 
 function ConnectedHeroGearList({ hero, candidate }: { hero: Hero; candidate: boolean }) {
   const { guild, updateGuild } = useGuild();
-  const [message, setMessage] = useState<string>();
+  const { showToast } = useGameToast();
   const [showLoadouts, setShowLoadouts] = useState(false);
   const [showGearDetails, setShowGearDetails] = useState(false);
   const liveHero = guild.heroes.find((entry) => entry.id === hero.id) ?? hero;
@@ -121,7 +123,10 @@ function ConnectedHeroGearList({ hero, candidate }: { hero: Hero; candidate: boo
   const remove = (slot: keyof Hero["equipment"]) => {
     const itemId = liveHero.equipment[slot];
     if (!itemId) return;
+    const itemName=resolveEquipmentDefinition(itemId)?.name ?? "Equipment";
     updateGuild({ ...guild, inventory: [...guild.inventory, itemId], heroes: guild.heroes.map((entry) => entry.id === hero.id ? unequipSlot(entry, slot) : entry) });
+    triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");
+    showToast({title:"Gear Unequipped",message:`${itemName} returned to guild inventory.`,tone:"info"});
   };
   const loadouts = guild.equipmentLoadoutsByHeroId[hero.id] ?? [];
   return <>
@@ -138,17 +143,18 @@ function ConnectedHeroGearList({ hero, candidate }: { hero: Hero; candidate: boo
             <ActionButton label={loadout ? `Equip ${loadout.name}` : `Loadout ${index + 1} Empty`} disabled={!loadout} onPress={() => {
               try {
                 updateGuild(applyEquipmentLoadout(guild, hero.id, loadout!.id));
-                setMessage(`${loadout!.name} equipped.`);
+                triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");
+                showToast({title:"Loadout Equipped",message:`${loadout!.name} is now active on ${hero.name}.`,tone:"success"});
               } catch (error) {
-                setMessage(error instanceof Error ? error.message : "Could not equip loadout.");
+                triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");
+                showToast({title:"Loadout Failed",message:error instanceof Error ? error.message : "Could not equip loadout.",tone:"danger"});
               }
             }} />
-            <Pressable accessibilityRole="button" onPress={() => { updateGuild(saveEquipmentLoadout(guild, hero.id, index)); setMessage(`Loadout ${index + 1} saved.`); }} style={styles.loadoutSave}>
+            <Pressable accessibilityRole="button" onPress={() => { updateGuild(saveEquipmentLoadout(guild, hero.id, index)); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); showToast({title:"Loadout Saved",message:`Loadout ${index + 1} now matches ${hero.name}’s current equipment.`,tone:"gold"}); }} style={styles.loadoutSave}>
               <Text style={styles.loadoutSaveText}>SAVE CURRENT</Text>
             </Pressable>
           </View>;
         })}
-        {message ? <Text style={styles.loadoutMessage}>{message}</Text> : null}
       </Panel>}
     </>}
     <Pressable accessibilityRole="button" accessibilityState={{ expanded: showGearDetails }} aria-expanded={showGearDetails} onPress={() => setShowGearDetails((value) => !value)} style={gearStyles.detailsToggle}>

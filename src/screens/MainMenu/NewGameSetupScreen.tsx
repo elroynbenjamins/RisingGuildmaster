@@ -21,14 +21,14 @@ export function NewGameSetupScreen({ onBack, onStart }: { onBack(): void; onStar
   const crest = GUILD_CRESTS[crestId];
   const cleanName = guildName.trim();
   const validName = cleanName.length >= 3 && cleanName.length <= 24;
-  return <ScrollView contentContainerStyle={styles.content}>
+  return <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} />
     <Text style={styles.eyebrow}>NEW GUILD CHARTER</Text>
     <Text style={styles.title}>Found Your Guild</Text>
     <Text style={styles.intro}>Name the company, choose its starter crest, then select the challenge for this save. Name and crest identify the guild; difficulty cannot be changed later.</Text>
 
     <Panel style={styles.identity}>
-      <View style={styles.identityHead}><GuildCrest crestId={crestId} size={62}/><View style={styles.flex}><Text style={styles.identityLabel}>GUILD NAME</Text><TextInput value={guildName} onChangeText={setGuildName} maxLength={24} placeholder="The Wayfarers" placeholderTextColor={colors.muted} style={styles.input}/></View></View>
+      <View style={styles.identityHead}><GuildCrest crestId={crestId} size={62}/><View style={styles.flex}><Text style={styles.identityLabel}>GUILD NAME</Text><TextInput accessibilityLabel="Guild name" value={guildName} onChangeText={setGuildName} maxLength={24} autoCapitalize="words" autoCorrect={false} returnKeyType="done" submitBehavior="blurAndSubmit" placeholder="The Wayfarers" placeholderTextColor={colors.muted} style={styles.input}/></View></View>
       <Text style={validName ? styles.valid : styles.invalid}>{validName ? cleanName.length + "/24 · Charter name ready" : "Use 3–24 characters."}</Text>
       <Text style={styles.identityLabel}>STARTER CREST</Text>
       <View style={styles.crests}>{STARTER_GUILD_CREST_IDS.map((id) => { const entry = GUILD_CRESTS[id]; const active = id === crestId; return <Pressable accessibilityRole="radio" accessibilityState={{checked:active}} key={id} onPress={() => setCrestId(id)} style={({pressed})=>[styles.crestCard, active && styles.crestSelected,pressed&&styles.pressed]}><GuildCrest crestId={id} size={44}/><Text style={styles.crestName}>{entry.name}</Text></Pressable>; })}</View>
@@ -40,7 +40,7 @@ export function NewGameSetupScreen({ onBack, onStart }: { onBack(): void; onStar
     <Panel style={[styles.difficultyDetail,selectedId==="iron_guild"&&styles.iron]}><Text style={styles.name}>{selected.name}</Text><Text style={styles.tagline}>{selected.tagline}</Text><Text style={styles.description}>{selected.description}</Text><View style={styles.guide}><Text style={styles.guideLabel}>BEST FOR</Text><Text style={styles.guideValue}>{EXPERIENCE_GUIDE[selectedId].bestFor}</Text><Text style={styles.guideLabel}>WHAT TO EXPECT</Text><Text style={styles.guideValue}>{EXPERIENCE_GUIDE[selectedId].experience}</Text></View>{!selected.allowsPaidRecruitmentRefresh && <Text style={styles.restriction}>IRON RULE · Tavern candidates cannot be refreshed with gold. Scheduled free and tutorial refreshes remain available.</Text>}</Panel>
 
     <Panel style={styles.summary}><View style={styles.identityHead}><GuildCrest crestId={crestId} size={48}/><View style={styles.flex}><Text style={styles.summaryLabel}>FOUNDING CHARTER</Text><Text style={styles.summaryName}>{cleanName || "Unnamed Guild"}</Text><Text style={styles.summaryText}>{selected.name + " · " + crest.name}</Text></View></View></Panel>
-    <ActionButton disabled={!validName} label={"Found " + (cleanName || "Guild")} onPress={() => onStart(selectedId, cleanName, crestId)} />
+    <ActionButton guardMs={1000} disabled={!validName} label={"Found " + (cleanName || "Guild")} onPress={() => onStart(selectedId, cleanName, crestId)} />
   </ScrollView>;
 }
 const styles = StyleSheet.create({

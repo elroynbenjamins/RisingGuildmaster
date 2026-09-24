@@ -64,8 +64,7 @@ export function DungeonScreen({ guild, random, updateGuild, onBack, startCombat 
     return <ScrollView contentContainerStyle={styles.content}>
       <Text style={styles.title}>{run.status === "victory" ? "Expedition Complete" : "Expedition Lost"}</Text>
       <View style={styles.resultArt}><DungeonThemeIcon themeId={dungeon.themeId} size={86}/><DungeonNodeIcon type={run.status === "victory" ? "treasure" : "boss"} state={run.status === "victory" ? "completed" : "boss"} size={72}/></View>
-      <ThemeHeader dungeon={dungeon} record={record}/>
-      <View style={[styles.gradeSeal, { borderColor: dungeon.accentColor }]}><Text style={[styles.grade, { color: dungeon.accentColor }]}>{score.grade}</Text><View style={styles.flex}><Text style={styles.gradeLabel}>EXPEDITION GRADE</Text><Text style={styles.gradeScore}>{score.total} points</Text><View style={styles.recordBadges}>{firstClear ? <Text style={styles.firstClear}>FIRST CLEAR</Text> : null}{newBest ? <Text style={styles.newBest}>NEW BEST</Text> : null}</View></View></View>
+      <View style={[styles.gradeSeal, { borderColor: dungeon.accentColor }]}><Text style={[styles.grade, { color: dungeon.accentColor }]}>{score.grade}</Text><View style={styles.flex}><Text style={styles.gradeLabel}>EXPEDITION GRADE</Text><Text style={styles.gradeScore}>{score.total} points</Text><View style={styles.recordBadges}>{firstClear ? <Text style={styles.firstClear}>FIRST CLEAR</Text> : null}{newBest ? <Text style={styles.newBest}>NEW BEST</Text> : null}</View></View></View><ThemeHeader dungeon={dungeon} record={record}/>
       <Text style={run.status === "victory" ? styles.victory : styles.warning}>{run.status === "victory" ? `${dungeon.name} has yielded—for this run.` : "The surviving party returns with what it managed to bank."}</Text>
       <DungeonPartyHud guild={guild} run={run}/>
       <View style={styles.rewardGrid}>

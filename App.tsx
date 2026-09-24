@@ -1,7 +1,7 @@
 import type { QuestTab } from "./src/ui/questList";
 import { TutorialGuideScreen } from "./src/screens/Tutorial/TutorialGuideScreen";
 import React, { useEffect, useRef, useState } from "react";
-import { StatusBar, StyleSheet, Text, View } from "react-native";
+import { BackHandler, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { ManagementShell } from "./src/components/navigation/ManagementShell"; import { colors } from "./src/components/ui"; import { CAMPAIGN_NODES } from "./src/data/campaign/chapter1"; import { QUESTS } from "./src/data/quests/quests";
 import { resolveCampaignChoice } from "./src/game/campaign/campaignChoiceResolver"; import { campaignNodeRequiresPostBattleChoice, completeCampaignNode, getAvailableCampaignNodes } from "./src/game/campaign/campaignService";
@@ -184,6 +184,75 @@ function Game() {
     promptedDayRef.current = promptKey;
     presentPendingDayMilestoneAd(guild, updateGuild, showDialog, () => currentGuildRef.current);
   }, [guild, gameStarted, isHydrated, route.name, isDialogOpen, updateGuild, showDialog]);
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (!isHydrated) return true;
+      if (!gameStarted) {
+        if (showNewGameSetup) { setShowNewGameSetup(false); return true; }
+        return false;
+      }
+      if (guild.tutorial.active && guild.tutorial.step === "welcome") return true;
+      if (route.name === "combat" || route.name === "dungeonCombat") return true;
+      if (route.name === "questResult") return true;
+
+      switch (route.name) {
+        case "main":
+          if (route.tab !== "Guild") { main("Guild"); return true; }
+          return false;
+        case "tutorialGuide": setRoute({ name: "settings" }); return true;
+        case "settings":
+        case "achievements":
+        case "contentUnlock":
+        case "monsterManual":
+        case "heroCodex":
+        case "skillCodex":
+        case "loreJournal": setRoute({ name: "management" }); return true;
+        case "management":
+        case "training":
+        case "gemsSupport":
+        case "temple":
+        case "recruitment":
+        case "guildmasterSkills":
+        case "finances": main("Guild"); return true;
+        case "candidate": setRoute({ name: "recruitment" }); return true;
+        case "alchemy":
+        case "crafting":
+        case "gathering":
+        case "item": main("Inventory"); return true;
+        case "operations":
+        case "raids":
+        case "legacy":
+        case "dungeon":
+        case "campaign": main("Quests"); return true;
+        case "regionMap": main("World"); return true;
+        case "hero": main("Heroes"); return true;
+        case "heroEquipmentPicker": {
+          const hero = guild.heroes.find((entry) => entry.id === route.heroId);
+          if (hero) setRoute({ name: "hero", hero }); else main("Heroes");
+          return true;
+        }
+        case "skills":
+        case "subclass": setRoute({ name: "hero", hero: route.hero }); return true;
+        case "questDetail": main("Quests"); return true;
+        case "questBriefing":
+          route.back === "campaign" ? setRoute({ name: "campaign" }) : setRoute({ name: "questDetail", questId: route.questId });
+          return true;
+        case "party":
+          route.back === "campaign" ? setRoute({ name: "campaign" }) : setRoute({ name: "questDetail", questId: route.questId });
+          return true;
+        case "decision":
+        case "exploration":
+          setRoute({ name: "party", questId: route.questId, campaignNodeId: route.campaignNodeId, back: route.campaignNodeId ? "campaign" : "quest" });
+          return true;
+        case "event":
+          route.back === "campaign" ? setRoute({ name: "campaign" }) : route.back === "quest" && route.questId ? setRoute({ name: "questDetail", questId: route.questId }) : main("World");
+          return true;
+        default:
+          return true;
+      }
+    });
+    return () => subscription.remove();
+  }, [gameStarted, guild.heroes, guild.tutorial.active, guild.tutorial.step, isHydrated, route, showNewGameSetup]);
   useEffect(() => { if (!gameStarted) setRoute({name: "main", tab: "Guild"}); }, [gameStarted]);
   if (!isHydrated) return <View style={styles.loading}><Text style={styles.loadingTitle}>GUILDMASTER</Text><Text style={styles.loadingText}>Loading guild save…</Text></View>;
   if (!gameStarted) return showNewGameSetup

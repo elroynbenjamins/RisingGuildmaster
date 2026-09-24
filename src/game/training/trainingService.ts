@@ -48,7 +48,8 @@ export function calculateTrainingQuote(hero: Hero, programId: TrainingProgramId,
   const program = TRAINING_PROGRAMS[programId]; const modifiers = collectHeroModifiers(hero); const context = { currentHP: hero.currentHP, maxHP: hero.currentHP };
   const costMultiplier = Math.max(.25, applyModifiers(1, "trainingCost", modifiers, context));
   const xpMultiplier = Math.max(.1, applyModifiers(1, "trainingXp", modifiers, context));
-  // Keep the former mid-range training pace while all heroes now share the same base progression rate.\n  const rawXp = Math.max(1, Math.round(program.baseXp * 1.25 * xpMultiplier));
+  // Keep the former mid-range training pace while all heroes now share the same base progression rate.
+  const rawXp = Math.max(1, Math.round(program.baseXp * 1.25 * xpMultiplier));
   const limit = guild ? getTrainingProgressionLimit(guild, hero) : undefined;
   return { goldCost: getTrainingGoldCost(programId, costMultiplier), xpReward: limit ? Math.min(rawXp, maxXpBeforeLevelCap(hero, limit.levelCap)) : rawXp, levelCap: limit?.levelCap, developmentSessionsUsed: hero.focusedTrainingSessions ?? 0 };
 }

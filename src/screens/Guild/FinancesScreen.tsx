@@ -74,6 +74,7 @@ export function FinancesScreen({ onBack }: { onBack(): void }) {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [lastAdvance, setLastAdvance] = useState<GuildDayResolution[]>([]);
   const [tab,setTab]=useState<"Calendar"|"Treasury"|"Contracts">("Calendar");
+  const [expandedContractHeroId,setExpandedContractHeroId]=useState<string>();
   const selectedDay = planner[Math.min(selectedDayIndex, Math.max(0, planner.length - 1))];
   const selectedPresentation = selectedDay ? getGuildPlannerDayPresentation(selectedDay) : null;
   const arrears = totalSalaryArrears(guild);
@@ -237,7 +238,7 @@ export function FinancesScreen({ onBack }: { onBack(): void }) {
             {owed > 0 && <Text style={styles.danger}>{owed} owed</Text>}
           </View>
         </View>
-        {hero && contract.status !== "active" ? <View style={{gap: 8}}><Text style={styles.contractMeta}>Departure after Day {contractDepartureDay(contract)} if not renewed.</Text>{([4,8,12] as RenewalLengthWeeks[]).map(weeks => <SecondaryButton key={weeks} label={`${weeks} WEEKS · ${getRenewalSalaryForGuild(guild, contract, hero.level, weeks)} GOLD/WEEK`} disabled={owed > 0} onPress={() => renew(hero.id, weeks)} />)}<SecondaryButton label={contract.renewalIntent === "depart" ? "Cancel Departure" : "Let Contract Expire"} onPress={() => updateGuild(contract.renewalIntent === "depart" ? cancelContractDeparture(guild, hero.id) : markContractForDeparture(guild, hero.id))} /></View> : null}
+        {hero && contract.status !== "active" ? <View style={styles.renewalBlock}><Pressable accessibilityRole="button" accessibilityLabel={`Contract options for ${hero.name}`} accessibilityState={{expanded:expandedContractHeroId===hero.id}} aria-expanded={expandedContractHeroId===hero.id} onPress={()=>setExpandedContractHeroId(expandedContractHeroId===hero.id?undefined:hero.id)} style={styles.renewalDisclosure}><View style={styles.flex}><Text style={styles.renewalLabel}>CONTRACT DECISION</Text><Text style={styles.contractMeta}>Departure after Day {contractDepartureDay(contract)} if not renewed.</Text></View><Text style={styles.renewalMark}>{expandedContractHeroId===hero.id?"−":"+"}</Text></Pressable>{expandedContractHeroId===hero.id&&<><View style={styles.renewalGrid}>{([4,8,12] as RenewalLengthWeeks[]).map(weeks => <View key={weeks} style={styles.renewalCell}><SecondaryButton label={`${weeks} WEEKS · ${getRenewalSalaryForGuild(guild, contract, hero.level, weeks)}G/WK`} disabled={owed > 0} onPress={() => renew(hero.id, weeks)} /></View>)}</View><SecondaryButton label={contract.renewalIntent === "depart" ? "Cancel Departure" : "Let Contract Expire"} onPress={() => updateGuild(contract.renewalIntent === "depart" ? cancelContractDeparture(guild, hero.id) : markContractForDeparture(guild, hero.id))} /></>}</View> : null}
       </Panel>;
     }) : <EmptyState title="No hero contracts" message="Recruit a hero to create the guild's first salary obligation." />}
 
@@ -258,7 +259,7 @@ const styles = StyleSheet.create({  hall:{gap:8},hallHead:{alignItems:"center",f
   currentDaySmall: { color: colors.muted, fontSize: 7, fontWeight: "900", letterSpacing: .8 },
   currentDayValue: { color: colors.gold, fontSize: 12, fontWeight: "900", marginTop: 2 },
   summary: { flexDirection: "row", gap: 7 },
-  summaryCard: { alignItems: "flex-start", flex: 1, minHeight: 125, padding: 9 },
+  summaryCard: { alignItems: "flex-start", flex: 1, minHeight: 96, padding: 9 },
   dangerCard: { borderColor: colors.danger },
   summaryLabel: { color: colors.muted, fontSize: 8, fontWeight: "900", marginTop: 7 },
   gold: { color: colors.gold, fontSize: 19, fontWeight: "900", marginTop: 3 },
@@ -316,6 +317,7 @@ const styles = StyleSheet.create({  hall:{gap:8},hallHead:{alignItems:"center",f
   routineResolution: { color: colors.muted, fontSize: 11, lineHeight: 16 },
   event: { color: colors.text, lineHeight: 19 },
   contract: { gap: 9, marginBottom: 8 },
+  renewalBlock:{gap:8},renewalDisclosure:{alignItems:"center",backgroundColor:colors.panel2,borderRadius:10,flexDirection:"row",gap:8,minHeight:46,paddingHorizontal:10,paddingVertical:7},renewalLabel:{color:colors.gold,fontSize:8,fontWeight:"900",letterSpacing:.8},renewalMark:{color:colors.gold,fontSize:20,fontWeight:"900"},renewalGrid:{flexDirection:"row",flexWrap:"wrap",gap:7},renewalCell:{flexBasis:"47%",flexGrow:1,minWidth:130},
   contractHeader: { alignItems: "center", flexDirection: "row", gap: 9 },
   flex: { flex: 1 },
   heroName: { color: colors.text, fontSize: 16, fontWeight: "900" },

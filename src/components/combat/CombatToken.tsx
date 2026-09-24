@@ -14,7 +14,7 @@ export function CombatToken({ label, side, enemyDefinitionId, hero, selected = f
   const healthState = getCombatHealthState(currentHP, maxHP);
   const healthRatio = Math.max(0, Math.min(1, currentHP / Math.max(1, maxHP)));
   const healthColor = healthState === "critical" ? colors.danger : healthState === "wounded" ? colors.gold : colors.green;
-  return <View accessibilityLabel={`${side === "heroes" ? "Hero" : "Enemy"} ${label}, ${Math.round(currentHP)} of ${Math.round(maxHP)} health${healthState === "critical" ? ", critical health" : ""}${equippedCount ? `, ${equippedCount} equipped items` : ""}`} style={[styles.token, { width: size, height: size }, side === "heroes" ? styles.hero : styles.enemy, selected && { borderColor: colors.gold, borderWidth: 3 }, attackable && styles.attackable, healthState === "critical" && styles.critical]}>
+  return <View accessibilityLabel={`${side === "heroes" ? "Hero" : "Enemy"} ${label}, ${Math.round(currentHP)} of ${Math.round(maxHP)} health${healthState === "critical" ? ", critical health" : ""}${equippedCount ? `, ${equippedCount} equipped items` : ""}`} style={[styles.token, { width: size, height: size }, side === "heroes" ? styles.hero : styles.enemy, selected && { borderColor: colors.gold, borderWidth: 3 }, attackable && styles.attackable, attackable && side==="enemies" && styles.attackableEnemy, healthState === "critical" && styles.critical]}>
     {side === "enemies" && enemyDefinitionId ? <EnemyPortrait enemyId={enemyDefinitionId} size={size - 4} /> : hero ? <HeroPortrait raceId={hero.raceId} classId={hero.classId} gender={hero.gender} variant={hero.portraitVariant ?? 0} label={hero.name} size={size - 4} /> : <Text style={[styles.label, { color: colors.text, fontSize: Math.max(8, Math.floor(size * .44)) }]}>{shortLabel}</Text>}
     <View pointerEvents="none" style={[styles.hpTrack, { width: size + 2 }]}><View style={[styles.hpFill, { backgroundColor: healthColor, width: `${healthRatio * 100}%` }]} /></View>
     {healthState === "critical" ? <View pointerEvents="none" style={[styles.dangerFlag, { backgroundColor: colors.danger }]}><Text style={styles.dangerText}>!</Text></View> : null}
@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
   hero: { backgroundColor: "#315b89", borderColor: "#86bdf4" },
   enemy: { backgroundColor: "#7d3030", borderColor: "#f08a83" },
   attackable: { borderStyle: "dashed", borderColor: "#fff" },
+  attackableEnemy:{backgroundColor:"#6f2929",borderColor:"#ff5b52",borderWidth:3},
   critical: { backgroundColor: "#51262a" },
   label: { fontWeight: "900" },
   hpTrack: { backgroundColor: "#0a0d10", borderColor: "rgba(255,255,255,.28)", borderWidth: 1, bottom: -5, height: 4, left: -3, overflow: "hidden", position: "absolute" },

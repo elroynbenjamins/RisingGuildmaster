@@ -46,11 +46,11 @@ export function applyAccountGemWallet(guild: GuildState, wallet: AccountGemWalle
 function normalizeWallet(value: unknown): AccountGemWallet | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const raw = value as Partial<AccountGemWallet>;
-  if (!Number.isFinite(raw.gems) || (raw.gems ?? -1) < 0) return null;
+  if (typeof raw.gems !== "number" || !Number.isFinite(raw.gems) || raw.gems < 0) return null;
   const dailyLogin = raw.dailyLogin && typeof raw.dailyLogin === "object"
     ? {
       lastClaimDate: typeof raw.dailyLogin.lastClaimDate === "string" ? raw.dailyLogin.lastClaimDate : null,
-      totalClaims: Number.isFinite(raw.dailyLogin.totalClaims) ? Math.max(0, Math.floor(raw.dailyLogin.totalClaims)) : 0,
+      totalClaims: typeof raw.dailyLogin.totalClaims === "number" && Number.isFinite(raw.dailyLogin.totalClaims) ? Math.max(0, Math.floor(raw.dailyLogin.totalClaims)) : 0,
     }
     : createDailyLoginState();
   return {

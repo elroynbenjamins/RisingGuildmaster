@@ -84,6 +84,9 @@ const gearStyles = StyleSheet.create({
   paperColumn: { gap: 9 },
   loadoutToggle: {alignItems: "center", backgroundColor: colors.panel, borderColor: colors.border, flexDirection: "row", justifyContent: "space-between", marginBottom: 9, padding: 11, borderWidth: 0, borderRadius: 10},
   loadoutToggleText: { color: colors.gold, fontSize: 10, fontWeight: "900" },
+  detailsToggle: {alignItems:"center",backgroundColor:colors.panel,borderRadius:10,flexDirection:"row",justifyContent:"space-between",marginBottom:9,minHeight:48,paddingHorizontal:11,paddingVertical:7},
+  detailsToggleLabel:{color:colors.gold,fontSize:9,fontWeight:"900",letterSpacing:.8},
+  detailsToggleHint:{color:colors.muted,fontSize:9,marginTop:2},
 });
 
 function GearSlot({ hero, slot, compact = false }: { hero: Hero; slot: keyof Hero["equipment"]; compact?: boolean }) {
@@ -112,6 +115,7 @@ function ConnectedHeroGearList({ hero, candidate }: { hero: Hero; candidate: boo
   const { guild, updateGuild } = useGuild();
   const [message, setMessage] = useState<string>();
   const [showLoadouts, setShowLoadouts] = useState(false);
+  const [showGearDetails, setShowGearDetails] = useState(false);
   const liveHero = guild.heroes.find((entry) => entry.id === hero.id) ?? hero;
   const owned = !candidate && guild.heroes.some((entry) => entry.id === hero.id);
   const remove = (slot: keyof Hero["equipment"]) => {
@@ -147,7 +151,10 @@ function ConnectedHeroGearList({ hero, candidate }: { hero: Hero; candidate: boo
         {message ? <Text style={styles.loadoutMessage}>{message}</Text> : null}
       </Panel>}
     </>}
-    <HeroGearList hero={liveHero} onUnequip={owned ? remove : undefined} />
+    <Pressable accessibilityRole="button" accessibilityState={{ expanded: showGearDetails }} aria-expanded={showGearDetails} onPress={() => setShowGearDetails((value) => !value)} style={gearStyles.detailsToggle}>
+      <View><Text style={gearStyles.detailsToggleLabel}>GEAR DETAILS</Text><Text style={gearStyles.detailsToggleHint}>{showGearDetails ? "Hide item stats and unequip controls." : "Inspect stats, effects, durability, and unequip controls."}</Text></View><Text style={gearStyles.loadoutToggleText}>{showGearDetails ? "−" : "+"}</Text>
+    </Pressable>
+    {showGearDetails && <HeroGearList hero={liveHero} onUnequip={owned ? remove : undefined} />}
   </>;
 }
 
@@ -362,7 +369,7 @@ export function HeroDetailScreen({
     {tab === "Gear" && <>
       <View style={styles.tabIntro}><Text style={[styles.tabTitle, { color: c.text }]}>EQUIPMENT & LOADOUTS</Text><Text style={[styles.tabDescription, { color: c.muted }]}>Inspect the hero's equipped kit, swap saved loadouts, or unequip items back to guild storage.</Text></View>
       <ConnectedHeroGearList hero={liveHero} candidate={candidate} />
-      {!candidate && openEquipmentSlot && <View style={{gap: 8}}>{(Object.keys(liveHero.equipment) as (keyof Hero["equipment"])[]).map(slot => <SecondaryButton key={slot} label={`Choose ${slot}`} onPress={() => openEquipmentSlot(slot)} />)}</View>}
+      {!candidate && openEquipmentSlot && <View style={styles.gearPickerGrid}>{(Object.keys(liveHero.equipment) as (keyof Hero["equipment"])[]).map(slot => <View key={slot} style={styles.gearPickerCell}><SecondaryButton label={`Choose ${slot.replace(/([0-9])/g," $1")}`} onPress={() => openEquipmentSlot(slot)} /></View>)}</View>}
     </>}
 
     {tab === "Skills" && <>
@@ -459,6 +466,8 @@ const styles = StyleSheet.create({
   inlineActionText: { fontSize: 8, fontWeight: "900", letterSpacing: .6 },
   compactGearRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 10 },
   compactGearSlot: { flexBasis: "30%", flexGrow: 1, minWidth: 56, width: undefined },
+  gearPickerGrid:{flexDirection:"row",flexWrap:"wrap",gap:7,marginTop:4},
+  gearPickerCell:{flexBasis:"47%",flexGrow:1,minWidth:130},
   doubleAction: { flexDirection: "row", gap: 7, marginTop: 10 },
   flex: { flex: 1 },
   levelCap: { marginTop: 9 },

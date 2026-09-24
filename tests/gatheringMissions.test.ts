@@ -13,6 +13,16 @@ describe("persistent two-hero gathering missions", () => {
     expect(()=>startGatheringMission(guild,"guildhaven_salvage",["g1","g2"],sequenceRandom([0,0]))).toThrow("unlock at 6 owned heroes");
   });
 
+  it("still allows a legacy pre-gate mission to be claimed below six heroes", () => {
+    const guild=createGuild();
+    guild.heroes=heroes().slice(0,2).map((hero)=>({...hero,isAvailable:false}));
+    guild.currentDay=3;
+    guild.gatheringMissions=[{id:"legacy-gather",definitionId:"greenveil_foraging",heroIds:["g1","g2"],startDay:1,completionDay:3,resolutionSeed:44,status:"active"}];
+    const claimed=claimGatheringMission(guild,"legacy-gather");
+    expect(claimed.guild.gatheringMissions[0]?.status).toBe("claimed");
+    expect(claimed.guild.heroes.every((hero)=>hero.isAvailable)).toBe(true);
+  });
+
   it("requires exactly two distinct available heroes and locks them for multiple days", () => {
     const guild = createGuild(); guild.heroes = heroes();
     expect(() => startGatheringMission(guild, "greenveil_foraging", ["g1"], sequenceRandom([0, 0]))).toThrow("exactly two");

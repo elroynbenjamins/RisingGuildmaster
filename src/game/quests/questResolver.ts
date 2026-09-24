@@ -116,7 +116,7 @@ export function getQuestXpForHero(hero: Hero, quest: ReturnType<typeof getQuestD
   // Completion XP rewards objectives, checks, rescues, and other authored work that
   // is not represented by the number of enemies killed.
   const developmentBase = sharedEnemyXp + Math.max(0, quest.xpRewardPerHero);
-  // Preserve the former midpoint progression pace now that hero Potential no longer exists.
+  // Preserve the former midpoint progression pace after retiring the hidden hero progression stat.
   const heroXp = Math.round(developmentBase * 1.25);
   if (!quest.repeatable || quest.recommendedLevelMax === undefined || hero.level <= quest.recommendedLevelMax) return heroXp;
   const levelsAbove = hero.level - quest.recommendedLevelMax;

@@ -208,7 +208,9 @@ export async function loadGuildSaveSlotsDetailed(): Promise<SaveSlotsLoadResult>
       return { guild: null, issue: saveSlotIssue(slotId, error) };
     }
   };
-  // Load sequentially so a legacy per-save wallet migrates deterministically before the second slot is read.\n  const slot1 = await loadOne(1);\n  const slot2 = await loadOne(2);
+  // Load sequentially so a legacy per-save wallet migrates deterministically before the second slot is read.
+  const slot1 = await loadOne(1);
+  const slot2 = await loadOne(2);
   return {
     guilds: { 1: slot1.guild, 2: slot2.guild },
     issues: { 1: slot1.issue, 2: slot2.issue },

@@ -10,7 +10,7 @@ import { getAvailableClassSkillPoints } from "./src/game/progression/skills/skil
 import { releaseBankedCampaignXp } from "./src/game/progression/levelSystem";
 import { CampaignScreen } from "./src/screens/Campaign/CampaignScreen"; import { CombatScreen } from "./src/screens/CombatScreen"; import { GuildManagementScreen } from "./src/screens/Guild/GuildManagementScreen"; import { GuildScreen } from "./src/screens/Guild/GuildScreen"; import { HeroDetailScreen } from "./src/screens/HeroDetailScreen"; import { HeroesScreen } from "./src/screens/Heroes/HeroesScreen"; import { HeroEquipmentPickerScreen } from "./src/screens/Heroes/HeroEquipmentPickerScreen"; import { InventoryScreen } from "./src/screens/Inventory/InventoryScreen"; import { ItemDetailScreen } from "./src/screens/Inventory/ItemDetailScreen"; import { PartySelectionScreen } from "./src/screens/PartySelectionScreen"; import { QuestDetailScreen } from "./src/screens/QuestDetailScreen"; import { QuestSelectionScreen } from "./src/screens/QuestSelectionScreen"; import { CandidateDetailScreen } from "./src/screens/Recruitment/CandidateDetailScreen"; import { RecruitmentScreen } from "./src/screens/RecruitmentScreen"; import { SkillTreeScreen } from "./src/screens/SkillTree/SkillTreeScreen"; import { StoryEventScreen } from "./src/screens/StoryEvent/StoryEventScreen"; import { SubclassSelectionScreen } from "./src/screens/SubclassSelection/SubclassSelectionScreen"; import { WorldMapScreen } from "./src/screens/WorldMap/WorldMapScreen";
 import { GuildProvider, useGuild } from "./src/state/GuildContext"; import type { MainTab } from "./src/ui/navigation"; import { createSeededRandom, randomSeed } from "./src/utils/random";
-import { QuestResultScreen, type QuestResultSummary } from "./src/screens/QuestResult/QuestResultScreen"; import { buildQuestHeroOutcomes, buildQuestRewardAccounting } from "./src/game/quests/questResultAccountingService";
+import { QuestResultScreen, type QuestResultSummary } from "./src/screens/QuestResult/QuestResultScreen"; import { buildQuestHeroOutcomes, buildQuestRewardAccounting, reconcileQuestHeroOutcomeAfterProgression } from "./src/game/quests/questResultAccountingService";
 import { GemsSupportScreen } from "./src/screens/GemsSupport/GemsSupportScreen";
 import { TempleScreen } from "./src/screens/Temple/TempleScreen";
 import { MonsterManualScreen } from "./src/screens/MonsterManual/MonsterManualScreen";
@@ -246,9 +246,7 @@ function Game() {
       const releasedHeroes = releaseBankedCampaignXp(guild.heroes, campaign.worldState);
       const heroOutcomes = route.summary.heroOutcomes.map((outcome) => {
         const after = releasedHeroes.find((hero) => hero.id === outcome.heroId);
-        if (!after) return outcome;
-        const availableSkillPointsAfter = getAvailableClassSkillPoints(after);
-        return { ...outcome, levelAfter: after.level, xpAfter: after.xp, availableSkillPoints: availableSkillPointsAfter, availableSkillPointsAfter };
+        return after ? reconcileQuestHeroOutcomeAfterProgression(outcome, after) : outcome;
       });
       const campaignChapterCompleted = campaign.worldState.campaignChapter > guild.world.campaignChapter ? guild.world.campaignChapter : route.summary.campaignChapterCompleted;
       updateGuild({ ...guild, heroes: releasedHeroes, world: campaign.worldState, gold: guild.gold + campaign.goldReward, reputation: guild.reputation + campaign.guildReputationReward, questChronicle: guild.questChronicle.map((entry) => entry.id === chronicle.id ? chronicle : entry), pendingQuestResult: null });

@@ -11,7 +11,6 @@ import { migrateHeroHistory } from "../heroes/heroHistoryService";
 import { createHeroLoyaltyState } from "../heroes/heroLoyaltyService";
 import { createContentEntitlements, createDailyLoginState } from "../monetization/contentUnlockService";
 import { migrateGuildOperationState } from "../operations/guildOperationService";
-import { clampPotential } from "../progression/potential";
 import { getContractStatus } from "../recruitment/contractService";
 import { createRecruitmentState } from "../recruitment/recruitmentService";
 import { attributeEstimates, financialEstimate } from "../recruitment/scoutingService";
@@ -45,6 +44,15 @@ function parseGuildShape(value: unknown): PersistedGuildShape {
   if (value.guildName !== undefined && typeof value.guildName !== "string") throw new Error("Save has an invalid guild name.");
   if (value.currentDay !== undefined && (typeof value.currentDay !== "number" || !Number.isFinite(value.currentDay))) throw new Error("Save has an invalid current day.");
   return value as PersistedGuildShape;
+}
+
+function stripLegacyPotential<T extends object>(value: T): T {
+  const cleaned = { ...value } as T & Record<string, unknown>;
+  delete cleaned.potential;
+  delete cleaned.potentialEstimateMin;
+  delete cleaned.potentialEstimateMax;
+  delete cleaned.truePotential;
+  return cleaned as T;
 }
 
 function migrateGender(gender: string | undefined): "female" | "male" {

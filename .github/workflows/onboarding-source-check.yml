@@ -1,0 +1,18 @@
+name: Onboarding source review
+on:
+  push:
+    branches: [codex/interactive-onboarding-20260924]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package tracked source only
+        run: git archive --format=tar HEAD App.tsx src tests scripts docs package.json pnpm-lock.yaml tsconfig.json .github > review-source.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: onboarding-review-source
+          path: review-source.tar
+          retention-days: 1

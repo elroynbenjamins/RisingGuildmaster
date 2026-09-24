@@ -234,8 +234,9 @@ function Game() {
   if (route.name === "item") return <ItemDetailScreen itemId={route.itemId} onBack={() => main("Inventory")} />;
   if (route.name === "questResult") {
     const node = route.summary.campaignNodeId ? CAMPAIGN_NODES[route.summary.campaignNodeId] : undefined; const choiceIds = node?.choiceIds ?? [];
-    const choose = (choiceId: string) => {
-      if (!route.summary.campaignNodeId) return;
+    const choose = (choiceId: string): boolean => {
+      if (!route.summary.campaignNodeId) return false;
+      try {
       const world = resolveCampaignChoice(guild.world, choiceId);
       const campaign = completeCampaignNode(world, route.summary.campaignNodeId);
       const consequence = { id: `choice-${choiceId}`, text: CAMPAIGN_CHOICE_OUTCOMES[choiceId] ?? "The guild's decision is recorded.", tone: "neutral" as const };
@@ -251,6 +252,11 @@ function Game() {
       const campaignChapterCompleted = campaign.worldState.campaignChapter > guild.world.campaignChapter ? guild.world.campaignChapter : route.summary.campaignChapterCompleted;
       updateGuild({ ...guild, heroes: releasedHeroes, world: campaign.worldState, gold: guild.gold + campaign.goldReward, reputation: guild.reputation + campaign.guildReputationReward, questChronicle: guild.questChronicle.map((entry) => entry.id === chronicle.id ? chronicle : entry), pendingQuestResult: null });
       setRoute({ name: "questResult", summary: { ...route.summary, selectedChoiceId: choiceId, chronicle, heroOutcomes, goldEarned: route.summary.goldEarned + campaign.goldReward, reputationEarned: (route.summary.reputationEarned ?? 0) + campaign.guildReputationReward, ...(campaignChapterCompleted ? { campaignChapterCompleted } : {}) } });
+      return true;
+      } catch (error) {
+        showDialog({title:"Decision Could Not Be Recorded",message:error instanceof Error?error.message:"The campaign decision could not be applied.",tone:"danger"});
+        return false;
+      }
     };
     return <QuestResultScreen openLoot={() => main("Inventory")} openGuildmasterSkills={() => setRoute({name: "guildmasterSkills"})} openCalendar={() => setRoute({name: "finances"})} summary={route.summary} choiceIds={choiceIds} onChoice={choose} openHeroSkills={(heroId)=>{const hero=guild.heroes.find((entry)=>entry.id===heroId);if(hero)setRoute({name:"skills",hero});}} openTemple={()=>setRoute({name:"temple"})} onContinue={() => route.summary.campaignNodeId ? setRoute({name:"campaign"}) : main("Guild")} />;
   }

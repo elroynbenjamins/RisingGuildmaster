@@ -49,7 +49,6 @@ async function runExclusiveAd<T>(show: () => Promise<T>): Promise<T> {
 
 export async function initializeAdMobPrivacy(): Promise<void> {
   if (Platform.OS !== "android") return;
-  if ((await loadAccountContentEntitlements()).adsRemoved) return;
   await initialize(loadNativeAdsModule());
 }
 
@@ -61,7 +60,6 @@ export async function showAdMobPrivacyOptions(): Promise<void> {
 
 export async function showAdMobRewardedAd(): Promise<VerifiedGemCredit> {
   return runExclusiveAd(async () => {
-    if ((await loadAccountContentEntitlements()).adsRemoved) throw new Error("Ads are permanently removed for this account.");
     const module = loadNativeAdsModule();
     await initialize(module);
     const rewarded = module.RewardedAd.createForAdRequest(getAndroidRewardedAdUnitId(DEVELOPMENT_BUILD), {

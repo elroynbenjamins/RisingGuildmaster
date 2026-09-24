@@ -36,6 +36,16 @@ export function getHeroSkillAvailability(hero: Hero, instance: HeroCombatInstanc
   return { skill, enabled: reasons.length === 0, reasons };
 }
 
+export function getAutoBasicAttackTargets(hero: Hero, instance: HeroCombatInstance, actor: CombatUnit, heroes: readonly CombatUnit[], enemies: readonly CombatUnit[], board: CombatBoardState): { skill: CombatSkillDefinition; targets: CombatUnit[] } | null {
+  const skill = getHeroSkillIds(hero).map((id) => HERO_SKILLS[id]).find((entry): entry is CombatSkillDefinition => Boolean(entry && entry.type === "basic_attack"));
+  if (!skill) return null;
+  const availability = getHeroSkillAvailability(hero, instance, actor, skill.id, heroes, enemies, board);
+  if (!availability.enabled) return null;
+  const validTargets = getValidTargets(skill.targetType ?? "single_enemy", actor, heroes, enemies);
+  const targets = getTargetsInSkillRange(skill, actor, validTargets, board, getHeroSkillRange(hero, skill));
+  return targets.length ? { skill, targets } : null;
+}
+
 export function resolveHeroAction(hero: Hero, instance: HeroCombatInstance, actor: CombatUnit, targets: readonly CombatUnit[], skillId: string, random: RandomSource, relationship?: { attackRollModifier: number; physicalDamageModifier: number; terrainAttackRollModifier?: number; healingReceivedModifier(target: CombatUnit): number }): { instance: HeroCombatInstance; actor: CombatUnit; targets: CombatUnit[]; skillResult: ResolveSkillResult } {
   const skill = HERO_SKILLS[skillId]; if (!skill || !getHeroSkillIds(hero).includes(skillId)) throw new Error("Invalid hero skill");
   if (blocksMagicSkills(actor) && skill.resourceType === "mana") throw new Error("Silenced heroes cannot use mana-based skills");

@@ -82,7 +82,7 @@ export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void
       <SegmentedTabs values={FILTERS} value={filter} onChange={setFilter} />
       {showSort && <SegmentedTabs values={SORTS} value={sort} onChange={value => { setSort(value); setShowSort(false); }} />}
     </Panel>
-    <Text style={[styles.cardHeader, { color: themeColors.muted }]}>{heroes.length} {heroes.length === 1 ? "hero" : "heroes"} shown · Tap to inspect</Text>
+    <Text style={[styles.cardHeader, { color: attentionCount ? themeColors.gold : themeColors.muted }]}>{attentionCount ? `${attentionCount} hero${attentionCount===1?"":"es"} need attention · ` : ""}{heroes.length} shown · Tap a hero to manage</Text>
 
     {heroes.map((hero) => {
       const skillPoints = getAvailableClassSkillPoints(hero);

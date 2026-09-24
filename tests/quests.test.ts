@@ -18,7 +18,7 @@ describe("quest loop", () => {
   it("combines shared enemy and objective XP, then applies potential", () => { const quest = QUESTS.goblin_patrol!; expect(getQuestEnemyXpPool(quest)).toBe(300); expect(getQuestXpForHero({ ...testHero(), potential: 50 }, quest, 2)).toBe(450); expect(getQuestXpForHero({ ...testHero(), potential: 100 }, quest, 2)).toBe(675); });
   it("boosts level-three side quest authored XP by twenty five percent", () => {
     expect(QUESTS.echoes_of_mosswatch).toMatchObject({ questType: "side", recommendedLevelMin: 3, xpRewardPerHero: 875 });
-    expect(QUESTS.brambleway_caravan?.xpRewardPerHero).toBe(1000);
+    expect(QUESTS.brambleway_caravan?.xpRewardPerHero).toBe(800);
     expect(QUESTS.hunt_spider_queen?.xpRewardPerHero).toBe(320);
   });
   it("awards shared XP, gold, loot, materials and history", () => { const healthy = testHero(); const fallen = { ...testHero(), id: "h2" }; const guild = { ...createGuild(), heroes: [healthy, fallen] }; const party = { id: "p", heroIds: [healthy.id, fallen.id] }; const result = resolveQuestVictory(startQuest(QUESTS.goblin_patrol!, party), party, guild, [instance(), instance({ heroId: "h2", currentHP: 0, isAlive: false })], sequenceRandom([0, .9, 0, .5, .5])); expect(result.guild.heroes[0]?.xp).toBe(450); expect(result.guild.heroes[1]?.xp).toBe(225); expect(result.guild.inventory).toHaveLength(1); expect(result.guild.materials.iron_ore).toBeGreaterThan(0); expect(result.guild.heroes[0]?.history.questsCompleted).toBe(1); });

@@ -21,10 +21,11 @@ import { getDifficulty } from "../../data/difficulty/difficulties";
 import { createGuild } from "../guild/guildService";
 import { advanceGuildTime, totalSalaryArrears } from "../economy/guildCalendarService";
 import { createHeroContract } from "../recruitment/contractService";
+import { calculateWeeklySalary } from "../recruitment/recruitmentCostCalculator";
 
 export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number }
 export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; averageRounds: number; averageSurvivingHeroes: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
-export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; weeklySalaryPerHero: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
+export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
 export interface EconomySimulationResult { scenarioId: string; startingGold: number; endingGold: number; netGold: number; questIncome: number; tavernIncome: number; salaryPaid: number; fieldExpenses: number; arrears: number; breakEvenQuestsPerWeek: number; goldAfterFacilityReserve: number }
 
 function levelHero(hero: Hero, level: number, index: number): Hero {
@@ -104,8 +105,9 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
 
 export function simulateEconomyScenario(scenario: EconomySimulationScenario): EconomySimulationResult {
   const random = createSeededRandom(scenario.seed); let guild = createGuild("Simulation", scenario.difficultyId);
-  guild.heroes = createSimulationParty(Array.from({ length: scenario.heroCount }, (_, index) => (["warrior", "ranger", "mage", "cleric"] as ClassId[])[index % 4]!), 1, scenario.seed);
-  guild.heroContracts = guild.heroes.map((hero) => createHeroContract(hero, scenario.weeklySalaryPerHero, 52, guild.currentDay));
+  guild.heroes = createSimulationParty(Array.from({ length: scenario.heroCount }, (_, index) => (["warrior", "ranger", "mage", "cleric"] as ClassId[])[index % 4]!), scenario.heroLevel ?? 1, scenario.seed);
+  const weeklySalaries = guild.heroes.map((hero) => scenario.weeklySalaryPerHero ?? calculateWeeklySalary(hero));
+  guild.heroContracts = guild.heroes.map((hero, index) => createHeroContract(hero, weeklySalaries[index]!, 52, guild.currentDay));
   const startingGold = guild.gold; let questIncome = 0; let fieldExpenses = 0; let questAccumulator = 0;
   for (let day = 0; day < scenario.days; day++) {
     const beforeTavern = guild.finance.totalTavernIncome; guild = advanceGuildTime(guild, 1).guild;
@@ -118,6 +120,7 @@ export function simulateEconomyScenario(scenario: EconomySimulationScenario): Ec
     void beforeTavern;
   }
   const averageQuestGold = ((QUESTS[scenario.questId]!.goldRewardMin + QUESTS[scenario.questId]!.goldRewardMax) / 2) * getDifficulty(scenario.difficultyId).questGoldMultiplier - (scenario.travelGoldCostPerQuest ?? 0) - (scenario.healingGoldCostPerQuest ?? 0) - (scenario.repairGoldCostPerQuest ?? 0) - (scenario.rationGoldCostPerQuest ?? 0);
-  const weeklyDeficitBeforeQuests = scenario.weeklySalaryPerHero * scenario.heroCount - GAME_CONFIG.dailyTavernIncome * 7 * getDifficulty(scenario.difficultyId).tavernIncomeMultiplier;
+  const weeklyPayroll = weeklySalaries.reduce((sum, salary) => sum + salary, 0);
+  const weeklyDeficitBeforeQuests = weeklyPayroll - GAME_CONFIG.dailyTavernIncome * 7 * getDifficulty(scenario.difficultyId).tavernIncomeMultiplier;
   return { scenarioId: scenario.id, startingGold, endingGold: guild.gold, netGold: guild.gold - startingGold, questIncome, tavernIncome: guild.finance.totalTavernIncome, salaryPaid: guild.finance.totalSalaryPaid, fieldExpenses, arrears: totalSalaryArrears(guild), breakEvenQuestsPerWeek: Math.max(0, weeklyDeficitBeforeQuests / Math.max(1, averageQuestGold)), goldAfterFacilityReserve: guild.gold - (scenario.facilityReserve ?? 0) };
 }

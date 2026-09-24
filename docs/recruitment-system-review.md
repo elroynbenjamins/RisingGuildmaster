@@ -1,11 +1,13 @@
 # Recruitment system review
 
-Recruitment now owns a persistent, save-backed candidate pool rather than regenerating heroes when the screen mounts. Candidate definitions wrap real `Hero` previews and keep hidden true potential separate from scouting estimates.
+Recruitment owns a persistent, save-backed candidate pool rather than regenerating heroes when the screen mounts. Candidate definitions wrap real `Hero` previews and scouting uncertainty is limited to attributes, signing fees, and weekly salary estimates.
 
-All true potential is constrained to 50–100. Generation squares the centralized random roll, biasing results toward the lower bound; high and exceptional potential remain possible but progressively rarer. Existing saves are migrated into the same range.
+Prospect, standard, veteran, and elite archetypes control age, level, trait count, costs, and estimate uncertainty. Candidate levels use the normal hero-generation and class-weighted attribute-growth pipeline rather than a separate hidden progression stat. Guild reputation gradually increases the chance of elite candidates within the configured cap.
 
-Prospect, standard, veteran, and elite archetypes control age, level, trait count, costs, estimate uncertainty, and potential ranges. Candidate levels are produced by applying the existing class-weighted attribute growth pipeline rather than inventing final stats. Guild reputation increases potential and elite probability within explicit caps.
+Candidate quality is a public presentation score derived from the hero's current level, trait mix, and attributes. It is descriptive only and does not change that hero's XP gain.
 
-The recruitment service owns refresh timing and cost, expiration, reservation, scouting payments, rejection, capacity validation, recruitment resolution, history entries, and contract creation. The UI calls these services and never accesses `truePotential`.
+The recruitment service owns refresh timing and cost, expiration, reservation, scouting payments, rejection, capacity validation, recruitment resolution, history entries, and contract creation. The UI works from the same candidate data used when the hero joins the guild.
 
-Financial presentation initially shows ranges for the upfront fee and weekly salary demand. Basic scouting narrows financial uncertainty to ±10%, Advanced to ±5%, and Expert reveals exact terms, in parallel with potential scouting. Contract salary liability and total cost are presented as ranges until those terms become exact. Recruitment affordability intentionally checks only the upfront fee.
+Financial presentation initially shows ranges for the upfront fee and weekly salary demand. Scouting narrows financial and attribute uncertainty until Expert scouting reveals exact figures. Contract salary liability and total cost are presented as ranges until those terms become exact. Recruitment affordability intentionally checks only the upfront fee.
+
+The guided recruitment flow uses pulsing controls rather than a separate board tutorial modal: Inspect a candidate, review the dossier tabs, return to the board, Hire, use the guided free refresh, Hire again, then continue into the Campaign.

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { ActionButton, BackButton, EmptyState, Panel, Portrait, SecondaryButton, SegmentedTabs, StatusChip, colors } from "../../components/ui";
 import { CLASSES } from "../../data/classes/classes";
@@ -35,9 +35,20 @@ export function CandidateDetailScreen({ candidateId, onBack }: { candidateId: st
   const candidate = candidates.find((item) => item.candidateId === candidateId);
   const tutorialInspection = guild.tutorial.active && guild.tutorial.step === "inspect_candidate";
   const overviewVisited = guild.tutorial.inspectedCandidateId === candidateId && guild.tutorial.inspectedCandidateTabs.includes("Overview");
+  const tutorialReadyToReturn = guild.tutorial.active && guild.tutorial.step === "recruit_first" && guild.tutorial.inspectedCandidateId === candidateId;
+  const tutorialPulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     if (candidate && tutorialInspection && !overviewVisited) updateGuild(recordTutorialCandidateTab(guild, candidateId, "Overview"));
   }, [candidate, candidateId, guild, overviewVisited, tutorialInspection, updateGuild]);
+  useEffect(() => {
+    if (!tutorialInspection && !tutorialReadyToReturn) { tutorialPulse.setValue(1); return; }
+    const pulse = Animated.loop(Animated.sequence([
+      Animated.timing(tutorialPulse, { toValue: .42, duration: 650, useNativeDriver: true }),
+      Animated.timing(tutorialPulse, { toValue: 1, duration: 650, useNativeDriver: true }),
+    ]));
+    pulse.start();
+    return () => pulse.stop();
+  }, [tutorialInspection, tutorialReadyToReturn, tutorialPulse]);
   if (!candidate) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><EmptyState title="Candidate unavailable" message="This adventurer was recruited, passed over, refreshed, or has already left the tavern." /></ScrollView>;
 
   const hero = candidate.heroPreview;
@@ -54,11 +65,11 @@ export function CandidateDetailScreen({ candidateId, onBack }: { candidateId: st
   const nextScout = Math.min(3, candidate.scoutingLevel + 1) as ScoutingLevel;
 
   return <ScrollView contentContainerStyle={styles.content}>
-    <BackButton onPress={onBack} />
+    <Animated.View style={{ opacity: tutorialReadyToReturn ? tutorialPulse : 1 }}><BackButton onPress={onBack} /></Animated.View>
     <Text style={styles.eyebrow}>ADVENTURER DOSSIER</Text>
     <View style={styles.identity}><Portrait hero={hero} size={96} /><View style={styles.flex}><Text style={[styles.title, { color: getRaceNameColor(hero.raceId) }]}>{hero.name}</Text><Text style={styles.gold}>{RACES[hero.raceId].name} · {CLASSES[hero.classId].name} · Lv {hero.level}</Text><Text style={styles.role}>{HERO_COMBAT_ROLES[hero.classId]}</Text><View style={styles.chips}><StatusChip label={presentation.roleLabel} tone="blue"/><StatusChip label={presentation.qualityLabel} tone={presentation.qualityTone}/><StatusChip label={presentation.fitLabel} tone={presentation.fitTone}/>{reserved ? <StatusChip label="RESERVED" tone="blue"/> : <StatusChip label={presentation.expiryLabel} tone={presentation.expiryTone}/>}</View><Text style={styles.meta}>Age {hero.age} · {candidate.archetype.toUpperCase()} · {BACKGROUNDS[hero.backgroundId ?? "farmhand"].name}</Text></View></View>
 
-    <SegmentedTabs values={TABS} value={tab} onChange={visitTab} />
+    <Animated.View style={{ opacity: tutorialInspection ? tutorialPulse : 1 }}><SegmentedTabs values={TABS} value={tab} onChange={visitTab} /></Animated.View>
     {tab === "Overview" && <><Panel><Text style={styles.sectionLabel}>SCOUT REPORT</Text>{candidate.source === "regional_scout" && <Text style={styles.reportSource}>REGIONAL SOURCE · {candidate.sourceLocationName}</Text>}<View style={styles.offerGrid}><View style={styles.offerCell}><Text style={styles.offerLabel}>FEE</Text><Text style={styles.offerValue}>{range(candidate.recruitmentFeeEstimateMin, candidate.recruitmentFeeEstimateMax)} G</Text></View><View style={styles.offerCell}><Text style={styles.offerLabel}>PAY</Text><Text style={styles.offerValue}>{range(candidate.weeklySalaryEstimateMin, candidate.weeklySalaryEstimateMax)}/WK</Text></View></View><Text style={styles.line}>Contract preference: {candidate.contractLengthWeeks} weeks</Text><Text style={styles.line}>Scouting: Level {candidate.scoutingLevel}/3</Text><Text style={styles.line}>Departure: Day {candidate.expiresAtDay} · {presentation.expiryLabel}</Text></Panel><View style={styles.actions}>{candidate.scoutingLevel < 3 && <View style={styles.flex}><SecondaryButton guardMs={600} label={`SCOUT · ${scoutingCost(nextScout)}G`} disabled={guild.tutorial.active} onPress={() => run(() => scoutCandidate(candidateId), "Scouting report improved and estimates narrowed.")} /></View>}<View style={styles.flex}><SecondaryButton guardMs={600} label={reserved ? "RESERVED" : `RESERVE · ${RECRUITMENT_CONFIG.reservationCost}G`} disabled={reserved || guild.tutorial.active} onPress={() => run(() => reserveCandidate(candidateId), `${hero.name} reserved.`)} /></View></View>{candidate.scoutingLevel < 3 && <Text style={styles.scoutHint}>Further scouting narrows recruitment fee, weekly salary, and attributes. Expert scouting reveals exact figures.</Text>}<ActionButton guardMs={700} label={guild.tutorial.active ? "RETURN TO TAVERN BOARD" : guild.recruitment.batchRecruitmentUsed ? "REFRESH BOARD FIRST" : guild.heroes.length >= RECRUITMENT_CONFIG.heroCapacity ? "GUILD CAPACITY REACHED" : !presentation.affordable ? "INSUFFICIENT GOLD" : "SIGN CONTRACT"} disabled={guild.tutorial.active || guild.recruitment.batchRecruitmentUsed || guild.heroes.length >= RECRUITMENT_CONFIG.heroCapacity || !presentation.affordable} onPress={confirm} /></>}
     {tab === "Stats" && <><Panel><Text style={styles.sectionLabel}>ESTIMATED ATTRIBUTES</Text>{ATTRIBUTE_KEYS.map((key) => { const preferred = isClassAttribute(hero.classId, key); const estimate = candidate.attributeEstimates[key]; const scoreText = range(estimate.minimum, estimate.maximum); const modifierText = range(Number(formatAbilityModifier(estimate.minimum)), Number(formatAbilityModifier(estimate.maximum))); return <View key={key} style={styles.statRow}><Text style={[styles.meta, preferred && styles.classAttribute]}>{key.toUpperCase()}</Text><Text style={[styles.value, preferred && styles.classAttribute]}>{scoreText} · MOD {modifierText}</Text></View>; })}<Text style={styles.classHint}>Green attributes are favored by this class. Scouting narrows every estimate; recruited heroes show exact values.</Text></Panel>{candidate.scoutingLevel === 3 ? <Panel style={styles.panelGap}><Text style={styles.sectionLabel}>DERIVED COMBAT STATS</Text>{Object.entries(calculated.stats).map(([key, value]) => <View key={key} style={styles.statRow}><Text style={styles.meta}>{key}</Text><Text style={styles.value}>{key === "criticalChance" ? `${(value * 100).toFixed(1)}%` : Math.round(value)}</Text></View>)}<View style={styles.statRow}><Text style={styles.meta}>Armor Class</Text><Text style={styles.value}>{unit.stats.armorClass}</Text></View><View style={styles.statRow}><Text style={styles.meta}>Movement Range</Text><Text style={styles.value}>{unit.movementRange}</Text></View></Panel> : <Panel style={styles.panelGap}><Text style={styles.meta}>Exact derived combat statistics unlock with Expert scouting or after recruitment.</Text></Panel>}</>}
     {tab === "Traits" && <>{hero.traitIds.map((id) => { const trait = TRAITS[id]; const traitColor = trait.polarity === "positive" ? colors.green : trait.polarity === "negative" ? colors.danger : colors.gold; return <Panel key={id} style={styles.panelGap}><Text style={[styles.value, { color: traitColor }]}>{trait.name} · {trait.category.toUpperCase()}</Text><Text style={styles.traitDescription}>{trait.description}</Text>{trait.modifiers.map((modifier, index) => <Text key={index} style={[styles.line, { color: modifier.value < 0 ? colors.danger : colors.green }]}>{getModifierTargetLabel(modifier.target)}: {modifier.value >= 0 ? "+" : ""}{modifier.operation === "percentage" ? `${modifier.value * 100}%` : modifier.value}{modifier.condition ? " while HP ratio ≤ 0.50" : ""}</Text>)}</Panel>; })}</>}

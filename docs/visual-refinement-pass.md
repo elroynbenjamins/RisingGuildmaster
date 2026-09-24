@@ -3,7 +3,7 @@
 Implemented all six proposed refinements, then reviewed the rendered screens and corrected additional layout inconsistencies.
 
 - Typography: lighter weights and quieter supporting labels; shared secondary buttons use parchment text while primary actions and selected tabs retain gold. Status text is larger. Headings remain strong.
-- Hero cards: full-width wrapping names; race, class and level beneath the name; health and readiness remain visible. Skill choices and loyalty/contract warnings remain actionable. XP, potential and ordinary contract detail are still available on inspection.
+- Hero cards: full-width wrapping names; race, class and level beneath the name; health and readiness remain visible. Skill choices and loyalty/contract warnings remain actionable. XP, attributes, traits, and ordinary contract detail are still available on inspection.
 - Inventory: shorter actions, less crowded item rows, wrapping equipment names, one fit indicator and durability summary. Detailed effects, values and eligibility remain in item inspection.
 - Atmosphere: new guild-hall and tavern headers generated against the existing portrait reference. Runtime PNGs are 960 x 320; no existing portrait or icon dimensions were changed. Text stays on solid surfaces, and decorative artwork is excluded from accessibility traversal.
 - Second review: fixed the narrow roster title, full location display, recruitment price columns and button labels, touch areas for Compare/Pass, and disabled-state semantics for shared buttons. Softened character/item inspection, quest-board frames, world summary panels and scouting estimate cells.

@@ -237,7 +237,7 @@ Implemented without requiring replacement artwork:
 - Rebuilt the Heroes screen as a **Guild Hall / Hero Roster** instead of a generic searchable list.
 - Added a permanent **Recruit** action to the roster header so recruitment is reachable even when the guild already owns heroes.
 - Added a four-part roster command strip for Field Ready heroes, heroes needing attention, top-four average level, and unspent class skill points.
-- Hero cards now use a stronger RPG hierarchy: class banner, large portrait, Level plate, race/class identity, field status, HP, readiness, XP-to-next-level, loyalty, contract time, potential, and one clear Inspect action.
+- Hero cards now use a stronger RPG hierarchy: class banner, large portrait, Level plate, race/class identity, field status, HP, readiness, XP-to-next-level, loyalty, contract time, and one clear Inspect action.
 - Training heroes show the active training program and remaining days directly on their card.
 - Injured heroes show the primary persistent condition and additional-condition count; fallen heroes show a Temple/revival state.
 - Expiring/expired contracts and low loyalty are surfaced at roster level instead of requiring the hero detail sheet to discover them.
@@ -303,7 +303,7 @@ Implemented without requiring new artwork:
 Implemented without requiring new artwork:
 - Rebuilt the individual hero screen from a long management page into a proper **Adventurer Character Sheet**.
 - The header now leads with portrait, class accent, Level plate, race/class/subclass identity, tactical role, background, field status, and pending skill-point state.
-- The default Sheet tab now prioritizes what matters before a quest: HP, readiness, mana where applicable, XP, combat profile, active conditions, equipment summary, progression choices, loyalty/contract, and scouted potential.
+- The default Sheet tab now prioritizes what matters before a quest: HP, readiness, mana where applicable, XP, combat profile, active conditions, equipment summary, progression choices, loyalty, and contract state.
 - Added class-role labels such as Frontline Fighter, Ranged Striker, Healer / Support, Tank / Protector, and Arcane Marksman so a hero's tactical purpose is readable without inspecting raw stats.
 - Added compact six-slot equipment preview on the Sheet with a direct **Open Gear** action; the full paper-doll, saved loadouts, equipment effects, and unequip controls remain in the Gear tab.
 - Promoted pending skill/subclass choices into the main progression panel and retained the notification on the Skills tab.
@@ -347,7 +347,7 @@ Implemented without requiring new artwork:
 ### Pass 14 validation
 
 - Full application TypeScript check (App + `src`, excluding the project's pre-existing test typing issues): **PASS** after reconstructing the uploaded pnpm top-level links in a temporary Linux validation environment.
-- Full project TypeScript run reaches only pre-existing strict typing errors in older tests (`heroNames`, `modifiers`, `potential`, `recruitment`); no Pass-14 source diagnostics were reported.
+- Full project TypeScript run reached only the pre-existing strict typing errors recorded at that time in older tests; no Pass-14 source diagnostics were reported.
 - Targeted Pass-14 test TypeScript compilation: **PASS**.
 - Direct runtime smoke for XP level-wrap math, subclass/skill milestones, and Rare-loot hierarchy: **PASS**.
 - Direct quest-completion runtime smoke confirmed Gold, Reputation, Guildmaster XP, and per-hero XP snapshots are populated correctly: **PASS**.
@@ -446,10 +446,10 @@ Implemented without requiring new artwork:
 Implemented without requiring new artwork:
 - Reframed Recruitment as a **Guildhaven Tavern / Adventurers for Hire** board rather than a generic candidate list.
 - Added a recruitment command header with roster capacity, treasury, current living-roster payroll, and frontline/support/ranged coverage.
-- Candidate cards now surface tactical role, public rarity/quality, whether the recruit fills a missing roster role, departure urgency, potential range, signing fee, weekly salary, contract length, and projected payroll after hire.
+- Candidate cards now surface tactical role, public rarity/quality, whether the recruit fills a missing roster role, departure urgency, signing fee, weekly salary, contract length, and projected payroll after hire.
 - Added explicit economy warnings for unaffordable fees and a treasury that would become tight immediately after the minimum signing fee.
 - Candidate inspection is now an **Adventurer Dossier** with RPG role identity, Guild Fit summary, scouting/contract forecast, and game-like Overview / Stats / Traits / Contract tabs.
-- Reworked the first recruitment tutorial around actual decisions: party role, potential, traits, upfront fee, weekly payroll, contract length, one-hire-per-batch refresh, and comparison tradeoffs.
+- Reworked the first recruitment tutorial around actual decisions: class/role, matching attributes, traits, upfront fee, weekly payroll, contract length, one-hire-per-batch refresh, and comparison tradeoffs.
 - Added a permanent **Guildmaster Handbook** under Settings so tutorials can always be reviewed instead of being one-time-only knowledge.
 - The Handbook now documents the current War Table, one-clear/location-bound Side Quests, balanced Deployment Check, solid-red-border double-tap basic attacks, End Day +10% max-HP healing, Guild Planner, hero loyalty/progression, travel/rations, Archive rewards/Mission Intel, dungeon Boons/Pacts, and the distinction between normal bosses and eight-hero Raids.
 - Added first-time contextual primer panels for the renewed **War Table**, **Field Deployment Check**, and **Guild Planner**; each can be dismissed after it is understood while remaining reviewable through the Handbook.

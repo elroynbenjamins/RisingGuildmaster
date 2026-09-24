@@ -52,6 +52,42 @@ describe("two save slots", () => {
     expect((await loadGuild(2))?.guildName).toBe("Other Slot");
   });
 
+  it("persists a mandatory post-battle result so its choice can resume after reload", async () => {
+    const guild = createGuild("Pending Choice");
+    guild.pendingQuestResult = {
+      questId: "goblin_chieftain_boss",
+      status: "victory",
+      goldEarned: 120,
+      reputationEarned: 4,
+      guildmasterXpEarned: 210,
+      xpEarnedPerHero: 90,
+      lootIds: [],
+      heroOutcomes: [],
+      chronicle: {
+        id: "quest-goblin_chieftain_boss-day-5",
+        day: 5,
+        questId: "goblin_chieftain_boss",
+        questName: "Goblin Chieftain",
+        status: "victory",
+        aftermath: "The battle is over, but the Chieftain's fate is unresolved.",
+        consequences: [],
+        loreDiscoveries: [],
+        heroMoments: [],
+        relationshipChanges: [],
+      },
+      campaignNodeId: "goblin_chieftain",
+    };
+
+    await saveGuild(guild, 1);
+    const loaded = await loadGuild(1);
+    expect(loaded?.pendingQuestResult).toMatchObject({
+      questId: "goblin_chieftain_boss",
+      status: "victory",
+      campaignNodeId: "goblin_chieftain",
+      chronicle: { id: "quest-goblin_chieftain_boss-day-5" },
+    });
+  });
+
   it("deletes only the selected slot", async () => {
     await saveGuild(createGuild("Keep Me"),1);
     await saveGuild(createGuild("Delete Me"),2);

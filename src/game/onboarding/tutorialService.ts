@@ -1,6 +1,7 @@
 import type { GuildState } from "../guild/types";
 import type { ContextualTutorialId } from "./onboardingTypes";
 import type { TutorialCandidateTab } from "./onboardingTypes";
+import { advanceCombatTutorial, type CombatTutorialAction, type CombatTutorialStep } from "./combatTutorialService";
 
 const hasCoreCandidateReview = (tabs: readonly TutorialCandidateTab[]): boolean => tabs.includes("Overview") && (tabs.includes("Stats") || tabs.includes("Traits"));
 
@@ -30,6 +31,16 @@ export function recordTutorialRefresh(guild: GuildState): GuildState {
   if (!guild.tutorial.active || guild.tutorial.step !== "refresh_board") return guild;
   return { ...guild, tutorial: { ...guild.tutorial, step: "recruit_second", freeRefreshUsed: true } };
 }
+export function getCombatTutorialStep(guild: GuildState): CombatTutorialStep {
+  return guild.tutorial.contextualSeen?.combat_basics === true ? "complete" : (guild.tutorial.combatStep ?? "move");
+}
+export function recordCombatTutorialAction(guild: GuildState, action: CombatTutorialAction): GuildState {
+  const current = getCombatTutorialStep(guild);
+  if (current === "complete") return guild;
+  const combatStep = advanceCombatTutorial(current, action);
+  return { ...guild, tutorial: { ...guild.tutorial, combatStep, contextualSeen: combatStep === "complete" ? { ...(guild.tutorial.contextualSeen ?? {}), combat_basics: true } : guild.tutorial.contextualSeen } };
+}
+
 export function hasSeenContextualTutorial(guild: GuildState, id: ContextualTutorialId): boolean { return guild.tutorial.contextualSeen?.[id] === true; }
 export function markContextualTutorialSeen(guild: GuildState, id: ContextualTutorialId): GuildState {
   if (hasSeenContextualTutorial(guild, id)) return guild;

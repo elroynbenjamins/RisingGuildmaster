@@ -156,7 +156,7 @@ function Game() {
   }, [gameStarted, isHydrated, isDialogOpen, guild, route, updateGuild, showDialog]);
   useEffect(() => {
     if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active || (guild.pendingQuestResult || guild.activeQuestCombat)) return;
-    const safeBreak = route.name === "main" || route.name === "management" || route.name === "finances";
+    const safeBreak = route.name === "main" || route.name === "campaign" || route.name === "management" || route.name === "finances";
     if (!safeBreak) return;
     const notices = getNewUnlockNotices(guild);
     if (!notices.length) return;

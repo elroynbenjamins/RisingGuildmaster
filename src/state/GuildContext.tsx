@@ -12,7 +12,7 @@ import type { GameDifficultyId } from "../game/difficulty/difficultyTypes";
 import type { GuildCrestId } from "../data/guild/guildCrests";
 import { loadAccountContentEntitlements } from "../game/monetization/accountEntitlementService";
 import { applyContentEntitlements } from "../game/monetization/contentUnlockService";
-import { applyAccountGemWallet, loadAccountGemWallet } from "../game/monetization/accountGemWalletService";
+import { accountGemWalletFromGuild, applyAccountGemWallet, loadAccountGemWallet, saveAccountGemWallet } from "../game/monetization/accountGemWalletService";
 
 interface GuildContextValue {
   guild: GuildState;
@@ -71,6 +71,13 @@ export function GuildProvider({ children }: React.PropsWithChildren) {
     void saveGuild(guild, activeSlotId).then(() => { setSaveError(null); return listSaveSlots(); }).then(setSaveSlots).catch((error: unknown) => setSaveError(error instanceof Error ? error.message : "Your guild could not be saved."));
   }, [guild, hydrated, gameStarted, activeSlotId]);
 
+  useEffect(() => {
+    if (!hydrated || !gameStarted) return;
+    void saveAccountGemWallet(accountGemWalletFromGuild(guild)).catch((error: unknown) =>
+      setSaveError(error instanceof Error ? error.message : "Your account-wide Gem wallet could not be saved."),
+    );
+  }, [guild.gems, guild.gemTransactions, hydrated, gameStarted]);
+
   const value = useMemo<GuildContextValue>(() => ({
     guild,
     candidates: guild.recruitment.candidates,
@@ -80,7 +87,7 @@ export function GuildProvider({ children }: React.PropsWithChildren) {
     saveError,
     activeSlotId,
     activeSaveSlot: activeSlotId,
-    returnToMainMenu: async () => { if (activeSlotId !== null) await saveGuild(guild, activeSlotId); setSaveSlots(await listSaveSlots()); setGameStarted(false); setActiveSlotId(null); },
+    returnToMainMenu: async () => { if (activeSlotId !== null) await saveGuild(guild, activeSlotId); await saveAccountGemWallet(accountGemWalletFromGuild(guild)); setSaveSlots(await listSaveSlots()); setGameStarted(false); setActiveSlotId(null); },
     saveSlots,
     startNewGame: (slotId, difficultyId = "standard", guildName = "The Wayfarers", crestId = "crownroad") => {
       const freshGuild = applyAccountGemWallet(applyContentEntitlements(createGuild(guildName.trim() || "The Wayfarers", difficultyId, crestId), guild.entitlements), { gems: guild.gems, gemTransactions: guild.gemTransactions });
@@ -93,8 +100,12 @@ export function GuildProvider({ children }: React.PropsWithChildren) {
         const saved = await loadGuild(slotId);
         if (!saved) return "Save slot is empty.";
         const accountEntitlements = await loadAccountContentEntitlements();
+        const accountWallet = await loadAccountGemWallet();
+        const entitlementAwareSaved = applyContentEntitlements(saved, accountEntitlements);
+        const accountAwareSaved = accountWallet ? applyAccountGemWallet(entitlementAwareSaved, accountWallet) : entitlementAwareSaved;
+        if (!accountWallet) await saveAccountGemWallet(accountGemWalletFromGuild(accountAwareSaved));
         setActiveSlotId(slotId);
-        setGuild(initializeRecruitment(applyContentEntitlements(saved, accountEntitlements), createSeededRandom(randomSeed())));
+        setGuild(initializeRecruitment(accountAwareSaved, createSeededRandom(randomSeed())));
         setGameStarted(true);
         return null;
       } catch (error) {

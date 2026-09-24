@@ -10,6 +10,8 @@ import { getRaceNameColor } from "../ui/raceColors";
 import { HeroPortrait } from "./heroes/HeroPortrait";
 import { useTheme } from "../theme/theme";
 import { NotificationDot } from "./navigation/NotificationDot";
+import { GameIcon } from "./icons/GameIcon";
+import type { GameIconId } from "../data/ui/gameIcons";
 
 export const colors = { background: "#101416", panel: "#1a2123", panel2: "#232d2f", gold: "#d8ad5c", text: "#f3eee3", muted: "#a8b1ad", green: "#79b887", danger: "#dd7a73", border: "#354044", blue: "#70a4c5" };
 
@@ -23,14 +25,14 @@ export function SectionTitle({ children }: React.PropsWithChildren) {
   return <View style={styles.sectionHeading}><Text style={[styles.sectionTitle, { color: c.text }]}>{children}</Text></View>;
 }
 
-export function ActionButton({ label, onPress, disabled = false }: { label: string; onPress(): void; disabled?: boolean }) {
+export function ActionButton({ label, onPress, disabled = false, iconId }: { label: string; onPress(): void; disabled?: boolean; iconId?: GameIconId }) {
   const { colors: c } = useTheme();
-  return <Pressable accessibilityRole="button" disabled={disabled} accessibilityState={{ disabled }} aria-disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.button, { backgroundColor: disabled ? c.panel2 : c.gold, borderColor: c.gold }, pressed && !disabled && styles.buttonDim, pressed && styles.buttonPressed]}><Text style={[styles.buttonText, { color: disabled ? c.muted : c.buttonText }]}>{label}</Text></Pressable>;
+  return <Pressable accessibilityRole="button" disabled={disabled} accessibilityState={{ disabled }} aria-disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.button, { backgroundColor: disabled ? c.panel2 : c.gold, borderColor: c.gold }, pressed && !disabled && styles.buttonDim, pressed && styles.buttonPressed]}><View style={styles.buttonContent}>{iconId ? <GameIcon id={iconId} size={19} framed={false}/> : null}<Text style={[styles.buttonText, { color: disabled ? c.muted : c.buttonText }]}>{label}</Text></View></Pressable>;
 }
 
-export function SecondaryButton({ label, onPress, disabled = false }: { label: string; onPress(): void; disabled?: boolean }) {
+export function SecondaryButton({ label, onPress, disabled = false, iconId }: { label: string; onPress(): void; disabled?: boolean; iconId?: GameIconId }) {
   const { colors: c } = useTheme();
-  return <Pressable accessibilityRole="button" disabled={disabled} accessibilityState={{ disabled }} aria-disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.secondaryButton, { borderColor: c.gold, backgroundColor: c.panel2 }, pressed && !disabled && styles.buttonDim, pressed && styles.buttonPressed]}><Text style={[styles.secondaryText, { color: disabled ? c.muted : c.text }]}>{label}</Text></Pressable>;
+  return <Pressable accessibilityRole="button" disabled={disabled} accessibilityState={{ disabled }} aria-disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.secondaryButton, { borderColor: c.gold, backgroundColor: c.panel2 }, pressed && !disabled && styles.buttonDim, pressed && styles.buttonPressed]}><View style={styles.buttonContent}>{iconId ? <GameIcon id={iconId} size={18} framed={false}/> : null}<Text style={[styles.secondaryText, { color: disabled ? c.muted : c.text }]}>{label}</Text></View></Pressable>;
 }
 
 export function BackButton({ onPress }: { onPress(): void }) {
@@ -93,6 +95,7 @@ const styles = StyleSheet.create({
   secondaryText: {color: colors.gold, fontSize: 13, fontWeight: "600", textAlign: "center", letterSpacing: 0},
   buttonDim: { opacity: 0.55 },
   buttonPressed: { transform: [{ translateY: 1 }] },
+  buttonContent:{alignItems:"center",flexDirection:"row",gap:6,justifyContent:"center"},
   buttonText: {color: "#17130c", fontSize: 14, letterSpacing: .3, fontWeight: "700", textAlign: "center"},
   backButton: { alignSelf: "flex-start", minHeight: 38, justifyContent: "center", paddingHorizontal: 10, borderWidth: 0, borderRadius: 10, },
   back: { color: colors.gold, fontSize: 12, fontWeight: "900", letterSpacing: .8 },

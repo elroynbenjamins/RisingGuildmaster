@@ -15,6 +15,9 @@ import { deleteGuildSave, listSaveSlots, loadGuild, saveGuild } from "../src/gam
 import { createCombatState } from "../src/game/combat/combatEngine";
 import { createSeededRandom } from "../src/utils/random";
 import { testHero } from "./testHero";
+import { beginDungeonCombatCheckpoint, beginDungeonExpedition, checkpointDungeonCombat, getDungeonCombatSetup, resolveDungeonUtilityNode } from "../src/game/dungeons/dungeonRunService";
+import { chooseDungeonNode } from "../src/game/dungeons/dungeonService";
+import { ENEMIES } from "../src/data/enemies";
 
 describe("two save slots", () => {
   beforeEach(() => store.clear());
@@ -96,6 +99,42 @@ describe("two save slots", () => {
     });
     expect(loaded?.activeQuestCombat?.state?.board.environmentId).toBe(state.board.environmentId);
     expect(loaded?.activeQuestCombat?.state?.initiativeRolls).toEqual(state.initiativeRolls);
+  });
+
+  it("persists exact active dungeon combat state and RNG checkpoint", async () => {
+    let guild = createGuild("Interrupted Dungeon");
+    guild.heroes = Array.from({ length: 6 }, (_, index) => ({
+      ...testHero(),
+      id: `dungeon-save-${index}`,
+      name: `Dungeon Save ${index + 1}`,
+      level: 6,
+    }));
+    guild.discoveredEnemyIds = Object.keys(ENEMIES);
+    guild.world.completedCampaignNodeIds = ["broken_wardstone"];
+    guild.rogueliteRotation.offeredDungeonIds = ["wardstone_depths", "thornwood_trials", "temple_of_coils"];
+
+    const partyIds = guild.heroes.slice(0, 4).map((hero) => hero.id);
+    guild = beginDungeonExpedition(guild, "wardstone_depths", partyIds, [], createSeededRandom(91));
+    guild = resolveDungeonUtilityNode(guild, createSeededRandom(92)).guild;
+    guild = { ...guild, activeDungeonRun: chooseDungeonNode(guild.activeDungeonRun!, "depths_combat") };
+
+    const seed = 13579;
+    guild = beginDungeonCombatCheckpoint(guild, seed);
+    const random = createSeededRandom(seed);
+    const heroes = guild.heroes.filter((hero) => partyIds.includes(hero.id));
+    const state = createCombatState("wardstone_depths_expedition", 0, heroes, random, guild.activeDungeonRun!.heroInstances, getDungeonCombatSetup(guild), guild.relationships, guild.difficultyId);
+    guild = checkpointDungeonCombat(guild, { ...state, combatStarted: true, turn: 5, round: 2 }, random.getState());
+
+    await saveGuild(guild, 1);
+    const loaded = await loadGuild(1);
+
+    expect(loaded?.activeDungeonRun?.combatRandomState).toBe(guild.activeDungeonRun?.combatRandomState);
+    expect(loaded?.activeDungeonRun?.combatState).toMatchObject({
+      questId: "wardstone_depths_expedition",
+      combatStarted: true,
+      turn: 5,
+      round: 2,
+    });
   });
 
   it("persists a mandatory post-battle result so its choice can resume after reload", async () => {

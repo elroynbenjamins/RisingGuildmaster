@@ -4,7 +4,7 @@ import { BackButton, Panel, StatusChip, colors } from "../../components/ui";
 import { TUTORIAL_GUIDE_TOPICS } from "../../game/onboarding/tutorialGuide";
 
 export function TutorialGuideScreen({ onBack }: { onBack(): void }) {
-  const [openId, setOpenId] = useState<string | null>("recruitment");
+  const [openId, setOpenId] = useState<string | null>(null);
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} />
     <Text style={styles.eyebrow}>GUILDMASTER HANDBOOK</Text>

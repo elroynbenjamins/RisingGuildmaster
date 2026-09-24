@@ -16,7 +16,7 @@ import { CLASSES } from "../data/classes/classes";
 import { getEnemyDefinition } from "../data/enemies";
 import { QUESTS } from "../data/quests/quests";
 import { HERO_SKILLS } from "../data/skills/heroSkills";
-import { advanceCombat, beginCombat, createCombatState, endCurrentHeroTurn, moveCurrentHero, performHeroTurn } from "../game/combat/combatEngine";
+import { advanceCombat, beginCombat, createCombatState, endCurrentHeroTurn, moveCurrentHero, performHeroTurn, type CombatState } from "../game/combat/combatEngine";
 import type { HeroCombatInstance, QuestCombatSetup } from "../game/combat/combatTypes";
 import { isMatchingDoubleTap, type CombatTapRecord } from "../game/combat/doubleTap";
 import { getAreaPositions } from "../game/combat/grid/areaCalculator";
@@ -51,14 +51,14 @@ import { interactWithBattlefieldObject } from "../game/combat/battlefieldMechani
 
 const ENEMY_TURN_DELAY_MS: Record<"normal"|"fast"|"very_fast", number> = { normal: 700, fast: 400, very_fast: 120 };
 
-export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstances, onQuestEnd, onEnemiesEncountered, onExit }: { questId: string; heroes: Hero[]; combatSetup?: QuestCombatSetup; initialHeroInstances?: HeroCombatInstance[]; onQuestEnd(status: "victory" | "defeat", instances: HeroCombatInstance[]): void; onEnemiesEncountered?(enemyDefinitionIds: string[]): void; onExit?(): void }) {
+export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstances, initialCombatState, initialRandomState, onCombatCheckpoint, onQuestEnd, onEnemiesEncountered, onExit }: { questId: string; heroes: Hero[]; combatSetup?: QuestCombatSetup; initialHeroInstances?: HeroCombatInstance[]; initialCombatState?: CombatState; initialRandomState?: number; onCombatCheckpoint?(state: CombatState, randomState: number): void; onQuestEnd(status: "victory" | "defeat", instances: HeroCombatInstance[]): void; onEnemiesEncountered?(enemyDefinitionIds: string[]): void; onExit?(): void }) {
   const { showDialog } = useGameDialog();
   const { guild, updateGuild } = useGuild();
-  const random = useRef(createSeededRandom(randomSeed())); const quest = QUESTS[questId]!;
+  const random = useRef(createSeededRandom(initialRandomState ?? randomSeed())); const quest = QUESTS[questId]!;
   const effectiveCombatSetup = applyQuestDifficultyCombatSetup(quest, combatSetup);
   const threatEnemyLevelModifier = getRegionThreatEffects(guild.world, quest.regionId).enemyLevelModifier;
   const lastTargetTap = useRef<CombatTapRecord | null>(null);
-  const [state, setState] = useState(() => createCombatState(questId, 0, heroes, random.current, initialHeroInstances, effectiveCombatSetup, guild.relationships, guild.difficultyId, threatEnemyLevelModifier));
+  const [state, setState] = useState(() => initialCombatState ?? createCombatState(questId, 0, heroes, random.current, initialHeroInstances, effectiveCombatSetup, guild.relationships, guild.difficultyId, threatEnemyLevelModifier));
   const [mode, setMode] = useState<"move" | "skill" | null>(null); const [selectedSkillId, setSelectedSkillId] = useState<string>();
   const [inspectedSkillId, setInspectedSkillId] = useState<string>();
   const [inspectedCombatantId, setInspectedCombatantId] = useState<string>();
@@ -87,6 +87,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
     state.enemies.map((item) => ({ isAlive: item.unit.isAlive, enemyDefinitionId: item.instance.enemyDefinitionId })),
   );
   useEffect(() => { if (encounteredEnemyIds.length) onEnemiesEncountered?.(encounteredEnemyIds); }, [encounteredEnemyKey]);
+  useEffect(() => { if (!onCombatCheckpoint) return; if (!state.combatStarted || state.awaitingHeroId || state.status !== "active") onCombatCheckpoint(state, random.current.getState()); }, [state, onCombatCheckpoint]);
   const aliveIds = useMemo(() => new Set(units.filter((unit) => unit.isAlive).map((unit) => unit.combatantId)), [units]);
   const activeTurnId=state.turnOrderIds[state.turnCursor];const activeTurnSide=units.find((unit)=>unit.combatantId===activeTurnId)?.side;const activeEnemy=state.enemies.find((entry)=>entry.unit.combatantId===activeTurnId);const latestCombatMessage=state.log[state.log.length-1]?.message;
   useEffect(() => {

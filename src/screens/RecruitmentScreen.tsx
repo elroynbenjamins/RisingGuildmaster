@@ -17,6 +17,7 @@ import { getRaceNameColor } from "../ui/raceColors";
 import { RegionalScoutPanel } from "./Recruitment/RegionalScoutPanel";
 import { getDifficulty } from "../data/difficulty/difficulties";
 import { canUsePaidRecruitmentRefresh } from "../game/onboarding/starterJourneyService";
+import { GameIcon } from "../components/icons/GameIcon";
 
 const range = (min: number, max: number) => min === max ? `${min}` : `${min}–${max}`;
 const toneColor = (tone: RecruitmentUiTone) => tone === "good" ? colors.green : tone === "gold" ? colors.gold : tone === "danger" ? colors.danger : tone === "blue" ? colors.blue : colors.border;
@@ -97,8 +98,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
   return <ScrollView ref={scrollRef} contentContainerStyle={styles.content}>
     <BackButton onPress={leaveRecruitment} />
     <LocationArtwork location="tavern" />
-    <Text style={styles.eyebrow}>GUILDHAVEN TAVERN</Text>
-    <Text style={styles.title}>Adventurers for Hire</Text>
+    <View style={styles.titleRow}><GameIcon id="recruitment" size={34}/><View style={styles.flex}><Text style={styles.eyebrow}>GUILDHAVEN TAVERN</Text><Text style={styles.title}>Adventurers for Hire</Text></View></View>
     <Text style={styles.intro}>Inspect each adventurer’s skills and contract before hiring.</Text>
 
     <Panel style={styles.guildPlate}>
@@ -143,6 +143,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
 
 const styles = StyleSheet.create({ cost: {color: colors.text, fontWeight: "800", marginTop: 5},formerHeading:{color:colors.gold,fontSize:10,fontWeight:"900",letterSpacing:1,marginBottom:4,marginTop:4},formerIntro:{color:colors.muted,fontSize:10,lineHeight:15,marginBottom:8},formerCard:{borderColor:"#705b3e",gap:8,marginBottom:8},formerCooling:{opacity:.64},retiredCard:{borderColor:"#7e7459"},retiredMeta:{color:colors.gold},formerMeta:{color:colors.green,fontSize:9,fontWeight:"900",marginTop:4},
   content: { padding: 18, paddingBottom: 55 },
+  titleRow:{alignItems:"center",flexDirection:"row",gap:10},
   eyebrow: {color: colors.gold, fontSize: 10, fontWeight: "500", letterSpacing: .3, marginTop: 0},
   title: {color: colors.text, fontWeight: "900", marginTop: 4, fontSize: 25, lineHeight: 31},
   intro: { color: colors.muted, lineHeight: 19, marginBottom: 12, marginTop: 5 },

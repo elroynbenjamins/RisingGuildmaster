@@ -55,6 +55,15 @@ describe("two save slots", () => {
     expect((await loadGuild(2))?.guildName).toBe("Other Slot");
   });
 
+  it("persists the guided combat tutorial step across save reloads", async () => {
+    const guild = createGuild("Guided Battle");
+    guild.tutorial.combatStep = "basic_attack";
+    await saveGuild(guild, 1);
+    const loaded = await loadGuild(1);
+    expect(loaded?.tutorial.combatStep).toBe("basic_attack");
+    expect(loaded?.tutorial.contextualSeen.combat_basics).not.toBe(true);
+  });
+
   it("persists exact active quest combat state and RNG checkpoint", async () => {
     const guild = createGuild("Interrupted Battle");
     const heroes = [

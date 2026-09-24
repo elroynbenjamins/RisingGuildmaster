@@ -32,7 +32,7 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
     if (!hero || !quote) return;
     try {
       updateGuild(startHeroTraining(guild, hero.id, programId));
-      showDialog({ title: "Training order issued", message: `${hero.name} begins ${program.name}. Expected: ${quote.xpReward} XP · returns Day ${quote.completionDay}.`, tone: "success" });
+      showDialog({ title: "Training Started", message: `${hero.name} begins ${program.name}. Projected reward: +${quote.xpReward} XP. Cost: ${quote.goldCost} gold. Returns Day ${quote.completionDay}.`, tone: "success" });
       const nextHero = available.find((entry) => entry.id !== hero.id);
       setHeroId(nextHero?.id);
     } catch (error) {
@@ -43,7 +43,7 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
     try {
       const next = startTrainingGroundUpgrade(guild);
       updateGuild(next);
-      showDialog({ title: "Training Hall upgrade begun", message: `Level ${guild.trainingGround.level + 1} will complete on Day ${guild.currentDay + (upgrade?.durationDays ?? 0)}.`, tone: "success" });
+      showDialog({ title: "Training Hall Upgrade Started", message: `Level ${guild.trainingGround.level} to ${guild.trainingGround.level + 1}. ${upgrade?.goldCost.toLocaleString() ?? 0} gold committed. Completes Day ${guild.currentDay + (upgrade?.durationDays ?? 0)} and adds one training slot.`, tone: "success" });
     } catch (error) {
       showDialog({ title: "Cannot upgrade", message: error instanceof Error ? error.message : "Upgrade could not begin", tone: "danger" });
     }

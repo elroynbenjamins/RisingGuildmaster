@@ -59,6 +59,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
   const threatEnemyLevelModifier = getRegionThreatEffects(guild.world, quest.regionId).enemyLevelModifier;
   const lastTargetTap = useRef<CombatTapRecord | null>(null);
   const [state, setState] = useState(() => initialCombatState ?? createCombatState(questId, 0, heroes, random.current, initialHeroInstances, effectiveCombatSetup, guild.relationships, guild.difficultyId, threatEnemyLevelModifier));
+  const checkpointRef = useRef(onCombatCheckpoint); checkpointRef.current = onCombatCheckpoint;
   const [mode, setMode] = useState<"move" | "skill" | null>(null); const [selectedSkillId, setSelectedSkillId] = useState<string>();
   const [inspectedSkillId, setInspectedSkillId] = useState<string>();
   const [inspectedCombatantId, setInspectedCombatantId] = useState<string>();
@@ -87,7 +88,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
     state.enemies.map((item) => ({ isAlive: item.unit.isAlive, enemyDefinitionId: item.instance.enemyDefinitionId })),
   );
   useEffect(() => { if (encounteredEnemyIds.length) onEnemiesEncountered?.(encounteredEnemyIds); }, [encounteredEnemyKey]);
-  useEffect(() => { if (!onCombatCheckpoint) return; if (!state.combatStarted || state.awaitingHeroId || state.status !== "active") onCombatCheckpoint(state, random.current.getState()); }, [state, onCombatCheckpoint]);
+  useEffect(() => { if (!checkpointRef.current) return; if (!state.combatStarted || state.awaitingHeroId || state.status !== "active") checkpointRef.current(state, random.current.getState()); }, [state]);
   const aliveIds = useMemo(() => new Set(units.filter((unit) => unit.isAlive).map((unit) => unit.combatantId)), [units]);
   const activeTurnId=state.turnOrderIds[state.turnCursor];const activeTurnSide=units.find((unit)=>unit.combatantId===activeTurnId)?.side;const activeEnemy=state.enemies.find((entry)=>entry.unit.combatantId===activeTurnId);const latestCombatMessage=state.log[state.log.length-1]?.message;
   useEffect(() => {

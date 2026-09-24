@@ -189,7 +189,7 @@ export function getGuildCommandOrders(guild: GuildState): GuildCommandOrder[] {
     orders.push(order({
       id: "strategic_roster_expansion",
       title: `Expand the Guild to ${REGIONAL_THREAT_REQUIRED_HERO_COUNT} Heroes`,
-      description: `Recruit ${missing} more hero${missing === 1 ? "" : "es"} to staff Crisis Operations and Roguelite Expeditions. Regional Threats begin only after six heroes reach Level ${REGIONAL_THREAT_MIN_HERO_LEVEL}.`,
+      description: `Recruit ${missing} more hero${missing === 1 ? "" : "es"} to staff Idle Missions, Crisis Operations, and Roguelite Expeditions. Regional Threats begin only after six heroes reach Level ${REGIONAL_THREAT_MIN_HERO_LEVEL}.`,
       actionLabel: "OPEN RECRUITMENT",
       destination: "recruitment",
       iconId: "recruitment",

@@ -72,9 +72,9 @@ export function useGameDialog() {
 
 const styles = StyleSheet.create({
   backdrop: { alignItems: "center", backgroundColor: "rgba(3, 7, 8, 0.82)", flex: 1, justifyContent: "center", padding: 22 },
-  card: { backgroundColor: colors.panel, borderColor: colors.gold, borderRadius: 3, borderWidth: 3, elevation: 18, maxWidth: 440, padding: 20, shadowColor: "#000", shadowOffset: { width: 0, height: 9 }, shadowOpacity: 0.55, shadowRadius: 18, width: "100%" },
+  card: { backgroundColor: colors.panel, borderColor: colors.gold, borderRadius: 14, borderWidth: 2, elevation: 18, maxWidth: 440, padding: 20, shadowColor: "#000", shadowOffset: { width: 0, height: 9 }, shadowOpacity: 0.55, shadowRadius: 18, width: "100%" },
   dangerCard: { borderColor: colors.danger }, successCard: { borderColor: colors.green },
-  crest: { alignItems: "center", alignSelf: "center", backgroundColor: colors.panel2, borderColor: colors.gold, borderRadius: 2, borderWidth: 2, height: 44, justifyContent: "center", marginBottom: 10, width: 44 },
+  crest: { alignItems: "center", alignSelf: "center", backgroundColor: colors.panel2, borderColor: colors.gold, borderRadius: 10, borderWidth: 2, height: 44, justifyContent: "center", marginBottom: 10, width: 44 },
   crestText: { color: colors.gold, fontSize: 21, fontWeight: "900" },
   eyebrow: { color: colors.gold, fontSize: 10, fontWeight: "900", letterSpacing: 2, textAlign: "center" },
   dangerText: { color: colors.danger }, successText: { color: colors.green },
@@ -83,6 +83,6 @@ const styles = StyleSheet.create({
   message: { color: colors.muted, fontSize: 14, lineHeight: 21, textAlign: "center" },
   actions: { flexDirection: "row", gap: 9, marginTop: 20 },
   actionStack: { flexDirection: "column" },
-  action: { alignItems: "center", borderColor: colors.border, borderRadius: 2, borderWidth: 2, flex: 1, justifyContent: "center", minHeight: 46, paddingHorizontal: 10 }, dangerAction: { backgroundColor: "#492725", borderColor: colors.danger },
+  action: { alignItems: "center", borderColor: colors.border, borderRadius: 10, borderWidth: 1, flex: 1, justifyContent: "center", minHeight: 46, paddingHorizontal: 10 }, dangerAction: { backgroundColor: "#492725", borderColor: colors.danger },
   actionText: { color: colors.text, fontSize: 13, fontWeight: "900" }, dangerActionText: { color: "#ffd8d4" }, pressed: { opacity: 0.65 },
 });

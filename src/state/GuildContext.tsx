@@ -36,8 +36,7 @@ interface GuildContextValue {
   scoutCandidate(candidateId: string): string | null;
   reserveCandidate(candidateId: string): string | null;
   rejectCandidate(candidateId: string): string | null;
-  /** Functional updates let tutorial progress merge with a successful gameplay action. */
-  updateGuild(guild: GuildState | ((current: GuildState) => GuildState)): void;
+  updateGuild: React.Dispatch<React.SetStateAction<GuildState>>;
 }
 const GuildContext = createContext<GuildContextValue | null>(null);
 const resultOf = (action: () => GuildState, setGuild: React.Dispatch<React.SetStateAction<GuildState>>): string | null => { try { setGuild(action()); return null; } catch (error) { return error instanceof Error ? error.message : "Action failed"; } };

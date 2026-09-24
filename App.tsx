@@ -6,11 +6,11 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { ManagementShell } from "./src/components/navigation/ManagementShell"; import { colors } from "./src/components/ui"; import { CAMPAIGN_NODES } from "./src/data/campaign/chapter1"; import { QUESTS } from "./src/data/quests/quests";
 import { resolveCampaignChoice } from "./src/game/campaign/campaignChoiceResolver"; import { campaignNodeRequiresPostBattleChoice, completeCampaignNode, getAvailableCampaignNodes } from "./src/game/campaign/campaignService";
 import { travelGuildTowardCampaignObjective } from "./src/game/campaign/campaignTravelService"; import { getCampaignNodeLocationRequirement, isAtCampaignLocation } from "./src/game/campaign/campaignLocationService"; import type { HeroCombatInstance, QuestCombatSetup } from "./src/game/combat/combatTypes"; import type { Hero } from "./src/game/heroes/types"; import type { Party } from "./src/game/party/partyTypes"; import { resolveQuestDefeat, resolveQuestVictory } from "./src/game/quests/questResolver"; import { startQuest } from "./src/game/quests/questService"; import type { WorldEventDefinition } from "./src/game/world/worldTypes";
-import { calculateHero } from "./src/game/heroes/heroCalculator"; import { getAvailableClassSkillPoints } from "./src/game/progression/skills/skillProgressionService"; import type { EquipmentSlot } from "./src/game/heroes/types"; import type { MaterialId } from "./src/game/crafting/craftingTypes";
+import { getAvailableClassSkillPoints } from "./src/game/progression/skills/skillProgressionService"; import type { EquipmentSlot } from "./src/game/heroes/types"; import type { MaterialId } from "./src/game/crafting/craftingTypes";
 import { releaseBankedCampaignXp } from "./src/game/progression/levelSystem";
 import { CampaignScreen } from "./src/screens/Campaign/CampaignScreen"; import { CombatScreen } from "./src/screens/CombatScreen"; import { GuildManagementScreen } from "./src/screens/Guild/GuildManagementScreen"; import { GuildScreen } from "./src/screens/Guild/GuildScreen"; import { HeroDetailScreen } from "./src/screens/HeroDetailScreen"; import { HeroesScreen } from "./src/screens/Heroes/HeroesScreen"; import { HeroEquipmentPickerScreen } from "./src/screens/Heroes/HeroEquipmentPickerScreen"; import { InventoryScreen } from "./src/screens/Inventory/InventoryScreen"; import { ItemDetailScreen } from "./src/screens/Inventory/ItemDetailScreen"; import { PartySelectionScreen } from "./src/screens/PartySelectionScreen"; import { QuestDetailScreen } from "./src/screens/QuestDetailScreen"; import { QuestSelectionScreen } from "./src/screens/QuestSelectionScreen"; import { CandidateDetailScreen } from "./src/screens/Recruitment/CandidateDetailScreen"; import { RecruitmentScreen } from "./src/screens/RecruitmentScreen"; import { SkillTreeScreen } from "./src/screens/SkillTree/SkillTreeScreen"; import { StoryEventScreen } from "./src/screens/StoryEvent/StoryEventScreen"; import { SubclassSelectionScreen } from "./src/screens/SubclassSelection/SubclassSelectionScreen"; import { WorldMapScreen } from "./src/screens/WorldMap/WorldMapScreen";
 import { GuildProvider, useGuild } from "./src/state/GuildContext"; import type { MainTab } from "./src/ui/navigation"; import { createSeededRandom, randomSeed } from "./src/utils/random";
-import { QuestResultScreen, type QuestResultSummary } from "./src/screens/QuestResult/QuestResultScreen";
+import { QuestResultScreen, type QuestResultSummary } from "./src/screens/QuestResult/QuestResultScreen"; import { buildQuestHeroOutcomes, buildQuestRewardAccounting } from "./src/game/quests/questResultAccountingService";
 import { GemsSupportScreen } from "./src/screens/GemsSupport/GemsSupportScreen";
 import { TempleScreen } from "./src/screens/Temple/TempleScreen";
 import { MonsterManualScreen } from "./src/screens/MonsterManual/MonsterManualScreen";
@@ -67,7 +67,7 @@ import { initializeAdMobPrivacy } from "./src/game/monetization/admobRewardedAdP
 import { pendingDayMilestone } from "./src/game/monetization/dayMilestoneAdService";
 import type { SaveSlotId } from "./src/game/save/saveService";
 import { presentPendingDayMilestoneAd } from "./src/game/monetization/dayMilestoneAdPresenter";
-type Route = { name: "tutorialGuide" } | { name: "gemsSupport" } | { name: "main"; tab: MainTab; questTab?: QuestTab } | { name: "settings" } | { name: "achievements" } | { name: "contentUnlock" } | { name: "training" } | { name: "operations" } | { name: "raids" } | { name: "legacy" } | { name: "dungeon" } | { name: "dungeonCombat" } | { name: "regionMap"; regionId: string } | { name: "guildmasterSkills" } | { name: "finances" } | { name: "recruitment" } | { name: "candidate"; candidateId: string } | { name: "alchemy" } | { name: "temple" } | { name: "monsterManual" } | { name: "heroCodex" } | { name: "skillCodex" } | { name: "loreJournal" } | { name: "management" } | { name: "crafting"; targetHeroId?: string; initialSlot?: EquipmentSlot; materialFilter?: MaterialId } | { name: "gathering"; targetMaterialId?: MaterialId } | { name: "hero"; hero: Hero } | { name: "heroEquipmentPicker"; heroId: string; slot: EquipmentSlot } | { name: "skills"; hero: Hero } | { name: "subclass"; hero: Hero } | { name: "questDetail"; questId: string } | { name: "questBriefing"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "party"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "exploration"; questId: string; party: Party; campaignNodeId?: string } | { name: "decision"; questId: string; party: Party; campaignNodeId?: string } | { name: "combat"; questId: string; party: Party; campaignNodeId?: string; combatSetup?: QuestCombatSetup } | { name: "questResult"; summary: QuestResultSummary } | { name: "campaign" } | { name: "event"; event: WorldEventDefinition; back?: "world" | "campaign" | "quest"; questId?: string } | { name: "item"; itemId: string };
+type Route = { name: "tutorialGuide" } | { name: "gemsSupport" } | { name: "main"; tab: MainTab; questTab?: QuestTab } | { name: "settings" } | { name: "achievements" } | { name: "contentUnlock" } | { name: "training" } | { name: "operations" } | { name: "raids" } | { name: "legacy" } | { name: "dungeon" } | { name: "dungeonCombat" } | { name: "regionMap"; regionId: string } | { name: "guildmasterSkills" } | { name: "finances" } | { name: "recruitment" } | { name: "candidate"; candidateId: string } | { name: "alchemy" } | { name: "temple" } | { name: "monsterManual" } | { name: "heroCodex" } | { name: "skillCodex" } | { name: "loreJournal" } | { name: "management" } | { name: "crafting"; targetHeroId?: string; initialSlot?: EquipmentSlot; materialFilter?: MaterialId } | { name: "gathering"; targetMaterialId?: MaterialId } | { name: "hero"; hero: Hero } | { name: "heroEquipmentPicker"; heroId: string; slot: EquipmentSlot } | { name: "skills"; hero: Hero } | { name: "subclass"; hero: Hero } | { name: "questDetail"; questId: string } | { name: "questBriefing"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "party"; questId: string; campaignNodeId?: string; back: "quest" | "campaign" } | { name: "exploration"; questId: string; party: Party; campaignNodeId?: string } | { name: "decision"; questId: string; party: Party; campaignNodeId?: string } | { name: "combat"; questId: string; party: Party; campaignNodeId?: string; combatSetup?: QuestCombatSetup; combatSeed?: number; resume?: boolean } | { name: "questResult"; summary: QuestResultSummary } | { name: "campaign" } | { name: "event"; event: WorldEventDefinition; back?: "world" | "campaign" | "quest"; questId?: string } | { name: "item"; itemId: string };
 
 function Game() {
   const { showToast } = useGameToast();
@@ -84,8 +84,10 @@ function Game() {
     const blocker = getQuestStartBlocker(quest, guild.world, guild.heroes);
     if (blocker) { showDialog({ title: blocker.startsWith("Travel to ") ? "Travel required" : "Quest unavailable", message: blocker, tone: "danger" }); return; }
     try {
-      updateGuild(commitQuestPartyToCombat(guild, quest, party, preCombatConditions));
-      setRoute({ name: "combat", questId, party, campaignNodeId, combatSetup });
+      const combatSeed = randomSeed();
+      const committed = commitQuestPartyToCombat(guild, quest, party, preCombatConditions);
+      updateGuild({ ...committed, activeQuestCombat: { questId, party, campaignNodeId, combatSetup, randomState: combatSeed, state: null } });
+      setRoute({ name: "combat", questId, party, campaignNodeId, combatSetup, combatSeed });
     } catch (error) {
       showDialog({ title: "Quest unavailable", message: error instanceof Error ? error.message : "The party cannot begin this quest.", tone: "danger" });
     }
@@ -96,7 +98,16 @@ function Game() {
   const threatIntroPromptedRef = useRef(false);
   const contextualPromptedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
-    if (!gameStarted || !isHydrated) return;
+    if (!gameStarted || !isHydrated || !guild.pendingQuestResult || route.name !== "main") return;
+    setRoute({ name: "questResult", summary: guild.pendingQuestResult });
+  }, [gameStarted, isHydrated, guild.pendingQuestResult, route.name]);
+  useEffect(() => {
+    if (!gameStarted || !isHydrated || guild.pendingQuestResult || !guild.activeQuestCombat || route.name !== "main") return;
+    const recovery = guild.activeQuestCombat;
+    setRoute({ name: "combat", questId: recovery.questId, party: recovery.party, campaignNodeId: recovery.campaignNodeId, combatSetup: recovery.combatSetup, combatSeed: recovery.randomState, resume: true });
+  }, [gameStarted, isHydrated, guild.pendingQuestResult, guild.activeQuestCombat, route.name]);
+  useEffect(() => {
+    if (!gameStarted || !isHydrated || (guild.pendingQuestResult || guild.activeQuestCombat)) return;
     if (!areRegionalThreatsUnlocked(guild.world)) { threatIntroPromptedRef.current = false; return; }
     if (guild.world.worldFlags[REGIONAL_THREAT_INTRO_SEEN_FLAG] || threatIntroPromptedRef.current) return;
     const safeBreak = route.name === "main" || route.name === "finances" || route.name === "management";
@@ -111,7 +122,7 @@ function Game() {
     });
   }, [gameStarted, isHydrated, guild, route.name, isDialogOpen, updateGuild, showDialog]);
   useEffect(() => {
-    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active) return;
+    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active || guild.pendingQuestResult || (guild.activeQuestCombat && route.name !== "combat")) return;
     let id: "campaign_travel" | "combat_basics" | "idle_missions" | "roguelite_expeditions" | null = null;
     let title = "";
     let eyebrow = "QUICK GUIDE";
@@ -144,7 +155,7 @@ function Game() {
     showDialog({ title, eyebrow, message, tone: "default" });
   }, [gameStarted, isHydrated, isDialogOpen, guild, route, updateGuild, showDialog]);
   useEffect(() => {
-    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active) return;
+    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active || (guild.pendingQuestResult || guild.activeQuestCombat)) return;
     const safeBreak = route.name === "main" || route.name === "management" || route.name === "finances";
     if (!safeBreak) return;
     const notices = getNewUnlockNotices(guild);
@@ -160,7 +171,7 @@ function Game() {
 
   useEffect(() => {
     const milestone = pendingDayMilestone(guild);
-    if (!gameStarted || milestone === null) { promptedDayRef.current = null; return; }
+    if (!gameStarted || milestone === null || guild.pendingQuestResult || guild.activeQuestCombat) { promptedDayRef.current = null; return; }
     const safeBreak = route.name === "main" || route.name === "finances" || route.name === "management";
     const promptKey = `${guild.currentDay}:${milestone}`;
     if (!isHydrated || !safeBreak || isDialogOpen || promptedDayRef.current === promptKey) return;
@@ -232,8 +243,16 @@ function Game() {
         .filter((entry) => guild.world.worldFlags[entry.unlockFlag] !== true && campaign.worldState.worldFlags[entry.unlockFlag] === true)
         .map((entry) => ({ id: entry.id, title: entry.title, category: entry.category, text: entry.text, perspectives: entry.perspectives }));
       const chronicle = { ...route.summary.chronicle, selectedChoiceId: choiceId, consequences: [...route.summary.chronicle.consequences, consequence], loreDiscoveries: [...route.summary.chronicle.loreDiscoveries, ...newLore.filter((entry) => !route.summary.chronicle.loreDiscoveries.some((known) => known.id === entry.id))] };
-      updateGuild({ ...guild, heroes: releaseBankedCampaignXp(guild.heroes, campaign.worldState), world: campaign.worldState, gold: guild.gold + campaign.goldReward, reputation: guild.reputation + campaign.guildReputationReward, questChronicle: guild.questChronicle.map((entry) => entry.id === chronicle.id ? chronicle : entry) });
-      setRoute({ name: "questResult", summary: { ...route.summary, selectedChoiceId: choiceId, chronicle } });
+      const releasedHeroes = releaseBankedCampaignXp(guild.heroes, campaign.worldState);
+      const heroOutcomes = route.summary.heroOutcomes.map((outcome) => {
+        const after = releasedHeroes.find((hero) => hero.id === outcome.heroId);
+        if (!after) return outcome;
+        const availableSkillPointsAfter = getAvailableClassSkillPoints(after);
+        return { ...outcome, levelAfter: after.level, xpAfter: after.xp, availableSkillPoints: availableSkillPointsAfter, availableSkillPointsAfter };
+      });
+      const campaignChapterCompleted = campaign.worldState.campaignChapter > guild.world.campaignChapter ? guild.world.campaignChapter : route.summary.campaignChapterCompleted;
+      updateGuild({ ...guild, heroes: releasedHeroes, world: campaign.worldState, gold: guild.gold + campaign.goldReward, reputation: guild.reputation + campaign.guildReputationReward, questChronicle: guild.questChronicle.map((entry) => entry.id === chronicle.id ? chronicle : entry), pendingQuestResult: null });
+      setRoute({ name: "questResult", summary: { ...route.summary, selectedChoiceId: choiceId, chronicle, heroOutcomes, goldEarned: route.summary.goldEarned + campaign.goldReward, reputationEarned: (route.summary.reputationEarned ?? 0) + campaign.guildReputationReward, ...(campaignChapterCompleted ? { campaignChapterCompleted } : {}) } });
     };
     return <QuestResultScreen openLoot={() => main("Inventory")} openGuildmasterSkills={() => setRoute({name: "guildmasterSkills"})} openCalendar={() => setRoute({name: "finances"})} summary={route.summary} choiceIds={choiceIds} onChoice={choose} openHeroSkills={(heroId)=>{const hero=guild.heroes.find((entry)=>entry.id===heroId);if(hero)setRoute({name:"skills",hero});}} openTemple={()=>setRoute({name:"temple"})} onContinue={() => main(route.summary.campaignNodeId ? "Quests" : "Guild")} />;
   }
@@ -250,17 +269,24 @@ function Game() {
       if (status === "victory") updated = { ...updated, world: resolveRegionalThreatForQuest(updated.world, quest.id) };
       if (status === "victory") updated = applyBountyReward(updated, quest.id).guild;
       if (status === "victory" && route.campaignNodeId && !campaignNodeRequiresPostBattleChoice(route.campaignNodeId)) { const campaign = completeCampaignNode(updated.world, route.campaignNodeId); updated = { ...updated, world: campaign.worldState, gold: updated.gold + campaign.goldReward, reputation: updated.reputation + campaign.guildReputationReward }; }
-      const beforeById = new Map(participants.map((hero) => [hero.id, hero]));
-      const heroOutcomes = updated.heroes.filter((hero) => route.party.heroIds.includes(hero.id)).map((hero) => { const before = beforeById.get(hero.id); const hadInjury = before?.conditions.some((condition) => condition.conditionId === "injured") ?? false; return { heroId: hero.id, name: hero.name, raceId: hero.raceId, classId: hero.classId, gender: hero.gender, portraitVariant: hero.portraitVariant ?? 0, levelBefore: before?.level ?? hero.level, levelAfter: hero.level, currentHP: hero.currentHP, maxHP: calculateHero(hero).stats.maxHP, conditionIds: hero.conditions.map((condition) => condition.conditionId), availableSkillPoints: getAvailableClassSkillPoints(hero), fellInBattle: hero.currentHP <= 0, newlyInjured: !hadInjury && hero.conditions.some((condition) => condition.conditionId === "injured") }; });
+      const heroOutcomes = buildQuestHeroOutcomes(participants, updated.heroes, route.party.heroIds);
       const relationshipResult = applyQuestRelationshipConsequences(updated, status, heroOutcomes, quest.id, quest.name); updated = relationshipResult.guild;
       const campResult = resolveCampConversation(updated, status, route.party.heroIds, heroOutcomes, quest.id, quest.name, random); updated = campResult.guild;
       const raid = findRaidByQuestId(route.questId); if (raid) updated = recordRaidOutcome(updated, raid.id, status === "victory", heroOutcomes.filter((hero) => !hero.fellInBattle).length);
       const chronicle = createQuestChronicleEntry({ quest, status, day: guild.currentDay, worldBefore: guild.world, worldAfter: updated.world, heroOutcomes, relationshipChanges: relationshipResult.changes, campConversation: campResult.conversation });
       updated = recordQuestChronicle(updated, chronicle);
-      updated = advanceGuildTime({ ...updated, recentPartyHeroIds: route.party.heroIds }).guild; updateGuild(updated);
-      setRoute({ name: "questResult", summary: { questId: route.questId, status, goldEarned: result.activeQuest.goldEarned, xpEarnedPerHero: result.activeQuest.xpEarnedPerHero, lootIds: result.activeQuest.collectedLootIds, materials: result.activeQuest.collectedMaterials, heroOutcomes, chronicle, campaignNodeId: route.campaignNodeId } });
+      const rewardedGuild = updated;
+      const campaignChapterCompleted = rewardedGuild.world.campaignChapter > guild.world.campaignChapter ? guild.world.campaignChapter : undefined;
+      const rewardSummary = buildQuestRewardAccounting(guild, rewardedGuild, quest, status);
+      const summary: QuestResultSummary = { questId: route.questId, status, ...rewardSummary, ...(campaignChapterCompleted ? { campaignChapterCompleted } : {}), xpEarnedPerHero: result.activeQuest.xpEarnedPerHero, lootIds: result.activeQuest.collectedLootIds, materials: result.activeQuest.collectedMaterials, heroOutcomes, chronicle, campaignNodeId: route.campaignNodeId };
+      const requiresPostBattleChoice = status === "victory" && Boolean(route.campaignNodeId && campaignNodeRequiresPostBattleChoice(route.campaignNodeId));
+      updated = advanceGuildTime({ ...rewardedGuild, recentPartyHeroIds: route.party.heroIds }).guild;
+      updated = { ...updated, activeQuestCombat: null, pendingQuestResult: requiresPostBattleChoice ? summary : null };
+      updateGuild(updated);
+      setRoute({ name: "questResult", summary });
     };
-    return <CombatScreen questId={route.questId} heroes={participants} combatSetup={route.combatSetup} onEnemiesEncountered={(ids) => updateGuild(discoverEnemies(guild, ids))} onQuestEnd={finish} />;
+    const recovery = route.resume && guild.activeQuestCombat?.questId === route.questId ? guild.activeQuestCombat : undefined;
+    return <CombatScreen questId={route.questId} heroes={participants} combatSetup={route.combatSetup} initialCombatState={recovery?.state ?? undefined} initialRandomState={recovery?.randomState ?? route.combatSeed} onCombatCheckpoint={(state,randomState)=>updateGuild((current)=>current.activeQuestCombat?.questId===route.questId?{...current,activeQuestCombat:{...current.activeQuestCombat,state,randomState}}:current)} onEnemiesEncountered={(ids) => updateGuild((current)=>discoverEnemies(current, ids))} onQuestEnd={finish} />;
   }
   if (route.name !== "main") return null;
   const tab = route.tab; let screen: React.ReactNode;

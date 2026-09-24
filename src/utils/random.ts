@@ -1,7 +1,8 @@
 export interface RandomSource { next(): number; int(min: number, max: number): number; pick<T>(values: readonly T[]): T }
+export interface StatefulRandomSource extends RandomSource { getState(): number }
 
-/** Mulberry32 provides lightweight reproducible generation for tests and future run seeds. */
-export function createSeededRandom(seed: number): RandomSource {
+/** Mulberry32 provides lightweight reproducible generation for tests and resumable runs. */
+export function createSeededRandom(seed: number): StatefulRandomSource {
   let state = seed >>> 0;
   const next = (): number => {
     state += 0x6d2b79f5;
@@ -12,6 +13,7 @@ export function createSeededRandom(seed: number): RandomSource {
   };
   return {
     next,
+    getState: () => state >>> 0,
     int: (min, max) => Math.floor(next() * (max - min + 1)) + min,
     pick: <T>(values: readonly T[]) => {
       if (!values.length) throw new Error("Cannot pick from an empty collection");

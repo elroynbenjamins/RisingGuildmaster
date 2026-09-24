@@ -77,7 +77,7 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
     </View>}
 
     <SegmentedTabs values={TABS} value={tab} onChange={setTab} />
-    <View style={styles.boardControls}><Text style={styles.boardCount}>{quests.length} POSTING{quests.length === 1 ? "" : "S"} HERE</Text><SecondaryButton label={showQuestDetails ? "Compact Cards" : "Show Intel"} onPress={() => setShowQuestDetails((value) => !value)} /></View>
+    <View style={styles.boardControls}><Text style={[styles.boardCount, quests.length ? {color:colors.gold}:undefined]}>{quests.length ? `${quests.length} POSTING${quests.length===1?"":"S"} HERE · BEST MATCH FIRST` : "NO LOCAL POSTINGS"}</Text><SecondaryButton label={showQuestDetails ? "Compact Cards" : "Show Intel"} onPress={() => setShowQuestDetails((value) => !value)} /></View>
 
     {tab === "Campaign" && openCampaign && <Panel style={styles.campaign}>
       <View style={styles.campaignRail} /><View style={styles.campaignBody}><Text style={styles.campaignStamp}>STORY ORDER · CHAPTER {guild.world.campaignChapter}</Text><Text style={styles.campaignName}>{nextCampaignNode?.title ?? "Campaign Timeline"}</Text><Text style={styles.detail}>{nextCampaignNode?.description ?? "Review completed chapters and the next available story objective."}</Text><View style={styles.campaignAction}><ActionButton label={nextCampaignNode?.questId ? "Prepare Story Mission" : "Open Campaign Timeline"} onPress={openCampaign} /></View></View>

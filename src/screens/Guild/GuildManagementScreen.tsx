@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { BackButton, Panel, colors } from "../../components/ui";
+import { BackButton, Panel, SegmentedTabs, colors } from "../../components/ui";
 
 import { NotificationDot } from "../../components/navigation/NotificationDot";
 import { useActionNotifications } from "../../state/useActionNotifications";
@@ -38,6 +38,8 @@ interface GuildManagementScreenProps {
 
 export function GuildManagementScreen(props: GuildManagementScreenProps) {
   const notices = useActionNotifications();
+  const [section, setSection] = useState<"Command" | "Services" | "Archives">("Command");
+  const group = GROUPS[section === "Command" ? 0 : section === "Services" ? 1 : 2]!;
   const actions: Record<EntryId, () => void> = {
     gems: props.openGemsSupport, guildmaster: props.openGuildmasterSkills, roster: props.openHeroes, temple: props.openTemple,
     operations: props.openOperations, legacy: props.openLegacy, achievements: props.openAchievements, content: props.openContentUnlocks,
@@ -49,12 +51,13 @@ export function GuildManagementScreen(props: GuildManagementScreenProps) {
     <Text style={styles.title}>Guild Management</Text>
     <Text style={styles.intro}>Command the guild, maintain its services, and consult its growing archives.</Text>
     <Panel style={styles.shortcut}><Text style={styles.shortcutTitle}>EVERYDAY ACTIONS</Text><Text style={styles.shortcutText}>Recruitment, Training Hall, Quests, World, Heroes, and Inventory remain one tap away in the main navigation.</Text></Panel>
-    {GROUPS.map((group) => <View key={group.title} style={styles.group}>
+    <SegmentedTabs values={["Command", "Services", "Archives"] as const} value={section} onChange={setSection}/>
+    <View style={styles.group}>
       <Text style={styles.section}>{group.title}</Text>
       {group.entries.map((entry) => <Pressable key={entry.id} accessibilityRole="button" accessibilityLabel={`Open ${entry.name}`} onPress={actions[entry.id]}>
         <Panel style={styles.row}><View style={styles.copy}><Text style={styles.name}>{entry.name}</Text><Text style={styles.detail}>{entry.detail}</Text></View>{(entry.id === "gems" && notices.daily || entry.id === "guildmaster" && notices.guildmaster || entry.id === "roster" && notices.heroes || entry.id === "achievements" && notices.achievements) ? <NotificationDot/> : null}<Text style={styles.arrow}>›</Text></Panel>
       </Pressable>)}
-    </View>)}
+    </View>
   </ScrollView>;
 }
 

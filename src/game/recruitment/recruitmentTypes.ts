@@ -16,7 +16,6 @@ export type AttributeEstimates = Record<AttributeKey, AttributeEstimate>;
 export interface RecruitmentCandidate {
   candidateId: string;
   heroPreview: Hero;
-  truePotential: number;
   archetype: RecruitmentArchetype;
   recruitmentFee: number;
   weeklySalary: number;
@@ -25,8 +24,6 @@ export interface RecruitmentCandidate {
   weeklySalaryEstimateMin: number;
   weeklySalaryEstimateMax: number;
   contractLengthWeeks: ContractLengthWeeks;
-  potentialEstimateMin: number;
-  potentialEstimateMax: number;
   attributeEstimates: AttributeEstimates;
   scoutingLevel: ScoutingLevel;
   generatedAtDay: number;

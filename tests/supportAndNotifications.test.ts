@@ -9,8 +9,8 @@ import { createGuild } from "../src/game/guild/guildService";
 import { testHero } from "./testHero";
 import { createHeroContract } from "../src/game/recruitment/contractService";
 import { advanceGuildTime, payrollDueOnDay } from "../src/game/economy/guildCalendarService";
-import { reviveHero } from "../src/game/temple/templeService";
-import { claimDailyLogin, applyContentEntitlements, unlockPremiumContent } from "../src/game/monetization/contentUnlockService";
+import { canUseFreeDailyRevive, reviveHero } from "../src/game/temple/templeService";
+import { claimDailyLogin, applyContentEntitlements, getDailyLoginGemReward, unlockPremiumContent } from "../src/game/monetization/contentUnlockService";
 import { loadAccountContentEntitlements, saveAccountContentEntitlements } from "../src/game/monetization/accountEntitlementService";
 import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
 import { fulfillStorePurchase } from "../src/game/monetization/storePurchaseService";
@@ -80,6 +80,30 @@ describe("permanent ad removal", () => {
     expect(deserializeGuild(serializeGuild(fresh)).entitlements.adsRemoved).toBe(true);
   });
 });
+
+  it("adds 5 daily gems for Remove Ads owners", () => {
+    const today = new Date(2026, 8, 4, 10);
+    const base = createGuild();
+    const owned = { ...base, entitlements: { ...base.entitlements, adsRemoved: true } };
+    expect(getDailyLoginGemReward(base)).toBe(10);
+    expect(getDailyLoginGemReward(owned)).toBe(15);
+    expect(claimDailyLogin(owned, today).gems - owned.gems).toBe(15);
+  });
+  it("grants one non-stacking free revive per real-world day", () => {
+    const today = new Date(2026, 8, 4, 10), tomorrow = new Date(2026, 8, 5, 10);
+    const fallenA = { ...testHero(), id: "fallen-a", currentHP: 0, isAvailable: false };
+    const fallenB = { ...testHero(), id: "fallen-b", currentHP: 0, isAvailable: false };
+    const base = createGuild();
+    const owned = { ...base, entitlements: { ...base.entitlements, adsRemoved: true }, heroes: [fallenA, fallenB] };
+    expect(canUseFreeDailyRevive(owned, today)).toBe(true);
+    const first = reviveHero(owned, fallenA.id, today);
+    expect(first.gems).toBe(owned.gems);
+    expect(canUseFreeDailyRevive(first, today)).toBe(false);
+    expect(canUseFreeDailyRevive(first, tomorrow)).toBe(true);
+    const second = reviveHero(first, fallenB.id, today);
+    expect(second.gems).toBe(first.gems - 5);
+  });
+
 describe("action notification dots", () => {
   it("clears daily dots when claimed and restores them next real day", () => {
     const today = new Date(2026, 8, 4, 10), tomorrow = new Date(2026, 8, 5, 10), guild = createGuild();

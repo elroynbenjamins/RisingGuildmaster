@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "../ui";
 import { useTheme } from "../../theme/theme";
@@ -32,13 +32,16 @@ const GameDialogContext = createContext<GameDialogContextValue | null>(null);
 export function GameDialogProvider({ children }: React.PropsWithChildren) {
   const {colors:themeColors}=useTheme();
   const [dialog, setDialog] = useState<GameDialogOptions | null>(null);
+  const choosingRef = useRef(false);
   const dismissDialog = useCallback(() => setDialog(null), []);
-  const showDialog = useCallback((options: GameDialogOptions) => setDialog(options), []);
+  const showDialog = useCallback((options: GameDialogOptions) => { choosingRef.current = false; setDialog(options); }, []);
   const actions = dialog?.actions?.length ? dialog.actions : [{ label: "Continue", tone: "primary" as const }];
   const canDismiss = actions.some((action) => action.tone === "secondary");
   const value = useMemo(() => ({ showDialog, dismissDialog, isDialogOpen: dialog !== null, canDismissDialog: canDismiss }), [dismissDialog, showDialog, dialog, canDismiss]);
 
   const choose = (action: GameDialogAction) => {
+    if (choosingRef.current) return;
+    choosingRef.current = true;
     setDialog(null);
     action.onPress?.();
   };

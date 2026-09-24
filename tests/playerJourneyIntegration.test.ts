@@ -3,6 +3,7 @@ import { CAMPAIGN_CHAPTERS } from "../src/data/campaign/chapter1";
 import { RAIDS } from "../src/data/raids/raids";
 import { createDungeonDraft } from "../src/game/dungeons/dungeonDraftService";
 import { createGuild } from "../src/game/guild/guildService";
+import { getGuildCommandOrders } from "../src/game/guild/guildCommandCenterService";
 import { getEligibleOperationHeroIds, isGuildOperationsUnlocked } from "../src/game/operations/guildOperationService";
 import { getCurrentUnlockNotices } from "../src/game/progression/unlockSummaryService";
 import { isRaidUnlocked } from "../src/game/raids/raidService";
@@ -40,6 +41,13 @@ describe("end-to-end roster progression handoffs", () => {
     const noticeIds = getCurrentUnlockNotices(guild).map((notice) => notice.id);
     expect(noticeIds).not.toContain("system:operations");
     expect(noticeIds).not.toContain("system:roguelite");
+    expect(getGuildCommandOrders(guild).map((order) => order.id)).toContain("strategic_roster_expansion");
+  });
+
+  it("guides six owned but under-levelled heroes toward the strategic threshold", () => {
+    const guild = chapterOneGuild(6, 1);
+    expect(getGuildCommandOrders(guild).map((order) => order.id)).toContain("strategic_roster_training");
+    expect(canUnlockRegionalThreats(guild.heroes)).toBe(false);
   });
 
   it("brings Operations, Roguelite Expeditions, and Regional Threat readiness together at six Level-2 heroes", () => {

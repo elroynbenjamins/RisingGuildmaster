@@ -1,24 +1,30 @@
 import { describe, expect, it } from "vitest";
 import { createGuild } from "../src/game/guild/guildService";
-import { advanceGuildDays, calculateGatheringModifier, claimGatheringMission, getIdleMissionLevelProgressXp, resolveGatheringMission, startGatheringMission } from "../src/game/gathering/gatheringService";
+import { IDLE_MISSION_UNLOCK_HERO_COUNT, advanceGuildDays, calculateGatheringModifier, claimGatheringMission, getIdleMissionLevelProgressXp, resolveGatheringMission, startGatheringMission } from "../src/game/gathering/gatheringService";
 import type { GatheringMissionInstance } from "../src/game/gathering/gatheringTypes";
 import { createSeededRandom } from "../src/utils/random";
 import { sequenceRandom } from "./combatTestUtils";
 import { testHero } from "./testHero";
 
-const heroes = () => [{ ...testHero(), id: "g1", name: "Gatherer One", level: 3 }, { ...testHero(), id: "g2", name: "Gatherer Two", level: 3 }];
+const heroes = () => Array.from({ length: IDLE_MISSION_UNLOCK_HERO_COUNT }, (_, index) => ({ ...testHero(), id: `g${index + 1}`, name: `Gatherer ${index + 1}`, level: 3 }));
 describe("persistent two-hero gathering missions", () => {
+  it("stays locked until the guild owns six heroes", () => {
+    const guild=createGuild(); guild.heroes=heroes().slice(0,5);
+    expect(()=>startGatheringMission(guild,"guildhaven_salvage",["g1","g2"],sequenceRandom([0,0]))).toThrow("unlock at 6 owned heroes");
+  });
+
   it("requires exactly two distinct available heroes and locks them for multiple days", () => {
     const guild = createGuild(); guild.heroes = heroes();
     expect(() => startGatheringMission(guild, "greenveil_foraging", ["g1"], sequenceRandom([0, 0]))).toThrow("exactly two");
     const started = startGatheringMission(guild, "greenveil_foraging", ["g1", "g2"], sequenceRandom([0, 0]));
     expect(started.gatheringMissions[0]).toMatchObject({ heroIds: ["g1", "g2"], startDay: 1, completionDay: 3, status: "active" });
-    expect(started.heroes.every((hero) => !hero.isAvailable)).toBe(true);
+    expect(started.heroes.filter((hero) => ["g1","g2"].includes(hero.id)).every((hero) => !hero.isAvailable)).toBe(true);
+    expect(started.heroes.filter((hero) => !["g1","g2"].includes(hero.id)).every((hero) => hero.isAvailable)).toBe(true);
     expect(() => resolveGatheringMission(started, started.gatheringMissions[0]!.id)).toThrow("not complete");
   });
 
   it("uses both hero attributes and level in the D20 modifier", () => {
-    const low = heroes() as [ReturnType<typeof testHero>, ReturnType<typeof testHero>];
+    const low = heroes().slice(0,2) as [ReturnType<typeof heroes>[number], ReturnType<typeof heroes>[number]];
     const high = low.map((hero) => ({ ...hero, level: 10, baseAttributes: { strength: 20, dexterity: 20, constitution: 20, intelligence: 20, wisdom: 20, charisma: 20 } })) as typeof low;
     expect(calculateGatheringModifier("greenveil_foraging", high)).toBeGreaterThan(calculateGatheringModifier("greenveil_foraging", low));
   });

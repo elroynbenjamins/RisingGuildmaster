@@ -1,6 +1,6 @@
 import type { GuildState } from "../guild/types";
 
-export const DAY_MILESTONE_AD_INTERVAL = 20;
+export const DAY_MILESTONE_AD_INTERVAL = 15;
 
 export function pendingDayMilestone(guild: GuildState): number | null {
   if (guild.entitlements.adsRemoved) return null;

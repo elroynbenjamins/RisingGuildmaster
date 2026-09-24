@@ -12,6 +12,7 @@ import type { GameDifficultyId } from "../game/difficulty/difficultyTypes";
 import type { GuildCrestId } from "../data/guild/guildCrests";
 import { loadAccountContentEntitlements } from "../game/monetization/accountEntitlementService";
 import { applyContentEntitlements } from "../game/monetization/contentUnlockService";
+import { applyAccountGemWallet, loadAccountGemWallet } from "../game/monetization/accountGemWalletService";
 
 interface GuildContextValue {
   guild: GuildState;
@@ -51,9 +52,12 @@ export function GuildProvider({ children }: React.PropsWithChildren) {
 
   useEffect(() => {
     void Promise.all([listSaveSlots(), loadAccountContentEntitlements()])
-      .then(([slots, accountEntitlements]) => {
+      .then(async ([slots, accountEntitlements]) => {
         setSaveSlots(slots);
-        setGuild(initializeRecruitment(applyContentEntitlements(createGuild(), accountEntitlements), createSeededRandom(randomSeed())));
+        const wallet = await loadAccountGemWallet();
+        const entitlementAwareGuild = applyContentEntitlements(createGuild(), accountEntitlements);
+        const accountAwareGuild = wallet ? applyAccountGemWallet(entitlementAwareGuild, wallet) : entitlementAwareGuild;
+        setGuild(initializeRecruitment(accountAwareGuild, createSeededRandom(randomSeed())));
         setHydrated(true);
       })
       .catch(() => {
@@ -79,7 +83,7 @@ export function GuildProvider({ children }: React.PropsWithChildren) {
     returnToMainMenu: async () => { if (activeSlotId !== null) await saveGuild(guild, activeSlotId); setSaveSlots(await listSaveSlots()); setGameStarted(false); setActiveSlotId(null); },
     saveSlots,
     startNewGame: (slotId, difficultyId = "standard", guildName = "The Wayfarers", crestId = "crownroad") => {
-      const freshGuild = applyContentEntitlements(createGuild(guildName.trim() || "The Wayfarers", difficultyId, crestId), guild.entitlements);
+      const freshGuild = applyAccountGemWallet(applyContentEntitlements(createGuild(guildName.trim() || "The Wayfarers", difficultyId, crestId), guild.entitlements), { gems: guild.gems, gemTransactions: guild.gemTransactions });
       setActiveSlotId(slotId);
       setGuild(initializeRecruitment(freshGuild, createSeededRandom(randomSeed())));
       setGameStarted(true);

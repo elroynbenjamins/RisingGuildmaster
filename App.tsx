@@ -137,7 +137,7 @@ function Game() {
     showDialog({
       title: notices.length === 1 ? notices[0]!.title : `${notices.length} Guild Milestones Unlocked`,
       eyebrow: notices.length === 1 ? "NEW UNLOCK" : "PROGRESSION MILESTONE",
-      message: notices.length === 1 ? `UNLOCKED · ${notices[0]!.title.toUpperCase()}\n\n${notices[0]!.detail}\n\nThis is now available from its normal guild screen.` : notices.map((notice) => `UNLOCKED · ${notice.title.toUpperCase()}\n${notice.detail}`).join("\n\n"),
+      message: notices.length === 1 ? `${notices[0]!.id.startsWith("chapter:") ? "CHAPTER COMPLETE" : "UNLOCKED"} · ${notices[0]!.title.toUpperCase()}\n\n${notices[0]!.detail}${notices[0]!.id.startsWith("chapter:") ? "\n\nThe next chapter and any newly opened regions or systems are now reflected across the guild." : "\n\nThis is now available from its normal guild screen."}` : notices.map((notice) => `${notice.id.startsWith("chapter:") ? "CHAPTER COMPLETE" : "UNLOCKED"} · ${notice.title.toUpperCase()}\n${notice.detail}`).join("\n\n"),
       tone: "success",
     });
   }, [gameStarted, isHydrated, isDialogOpen, guild, route.name, updateGuild, showDialog]);

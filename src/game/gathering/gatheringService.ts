@@ -13,6 +13,7 @@ import { getTrainingProgressionLimit, grantTrainingXp } from "../training/traini
 import { xpRequiredForNextLevel } from "../progression/xpSystem";
 import { createGuildLegacyState, displayedTrophyBonus } from "../renown/guildLegacyService";
 
+export const IDLE_MISSION_UNLOCK_HERO_COUNT = 6;
 export const IDLE_MISSION_LEVEL_PROGRESS_XP_PERCENT = .05;
 export function getIdleMissionLevelProgressXp(heroLevel: number): number { return Math.max(1, Math.round(xpRequiredForNextLevel(heroLevel) * IDLE_MISSION_LEVEL_PROGRESS_XP_PERCENT)); }
 
@@ -26,6 +27,7 @@ export function calculateGatheringModifier(definitionId: string, heroes: readonl
 
 export function startGatheringMission(guild: GuildState, definitionId: string, heroIds: readonly string[], random: RandomSource): GuildState {
   const definition = GATHERING_MISSIONS[definitionId]; if (!definition) throw new Error("Unknown gathering mission");
+  if (guild.heroes.length < IDLE_MISSION_UNLOCK_HERO_COUNT) throw new Error(`Idle Missions unlock at ${IDLE_MISSION_UNLOCK_HERO_COUNT} owned heroes`);
   if (heroIds.length !== 2 || new Set(heroIds).size !== 2) throw new Error("Gathering missions require exactly two different heroes");
   if (!guild.world.unlockedRegionIds.includes(definition.regionId)) throw new Error("Mission region is locked");
   const heroes = heroIds.map((id) => guild.heroes.find((hero) => hero.id === id)); if (heroes.some((hero) => !hero)) throw new Error("Hero is not in this guild");

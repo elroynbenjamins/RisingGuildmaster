@@ -47,7 +47,7 @@ interface NavigationSignal {
 }
 
 function tabForDestination(destination: GuildCommandDestination): MainTab {
-  if (destination === "campaign" || destination === "sideQuests") return "Quests";
+  if (destination === "campaign" || destination === "quests" || destination === "sideQuests") return "Quests";
   if (destination === "world") return "World";
   if (destination === "gathering") return "Inventory";
   if (destination === "heroes" || destination === "recruitment" || destination === "temple" || destination === "training") return "Heroes";

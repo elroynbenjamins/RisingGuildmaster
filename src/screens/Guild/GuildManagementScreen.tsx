@@ -3,9 +3,12 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BackButton, Panel, SegmentedTabs, colors } from "../../components/ui";
 
 import { NotificationDot } from "../../components/navigation/NotificationDot";
+import { GameIcon } from "../../components/icons/GameIcon";
+import type { GameIconId } from "../../data/ui/gameIcons";
 import { useActionNotifications } from "../../state/useActionNotifications";
 type EntryId = "gems" | "guildmaster" | "roster" | "temple" | "operations" | "legacy" | "achievements" | "content" | "finances" | "manual" | "heroCodex" | "skillCodex" | "loreJournal" | "settings";
 type Entry = { id: EntryId; name: string; detail: string };
+const ENTRY_ICONS: Record<EntryId,GameIconId> = { gems:"gold", guildmaster:"management", roster:"heroes", temple:"temple", operations:"management", legacy:"victory", achievements:"victory", content:"hero_codex", finances:"calendar", manual:"monster_manual", heroCodex:"hero_codex", skillCodex:"skill_codex", loreJournal:"journal", settings:"management" };
 
 const GROUPS: { title: string; entries: Entry[] }[] = [
   { title: "COMMAND", entries: [
@@ -55,7 +58,7 @@ export function GuildManagementScreen(props: GuildManagementScreenProps) {
     <View style={styles.group}>
       <Text style={styles.section}>{group.title}</Text>
       {group.entries.map((entry) => <Pressable key={entry.id} accessibilityRole="button" accessibilityLabel={`Open ${entry.name}`} onPress={actions[entry.id]}>
-        <Panel style={[styles.row, entry.id==="temple"?styles.serviceGreen:entry.id==="operations"?styles.serviceRed:entry.id==="gems"||entry.id==="content"?styles.serviceBlue:entry.id==="guildmaster"||entry.id==="legacy"||entry.id==="achievements"?styles.serviceGold:undefined]}><View style={styles.copy}><Text style={styles.name}>{entry.name}</Text><Text style={styles.detail}>{entry.detail}</Text></View>{(entry.id === "gems" && notices.daily || entry.id === "guildmaster" && notices.guildmaster || entry.id === "roster" && notices.heroes || entry.id === "achievements" && notices.achievements) ? <NotificationDot/> : null}<Text style={styles.arrow}>›</Text></Panel>
+        <Panel style={[styles.row, entry.id==="temple"?styles.serviceGreen:entry.id==="operations"?styles.serviceRed:entry.id==="gems"||entry.id==="content"?styles.serviceBlue:entry.id==="guildmaster"||entry.id==="legacy"||entry.id==="achievements"?styles.serviceGold:undefined]}><View style={styles.iconPlate}><GameIcon id={ENTRY_ICONS[entry.id]} size={30}/></View><View style={styles.copy}><Text style={styles.name}>{entry.name}</Text><Text style={styles.detail}>{entry.detail}</Text></View>{(entry.id === "gems" && notices.daily || entry.id === "guildmaster" && notices.guildmaster || entry.id === "roster" && notices.heroes || entry.id === "achievements" && notices.achievements) ? <NotificationDot/> : null}<Text style={styles.arrow}>›</Text></Panel>
       </Pressable>)}
     </View>
   </ScrollView>;
@@ -65,6 +68,6 @@ const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 44 }, title: { color: colors.text, fontSize: 30, fontWeight: "900", marginTop: 12 }, intro: { color: colors.muted, lineHeight: 20, marginVertical: 12 },
   shortcut: { marginBottom: 18 }, shortcutTitle: { color: colors.gold, fontSize: 11, fontWeight: "900", letterSpacing: 1.2 }, shortcutText: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 5 },
   group: { marginBottom: 10 }, section: { color: colors.gold, fontSize: 13, fontWeight: "900", letterSpacing: 1.5, marginBottom: 8 }, row: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginBottom: 9, minHeight: 76 },
-  serviceGold:{borderLeftColor:colors.gold,borderLeftWidth:3},serviceGreen:{borderLeftColor:colors.green,borderLeftWidth:3},serviceBlue:{borderLeftColor:colors.blue,borderLeftWidth:3},serviceRed:{borderLeftColor:colors.danger,borderLeftWidth:3},copy: { flex: 1, paddingRight: 12 }, name: { color: colors.text, fontSize: 17, fontWeight: "800" }, detail: { color: colors.muted, fontSize: 12, lineHeight: 17, marginTop: 4 }, arrow: { color: colors.gold, fontSize: 30 },
+  serviceGold:{borderLeftColor:colors.gold,borderLeftWidth:3},serviceGreen:{borderLeftColor:colors.green,borderLeftWidth:3},serviceBlue:{borderLeftColor:colors.blue,borderLeftWidth:3},serviceRed:{borderLeftColor:colors.danger,borderLeftWidth:3},iconPlate:{alignItems:"center",justifyContent:"center",width:34},copy: { flex: 1, paddingRight: 12 }, name: { color: colors.text, fontSize: 17, fontWeight: "800" }, detail: { color: colors.muted, fontSize: 12, lineHeight: 17, marginTop: 4 }, arrow: { color: colors.gold, fontSize: 30 },
   futureButton: { alignItems: "center", borderColor: colors.border, borderTopWidth: 1, marginTop: 6, paddingVertical: 15 }, futureLabel: { color: colors.muted, fontSize: 12, fontWeight: "900", letterSpacing: 1.1 }, futurePanel: { marginBottom: 10 },
 });

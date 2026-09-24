@@ -47,6 +47,23 @@ export function buildQuestHeroOutcomes(
   });
 }
 
+export function reconcileQuestHeroOutcomeAfterProgression(
+  outcome: QuestHeroOutcomeRecord,
+  after: Hero,
+): QuestHeroOutcomeRecord {
+  const levelBefore = Math.max(1, outcome.levelBefore);
+  const xpBefore = Math.max(0, outcome.xpBefore ?? 0);
+  const availableSkillPointsAfter = getAvailableClassSkillPoints(after);
+  return {
+    ...outcome,
+    levelAfter: after.level,
+    xpAfter: after.xp,
+    xpEarned: calculateHeroXpGain(levelBefore, xpBefore, after.level, after.xp),
+    availableSkillPoints: availableSkillPointsAfter,
+    availableSkillPointsAfter,
+  };
+}
+
 export function buildQuestRewardAccounting(
   beforeGuild: GuildState,
   rewardedGuild: GuildState,

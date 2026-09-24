@@ -12,8 +12,8 @@ const CATEGORIES: ("All"|AchievementCategory)[] = ["All","Guild","Heroes","Adven
 
 export function AchievementsScreen({onBack}:{onBack():void}) {
   const {guild,updateGuild}=useGuild();
+  const {showToast}=useGameToast();
   const [category,setCategory]=useState<"All"|AchievementCategory>("All");
-  const [message,setMessage]=useState<string>();
   const [showClaimed,setShowClaimed]=useState(false);
   const progress=useMemo(()=>getAllAchievementProgress(guild),[guild]);
   const categoryProgress=category==="All"?progress:progress.filter((entry)=>entry.definition.category===category);

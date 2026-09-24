@@ -142,7 +142,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
 }
 
 const styles = StyleSheet.create({ cost: {color: colors.text, fontWeight: "800", marginTop: 5},formerHeading:{color:colors.gold,fontSize:10,fontWeight:"900",letterSpacing:1,marginBottom:4,marginTop:4},formerIntro:{color:colors.muted,fontSize:10,lineHeight:15,marginBottom:8},formerCard:{borderColor:"#705b3e",gap:8,marginBottom:8},formerCooling:{opacity:.64},retiredCard:{borderColor:"#7e7459"},retiredMeta:{color:colors.gold},formerMeta:{color:colors.green,fontSize:9,fontWeight:"900",marginTop:4},
-  content: { padding: 18, paddingBottom: 55 },
+  content: { padding: 16, paddingBottom: 55 },
   titleRow:{alignItems:"center",flexDirection:"row",gap:10},
   eyebrow: {color: colors.gold, fontSize: 10, fontWeight: "500", letterSpacing: .3, marginTop: 0},
   title: {color: colors.text, fontWeight: "900", marginTop: 4, fontSize: 25, lineHeight: 31},
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({ cost: {color: colors.text, fontWeight: "800",
   flex: { flex: 1 },
   messagePanel: { borderColor: colors.green, marginBottom: 10, padding: 9 },
   message: { color: colors.green, fontWeight: "800" },
-  card: { marginBottom: 12, overflow: "hidden", paddingLeft: 18 },
+  card: { marginBottom: 10, overflow: "hidden", paddingLeft: 16 },
   cardRail: { bottom: 0, left: 0, position: "absolute", top: 0, width: 5 },
   row: { flexDirection: "row", gap: 12 },
   nameRow: {flexWrap: "wrap", gap: 6, flexDirection: "column", alignItems: "flex-start"},

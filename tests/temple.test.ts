@@ -59,10 +59,10 @@ describe("Temple services", () => {
     const fallen = { ...testHero(), currentHP: 0, isAvailable: false };
     const guild = { ...createGuild(), heroes: [fallen] };
     const result = reviveHero(guild, fallen.id);
-    expect(result.gems).toBe(2);
+    expect(result.gems).toBe(0);
     expect(result.heroes[0]).toMatchObject({ currentHP: 58, isAvailable: true });
     expect(result.heroes[0]?.conditions.some((item) => item.conditionId === "injured")).toBe(true);
-    expect(result.gemTransactions[0]).toMatchObject({ type: "revival", amount: -3 });
+    expect(result.gemTransactions[0]).toMatchObject({ type: "revival", amount: -5 });
   });
 
   it("rejects revival without enough gems", () => {

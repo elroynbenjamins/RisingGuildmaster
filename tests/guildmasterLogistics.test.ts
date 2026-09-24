@@ -31,7 +31,7 @@ describe("Guildmaster logistics branch", () => {
 
   it("shortens newly started material expeditions by one day", () => {
     const guild = withSkills("expedition_routes");
-    guild.heroes = [{ ...testHero(), id: "route-a" }, { ...testHero(), id: "route-b" }];
+    guild.heroes = Array.from({length:6},(_,index)=>({ ...testHero(), id: index===0?"route-a":index===1?"route-b":`route-${index}` }));
     const started = startGatheringMission(guild, "greenveil_foraging", ["route-a", "route-b"], sequenceRandom([0, 0]));
     expect(started.gatheringMissions[0]?.completionDay).toBe(guild.currentDay + 1);
   });

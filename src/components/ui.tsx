@@ -51,7 +51,8 @@ export function SegmentedTabs<T extends string>({ values, value, onChange, notif
 export function StatusChip({ label, tone = "neutral" }: { label: string; tone?: "neutral" | "gold" | "good" | "danger" | "blue" }) {
   const { colors: c } = useTheme();
   const toneColor = tone === "gold" ? c.gold : tone === "good" ? c.green : tone === "danger" ? c.danger : tone === "blue" ? c.blue : c.muted;
-  return <View style={[styles.chip, { borderColor: toneColor, backgroundColor: c.panel2 }]}><Text style={[styles.chipText, { color: toneColor }]}>{label}</Text></View>;
+  const tint = tone === "good" ? `${c.green}20` : tone === "danger" ? `${c.danger}20` : tone === "gold" ? `${c.gold}20` : tone === "blue" ? `${c.blue}20` : c.panel2;
+  return <View style={[styles.chip, { borderColor: toneColor, backgroundColor: tint }]}><Text style={[styles.chipText, { color: toneColor }]}>{label}</Text></View>;
 }
 
 export function MiniMeter({ value, max, color, backgroundColor, height = 5 }: { value: number; max: number; color: string; backgroundColor?: string; height?: number }) {
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
   tabs: { flexDirection: "row", borderBottomWidth: 1, marginBottom: 16, gap: 3 },
   tab: {flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 10, borderRadius: 8, borderBottomWidth: 2, minHeight: 44, minWidth: 0},
   tabText: {color: colors.muted, textAlign: "center", fontWeight: "600", fontSize: 11, letterSpacing: 0},
-  chip: {alignSelf: "flex-start", paddingHorizontal: 6, paddingVertical: 3, borderWidth: 0, borderRadius: 12, maxWidth: "100%", flexShrink: 1},
+  chip: {alignSelf: "flex-start", paddingHorizontal: 7, paddingVertical: 4, borderWidth: 1, borderRadius: 12, maxWidth: "100%", flexShrink: 1},
   chipText: { fontWeight: "600", fontSize: 10, letterSpacing: 0},
   meterTrack: { overflow: "hidden", borderWidth: 0, borderRadius: 3, },
   meterFill: { height: "100%" },

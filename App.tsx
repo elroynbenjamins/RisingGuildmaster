@@ -33,6 +33,7 @@ import { DUNGEON_UNLOCK_HERO_COUNT } from "./src/game/dungeons/dungeonDraftServi
 import { MainMenuScreen } from "./src/screens/MainMenu/MainMenuScreen";
 import { TutorialScreen } from "./src/screens/Tutorial/TutorialScreen";
 import { beginTutorial, hasSeenContextualTutorial, markContextualTutorialSeen, skipTutorial } from "./src/game/onboarding/tutorialService";
+import { markFourthHeroReady } from "./src/game/onboarding/starterJourneyService";
 import { spendPartyAdventureStamina } from "./src/game/heroes/adventureStaminaService";
 import { advanceGuildTime } from "./src/game/economy/guildCalendarService";
 import { applyStoryRaceUnlocks } from "./src/game/monetization/contentUnlockService";
@@ -230,6 +231,7 @@ function Game() {
       const quest = QUESTS[route.questId]!;
       if (status === "victory" && !quest.repeatable && !updated.world.completedQuestIds.includes(route.questId)) updated = { ...updated, world: { ...updated.world, completedQuestIds: [...updated.world.completedQuestIds, route.questId] } };
       if (status === "victory" && quest.setWorldFlagsOnVictory) updated = { ...updated, world: { ...updated.world, worldFlags: { ...updated.world.worldFlags, ...quest.setWorldFlagsOnVictory } } };
+      if (status === "victory") updated = markFourthHeroReady(updated);
       if (status === "victory") updated = applyStoryRaceUnlocks(updated);
       if (status === "victory") updated = { ...updated, world: resolveRegionalThreatForQuest(updated.world, quest.id) };
       if (status === "victory") updated = applyBountyReward(updated, quest.id).guild;

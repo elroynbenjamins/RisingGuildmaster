@@ -6,6 +6,7 @@ import type { GuildState } from "../guild/types";
 import { calculateHero } from "../heroes/heroCalculator";
 import type { ConditionId, Hero } from "../heroes/types";
 import type { GemTransaction } from "../monetization/gemTypes";
+import { calendarDateKey } from "../monetization/contentUnlockService";
 
 const TREATABLE_CONDITIONS = new Set<ConditionId>(Object.keys(TEMPLE_CONFIG.conditionTreatmentCosts) as ConditionId[]);
 
@@ -92,12 +93,20 @@ export function fullyTreatHero(guild: GuildState, heroId: string): GuildState {
   return replaceHero(paid, { ...treated, currentHP: calculateHero(treated).stats.maxHP, isAvailable: true });
 }
 
-export function reviveHero(guild: GuildState, heroId: string): GuildState {
+export function canUseFreeDailyRevive(guild: GuildState, date = new Date()): boolean {
+  return Boolean(guild.entitlements.adsRemoved) && guild.lastFreeReviveDate !== calendarDateKey(date);
+}
+
+export function reviveHero(guild: GuildState, heroId: string, date = new Date()): GuildState {
   requireLocalHealingService(guild);
   const hero = findHero(guild, heroId);
   if (hero.currentHP > 0) throw new Error("This hero is not fallen");
-  if (guild.gems < TEMPLE_CONFIG.revivalGemCost) throw new Error("Not enough gems");
+  const useFreeRevive = canUseFreeDailyRevive(guild, date);
+  if (!useFreeRevive && guild.gems < TEMPLE_CONFIG.revivalGemCost) throw new Error("Not enough gems");
   const revived = { ...hero, currentHP: Math.max(1, Math.round(calculateHero(hero).stats.maxHP * TEMPLE_CONFIG.revivedHpRatio)), conditions: hasInjury(hero.conditions) ? hero.conditions : addCondition(hero.conditions, "injured"), isAvailable: true };
+  if (useFreeRevive) {
+    return replaceHero({ ...guild, lastFreeReviveDate: calendarDateKey(date) }, revived);
+  }
   const transaction: GemTransaction = { id: `revival-${hero.id}-${guild.currentDay}-${guild.gemTransactions.length}`, type: "revival", amount: -TEMPLE_CONFIG.revivalGemCost, day: guild.currentDay, note: `Revived ${hero.name}` };
   return replaceHero({ ...guild, gems: guild.gems - TEMPLE_CONFIG.revivalGemCost, gemTransactions: [...guild.gemTransactions, transaction] }, revived);
 }

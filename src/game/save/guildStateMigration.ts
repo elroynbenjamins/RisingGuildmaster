@@ -87,7 +87,7 @@ export function migrateGuildState(value: unknown): GuildState {
     const portraitVariant = candidate.heroPreview.portraitVariant ?? 0;
 
     return {
-      ...candidate,
+      ...stripLegacyPotential(candidate),
       source: candidate.source ?? "guild_board",
       sourceRaceId: candidate.sourceRaceId ?? null,
       sourceRegionId: candidate.sourceRegionId ?? null,
@@ -98,7 +98,7 @@ export function migrateGuildState(value: unknown): GuildState {
       weeklySalaryEstimateMin: candidate.weeklySalaryEstimateMin ?? salary.minimum,
       weeklySalaryEstimateMax: candidate.weeklySalaryEstimateMax ?? salary.maximum,
       heroPreview: {
-        ...candidate.heroPreview,
+        ...stripLegacyPotential(candidate.heroPreview),
         gender,
         portraitVariant,
         portraitKey: `${candidate.heroPreview.raceId}-${candidate.heroPreview.classId}-${gender}-v${portraitVariant}`,
@@ -153,7 +153,7 @@ export function migrateGuildState(value: unknown): GuildState {
     const gender = migrateGender(hero.gender);
     const portraitVariant = hero.portraitVariant ?? 0;
     return {
-      ...hero,
+      ...stripLegacyPotential(hero),
       gender,
       portraitVariant,
       portraitKey: `${hero.raceId}-${hero.classId}-${gender}-v${portraitVariant}`,
@@ -254,6 +254,7 @@ export function migrateGuildState(value: unknown): GuildState {
       reservedCandidateId: recruitment.reservedCandidateId ?? null,
       reservationExpiresAtDay: recruitment.reservationExpiresAtDay ?? null,
       regionalScoutMission: recruitment.regionalScoutMission ?? null,
+      formerMembers: (recruitment.formerMembers ?? []).map((member) => ({ ...member, hero: stripLegacyPotential(member.hero) })),
     },
     heroes: migratedHeroes,
   };

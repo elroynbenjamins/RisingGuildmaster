@@ -23,7 +23,7 @@ export function applyContentEntitlements(guild: GuildState, accountEntitlements:
 }
 export const createDailyLoginState = (): DailyLoginState => ({ lastClaimDate: null, totalClaims: 0 });
 export const calendarDateKey = (date = new Date()): string => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-export const canClaimDailyLogin = (guild: GuildState, date = new Date()): boolean => guild.dailyLogin.lastClaimDate !== calendarDateKey(date);
+export const canClaimDailyLogin = (guild: GuildState, date = new Date()): boolean => { const dateKey = calendarDateKey(date); return guild.dailyLogin.lastClaimDate !== dateKey && !guild.gemTransactions.some((transaction) => transaction.id === `daily-login-${dateKey}`); };
 
 export function getDailyLoginGemReward(guild: GuildState): number {
   return DAILY_LOGIN_GEMS + (guild.entitlements.adsRemoved ? REMOVE_ADS_DAILY_BONUS_GEMS : 0);

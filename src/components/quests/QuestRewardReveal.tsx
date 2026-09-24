@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { AccessibilityInfo, Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { AccessibilityInfo, Animated, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import type { QuestDefinition } from "../../game/quests/questTypes";
 import type { QuestResultSummary } from "../../game/quests/questResultTypes";
 import { getEquipmentRewardPresentation, getHeroQuestProgressPresentation, type RewardRarityTone } from "../../game/quests/questRewardPresentationService";
@@ -108,8 +108,8 @@ export function QuestRewardReveal({ summary, quest, openLoot, openHeroSkills, op
       </RewardStage> : null}
     </> : null}
 
-    <SectionTitle>PARTY PROGRESSION</SectionTitle>
-    {summary.heroOutcomes.map((hero, index) => <HeroProgressionRewardCard key={hero.heroId} outcome={hero} delay={victory ? 300 + index * 110 : index * 80} reducedMotion={reducedMotion} openSkills={() => openHeroSkills(hero.heroId)} />)}
+    <SectionTitle>PARTY PROGRESSION · {summary.heroOutcomes.length}</SectionTitle>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.heroProgressionStrip}>{summary.heroOutcomes.map((hero, index) => <View key={hero.heroId} style={styles.heroProgressionCard}><HeroProgressionRewardCard outcome={hero} delay={victory ? 300 + index * 110 : index * 80} reducedMotion={reducedMotion} openSkills={() => openHeroSkills(hero.heroId)} /></View>)}</ScrollView>
   </>;
 }
 
@@ -208,7 +208,9 @@ const styles = StyleSheet.create({
   materialRow: { alignItems: "center", borderTopColor: colors.border, borderTopWidth: 1, flexDirection: "row", gap: 10, paddingVertical: 8 },
   materialName: { color: colors.text, fontSize: 13, fontWeight: "900" },
   materialAmount: { color: colors.gold, fontSize: 18, fontWeight: "900" },
-  heroCard: { borderColor: colors.border, marginBottom: 9, overflow: "hidden" },
+  heroProgressionStrip: { gap: 8, paddingBottom: 2, paddingRight: 14 },
+  heroProgressionCard: { width: 286 },
+  heroCard: { borderColor: colors.border, marginBottom: 2, minHeight: 210, overflow: "hidden" },
   levelUpCard: { borderColor: colors.gold, borderWidth: 3 },
   fallenCard: { borderColor: colors.danger },
   heroHeader: { alignItems: "center", flexDirection: "row", gap: 10 },

@@ -32,7 +32,7 @@ import { isChapterOneComplete } from "./src/game/dungeons/rogueliteRotationServi
 import { DUNGEON_UNLOCK_HERO_COUNT } from "./src/game/dungeons/dungeonDraftService";
 import { MainMenuScreen } from "./src/screens/MainMenu/MainMenuScreen";
 import { TutorialScreen } from "./src/screens/Tutorial/TutorialScreen";
-import { beginTutorial, hasSeenContextualTutorial, markContextualTutorialSeen, skipTutorial } from "./src/game/onboarding/tutorialService";
+import { beginTutorial, getTutorialResumeDestination, hasSeenContextualTutorial, markContextualTutorialSeen, skipTutorial } from "./src/game/onboarding/tutorialService";
 import { markFourthHeroReady } from "./src/game/onboarding/starterJourneyService";
 import { commitQuestPartyToCombat, type QuestPreCombatCondition } from "./src/game/quests/questCombatCommitService";
 import { advanceGuildTime } from "./src/game/economy/guildCalendarService";
@@ -112,6 +112,10 @@ function Game() {
     if (!run || run.status !== "active" || run.combatRandomState == null) return;
     setRoute({ name: "dungeonCombat" });
   }, [gameStarted, isHydrated, guild.pendingQuestResult, guild.activeQuestCombat, guild.activeDungeonRun, route.name]);
+  useEffect(() => {
+    if (!gameStarted || !isHydrated || guild.pendingQuestResult || guild.activeQuestCombat || guild.activeDungeonRun?.combatRandomState != null || route.name !== "main") return;
+    if (getTutorialResumeDestination(guild) === "recruitment") setRoute({ name: "recruitment" });
+  }, [gameStarted, isHydrated, guild.pendingQuestResult, guild.activeQuestCombat, guild.activeDungeonRun?.combatRandomState, guild.tutorial, route.name]);
   useEffect(() => {
     if (!gameStarted || !isHydrated || (guild.pendingQuestResult || guild.activeQuestCombat)) return;
     if (!areRegionalThreatsUnlocked(guild.world)) { threatIntroPromptedRef.current = false; return; }

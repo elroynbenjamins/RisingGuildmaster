@@ -53,21 +53,27 @@ export function GuildManagementScreen(props: GuildManagementScreenProps) {
     <BackButton onPress={props.onBack} />
     <Text style={styles.title}>Guild Management</Text>
     <Text style={styles.intro}>Command the guild, maintain its services, and consult its growing archives.</Text>
-    <Panel style={styles.shortcut}><Text style={styles.shortcutTitle}>EVERYDAY ACTIONS</Text><Text style={styles.shortcutText}>Recruitment, Training Hall, Quests, World, Heroes, and Inventory remain one tap away in the main navigation.</Text></Panel>
     <SegmentedTabs values={["Command", "Services", "Archives"] as const} value={section} onChange={setSection}/>
     <View style={styles.group}>
       <Text style={styles.section}>{group.title}</Text>
-      {group.entries.map((entry) => <Pressable key={entry.id} accessibilityRole="button" accessibilityLabel={`Open ${entry.name}`} onPress={actions[entry.id]}>
-        <Panel style={[styles.row, entry.id==="temple"?styles.serviceGreen:entry.id==="operations"?styles.serviceRed:entry.id==="gems"||entry.id==="content"?styles.serviceBlue:entry.id==="guildmaster"||entry.id==="legacy"||entry.id==="achievements"?styles.serviceGold:undefined]}><View style={styles.iconPlate}><GameIcon id={ENTRY_ICONS[entry.id]} size={30}/></View><View style={styles.copy}><Text style={styles.name}>{entry.name}</Text><Text style={styles.detail}>{entry.detail}</Text></View>{(entry.id === "gems" && notices.daily || entry.id === "guildmaster" && notices.guildmaster || entry.id === "roster" && notices.heroes || entry.id === "achievements" && notices.achievements) ? <NotificationDot/> : null}<Text style={styles.arrow}>›</Text></Panel>
-      </Pressable>)}
+      <View style={styles.entryGrid}>{group.entries.map((entry) => {
+        const notified = entry.id === "gems" && notices.daily || entry.id === "guildmaster" && notices.guildmaster || entry.id === "roster" && notices.heroes || entry.id === "achievements" && notices.achievements;
+        return <Pressable key={entry.id} accessibilityRole="button" accessibilityLabel={`Open ${entry.name}`} onPress={actions[entry.id]} style={styles.entryPressable}>
+          <Panel style={[styles.tile, entry.id==="temple"?styles.serviceGreen:entry.id==="operations"?styles.serviceRed:entry.id==="gems"||entry.id==="content"?styles.serviceBlue:entry.id==="guildmaster"||entry.id==="legacy"||entry.id==="achievements"?styles.serviceGold:undefined]}>
+            <View style={styles.tileTop}><View style={styles.iconPlate}><GameIcon id={ENTRY_ICONS[entry.id]} size={28}/></View><View style={styles.tileSignals}>{notified ? <NotificationDot/> : null}<Text style={styles.arrow}>›</Text></View></View>
+            <Text style={styles.name}>{entry.name}</Text><Text numberOfLines={2} style={styles.detail}>{entry.detail}</Text>
+          </Panel>
+        </Pressable>;
+      })}</View>
     </View>
   </ScrollView>;
 }
 
 const styles = StyleSheet.create({
   content: { padding: 16, paddingBottom: 44 }, title: { color: colors.text, fontSize: 30, fontWeight: "900", marginTop: 12 }, intro: { color: colors.muted, lineHeight: 20, marginVertical: 12 },
-  shortcut: { marginBottom: 18 }, shortcutTitle: { color: colors.gold, fontSize: 11, fontWeight: "900", letterSpacing: 1.2 }, shortcutText: { color: colors.muted, fontSize: 12, lineHeight: 18, marginTop: 5 },
-  group: { marginBottom: 10 }, section: { color: colors.gold, fontSize: 13, fontWeight: "900", letterSpacing: 1.5, marginBottom: 8 }, row: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginBottom: 8, minHeight: 72 },
-  serviceGold:{borderLeftColor:colors.gold,borderLeftWidth:3},serviceGreen:{borderLeftColor:colors.green,borderLeftWidth:3},serviceBlue:{borderLeftColor:colors.blue,borderLeftWidth:3},serviceRed:{borderLeftColor:colors.danger,borderLeftWidth:3},iconPlate:{alignItems:"center",justifyContent:"center",width:34},copy: { flex: 1, paddingRight: 12 }, name: { color: colors.text, fontSize: 17, fontWeight: "800" }, detail: { color: colors.muted, fontSize: 12, lineHeight: 17, marginTop: 4 }, arrow: { color: colors.gold, fontSize: 30 },
+  group: { marginBottom: 10 }, section: { color: colors.gold, fontSize: 13, fontWeight: "900", letterSpacing: 1.5, marginBottom: 8 },
+  entryGrid:{flexDirection:"row",flexWrap:"wrap",gap:8},entryPressable:{flexBasis:"47%",flexGrow:1,minWidth:138},
+  tile:{minHeight:126,justifyContent:"flex-start",padding:11},tileTop:{alignItems:"center",flexDirection:"row",justifyContent:"space-between",marginBottom:8},tileSignals:{alignItems:"center",flexDirection:"row",gap:5},
+  serviceGold:{borderTopColor:colors.gold,borderTopWidth:3},serviceGreen:{borderTopColor:colors.green,borderTopWidth:3},serviceBlue:{borderTopColor:colors.blue,borderTopWidth:3},serviceRed:{borderTopColor:colors.danger,borderTopWidth:3},iconPlate:{alignItems:"center",justifyContent:"center",width:32},name:{color:colors.text,fontSize:15,fontWeight:"800",lineHeight:19},detail:{color:colors.muted,fontSize:11,lineHeight:15,marginTop:4},arrow:{color:colors.gold,fontSize:22},
   futureButton: { alignItems: "center", borderColor: colors.border, borderTopWidth: 1, marginTop: 6, paddingVertical: 15 }, futureLabel: { color: colors.muted, fontSize: 12, fontWeight: "900", letterSpacing: 1.1 }, futurePanel: { marginBottom: 10 },
 });

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useGameDialog } from "../../components/dialogs/GameDialog";
-import { ActionButton, BackButton, EmptyState, MiniMeter, Panel, Portrait, SecondaryButton, SectionTitle, StatusChip, colors } from "../../components/ui";
+import { ActionButton, BackButton, EmptyState, MiniMeter, Panel, Portrait, SecondaryButton, SectionTitle, SegmentedTabs, StatusChip, colors } from "../../components/ui";
 import { TRAINING_PROGRAMS } from "../../data/training/trainingPrograms";
 import { TRAINING_GROUND_CONFIG } from "../../config/trainingConfig";
 import { getTrainingGoldCost, calculateTrainingQuote, startHeroTraining, startTrainingGroundUpgrade, trainingCapacity } from "../../game/training/trainingService";
@@ -16,6 +16,7 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
   const available = guild.heroes.filter((hero) => hero.isAvailable && hero.currentHP > 0);
   const [heroId, setHeroId] = useState<string | undefined>(available[0]?.id);
   const [programId, setProgramId] = useState<TrainingProgramId>("sparring_drills");
+  const [tab,setTab]=useState<"Train"|"Active">("Train");
   const hero = guild.heroes.find((item) => item.id === heroId);
   const program = TRAINING_PROGRAMS[programId];
   const programQuotes = useMemo(() => new Map(Object.values(TRAINING_PROGRAMS).map((entry) => [entry.id, hero ? calculateTrainingQuote(hero, entry.id, guild) : undefined])), [guild, hero]);
@@ -76,16 +77,16 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
       {openSideQuests && <ActionButton label={`BROWSE SIDE QUESTS${catchup.sideQuestCount ? ` · ${catchup.sideQuestCount}` : ""}`} onPress={openSideQuests}/>}
     </Panel>}
 
-    <SectionTitle>ACTIVE TRAINING</SectionTitle>
+    <SegmentedTabs values={["Train","Active"] as const} value={tab} onChange={setTab}/>{tab==="Active"&&<><SectionTitle>ACTIVE TRAINING</SectionTitle>
     <View style={styles.slotGrid}>{Array.from({ length: capacity }, (_, index) => {
       const session = sessions[index];
       if (!session) return <Panel key={`empty-${index}`} style={styles.emptySlot}><Text style={styles.emptySlotNumber}>SLOT {index + 1}</Text><Text style={styles.emptySlotTitle}>AVAILABLE</Text><Text style={styles.meta}>Assign an available hero below.</Text></Panel>;
       const trainee = guild.heroes.find((entry) => entry.id === session.heroId);
       return <Panel key={session.sessionId} style={styles.session}><View style={styles.sessionHead}>{trainee ? <Portrait hero={trainee} size={48}/> : null}<View style={styles.flex}><Text style={styles.sessionSlot}>SLOT {index + 1} · TRAINING</Text><Text style={styles.sessionName}>{session.heroName}</Text><Text style={styles.meta}>{session.programName}</Text></View><StatusChip label={`${session.daysRemaining}D LEFT`} tone={session.daysRemaining <= 1 ? "good" : "blue"}/></View><MiniMeter value={session.elapsedDays} max={session.durationDays} color={colors.green} height={7}/><View style={styles.sessionStats}><Text style={styles.reward}>+{session.xpReward} XP</Text><Text style={styles.meta}>Readiness on return · {Math.round(session.readinessAtCompletion)}</Text><Text style={styles.meta}>Ready Day {session.completionDay}</Text></View></Panel>;
     })}</View>
-    {sessions.length > 0 && <SecondaryButton label="OPEN GUILD CALENDAR" onPress={openCalendar}/>}
+    {sessions.length > 0 && <SecondaryButton label="OPEN GUILD CALENDAR" onPress={openCalendar}/>}</>}
 
-    <SectionTitle>SELECT HERO</SectionTitle>
+    {tab==="Train"&&<><SectionTitle>SELECT HERO</SectionTitle>
     {available.length ? <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.heroRow}>{available.map((entry) => <Pressable key={entry.id} accessibilityRole="button" accessibilityLabel={`Select ${entry.name} for training`} accessibilityState={{ selected: heroId === entry.id }} aria-pressed={heroId === entry.id} onPress={() => setHeroId(entry.id)}><Panel style={[styles.hero, heroId === entry.id && styles.selected]}><Portrait hero={entry} size={58}/><Text style={[styles.heroName, { color: getRaceNameColor(entry.raceId) }]}>{entry.name}</Text><Text style={styles.heroLevel}>LV {entry.level}</Text><Text style={styles.heroMeta}>Readiness {Math.round(entry.adventureStamina)}</Text><Text style={styles.heroMeta}>Potential {entry.potentialEstimateMin}–{entry.potentialEstimateMax}</Text></Panel></Pressable>)}</ScrollView> : <EmptyState title="No heroes available" message="Heroes who are fallen, away on guild work, or already training cannot begin another program."/>}
 
     <SectionTitle>CHOOSE PROGRAM</SectionTitle>
@@ -108,7 +109,7 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
         <Text style={styles.quoteNote}>Daily calendar recovery still applies while training, so readiness can improve before the hero returns. Training never grants permanent attributes.</Text>
         <ActionButton label={quote.canBegin ? `BEGIN ${program.name.toUpperCase()} · READY DAY ${quote.completionDay}` : "TRAINING REQUIREMENTS NOT MET"} disabled={!quote.canBegin} onPress={begin}/>
       </Panel>
-    </> : null}
+    </> : null}</>}
   </ScrollView>;
 }
 

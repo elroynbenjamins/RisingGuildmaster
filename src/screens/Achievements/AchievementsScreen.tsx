@@ -5,6 +5,7 @@ import { ActionButton, BackButton, Panel, SegmentedTabs, colors } from "../../co
 import { getAllAchievementProgress, claimAchievement } from "../../game/achievements/achievementService";
 import type { AchievementCategory } from "../../game/achievements/achievementTypes";
 import { useGuild } from "../../state/GuildContext";
+import { triggerTactileFeedback } from "../../ui/tactileFeedback";
 
 const CATEGORIES: ("All"|AchievementCategory)[] = ["All","Guild","Heroes","Adventures","Collection","Crafting"];
 
@@ -16,7 +17,7 @@ export function AchievementsScreen({onBack}:{onBack():void}) {
   const visible=category==="All"?progress:progress.filter((entry)=>entry.definition.category===category);
   const complete=progress.filter((entry)=>entry.complete).length;
   const claimed=progress.filter((entry)=>entry.claimed).length;
-  const claim=(id:string)=>{try{const entry=progress.find((item)=>item.definition.id===id);const before=guild.gems;const next=claimAchievement(guild,id);updateGuild(next);setMessage(`${entry?.definition.title ?? "Achievement"} complete · +${next.gems-before} Gems · ${before} → ${next.gems}`);}catch{/* stale taps are harmless */}};
+  const claim=(id:string)=>{try{const entry=progress.find((item)=>item.definition.id===id);const before=guild.gems;const next=claimAchievement(guild,id);updateGuild(next);triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");setMessage(`${entry?.definition.title ?? "Achievement"} complete · +${next.gems-before} Gems · ${before} → ${next.gems}`);}catch{triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");}};
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack}/>
     <Text style={styles.eyebrow}>GUILD MILESTONES</Text><Text style={styles.title}>Achievements</Text>
@@ -30,7 +31,7 @@ export function AchievementsScreen({onBack}:{onBack():void}) {
         <Text style={styles.description}>{entry.definition.description}</Text>
         <View style={styles.progressRow}><Text style={styles.progressText}>{Math.min(entry.current,entry.target)} / {entry.target}</Text><Text style={entry.complete?styles.ready:styles.progressText}>{entry.claimed?"CLAIMED":entry.complete?"COMPLETE":"IN PROGRESS"}</Text></View>
         <View style={styles.track}><View style={[styles.fill,{width:`${pct}%`}]}/></View>
-        {entry.complete&&!entry.claimed?<ActionButton label={`Claim +${entry.definition.rewardGems} Gems`} onPress={()=>claim(entry.definition.id)}/>:null}
+        {entry.complete&&!entry.claimed?<ActionButton guardMs={500} label={`Claim +${entry.definition.rewardGems} Gems`} onPress={()=>claim(entry.definition.id)}/>:null}
       </Panel>;
     })}
   </ScrollView>;

@@ -7,6 +7,7 @@ import { REGIONS } from "../../data/world/regions";
 import type { GameIconId } from "../../data/ui/gameIcons";
 import type { GuildState } from "../guild/types";
 import { isChapterOneComplete } from "../dungeons/rogueliteRotationService";
+import { IDLE_MISSION_UNLOCK_HERO_COUNT } from "../gathering/gatheringService";
 import { GUILD_OPERATION_TEAM_SIZE, isGuildOperationsUnlocked } from "../operations/guildOperationService";
 import { isRaidUnlocked } from "../raids/raidService";
 import { resolveEquipmentDefinition } from "../equipment/equipmentResolver";
@@ -43,6 +44,7 @@ export function getCurrentUnlockNotices(guild: GuildState): UnlockNotice[] {
     notices.push({ id:`recipe:${recipeId}`, title:item?.name ?? recipeId.replace(/_/g," "), detail:"New crafting pattern unlocked.", iconId:"blacksmith" });
   }
 
+  if (guild.heroes.length >= IDLE_MISSION_UNLOCK_HERO_COUNT) notices.push({ id:"system:gathering", title:"Idle Missions", detail:"Two-hero material expeditions are now available, including guaranteed +5% next-level XP progress on claim.", iconId:"materials" });
   if (isGuildOperationsUnlocked(guild) && guild.heroes.length >= GUILD_OPERATION_TEAM_SIZE * 2) notices.push({ id:"system:operations", title:"Crisis Operations", detail:"Six-hero strategic operations are now available.", iconId:"management" });
   if (isChapterOneComplete(guild) && guild.heroes.length >= 6) notices.push({ id:"system:roguelite", title:"Roguelite Expeditions", detail:"Four-hero branching Wardstone expeditions are now available.", iconId:"loot" });
 

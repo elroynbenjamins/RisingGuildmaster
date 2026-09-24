@@ -98,7 +98,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
       const result = travelGuildPartyToRegion(guild, selectedId, travelPartyIds, random);
       const world = discoverRegionSettlements(result.guild.world, selectedId);
       updateGuild({ ...result.guild, world, recentPartyHeroIds: travelPartyIds });
-      setMessage(`Arrived in ${selected.name} after ${result.days} days. Used ${result.rationCost} rations. d100: ${result.d100Roll}${result.tier ? ` · ${result.tier.toUpperCase()} event` : " · quiet journey"}.`);
+      setMessage(`ARRIVED · ${selected.name} · Day ${guild.currentDay} → ${result.guild.currentDay} · Rations -${result.rationCost}${result.tier ? ` · ${result.tier.toUpperCase()} road event` : " · Safe journey"}`);
       if (result.event) openEvent(result.event);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Travel failed");

@@ -46,7 +46,7 @@ export function BackButton({ onPress }: { onPress(): void }) {
 
 export function EmptyState({ title, message, actionLabel, onAction }: { title: string; message: string; actionLabel?: string; onAction?(): void }) {
   const { colors: c } = useTheme();
-  return <Panel style={styles.empty}><Text style={[styles.emptyTitle, { color: c.text }]}>{title}</Text><Text style={[styles.muted, { color: c.muted }]}>{message}</Text>{actionLabel && onAction ? <ActionButton label={actionLabel} onPress={onAction} /> : null}</Panel>;
+  return <Panel style={[styles.empty,{borderLeftColor:c.gold}]}><Text style={[styles.emptyTitle, { color: c.text }]}>{title}</Text><Text style={[styles.muted, { color: c.muted }]}>{message}</Text>{actionLabel && onAction ? <ActionButton label={actionLabel} onPress={onAction} /> : null}</Panel>;
 }
 
 export function SegmentedTabs<T extends string>({ values, value, onChange, notificationValues = [] }: { values: readonly T[]; value: T; onChange(value: any): void; notificationValues?: readonly T[] }) {
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   sectionTitle: {color: colors.gold, fontWeight: "900", letterSpacing: .8, fontSize: 12},
   sectionRule:{flex:1,height:1,opacity:.75},
   button: { paddingHorizontal: 14, paddingVertical: 12, alignItems: "center", minHeight: 44, justifyContent: "center", borderWidth: 0, borderRadius: 10, },
-  secondaryButton: { paddingHorizontal: 13, paddingVertical: 10, alignItems: "center", minHeight: 44, justifyContent: "center", borderWidth: 0, borderRadius: 10, },
+  secondaryButton: { paddingHorizontal: 13, paddingVertical: 10, alignItems: "center", minHeight: 44, justifyContent: "center", borderWidth: 1, borderRadius: 10, },
   secondaryText: {color: colors.gold, flexShrink:1, fontSize: 13, fontWeight: "600", textAlign: "center", letterSpacing: 0},
   buttonDim: { opacity: 0.55 },
   buttonPressed: { transform: [{ translateY: 1 }] },
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   buttonText: {color: "#17130c", flexShrink:1, fontSize: 14, letterSpacing: .3, fontWeight: "700", textAlign: "center"},
   backButton: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center", paddingHorizontal: 10, borderWidth: 0, borderRadius: 10, },
   back: { color: colors.gold, fontSize: 12, fontWeight: "900", letterSpacing: .8 },
-  empty: { alignItems: "stretch", gap: 12 },
+  empty: { alignItems: "stretch", borderLeftWidth: 3, gap: 12 },
   emptyTitle: { color: colors.text, fontSize: 18, fontWeight: "900" },
   muted: { color: colors.muted, fontSize: 12 },
   tabs: { flexDirection: "row", borderBottomWidth: 1, marginBottom: 16, gap: 3 },

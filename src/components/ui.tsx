@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   button: { paddingHorizontal: 14, paddingVertical: 12, alignItems: "center", minHeight: 44, justifyContent: "center", borderWidth: 0, borderRadius: 10, },
   secondaryButton: { paddingHorizontal: 13, paddingVertical: 10, alignItems: "center", minHeight: 44, justifyContent: "center", borderWidth: 1, borderRadius: 10, },
   secondaryText: {color: colors.gold, flexShrink:1, fontSize: 13, fontWeight: "600", textAlign: "center", letterSpacing: 0},
-  buttonDim: { opacity: 0.55 },
+  buttonDim: { opacity: 0.74 },
   buttonPressed: { transform: [{ translateY: 1 }] },
   buttonContent:{alignItems:"center",flexDirection:"row",gap:5,justifyContent:"center",maxWidth:"100%",minWidth:0},
   buttonText: {color: "#17130c", flexShrink:1, fontSize: 14, letterSpacing: .3, fontWeight: "700", textAlign: "center"},

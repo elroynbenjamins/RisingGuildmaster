@@ -41,6 +41,19 @@ describe("two save slots", () => {
     expect((await loadGuild(2))?.guildName).toBe("Second Banner");
   });
 
+  it("shares one gem wallet across both save slots", async () => {
+    const first = { ...createGuild("Gem One"), gems: 42 };
+    await saveGuild(first, 1);
+    const second = { ...createGuild("Gem Two"), gems: 42 };
+    await saveGuild(second, 2);
+    expect((await loadGuild(1))?.gems).toBe(42);
+    expect((await loadGuild(2))?.gems).toBe(42);
+
+    const spent = { ...(await loadGuild(1))!, gems: 37 };
+    await saveGuild(spent, 1);
+    expect((await loadGuild(2))?.gems).toBe(37);
+  });
+
   it("recovers a corrupt primary save from its last valid backup without touching the other slot", async () => {
     const first = createGuild("Backup Banner");
     first.currentDay = 4;

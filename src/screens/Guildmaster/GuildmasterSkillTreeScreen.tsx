@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { SkillDetailsModal } from "../../components/skills/SkillDetailsModal";
+import { useGameToast } from "../../components/feedback/GameToast";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { GameIcon } from "../../components/icons/GameIcon";
 import { ActionButton, BackButton, Panel, colors } from "../../components/ui";
@@ -24,13 +25,14 @@ function nodeState(profile: GuildmasterProfile, id: GuildmasterSkillId) {
 
 export function GuildmasterSkillTreeScreen({ onBack }: { onBack(): void }) {
   const { guild, updateGuild } = useGuild();
+  const { showToast } = useGameToast();
   const profile = guild.guildmaster;
   const [selectedId, setSelectedId] = useState<GuildmasterSkillId>("scouting_basics");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [message, setMessage] = useState<string>();
   const requiredXp = guildmasterXpToNextLevel(profile.level);
   const selectNode = (id: GuildmasterSkillId) => { setSelectedId(id); setMessage(undefined); setDetailsOpen(true); };
-  const learn = () => { try { const selected = GUILDMASTER_SKILLS[selectedId]; const guildmaster = unlockGuildmasterSkill(profile, selectedId); updateGuild({ ...guild, guildmaster }); setMessage(`${selected.name} unlocked.`); } catch (error) { setMessage(error instanceof Error ? error.message : "Unable to unlock skill"); } };
+  const learn = () => { try { const selected = GUILDMASTER_SKILLS[selectedId]; const guildmaster = unlockGuildmasterSkill(profile, selectedId); updateGuild({ ...guild, guildmaster }); setMessage(undefined); showToast({title:"Guildmaster Skill Unlocked",message:`${selected.name} is now active across the guild.`,tone:"gold"}); } catch (error) { const message=error instanceof Error ? error.message : "Unable to unlock skill"; setMessage(message); showToast({title:"Skill Unlock Failed",message,tone:"danger"}); } };
 
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} /><Text style={styles.eyebrow}>GUILD LEADERSHIP</Text><Text style={styles.title}>Guildmaster Skill Tree</Text>

@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { GuildState } from "../guild/types";
 import { applyContentEntitlements, applyStoryRaceUnlocks } from "../monetization/contentUnlockService";
 import { loadAccountContentEntitlements, saveAccountContentEntitlements } from "../monetization/accountEntitlementService";
+import { applyAccountGemWallet, gemWalletFromGuild, loadAccountGemWallet, saveAccountGemWallet, type AccountGemWallet } from "../monetization/accountGemWalletService";
 import { migrateGuildState } from "./guildStateMigration";
 import { UnsupportedSaveSchemaError, decodePersistedSave, serializePersistedGuild } from "./saveSchema";
 
@@ -66,7 +67,7 @@ export function deserializeGuild(value: string): GuildState {
 async function saveGuildImmediate(guild: GuildState, slotId: SaveSlotId): Promise<void> {
   await importHistoricalSlot(slotId);
   const entitlementAwareGuild = applyStoryRaceUnlocks(guild);
-  await saveAccountContentEntitlements(entitlementAwareGuild.entitlements);
+  await Promise.all([saveAccountContentEntitlements(entitlementAwareGuild.entitlements), saveAccountGemWallet(gemWalletFromGuild(entitlementAwareGuild))]);
 
   const next = serializePersistedGuild(entitlementAwareGuild);
   // Validate the exact payload before it can replace a known-good primary.
@@ -102,13 +103,13 @@ export async function saveGuild(guild: GuildState, slotId: SaveSlotId = 1): Prom
 
 type AccountEntitlements = Awaited<ReturnType<typeof loadAccountContentEntitlements>>;
 
-async function prepareLoadedGuild(value: string, accountEntitlements: AccountEntitlements): Promise<{
+async function prepareLoadedGuild(value: string, accountEntitlements: AccountEntitlements, accountWallet: AccountGemWallet | null): Promise<{
   guild: GuildState;
   needsSchemaRewrite: boolean;
 }> {
   const decoded = decodePersistedSave(value);
   const migrated = applyStoryRaceUnlocks(migrateDomain(JSON.stringify(migrateGuildState(decoded.guild))));
-  const guild = applyContentEntitlements(migrated, accountEntitlements);
+  const guild = applyAccountGemWallet(applyContentEntitlements(migrated, accountEntitlements), accountWallet);
   await saveAccountContentEntitlements(guild.entitlements);
   return { guild, needsSchemaRewrite: decoded.migrated };
 }
@@ -117,11 +118,12 @@ async function loadFromKeys(
   primaryKey: string,
   backupKey: string,
   accountEntitlements: AccountEntitlements,
+  accountWallet: AccountGemWallet | null,
 ): Promise<GuildState | null> {
   const primary = await AsyncStorage.getItem(primaryKey);
   if (primary !== null) {
     try {
-      const loaded = await prepareLoadedGuild(primary, accountEntitlements);
+      const loaded = await prepareLoadedGuild(primary, accountEntitlements, accountWallet);
       if (loaded.needsSchemaRewrite) {
         // Upgrade old raw/v1 payloads in place only after they have loaded and
         // normalized successfully. The old primary becomes the recovery copy.
@@ -143,7 +145,7 @@ async function loadFromKeys(
     return null;
   }
 
-  const recovered = await prepareLoadedGuild(backup, accountEntitlements);
+  const recovered = await prepareLoadedGuild(backup, accountEntitlements, accountWallet);
   // Recovery always writes a fresh current-schema primary, even if the backup
   // was already current, so a corrupt/interrupted primary is fully repaired.
   await AsyncStorage.setItem(primaryKey, serializePersistedGuild(recovered.guild));
@@ -154,14 +156,14 @@ async function loadFromKeys(
 export async function loadGuild(slotId: SaveSlotId = 1): Promise<GuildState | null> {
   await saveQueues[slotId];
   await importHistoricalSlot(slotId);
-  const accountEntitlements = await loadAccountContentEntitlements();
+  const [accountEntitlements, accountWallet] = await Promise.all([loadAccountContentEntitlements(), loadAccountGemWallet()]);
   const keys = SAVE_SLOT_KEYS[slotId];
-  const saved = await loadFromKeys(keys.primary, keys.backup, accountEntitlements);
+  const saved = await loadFromKeys(keys.primary, keys.backup, accountEntitlements, accountWallet);
   if (saved) return saved;
   if (slotId !== 1) return null;
 
   // One-time compatibility bridge: old single-save installs become Slot 1.
-  const legacy = await loadFromKeys(LEGACY_SAVE_KEY, LEGACY_BACKUP_SAVE_KEY, accountEntitlements);
+  const legacy = await loadFromKeys(LEGACY_SAVE_KEY, LEGACY_BACKUP_SAVE_KEY, accountEntitlements, accountWallet);
   if (!legacy) return null;
   await saveGuild(legacy, 1);
   return legacy;

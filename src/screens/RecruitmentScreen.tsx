@@ -9,7 +9,7 @@ import { CLASSES } from "../data/classes/classes";
 import { RACES } from "../data/races/races";
 import { RECRUITMENT_CONFIG } from "../data/recruitment/recruitmentBalance";
 import { TRAITS } from "../data/traits/traits";
-import { completeTutorial, skipTutorial } from "../game/onboarding/tutorialService";
+import { completeTutorial } from "../game/onboarding/tutorialService";
 import type { RecruitmentCandidate } from "../game/recruitment/recruitmentTypes";
 import { getCandidateRecruitmentPresentation, getRosterRoleSummary, type RecruitmentUiTone } from "../game/recruitment/recruitmentPresentationService";
 import { useGuild } from "../state/GuildContext";
@@ -57,17 +57,6 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
   const livingHeroes = guild.heroes.filter((hero) => hero.currentHP > 0);
   const roleSummary = getRosterRoleSummary(livingHeroes);
   const currentPayroll = guild.heroContracts.filter((contract) => livingHeroes.some((hero) => hero.id === contract.heroId)).reduce((sum, contract) => sum + contract.weeklySalary, 0);
-  const tutorialCopy = tutorial === "inspect_candidate"
-    ? "Inspect one adventurer. Start with role fit and Overview, then read Stats or Traits. The strongest-looking recruit is not always the best hire: party role, upfront fee, weekly payroll, and contract length all matter."
-    : tutorial === "recruit_first"
-        ? "Review complete. Sign your first contract when you are ready. Choose a role and salary that suit your guild. Comparing candidates is optional."
-        : tutorialRefresh
-          ? "A candidate batch allows one hire. Refresh the tavern board now; this guided refresh is free and required before hero 2."
-          : tutorial === "recruit_second"
-            ? "Choose exactly one adventurer from the refreshed arrivals. A balanced first party benefits from complementary frontline, support, and ranged roles."
-            : tutorial === "party_complete"
-              ? "Your first company is formed. The War Table will now guide your most important next order. Start Chapter 1 and clear the guildhall cellar to earn Guildhaven's trust."
-              : null;
   const leaveRecruitment = () => { if (tutorial === "party_complete") updateGuild(completeTutorial(guild)); onBack(); };
   const beginCampaign = () => { updateGuild(completeTutorial(guild)); openCampaign(); };
   const act = (action: () => string | null, success: string) => { const error = action(); if(error){triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");showToast({title:"Recruitment Action Failed",message:error,tone:"danger"});return;} triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); showToast({title:success.includes("joined")?"Contract Signed":success.includes("arrived")?"Recruitment Board Refreshed":success.includes("left")?"Candidate Passed":"Recruitment Updated",message:success,tone:success.includes("left")?"info":"success"}); };

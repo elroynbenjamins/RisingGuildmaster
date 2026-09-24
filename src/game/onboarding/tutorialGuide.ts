@@ -13,7 +13,7 @@ export const TUTORIAL_GUIDE_TOPICS: readonly TutorialGuideTopic[] = [
     subtitle: "Build a balanced guild without bankrupting it.",
     accent: "gold",
     bullets: [
-      "Candidate cards show tactical role fit, potential estimates, traits, upfront fee, weekly salary, and departure deadline.",
+      "Candidate cards show class, level, favored attributes, traits, upfront fee, weekly salary, and departure deadline.",
       "A candidate marked FILLS ... GAP covers a role your living roster currently lacks; balanced four-hero parties usually want frontline, support, and ranged coverage.",
       "Scouting narrows uncertain stats and contract estimates. Expert scouting reveals exact figures.",
       "Only one hero may be recruited from each candidate batch before the board must refresh. Reserved candidates survive a refresh for a limited time.",

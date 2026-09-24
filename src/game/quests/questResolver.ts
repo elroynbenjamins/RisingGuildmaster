@@ -20,7 +20,6 @@ import { recordQuestHistory } from "../heroes/heroHistoryService";
 import { getDifficulty } from "../../data/difficulty/difficulties";
 import { QUEST_ENCOUNTERS } from "../../data/encounters/questEncounters";
 import { getEnemyDefinition } from "../../data/enemies";
-import { potentialMultiplier } from "../progression/potential";
 import { applyCombatEquipmentWear } from "../equipment/equipmentDurabilityService";
 import { getGuildRank, getQuestReputationReward } from "../renown/guildLegacyService";
 import { getRegionThreatEffects } from "../world/regionalThreatService";
@@ -117,10 +116,10 @@ export function getQuestXpForHero(hero: Hero, quest: ReturnType<typeof getQuestD
   // Completion XP rewards objectives, checks, rescues, and other authored work that
   // is not represented by the number of enemies killed.
   const developmentBase = sharedEnemyXp + Math.max(0, quest.xpRewardPerHero);
-  const potentialXp = Math.round(developmentBase * potentialMultiplier(hero.potential));
-  if (!quest.repeatable || quest.recommendedLevelMax === undefined || hero.level <= quest.recommendedLevelMax) return potentialXp;
+  const developmentXp = Math.round(developmentBase);
+  if (!quest.repeatable || quest.recommendedLevelMax === undefined || hero.level <= quest.recommendedLevelMax) return developmentXp;
   const levelsAbove = hero.level - quest.recommendedLevelMax;
-  return Math.max(1, Math.round(potentialXp * Math.max(.1, 1 - levelsAbove * .25)));
+  return Math.max(1, Math.round(developmentXp * Math.max(.1, 1 - levelsAbove * .25)));
 }
 
 function persistHeroOutcome(hero: Hero, instance: HeroCombatInstance, xp: number, random: RandomSource, guild: GuildState): Hero {

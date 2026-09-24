@@ -368,8 +368,7 @@ export function HeroDetailScreen({
         </Panel>
       </>}
 
-      <SectionTitle>POTENTIAL</SectionTitle>
-      <Panel style={styles.sheetPanel}><View style={styles.row}><Text style={[styles.entryName, { color: c.text }]}>Scouted Potential</Text><Text style={[styles.potentialValue, { color: accent }]}>{liveHero.potentialEstimateMin}–{liveHero.potentialEstimateMax}</Text></View><Text style={[styles.hint, { color: c.muted }]}>Estimated scouting range. True potential remains hidden.</Text></Panel>
+
     </>}
 
     {tab === "Gear" && <>
@@ -414,7 +413,7 @@ export function HeroDetailScreen({
       })}</Panel>
 
       <SectionTitle>TRAITS</SectionTitle>
-      <Panel>{liveHero.traitIds.map((id) => <View key={id} style={styles.entry}><Text style={[styles.entryName, { color: c.text }]}>{TRAITS[id].name} · {TRAITS[id].category.toUpperCase()}</Text><Text style={[styles.hint, { color: c.muted }]}>{TRAITS[id].description}</Text>{TRAITS[id].modifiers.map((modifier, index) => <Text key={index} style={[styles.traitModifier, { color: modifier.value >= 0 ? c.green : c.danger }]}>{modifierText(modifier.operation, modifier.value, modifier.target)}{modifier.condition ? " while at or below 50% HP" : ""}</Text>)}</View>)}</Panel>
+      <Panel>{liveHero.traitIds.map((id) => <View key={id} style={styles.entry}><Text style={[styles.entryName, { color: TRAITS[id].polarity === "positive" ? c.green : TRAITS[id].polarity === "negative" ? c.danger : c.text }]}>{TRAITS[id].name} · {TRAITS[id].category.toUpperCase()}</Text><Text style={[styles.hint, { color: c.muted }]}>{TRAITS[id].description}</Text>{TRAITS[id].modifiers.map((modifier, index) => <Text key={index} style={[styles.traitModifier, { color: modifier.value >= 0 ? c.green : c.danger }]}>{modifierText(modifier.operation, modifier.value, modifier.target)}{modifier.condition ? " while at or below 50% HP" : ""}</Text>)}</View>)}</Panel>
 
       <SectionTitle>RELATIONSHIPS</SectionTitle>
       <Panel>{relationships.length ? relationships.map((entry) => <View key={entry.hero.id} style={styles.row}><View><Text style={[styles.entryName, { color: getRaceNameColor(entry.hero.raceId) }]}>{entry.hero.name}</Text><Text style={[styles.hint, { color: c.muted }]}>{RELATIONSHIP_BAND_LABELS[entry.band]}</Text></View><Text style={[styles.rowValue, { color: entry.score > 20 ? c.green : entry.score < -20 ? c.danger : c.muted }]}>{entry.score > 0 ? "+" : ""}{entry.score}</Text></View>) : <Text style={[styles.hint, { color: c.muted }]}>No meaningful bonds yet. Shared quests and difficult choices will shape them.</Text>}</Panel>
@@ -484,7 +483,6 @@ const styles = StyleSheet.create({
   contractStateRow: { alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: 7, marginTop: 9 },
   contractDetail: { fontSize: 9, fontWeight: "700" },
   loyaltyRecent: { fontSize: 9, fontWeight: "800", marginTop: 7 },
-  potentialValue: { fontSize: 18, fontWeight: "900" },
   tabIntro: { marginBottom: 4, paddingHorizontal: 2 },
   tabTitle: { fontSize: 18, fontWeight: "900" },
   tabDescription: { fontSize: 10, lineHeight: 15, marginTop: 3 },

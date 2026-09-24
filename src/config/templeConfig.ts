@@ -2,7 +2,7 @@ import type { ConditionId } from "../game/heroes/types";
 
 export const TEMPLE_CONFIG = {
   goldPerMissingHp: 0.9,
-  revivalGemCost: 3,
+  revivalGemCost: 5,
   revivedHpRatio: .25,
   rewardedAdGems: 5,
   conditionTreatmentCosts: {

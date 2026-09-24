@@ -1,3 +1,4 @@
+import { GAME_CONFIG } from "../../config/gameConfig";
 import { CLASSES } from "../../data/classes/classes";
 
 import { RACES } from "../../data/races/races";
@@ -49,7 +50,7 @@ export function generateHero(random: RandomSource, options: HeroGenerationOption
     history: createHeroHistory(),
     recruitmentCost: random.int(300, 750), salary: random.int(30, 85),
     isAvailable: true,
-    adventureStamina: 100,
+    adventureStamina: GAME_CONFIG.maxAdventureStamina,
     attributeGrowthProgress: { strength: 0, dexterity: 0, constitution: 0, intelligence: 0, wisdom: 0, charisma: 0 },
   };
   let progressed = hero; const targetLevel = options.level ?? 1;

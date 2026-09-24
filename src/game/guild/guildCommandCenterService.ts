@@ -18,6 +18,7 @@ export type GuildCommandDestination =
   | "guildmasterSkills"
   | "heroes"
   | "recruitment"
+  | "quests"
   | "sideQuests"
   | "temple"
   | "training"
@@ -225,6 +226,21 @@ export function getGuildCommandOrders(guild: GuildState): GuildCommandOrder[] {
         badge: `${readyCount}/${REGIONAL_THREAT_REQUIRED_HERO_COUNT} AT LV ${REGIONAL_THREAT_MIN_HERO_LEVEL}`,
       }, 15));
     }
+  }
+
+  const strategicReadyCount = guild.heroes.filter((hero) => hero.currentHP > 0 && hero.level >= REGIONAL_THREAT_MIN_HERO_LEVEL).length;
+  const hasTriedStrategicMode = guild.guildOperations.completedCount > 0 || Boolean(guild.activeDungeonRun) || guild.gatheringMissions.length > 0;
+  if (isChapterOneComplete(guild) && guild.heroes.length >= REGIONAL_THREAT_REQUIRED_HERO_COUNT && strategicReadyCount >= REGIONAL_THREAT_REQUIRED_HERO_COUNT && !areRegionalThreatsUnlocked(guild.world) && !hasTriedStrategicMode) {
+    orders.push(order({
+      id: "strategic_modes_ready",
+      title: "Six-Hero Strategic Roster Ready",
+      description: "Crisis Operations and Roguelite Expeditions are available from Special Activities now. Idle Missions are available from Inventory; Regional Threats begin once guild time advances.",
+      actionLabel: "OPEN SPECIAL ACTIVITIES",
+      destination: "quests",
+      iconId: "management",
+      tone: "ready",
+      badge: "6/6 READY",
+    }, 32));
   }
 
   const levelGuidance = getCampaignLevelGuidance(guild);

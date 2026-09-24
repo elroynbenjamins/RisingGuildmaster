@@ -137,7 +137,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
       }
       if(mode!=="skill"&&objectiveKeys.has(targetKey)){setSelectedPosition(position);lastTargetTap.current=null;return;}
       if (mode !== "skill" && occupantId && doubleTapped && autoBasicAttack && autoAttackableKeys.has(targetKey)) { setState((value)=>performHeroTurn(value, autoBasicAttack.skill.id, random.current, occupantId, position)); updateGuild((currentGuild)=>recordCombatTutorialAction(currentGuild,"used_basic_attack")); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); resetSelection(); return; }
-      if (mode !== "skill" && occupantId) { setInspectedCombatantId(occupantId); setSelectedPosition(position); lastTargetTap.current = null; return; }
+      if (mode !== "skill" && occupantId) { setInspectedCombatantId(occupantId); setSelectedPosition(position); lastTargetTap.current = autoAttackableKeys.has(targetKey) ? { targetKey, timestamp } : null; return; }
       if (mode === "skill" && targetableKeys.has(targetKey)) {
         setSelectedPosition(position); setSelectedTargetId(occupantId ?? undefined);
         if (doubleTapped && selectedSkillId) { setState((value) => performHeroTurn(value, selectedSkillId, random.current, occupantId ?? undefined, position)); if(HERO_SKILLS[selectedSkillId]?.type==="basic_attack") updateGuild((currentGuild)=>recordCombatTutorialAction(currentGuild,"used_basic_attack")); triggerTactileFeedback(guild.uiPreferences.tactileFeedback, "confirm"); resetSelection(); }

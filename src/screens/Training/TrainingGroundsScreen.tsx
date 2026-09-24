@@ -115,7 +115,7 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 18, paddingBottom: 55 },
+  content: { padding: 16, paddingBottom: 55 },
   headerIcon:{alignItems:"center",justifyContent:"center",width:38},header: { alignItems: "center", flexDirection: "row", gap: 9, marginTop: 7 },
   flex: { flex: 1 },
   eyebrow: { color: colors.gold, fontSize: 11, fontWeight: "600", letterSpacing: 1.5 },
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   sessionStats: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
   reward: { color: colors.green, fontSize: 10, fontWeight: "600" },
   heroRow: { gap: 8 },
-  hero: { alignItems: "center", minHeight: 150, width: 132 },
+  hero: { alignItems: "center", minHeight: 142, width: 124 },
   selectedPop:{backgroundColor:"#2b281c",borderColor:colors.gold,borderWidth:2},selected: { backgroundColor: colors.panel2, borderColor: colors.gold, borderWidth: 1 },
   heroName: { fontSize: 14, lineHeight: 19, textAlign: "center", fontWeight: "600", marginTop: 5, maxWidth: 110 },
   heroLevel: { color: colors.gold, fontSize: 11, fontWeight: "600", marginTop: 3 },

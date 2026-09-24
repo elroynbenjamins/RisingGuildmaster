@@ -13,12 +13,14 @@ import { getAdvancedClassName } from "../../game/progression/masteries/masterySe
 import { getRaceNameColor } from "../../ui/raceColors";
 import { useGameToast } from "../../components/feedback/GameToast";
 import { triggerTactileFeedback } from "../../ui/tactileFeedback";
+import { useGuild } from "../../state/GuildContext";
 
 const TIER_LABELS = ["FOUNDATION", "FIRST TECHNIQUE", "SPECIALIZATION", "VETERAN TECHNIQUE", "CLASS MASTERY"] as const;
 const stateLabel = { learned: "LEARNED", available: "AVAILABLE", locked_level: "LEVEL LOCKED", locked_prerequisite: "PATH LOCKED", no_points: "NO SKILL POINT" } as const;
 
 export function SkillTreeScreen({ hero, onBack, onUpdate, openClassPath }: { hero: Hero; onBack(): void; onUpdate(hero: Hero): void; openClassPath?(): void }) {
   const { showToast } = useGameToast();
+  const { guild } = useGuild();
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [confirmLearning, setConfirmLearning] = useState(false);
   const tree = CLASS_SKILL_TREES[hero.classId];
@@ -31,8 +33,8 @@ export function SkillTreeScreen({ hero, onBack, onUpdate, openClassPath }: { her
   const inspect = (id: string) => { setSelectedId(id); setError(undefined); setConfirmLearning(false); setDetailsOpen(true); };
   const learn = (skillId: string) => {
     if (!confirmLearning) { setConfirmLearning(true); return; }
-    try { const next=learnClassSkill(hero,skillId); setError(undefined); onUpdate(next); setConfirmLearning(false); triggerTactileFeedback(true,"confirm"); showToast({title:"Skill Learned",message:`${hero.name} learned ${HERO_SKILLS[skillId]?.name ?? "a new skill"}.`,tone:"success"}); }
-    catch (caught) { const message=caught instanceof Error ? caught.message : "Could not learn skill"; setError(message); triggerTactileFeedback(true,"warning"); showToast({title:"Skill Choice Failed",message,tone:"danger"}); }
+    try { const next=learnClassSkill(hero,skillId); setError(undefined); onUpdate(next); setConfirmLearning(false); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); showToast({title:"Skill Learned",message:`${hero.name} learned ${HERO_SKILLS[skillId]?.name ?? "a new skill"}.`,tone:"success"}); }
+    catch (caught) { const message=caught instanceof Error ? caught.message : "Could not learn skill"; setError(message); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning"); showToast({title:"Skill Choice Failed",message,tone:"danger"}); }
   };
 
   return <ScrollView contentContainerStyle={styles.content}>

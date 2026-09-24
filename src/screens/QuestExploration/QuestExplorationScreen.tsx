@@ -6,6 +6,7 @@ import { QUESTS } from "../../data/quests/quests";
 import { addCondition } from "../../game/conditions/conditionService";
 import type { Party } from "../../game/party/partyTypes";
 import type { QuestExplorationStageResult } from "../../game/quests/explorationTypes";
+import type { QuestPreCombatCondition } from "../../game/quests/questCombatCommitService";
 import type { QuestCombatSetup } from "../../game/combat/combatTypes";
 import { resolveQuestExplorationStage } from "../../game/quests/questExplorationService";
 import { useGuild } from "../../state/GuildContext";
@@ -15,12 +16,13 @@ import { getQuestStageProficiency } from "../../data/quests/questProficiencies";
 import { getHeroCheckDialogue } from "../../game/heroes/heroDialogueService";
 import { formatGameId } from "../../ui/textFormat";
 
-export function QuestExplorationScreen({ questId, party, onBack, onComplete }: { questId: string; party: Party; onBack(): void; onComplete(combatSetup?: QuestCombatSetup): void }) {
-  const { guild, updateGuild } = useGuild(); const quest = QUESTS[questId]!; const stages = (quest.explorationStageIds ?? []).map((id) => QUEST_EXPLORATION_STAGES[id]!).filter(Boolean);
+export function QuestExplorationScreen({ questId, party, onBack, onComplete }: { questId: string; party: Party; onBack(): void; onComplete(combatSetup?: QuestCombatSetup, preCombatConditions?: QuestPreCombatCondition[]): void }) {
+  const { guild } = useGuild(); const quest = QUESTS[questId]!; const stages = (quest.explorationStageIds ?? []).map((id) => QUEST_EXPLORATION_STAGES[id]!).filter(Boolean);
   const [stageIndex, setStageIndex] = useState(0); const [result, setResult] = useState<QuestExplorationStageResult>(); const stage = stages[stageIndex];
   const [combatSetup, setCombatSetup] = useState<QuestCombatSetup>({ encounterIds: quest.encounterIds, label: "", heroInitiativeModifier: 0, enemyInitiativeModifier: 0, heroArmorClassModifier: 0, heroOpeningAttackRollModifier: 0, enemyOpeningAttackRollModifier: 0 });
-  const partyHeroes = guild.heroes.filter((hero) => party.heroIds.includes(hero.id)); const checkingHero = result ? partyHeroes.find((hero) => hero.id === result.check.heroId) : undefined; const proficiency = stage ? getQuestStageProficiency(stage.id, stage.skillId) : undefined; const proficiencyLabel = proficiency ? formatGameId(proficiency) : undefined;
-  const roll = () => { if (!stage || result) return; const resolved = resolveQuestExplorationStage(stage, partyHeroes, createSeededRandom(randomSeed())); setResult(resolved); if (resolved.appliedConditionId) updateGuild({ ...guild, heroes: guild.heroes.map((hero) => hero.id === resolved.check.heroId ? { ...hero, conditions: addCondition(hero.conditions, resolved.appliedConditionId!) } : hero) }); };
+  const [preCombatConditions,setPreCombatConditions]=useState<QuestPreCombatCondition[]>([]);
+  const partyHeroes = guild.heroes.filter((hero) => party.heroIds.includes(hero.id)).map((hero)=>({ ...hero, conditions: preCombatConditions.filter((pending)=>pending.heroId===hero.id).reduce((current,pending)=>addCondition(current,pending.conditionId),hero.conditions) })); const checkingHero = result ? partyHeroes.find((hero) => hero.id === result.check.heroId) : undefined; const proficiency = stage ? getQuestStageProficiency(stage.id, stage.skillId) : undefined; const proficiencyLabel = proficiency ? formatGameId(proficiency) : undefined;
+  const roll = () => { if (!stage || result) return; const resolved = resolveQuestExplorationStage(stage, partyHeroes, createSeededRandom(randomSeed())); setResult(resolved); if (resolved.appliedConditionId) setPreCombatConditions((current)=>[...current,{heroId:resolved.check.heroId,conditionId:resolved.appliedConditionId!}]); };
   const proceed = () => {
     const effect = result?.combatEffect;
     const next = effect ? {
@@ -37,10 +39,11 @@ export function QuestExplorationScreen({ questId, party, onBack, onComplete }: {
       heroMovementRangeModifier: (combatSetup.heroMovementRangeModifier ?? 0) + (effect.heroMovementRangeModifier ?? 0),
       enemyMovementRangeModifier: (combatSetup.enemyMovementRangeModifier ?? 0) + (effect.enemyMovementRangeModifier ?? 0),
     } : combatSetup;
-    if (stageIndex >= stages.length - 1) onComplete(next); else { setCombatSetup(next); setStageIndex((value) => value + 1); setResult(undefined); }
+    if (stageIndex >= stages.length - 1) onComplete(next,preCombatConditions); else { setCombatSetup(next); setStageIndex((value) => value + 1); setResult(undefined); }
   };
-  if (!stage) { onComplete(); return null; }
-  return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={styles.eyebrow}>SIDE QUEST • SEARCH STAGE {stageIndex + 1}/{stages.length}</Text><Text style={styles.title}>{stage.title}</Text><Text style={styles.description}>{stage.description}</Text>
+  if (!stage) { onComplete(undefined,preCombatConditions); return null; }
+  const canBack=stageIndex===0&&!result&&!preCombatConditions.length;
+  return <ScrollView contentContainerStyle={styles.content}>{canBack?<BackButton onPress={onBack} />:null}<Text style={styles.eyebrow}>SIDE QUEST • SEARCH STAGE {stageIndex + 1}/{stages.length}</Text><Text style={styles.title}>{stage.title}</Text><Text style={styles.description}>{stage.description}</Text>
     <Panel style={styles.check}><Text style={styles.checkTitle}>{proficiencyLabel ? `${proficiencyLabel} · ` : ""}{stage.attribute.toUpperCase()} CHECK</Text><Text style={styles.dc}>DC {stage.difficultyClass}</Text><Text style={styles.hint}>The party member with the best total ability and proficiency bonus attempts the check.</Text>{!result ? <Pressable onPress={roll} style={styles.die}><Text style={styles.dieText}>D20</Text><Text style={styles.rollText}>ROLL TO CONTINUE</Text></Pressable> : <><View style={styles.math}><Text style={styles.roll}>{result.check.diceRoll}</Text><Text style={styles.operator}>+</Text><View><Text style={styles.modifier}>{result.check.modifier >= 0 ? "+" : ""}{result.check.modifier}</Text><Text style={styles.small}>MODIFIER</Text></View><Text style={styles.operator}>=</Text><Text style={styles.total}>{result.check.total}</Text></View><Text style={[styles.verdict, result.check.success ? styles.success : styles.failure]}>{result.check.success ? "SUCCESS" : "FAILURE"} • DC {result.check.difficultyClass}</Text>{checkingHero && <><Text style={[styles.hero, { color: getRaceNameColor(checkingHero.raceId) }]}>{checkingHero.name} made the check{result.check.proficiencyBonus > 0 ? ` · Proficiency +${result.check.proficiencyBonus}` : " · Not proficient"}</Text><Text style={styles.dialogue}>“{getHeroCheckDialogue(checkingHero, result.check.skillId, result.check.success)}”</Text></>}<Text style={styles.outcome}>{result.outcomeText}</Text>{result.combatEffect && <Text style={styles.combatEffect}>COMBAT EFFECT: {result.combatEffect.label}</Text>}{result.appliedConditionId && <Text style={styles.condition}>Condition applied: {result.appliedConditionId.toUpperCase()}</Text>}<ActionButton label={stage.continueLabel ?? (stageIndex === stages.length - 1 ? "Begin Combat" : "Continue the Search")} onPress={proceed} /></>}</Panel>
   </ScrollView>;
 }

@@ -24,6 +24,7 @@ import { getCampaignTravelStep } from "../../game/campaign/campaignTravelService
 import { getDefaultTravelPartyHeroIds, getEligibleTravelHeroes, normalizeTravelPartyHeroIds, toggleTravelPartyHeroId, travelGuildPartyToRegion } from "../../game/world/travelPartyService";
 import { QUESTS } from "../../data/quests/quests";
 import { isQuestAvailableForGuild, isQuestBoardCategoryUnlocked } from "../../game/quests/questAvailability";
+import { triggerTactileFeedback } from "../../ui/tactileFeedback";
 
 interface WorldMapProps {
   guild: GuildState;
@@ -98,9 +99,11 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
       const result = travelGuildPartyToRegion(guild, selectedId, travelPartyIds, random);
       const world = discoverRegionSettlements(result.guild.world, selectedId);
       updateGuild({ ...result.guild, world, recentPartyHeroIds: travelPartyIds });
+      triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");
       setMessage(`ARRIVED · ${selected.name} · Day ${guild.currentDay} → ${result.guild.currentDay} · Rations -${result.rationCost}${result.tier ? ` · ${result.tier.toUpperCase()} road event` : " · Safe journey"}`);
       if (result.event) openEvent(result.event);
     } catch (error) {
+      triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");
       setMessage(error instanceof Error ? error.message : "Travel failed");
     }
   };
@@ -181,7 +184,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
         <Text style={styles.description}>{selected.description}</Text>
         {unlocked && averageLevel > 0 && averageLevel < selected.recommendedLevelMin && <Text style={styles.danger}>⚠ DANGER: Party level below recommended range.</Text>}
         <Text style={styles.detail}>Settlement: {selected.settlementIds.map((id) => SETTLEMENTS[id]!.name).join(", ")}</Text>
-        <View style={styles.travelPartyHeader}><Text style={styles.roadTitle}>TRAVEL PARTY · {travelPartySize}/4</Text><Pressable accessibilityRole="button" onPress={() => setShowTravelParty((value) => !value)}><Text style={styles.travelPartyEdit}>{showTravelParty ? "DONE" : "EDIT"}</Text></Pressable></View>
+        <View style={styles.travelPartyHeader}><Text style={styles.roadTitle}>TRAVEL PARTY · {travelPartySize}/4</Text><Pressable accessibilityRole="button" accessibilityState={{expanded:showTravelParty}} style={styles.travelPartyEditButton} onPress={() => setShowTravelParty((value) => !value)}><Text style={styles.travelPartyEdit}>{showTravelParty ? "DONE" : "EDIT"}</Text></Pressable></View>
         <Text style={styles.travelPartyNames}>{travelPartyIds.length ? travelPartyIds.map((id) => guild.heroes.find((hero) => hero.id === id)?.name).filter(Boolean).join(" · ") : "No heroes selected"}</Text>
         {showTravelParty && <View style={styles.travelPartyGrid}>{availableHeroes.map((hero) => { const selectedHero = travelPartyIds.includes(hero.id); const full = travelPartyIds.length >= 4 && !selectedHero; return <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: selectedHero, disabled: full }} disabled={full} key={hero.id} onPress={() => setTravelPartyIds((ids) => toggleTravelPartyHeroId(guild, ids, hero.id))} style={[styles.travelHero, selectedHero && styles.travelHeroSelected, full && styles.travelHeroDisabled]}><Portrait hero={hero} size={30}/><View style={styles.flex}><Text numberOfLines={1} style={styles.travelHeroName}>{hero.name}</Text><Text style={styles.travelHeroMeta}>Lv {hero.level} · {hero.classId}</Text></View><Text style={selectedHero ? styles.travelHeroCheck : styles.travelHeroPlus}>{selectedHero ? "✓" : "+"}</Text></Pressable>; })}</View>}
         <Text style={styles.travelPartyNote}>Selected heroes determine ration cost and become the remembered party for road encounters.</Text>
@@ -199,8 +202,8 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
         </View>}
         <View style={styles.buttons}>
           <ActionButton label="Open Region Map" onPress={() => openRegion(selectedId)} />
-          {!current && unlocked && <ActionButton label={`Travel · ${travelDays}d · ${rationCost} rations`} disabled={Boolean(travelBlocker)} onPress={travel} />}
-          {current && guild.world.currentSettlementId && <ActionButton label={`Buy ${getRationBundleAmount(guild)} rations · ${GAME_CONFIG.rationBundleGoldCost}g`} onPress={() => { try { const before = guild.rations; const next = buyRations(guild); updateGuild(next); setMessage(`Bought ${next.rations - before} rations.`); } catch (error) { setMessage(error instanceof Error ? error.message : "Purchase failed"); } }} />}
+          {!current && unlocked && <ActionButton guardMs={700} label={`Travel · ${travelDays}d · ${rationCost} rations`} disabled={Boolean(travelBlocker)} onPress={travel} />}
+          {current && guild.world.currentSettlementId && <ActionButton guardMs={500} label={`Buy ${getRationBundleAmount(guild)} rations · ${GAME_CONFIG.rationBundleGoldCost}g`} onPress={() => { try { const before = guild.rations; const next = buyRations(guild); updateGuild(next); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); setMessage(`Bought ${next.rations - before} rations.`); } catch (error) { triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning"); setMessage(error instanceof Error ? error.message : "Purchase failed"); } }} />}
           {unlocked && availableRegionalQuestId && <ActionButton label="View Regional Quest" onPress={() => openQuest(availableRegionalQuestId)} />}
           <ActionButton label="Campaign" onPress={openCampaign} />
         </View>
@@ -252,7 +255,7 @@ const styles = StyleSheet.create({
   danger: { color: colors.danger, fontWeight: "800", marginTop: 8 },
   boss: { color: colors.gold, fontWeight: "700", marginTop: 8 },
   routeWarning: { color: colors.danger, fontSize: 12, lineHeight: 17, marginTop: 9 },
-  travelPartyHeader: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginTop: 8 }, travelPartyEdit: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: .7 }, travelPartyNames: { color: colors.text, fontSize: 11, lineHeight: 16, marginTop: 5 }, travelPartyNote: { color: colors.muted, fontSize: 9, lineHeight: 14, marginTop: 5 }, travelPartyGrid: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 8 }, travelHero: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, borderRadius: 8, borderWidth: 1, flexDirection: "row", gap: 6, padding: 6, width: "48%" }, travelHeroSelected: { borderColor: colors.gold }, travelHeroDisabled: { opacity: .42 }, travelHeroName: { color: colors.text, fontSize: 10, fontWeight: "900" }, travelHeroMeta: { color: colors.muted, fontSize: 8, marginTop: 1 }, travelHeroCheck: { color: colors.green, fontSize: 15, fontWeight: "900" }, travelHeroPlus: { color: colors.gold, fontSize: 15, fontWeight: "900" },
+  travelPartyHeader: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginTop: 8 }, travelPartyEditButton:{alignItems:"center",justifyContent:"center",minHeight:44,paddingHorizontal:4}, travelPartyEdit: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: .7 }, travelPartyNames: { color: colors.text, fontSize: 11, lineHeight: 16, marginTop: 5 }, travelPartyNote: { color: colors.muted, fontSize: 9, lineHeight: 14, marginTop: 5 }, travelPartyGrid: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 8 }, travelHero: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.border, borderRadius: 8, borderWidth: 1, flexDirection: "row", gap: 6, minHeight:44, padding: 6, width: "48%" }, travelHeroSelected: { borderColor: colors.gold }, travelHeroDisabled: { opacity: .42 }, travelHeroName: { color: colors.text, fontSize: 10, fontWeight: "900" }, travelHeroMeta: { color: colors.muted, fontSize: 8, marginTop: 1 }, travelHeroCheck: { color: colors.green, fontSize: 15, fontWeight: "900" }, travelHeroPlus: { color: colors.gold, fontSize: 15, fontWeight: "900" },
   travelReadiness: { borderRadius: 8, borderWidth: 1, marginTop: 10, padding: 9 },
   travelBlocked: { backgroundColor: "#25191a", borderColor: colors.danger },
   travelReady: { backgroundColor: "#16241c", borderColor: colors.green },

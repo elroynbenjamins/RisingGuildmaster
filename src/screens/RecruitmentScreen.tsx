@@ -65,7 +65,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
               : null;
   const leaveRecruitment = () => { if (tutorial === "party_complete") updateGuild(completeTutorial(guild)); onBack(); };
   const beginCampaign = () => { updateGuild(completeTutorial(guild)); openCampaign(); };
-  const act = (action: () => string | null, success: string) => { const error = action(); setMessage(error ?? success); };
+  const act = (action: () => string | null, success: string) => { const beforeHeroes=guild.heroes.length; const beforeGold=guild.gold; const error = action(); if(error){setMessage(error);return;} const hired=guild.heroes.length>beforeHeroes; setMessage(hired?`${success} · Roster ${beforeHeroes} → ${guild.heroes.length} · Treasury ${beforeGold.toLocaleString()} → ${guild.gold.toLocaleString()}G`:success); };
   const confirmRecruit = (candidate: RecruitmentCandidate) => {
     const presentation = getCandidateRecruitmentPresentation(candidate, livingHeroes, guild.currentDay, guild.gold, currentPayroll);
     showDialog({

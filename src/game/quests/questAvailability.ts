@@ -4,6 +4,7 @@ import type { QuestType } from "./questTypes";
 import { isCampaignQuestUnlocked } from "../campaign/campaignService";
 import type { Hero } from "../heroes/types";
 import { isSettlementAvailable } from "../world/regionalThreatService";
+import { STARTER_JOURNEY } from "../onboarding/starterJourneyService";
 
 export function isQuestBoardCategoryUnlocked(type: QuestType, world: WorldState, highestHeroLevel = 1): boolean {
   if (type === "campaign") return true;
@@ -35,7 +36,8 @@ export function isQuestAvailableForGuild(quest:QuestDefinition,world:WorldState,
 
 export function getQuestStartBlocker(quest: QuestDefinition, world: WorldState, heroes: readonly Hero[]): string | null {
   const highestHeroLevel = Math.max(1, ...heroes.map((hero) => hero.level));
-  if (!isQuestBoardCategoryUnlocked(quest.questType, world, highestHeroLevel)) {
+  const starterSideQuestException = quest.id === STARTER_JOURNEY.sideQuestId && world.worldFlags.starter_brambleway_road_ambush_complete === true && world.worldFlags.starter_brambleford_side_quest_complete !== true;
+  if (!isQuestBoardCategoryUnlocked(quest.questType, world, highestHeroLevel) && !starterSideQuestException) {
     if (quest.questType === "contract") return "Contracts unlock when a hero reaches Level 2.";
     if (quest.questType === "side") return "Side quests unlock when a hero reaches Level 3.";
     if (quest.questType === "boss") return "Boss missions unlock after Chapter 1 is completed.";

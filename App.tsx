@@ -96,7 +96,11 @@ function Game() {
   const threatIntroPromptedRef = useRef(false);
   const contextualPromptedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
-    if (!gameStarted || !isHydrated) return;
+    if (!gameStarted || !isHydrated || !guild.pendingQuestResult || route.name !== "main") return;
+    setRoute({ name: "questResult", summary: guild.pendingQuestResult });
+  }, [gameStarted, isHydrated, guild.pendingQuestResult, route.name]);
+  useEffect(() => {
+    if (!gameStarted || !isHydrated || guild.pendingQuestResult) return;
     if (!areRegionalThreatsUnlocked(guild.world)) { threatIntroPromptedRef.current = false; return; }
     if (guild.world.worldFlags[REGIONAL_THREAT_INTRO_SEEN_FLAG] || threatIntroPromptedRef.current) return;
     const safeBreak = route.name === "main" || route.name === "finances" || route.name === "management";
@@ -111,7 +115,7 @@ function Game() {
     });
   }, [gameStarted, isHydrated, guild, route.name, isDialogOpen, updateGuild, showDialog]);
   useEffect(() => {
-    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active) return;
+    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active || guild.pendingQuestResult) return;
     let id: "campaign_travel" | "combat_basics" | "idle_missions" | "roguelite_expeditions" | null = null;
     let title = "";
     let eyebrow = "QUICK GUIDE";
@@ -144,7 +148,7 @@ function Game() {
     showDialog({ title, eyebrow, message, tone: "default" });
   }, [gameStarted, isHydrated, isDialogOpen, guild, route, updateGuild, showDialog]);
   useEffect(() => {
-    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active) return;
+    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active || guild.pendingQuestResult) return;
     const safeBreak = route.name === "main" || route.name === "management" || route.name === "finances";
     if (!safeBreak) return;
     const notices = getNewUnlockNotices(guild);
@@ -160,7 +164,7 @@ function Game() {
 
   useEffect(() => {
     const milestone = pendingDayMilestone(guild);
-    if (!gameStarted || milestone === null) { promptedDayRef.current = null; return; }
+    if (!gameStarted || milestone === null || guild.pendingQuestResult) { promptedDayRef.current = null; return; }
     const safeBreak = route.name === "main" || route.name === "finances" || route.name === "management";
     const promptKey = `${guild.currentDay}:${milestone}`;
     if (!isHydrated || !safeBreak || isDialogOpen || promptedDayRef.current === promptKey) return;
@@ -240,7 +244,7 @@ function Game() {
         return { ...outcome, levelAfter: after.level, xpAfter: after.xp, availableSkillPoints: availableSkillPointsAfter, availableSkillPointsAfter };
       });
       const campaignChapterCompleted = campaign.worldState.campaignChapter > guild.world.campaignChapter ? guild.world.campaignChapter : route.summary.campaignChapterCompleted;
-      updateGuild({ ...guild, heroes: releasedHeroes, world: campaign.worldState, gold: guild.gold + campaign.goldReward, reputation: guild.reputation + campaign.guildReputationReward, questChronicle: guild.questChronicle.map((entry) => entry.id === chronicle.id ? chronicle : entry) });
+      updateGuild({ ...guild, heroes: releasedHeroes, world: campaign.worldState, gold: guild.gold + campaign.goldReward, reputation: guild.reputation + campaign.guildReputationReward, questChronicle: guild.questChronicle.map((entry) => entry.id === chronicle.id ? chronicle : entry), pendingQuestResult: null });
       setRoute({ name: "questResult", summary: { ...route.summary, selectedChoiceId: choiceId, chronicle, heroOutcomes, goldEarned: route.summary.goldEarned + campaign.goldReward, reputationEarned: (route.summary.reputationEarned ?? 0) + campaign.guildReputationReward, ...(campaignChapterCompleted ? { campaignChapterCompleted } : {}) } });
     };
     return <QuestResultScreen openLoot={() => main("Inventory")} openGuildmasterSkills={() => setRoute({name: "guildmasterSkills"})} openCalendar={() => setRoute({name: "finances"})} summary={route.summary} choiceIds={choiceIds} onChoice={choose} openHeroSkills={(heroId)=>{const hero=guild.heroes.find((entry)=>entry.id===heroId);if(hero)setRoute({name:"skills",hero});}} openTemple={()=>setRoute({name:"temple"})} onContinue={() => main(route.summary.campaignNodeId ? "Quests" : "Guild")} />;
@@ -284,8 +288,12 @@ function Game() {
         guildmasterSkillPointsBefore: guild.guildmaster.skillPoints,
         guildmasterSkillPointsAfter: rewardedGuild.guildmaster.skillPoints,
       };
-      updated = advanceGuildTime({ ...rewardedGuild, recentPartyHeroIds: route.party.heroIds }).guild; updateGuild(updated);
-      setRoute({ name: "questResult", summary: { questId: route.questId, status, ...rewardSummary, ...(campaignChapterCompleted ? { campaignChapterCompleted } : {}), xpEarnedPerHero: result.activeQuest.xpEarnedPerHero, lootIds: result.activeQuest.collectedLootIds, materials: result.activeQuest.collectedMaterials, heroOutcomes, chronicle, campaignNodeId: route.campaignNodeId } });
+      const summary: QuestResultSummary = { questId: route.questId, status, ...rewardSummary, ...(campaignChapterCompleted ? { campaignChapterCompleted } : {}), xpEarnedPerHero: result.activeQuest.xpEarnedPerHero, lootIds: result.activeQuest.collectedLootIds, materials: result.activeQuest.collectedMaterials, heroOutcomes, chronicle, campaignNodeId: route.campaignNodeId };
+      const requiresPostBattleChoice = status === "victory" && Boolean(route.campaignNodeId && campaignNodeRequiresPostBattleChoice(route.campaignNodeId));
+      updated = advanceGuildTime({ ...rewardedGuild, recentPartyHeroIds: route.party.heroIds }).guild;
+      updated = { ...updated, pendingQuestResult: requiresPostBattleChoice ? summary : null };
+      updateGuild(updated);
+      setRoute({ name: "questResult", summary });
     };
     return <CombatScreen questId={route.questId} heroes={participants} combatSetup={route.combatSetup} onEnemiesEncountered={(ids) => updateGuild(discoverEnemies(guild, ids))} onQuestEnd={finish} />;
   }

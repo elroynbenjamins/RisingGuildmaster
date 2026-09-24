@@ -25,14 +25,18 @@ export function SectionTitle({ children }: React.PropsWithChildren) {
   return <View style={styles.sectionHeading}><Text style={[styles.sectionTitle, { color: c.text }]}>{children}</Text></View>;
 }
 
-export function ActionButton({ label, onPress, disabled = false, iconId }: { label: string; onPress(): void; disabled?: boolean; iconId?: GameIconId }) {
+export function ActionButton({ label, onPress, disabled = false, iconId, guardMs = 0 }: { label: string; onPress(): void; disabled?: boolean; iconId?: GameIconId; guardMs?: number }) {
   const { colors: c } = useTheme();
-  return <Pressable accessibilityRole="button" disabled={disabled} accessibilityState={{ disabled }} aria-disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.button, { backgroundColor: disabled ? c.panel2 : c.gold, borderColor: c.gold }, pressed && !disabled && styles.buttonDim, pressed && styles.buttonPressed]}><View style={styles.buttonContent}>{iconId ? <GameIcon id={iconId} size={19} framed={false}/> : null}<Text style={[styles.buttonText, { color: disabled ? c.muted : c.buttonText }]}>{label}</Text></View></Pressable>;
+  const lastPress = React.useRef(0);
+  const press = () => { const now = Date.now(); if (guardMs > 0 && now - lastPress.current < guardMs) return; lastPress.current = now; onPress(); };
+  return <Pressable accessibilityRole="button" disabled={disabled} accessibilityState={{ disabled }} aria-disabled={disabled} onPress={press} style={({ pressed }) => [styles.button, { backgroundColor: disabled ? c.panel2 : c.gold, borderColor: disabled ? c.border : c.gold }, pressed && !disabled && styles.buttonDim, pressed && styles.buttonPressed]}><View style={styles.buttonContent}>{iconId ? <GameIcon id={iconId} size={19} framed={false}/> : null}<Text style={[styles.buttonText, { color: disabled ? c.muted : c.buttonText }]}>{label}</Text></View></Pressable>;
 }
 
-export function SecondaryButton({ label, onPress, disabled = false, iconId }: { label: string; onPress(): void; disabled?: boolean; iconId?: GameIconId }) {
+export function SecondaryButton({ label, onPress, disabled = false, iconId, guardMs = 0 }: { label: string; onPress(): void; disabled?: boolean; iconId?: GameIconId; guardMs?: number }) {
   const { colors: c } = useTheme();
-  return <Pressable accessibilityRole="button" disabled={disabled} accessibilityState={{ disabled }} aria-disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.secondaryButton, { borderColor: c.gold, backgroundColor: c.panel2 }, pressed && !disabled && styles.buttonDim, pressed && styles.buttonPressed]}><View style={styles.buttonContent}>{iconId ? <GameIcon id={iconId} size={18} framed={false}/> : null}<Text style={[styles.secondaryText, { color: disabled ? c.muted : c.text }]}>{label}</Text></View></Pressable>;
+  const lastPress = React.useRef(0);
+  const press = () => { const now = Date.now(); if (guardMs > 0 && now - lastPress.current < guardMs) return; lastPress.current = now; onPress(); };
+  return <Pressable accessibilityRole="button" disabled={disabled} accessibilityState={{ disabled }} aria-disabled={disabled} onPress={press} style={({ pressed }) => [styles.secondaryButton, { borderColor: disabled ? c.border : c.gold, backgroundColor: disabled ? c.panel : c.panel2 }, pressed && !disabled && styles.buttonDim, pressed && styles.buttonPressed]}><View style={styles.buttonContent}>{iconId ? <GameIcon id={iconId} size={18} framed={false}/> : null}<Text style={[styles.secondaryText, { color: disabled ? c.muted : c.text }]}>{label}</Text></View></Pressable>;
 }
 
 export function BackButton({ onPress }: { onPress(): void }) {
@@ -47,7 +51,7 @@ export function EmptyState({ title, message, actionLabel, onAction }: { title: s
 
 export function SegmentedTabs<T extends string>({ values, value, onChange, notificationValues = [] }: { values: readonly T[]; value: T; onChange(value: any): void; notificationValues?: readonly T[] }) {
   const { colors: c } = useTheme();
-  return <View style={[styles.tabs, { borderColor: c.border }]}>{values.map((item) => <Pressable key={item} onPress={() => onChange(item)} accessibilityRole="tab" accessibilityState={{ selected: item === value }} aria-selected={item === value} style={[styles.tab, { borderColor: "transparent" }, selectionStyle(c, item === value)]}><Text style={[styles.tabText, { color: c.muted }, item === value && { color: c.gold }]}>{item}</Text>{notificationValues.includes(item) ? <View style={{ position: "absolute", top: 0, right: 1 }}><NotificationDot label={`${item}: choice available`} /></View> : null}</Pressable>)}</View>;
+  return <View style={[styles.tabs, { borderColor: c.border }]}>{values.map((item) => <Pressable key={item} onPress={() => onChange(item)} accessibilityRole="tab" accessibilityState={{ selected: item === value }} aria-selected={item === value} style={({pressed}) => [styles.tab, { borderColor: "transparent" }, selectionStyle(c, item === value), pressed && styles.tabPressed]}><Text style={[styles.tabText, { color: c.muted }, item === value && { color: c.gold }]}>{item}</Text>{notificationValues.includes(item) ? <View style={{ position: "absolute", top: 0, right: 1 }}><NotificationDot label={`${item}: choice available`} /></View> : null}</Pressable>)}</View>;
 }
 
 export function StatusChip({ label, tone = "neutral" }: { label: string; tone?: "neutral" | "gold" | "good" | "danger" | "blue" }) {
@@ -97,7 +101,7 @@ const styles = StyleSheet.create({
   buttonPressed: { transform: [{ translateY: 1 }] },
   buttonContent:{alignItems:"center",flexDirection:"row",gap:5,justifyContent:"center",maxWidth:"100%",minWidth:0},
   buttonText: {color: "#17130c", flexShrink:1, fontSize: 14, letterSpacing: .3, fontWeight: "700", textAlign: "center"},
-  backButton: { alignSelf: "flex-start", minHeight: 38, justifyContent: "center", paddingHorizontal: 10, borderWidth: 0, borderRadius: 10, },
+  backButton: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center", paddingHorizontal: 10, borderWidth: 0, borderRadius: 10, },
   back: { color: colors.gold, fontSize: 12, fontWeight: "900", letterSpacing: .8 },
   empty: { alignItems: "stretch", gap: 12 },
   emptyTitle: { color: colors.text, fontSize: 18, fontWeight: "900" },
@@ -105,6 +109,7 @@ const styles = StyleSheet.create({
   tabs: { flexDirection: "row", borderBottomWidth: 1, marginBottom: 16, gap: 3 },
   tab: {flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 10, borderRadius: 8, borderBottomWidth: 2, minHeight: 44, minWidth: 0},
   tabText: {color: colors.muted, flexShrink:1, textAlign: "center", fontWeight: "600", fontSize: 11, letterSpacing: 0},
+  tabPressed:{opacity:.72,transform:[{translateY:1}]},
   chip: {alignSelf: "flex-start", paddingHorizontal: 7, paddingVertical: 4, borderWidth: 1, borderRadius: 12, maxWidth: "100%", flexShrink: 1},
   chipText: { fontWeight: "600", fontSize: 10, letterSpacing: 0},
   meterTrack: { overflow: "hidden", borderWidth: 0, borderRadius: 3, },

@@ -4,6 +4,7 @@ import type { RenewalLengthWeeks } from "../../game/recruitment/recruitmentTypes
 import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useGameDialog } from "../../components/dialogs/GameDialog";
+import { useGameToast } from "../../components/feedback/GameToast";
 import { GameIcon } from "../../components/icons/GameIcon";
 import { ActionButton, BackButton, EmptyState, Panel, SecondaryButton, SectionTitle, SegmentedTabs, StatusChip, colors } from "../../components/ui";
 import {
@@ -68,6 +69,7 @@ function PlannerEventRow({ event }: { event: GuildDayEvent }) {
 
 export function FinancesScreen({ onBack }: { onBack(): void }) {
   const { showDialog } = useGameDialog();
+  const { showToast } = useGameToast();
   const { guild, updateGuild } = useGuild();
   const planner = useMemo(() => forecastGuildPlanner(guild, 7), [guild]);
   const nextEvent = useMemo(() => findNextGuildPlannerEvent(guild, 30), [guild]);
@@ -84,7 +86,7 @@ export function FinancesScreen({ onBack }: { onBack(): void }) {
     .reduce((sum, contract) => sum + contract.weeklySalary, 0);
   const currentHall = TAVERN_LEVELS[guild.finance.tavernLevel] ?? TAVERN_LEVELS[1]!;
   const nextHall = nextTavernLevel(guild);
-  const upgradeHall = () => {try {updateGuild(startTavernUpgrade(guild));} catch(error) {showDialog({title:"Guild Hall upgrade unavailable",message:error instanceof Error?error.message:"Upgrade failed",tone:"danger"});}};
+  const upgradeHall = () => {try {const next=startTavernUpgrade(guild);updateGuild(next);showToast({title:"Guild Hall Upgrade Started",message:`Level ${guild.finance.tavernLevel} → ${guild.finance.tavernLevel+1} · completes Day ${next.finance.tavernUpgrade?.completionDay ?? guild.currentDay}`,tone:"gold"});} catch(error) {showDialog({title:"Guild Hall upgrade unavailable",message:error instanceof Error?error.message:"Upgrade failed",tone:"danger"});}};
   const tavernIncome = dailyTavernIncome(guild);
   const plannerPrimerSeen = guild.world.worldFlags.guild_planner_v2_tutorial_seen === true;
   const acknowledgePlannerPrimer = () => updateGuild({ ...guild, world: { ...guild.world, worldFlags: { ...guild.world.worldFlags, guild_planner_v2_tutorial_seen: true } } });
@@ -131,11 +133,11 @@ export function FinancesScreen({ onBack }: { onBack(): void }) {
   };
 
   const settle = () => {
-    try { updateGuild(paySalaryArrears(guild)); }
+    try { const before=totalSalaryArrears(guild); const next=paySalaryArrears(guild); updateGuild(next); showToast({title:"Salary Arrears Paid",message:`${before} gold in overdue wages settled.`,tone:"success"}); }
     catch (error) { showDialog({ title: "Payroll order failed", message: error instanceof Error ? error.message : "Payment failed", tone: "danger" }); }
   };
   const renew = (heroId: string, weeks: RenewalLengthWeeks) => {
-    try { updateGuild(renewHeroContract(guild, heroId, weeks)); }
+    try { const hero=guild.heroes.find((entry)=>entry.id===heroId); const contract=guild.heroContracts.find((entry)=>entry.heroId===heroId); const salary=hero&&contract?getRenewalSalaryForGuild(guild,contract,hero.level,weeks):undefined; updateGuild(renewHeroContract(guild, heroId, weeks)); showToast({title:"Contract Renewed",message:`${hero?.name ?? "Hero"} · ${weeks} weeks${salary!==undefined?` · ${salary} gold/week`:""}`,tone:"success"}); setExpandedContractHeroId(undefined); }
     catch (error) { showDialog({ title: "Contract renewal failed", message: error instanceof Error ? error.message : "Renewal failed", tone: "danger" }); }
   };
 
@@ -238,7 +240,7 @@ export function FinancesScreen({ onBack }: { onBack(): void }) {
             {owed > 0 && <Text style={styles.danger}>{owed} owed</Text>}
           </View>
         </View>
-        {hero && contract.status !== "active" ? <View style={styles.renewalBlock}><Pressable accessibilityRole="button" accessibilityLabel={`Contract options for ${hero.name}`} accessibilityState={{expanded:expandedContractHeroId===hero.id}} aria-expanded={expandedContractHeroId===hero.id} onPress={()=>setExpandedContractHeroId(expandedContractHeroId===hero.id?undefined:hero.id)} style={styles.renewalDisclosure}><View style={styles.flex}><Text style={styles.renewalLabel}>CONTRACT DECISION</Text><Text style={styles.contractMeta}>Departure after Day {contractDepartureDay(contract)} if not renewed.</Text></View><Text style={styles.renewalMark}>{expandedContractHeroId===hero.id?"−":"+"}</Text></Pressable>{expandedContractHeroId===hero.id&&<><View style={styles.renewalGrid}>{([4,8,12] as RenewalLengthWeeks[]).map(weeks => <View key={weeks} style={styles.renewalCell}><SecondaryButton label={`${weeks} WEEKS · ${getRenewalSalaryForGuild(guild, contract, hero.level, weeks)}G/WK`} disabled={owed > 0} onPress={() => renew(hero.id, weeks)} /></View>)}</View><SecondaryButton label={contract.renewalIntent === "depart" ? "Cancel Departure" : "Let Contract Expire"} onPress={() => updateGuild(contract.renewalIntent === "depart" ? cancelContractDeparture(guild, hero.id) : markContractForDeparture(guild, hero.id))} /></>}</View> : null}
+        {hero && contract.status !== "active" ? <View style={styles.renewalBlock}><Pressable accessibilityRole="button" accessibilityLabel={`Contract options for ${hero.name}`} accessibilityState={{expanded:expandedContractHeroId===hero.id}} aria-expanded={expandedContractHeroId===hero.id} onPress={()=>setExpandedContractHeroId(expandedContractHeroId===hero.id?undefined:hero.id)} style={styles.renewalDisclosure}><View style={styles.flex}><Text style={styles.renewalLabel}>CONTRACT DECISION</Text><Text style={styles.contractMeta}>Departure after Day {contractDepartureDay(contract)} if not renewed.</Text></View><Text style={styles.renewalMark}>{expandedContractHeroId===hero.id?"−":"+"}</Text></Pressable>{expandedContractHeroId===hero.id&&<><View style={styles.renewalGrid}>{([4,8,12] as RenewalLengthWeeks[]).map(weeks => <View key={weeks} style={styles.renewalCell}><SecondaryButton label={`${weeks} WEEKS · ${getRenewalSalaryForGuild(guild, contract, hero.level, weeks)}G/WK`} disabled={owed > 0} onPress={() => renew(hero.id, weeks)} /></View>)}</View><SecondaryButton label={contract.renewalIntent === "depart" ? "Cancel Departure" : "Let Contract Expire"} onPress={() => { const cancelling=contract.renewalIntent==="depart"; updateGuild(cancelling?cancelContractDeparture(guild,hero.id):markContractForDeparture(guild,hero.id)); showToast({title:cancelling?"Departure Cancelled":"Contract Set to Expire",message:cancelling?`${hero.name} will remain available for renewal.`:`${hero.name} will leave after Day ${contractDepartureDay(contract)} unless renewed.`,tone:cancelling?"success":"gold"}); }} /></>}</View> : null}
       </Panel>;
     }) : <EmptyState title="No hero contracts" message="Recruit a hero to create the guild's first salary obligation." />}
 

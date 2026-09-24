@@ -74,9 +74,6 @@ export interface Hero { focusedTrainingLevel?: number; focusedTrainingSessions?:
   baseAttributes: Attributes;
   level: number;
   xp: number;
-  potential: number;
-  potentialEstimateMin: number;
-  potentialEstimateMax: number;
   traitIds: TraitId[];
   conditions: ConditionInstance[];
   equipment: EquipmentSlots;

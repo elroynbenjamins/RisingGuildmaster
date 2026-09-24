@@ -4,7 +4,6 @@ import type { GuildState } from "../guild/types";
 import { collectHeroModifiers } from "../heroes/heroCalculator";
 import type { Hero } from "../heroes/types";
 import { applyModifiers } from "../modifiers/modifierEngine";
-import { potentialMultiplier } from "../progression/potential";
 import { grantHeroXp } from "../progression/levelSystem";
 import { xpRequiredForNextLevel } from "../progression/xpSystem";
 import type { TrainingProgramId, TrainingSession } from "./trainingTypes";
@@ -49,7 +48,7 @@ export function calculateTrainingQuote(hero: Hero, programId: TrainingProgramId,
   const program = TRAINING_PROGRAMS[programId]; const modifiers = collectHeroModifiers(hero); const context = { currentHP: hero.currentHP, maxHP: hero.currentHP };
   const costMultiplier = Math.max(.25, applyModifiers(1, "trainingCost", modifiers, context));
   const xpMultiplier = Math.max(.1, applyModifiers(1, "trainingXp", modifiers, context));
-  const rawXp = Math.max(1, Math.round(program.baseXp * potentialMultiplier(hero.potential) * xpMultiplier));
+  const rawXp = Math.max(1, Math.round(program.baseXp * xpMultiplier));
   const limit = guild ? getTrainingProgressionLimit(guild, hero) : undefined;
   return { goldCost: getTrainingGoldCost(programId, costMultiplier), xpReward: limit ? Math.min(rawXp, maxXpBeforeLevelCap(hero, limit.levelCap)) : rawXp, levelCap: limit?.levelCap, developmentSessionsUsed: hero.focusedTrainingSessions ?? 0 };
 }

@@ -31,9 +31,12 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
   const [query, setQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState<"All" | "Board" | "Scout">("All");
   const [section,setSection]=useState<"Candidates"|"Scouting"|"Alumni">("Candidates");
-  const [sort, setSort] = useState<"Potential" | "Fee" | "Salary" | "Expiry">("Potential");
+  const [sort, setSort] = useState<"Level" | "Fee" | "Salary" | "Expiry">("Level");
   const [showCandidateTools, setShowCandidateTools] = useState(false);
-  const displayedCandidates = candidates.filter(candidate => sourceFilter === "All" || candidate.source === (sourceFilter === "Scout" ? "regional_scout" : "guild_board")).filter(candidate => `${candidate.heroPreview.name} ${RACES[candidate.heroPreview.raceId].name} ${CLASSES[candidate.heroPreview.classId].name}`.toLowerCase().includes(query.trim().toLowerCase())).sort((a,b) => sort === "Fee" ? a.recruitmentFeeEstimateMin - b.recruitmentFeeEstimateMin : sort === "Salary" ? a.weeklySalaryEstimateMin - b.weeklySalaryEstimateMin : sort === "Expiry" ? a.expiresAtDay - b.expiresAtDay : b.potentialEstimateMax - a.potentialEstimateMax);
+  const displayedCandidates = candidates
+    .filter(candidate => sourceFilter === "All" || candidate.source === (sourceFilter === "Scout" ? "regional_scout" : "guild_board"))
+    .filter(candidate => `${candidate.heroPreview.name} ${RACES[candidate.heroPreview.raceId].name} ${CLASSES[candidate.heroPreview.classId].name}`.toLowerCase().includes(query.trim().toLowerCase()))
+    .sort((a,b) => sort === "Fee" ? a.recruitmentFeeEstimateMin - b.recruitmentFeeEstimateMin : sort === "Salary" ? a.weeklySalaryEstimateMin - b.weeklySalaryEstimateMin : sort === "Expiry" ? a.expiresAtDay - b.expiresAtDay : b.heroPreview.level - a.heroPreview.level);
   const [showPartyFit, setShowPartyFit] = useState(false);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [expandedCandidateId,setExpandedCandidateId]=useState<string>();
@@ -46,7 +49,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
   const confirmRehire = (heroId:string) => {
     const member=guild.recruitment.formerMembers.find((entry)=>entry.hero.id===heroId); if(!member||member.departureKind==="retired")return;
     const fee=formerMemberRehireFee(member); const salary=formerMemberRehireSalary(member);
-    showDialog({ title:`Invite ${member.hero.name} Back?`, message:`Level ${member.hero.level} ${CLASSES[member.hero.classId].name}\nSigning bonus: ${fee} gold\nNew salary: ${salary} gold/week\nContract: 12 weeks\n\nThey keep their level, XP, skills, traits, potential and personal history. Their old equipment remains in guild inventory.`, eyebrow:"FORMER GUILD MEMBER", actions:[{label:"Cancel",tone:"secondary"},{label:"Rehire",tone:"primary",onPress:()=>{try{updateGuild(rehireFormerMember(guild,heroId));triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");showToast({title:"Hero Rehired",message:`${member.hero.name} returned · ${fee} gold signing bonus · ${salary} gold/week`,tone:"success"});}catch(error){triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");showToast({title:"Rehire Failed",message:error instanceof Error?error.message:"Could not rehire hero",tone:"danger"});}}}]});
+    showDialog({ title:`Invite ${member.hero.name} Back?`, message:`Level ${member.hero.level} ${CLASSES[member.hero.classId].name}\nSigning bonus: ${fee} gold\nNew salary: ${salary} gold/week\nContract: 12 weeks\n\nThey keep their level, XP, skills, traits and personal history. Their old equipment remains in guild inventory.`, eyebrow:"FORMER GUILD MEMBER", actions:[{label:"Cancel",tone:"secondary"},{label:"Rehire",tone:"primary",onPress:()=>{try{updateGuild(rehireFormerMember(guild,heroId));triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");showToast({title:"Hero Rehired",message:`${member.hero.name} returned · ${fee} gold signing bonus · ${salary} gold/week`,tone:"success"});}catch(error){triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");showToast({title:"Rehire Failed",message:error instanceof Error?error.message:"Could not rehire hero",tone:"danger"});}}}]});
   };
 
   const freeReady = guild.currentDay >= guild.recruitment.nextFreeRefreshDay;
@@ -56,17 +59,6 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
   const livingHeroes = guild.heroes.filter((hero) => hero.currentHP > 0);
   const roleSummary = getRosterRoleSummary(livingHeroes);
   const currentPayroll = guild.heroContracts.filter((contract) => livingHeroes.some((hero) => hero.id === contract.heroId)).reduce((sum, contract) => sum + contract.weeklySalary, 0);
-  const tutorialCopy = tutorial === "inspect_candidate"
-    ? "Inspect one adventurer. Start with role fit and Overview, then read Stats or Traits. The strongest-looking recruit is not always the best hire: party role, upfront fee, weekly payroll, and contract length all matter."
-    : tutorial === "recruit_first"
-        ? "Review complete. Sign your first contract when you are ready. Choose a role and salary that suit your guild. Comparing candidates is optional."
-        : tutorialRefresh
-          ? "A candidate batch allows one hire. Refresh the tavern board now; this guided refresh is free and required before hero 2."
-          : tutorial === "recruit_second"
-            ? "Choose exactly one adventurer from the refreshed arrivals. A balanced first party benefits from complementary frontline, support, and ranged roles."
-            : tutorial === "party_complete"
-              ? "Your first company is formed. The War Table will now guide your most important next order. Start Chapter 1 and clear the guildhall cellar to earn Guildhaven's trust."
-              : null;
   const leaveRecruitment = () => { if (tutorial === "party_complete") updateGuild(completeTutorial(guild)); onBack(); };
   const beginCampaign = () => { updateGuild(completeTutorial(guild)); openCampaign(); };
   const act = (action: () => string | null, success: string) => { const error = action(); if(error){triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");showToast({title:"Recruitment Action Failed",message:error,tone:"danger"});return;} triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); showToast({title:success.includes("joined")?"Contract Signed":success.includes("arrived")?"Recruitment Board Refreshed":success.includes("left")?"Candidate Passed":"Recruitment Updated",message:success,tone:success.includes("left")?"info":"success"}); };
@@ -84,19 +76,19 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
     setCompareIds(next);
   };
   const compared = candidates.filter((item) => compareIds.includes(item.candidateId));
-  const potentialLeader = compared.reduce<RecruitmentCandidate | undefined>((best, candidate) => !best || candidate.potentialEstimateMax > best.potentialEstimateMax ? candidate : best, undefined);
   const salaryLeader = compared.reduce<RecruitmentCandidate | undefined>((best, candidate) => !best || candidate.weeklySalaryEstimateMin < best.weeklySalaryEstimateMin ? candidate : best, undefined);
 
   useEffect(() => {
-    if (!tutorialRefresh) { refreshPulse.setValue(1); return; }
-    scrollRef.current?.scrollTo({ y: 0, animated: true });
+    const shouldPulse = tutorial === "inspect_candidate" || tutorial === "recruit_first" || tutorial === "refresh_board" || tutorial === "recruit_second";
+    if (!shouldPulse) { refreshPulse.setValue(1); return; }
+    if (tutorialRefresh) scrollRef.current?.scrollTo({ y: 0, animated: true });
     const pulse = Animated.loop(Animated.sequence([
       Animated.timing(refreshPulse, { toValue: .45, duration: 650, useNativeDriver: true }),
       Animated.timing(refreshPulse, { toValue: 1, duration: 650, useNativeDriver: true }),
     ]));
     pulse.start();
     return () => pulse.stop();
-  }, [tutorialRefresh, refreshPulse]);
+  }, [tutorial, tutorialRefresh, refreshPulse]);
 
   return <ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={styles.content}>
     <BackButton onPress={leaveRecruitment} />
@@ -112,7 +104,6 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
       {roleSummary.missing.length > 0 ? <Text style={styles.needText}>GUILD NEED · {roleSummary.missing.map((role) => role.toUpperCase()).join(" · ")}</Text> : null}
     </Panel>
 
-    {tutorialCopy && <Panel style={styles.tutorial}><Text style={styles.tutorialStep}>FIRST GUILD PARTY · {guild.heroes.length}/2 HEROES</Text><Text style={styles.tutorialTitle}>{tutorial === "inspect_candidate" ? "Read the Adventurer" : tutorial === "recruit_first" ? "Sign Your First Contract" : tutorialRefresh ? "Bring in New Arrivals" : tutorial === "recruit_second" ? "Complete the First Company" : "Your First Party Is Ready"}</Text><Text style={styles.tutorialText}>{tutorialCopy}</Text>{tutorial === "party_complete" ? <ActionButton iconId="quests" label="BEGIN CHAPTER 1" onPress={beginCampaign} /> : <SecondaryButton label="Skip Recruitment Tutorial" onPress={() => updateGuild(skipTutorial(guild))} />}</Panel>}
 
     <Animated.View style={{ opacity: refreshPulse }}><Panel style={[styles.refresh, tutorialRefresh && styles.tutorialTarget]}><View style={styles.flex}><Text style={styles.name}>New arrivals</Text><Text style={styles.meta}>{tutorialRefresh ? "Guided refresh · FREE" : `Next free refresh · ${freeReady ? "READY" : `${guild.recruitment.nextFreeRefreshDay - guild.currentDay} DAYS`}`}</Text><Text style={styles.meta}>{tutorialRefresh ? "Required before recruiting hero 2" : guild.recruitment.batchRecruitmentUsed ? "One contract signed from this batch · refresh required" : paidRefreshAllowed ? `Manual refresh · ${guild.recruitment.manualRefreshCost} gold` : "Iron Guild · gold refresh returns after Brambleford"}</Text></View><View style={styles.refreshButtons}><SecondaryButton guardMs={600} label={tutorialRefresh ? "Free refresh" : freeReady ? "Free refresh" : paidRefreshAllowed ? `Refresh · ${guild.recruitment.manualRefreshCost}G` : "Wait for refresh"} disabled={(Boolean(tutorial) && !tutorialRefresh) || (!tutorialRefresh && !freeReady && (!paidRefreshAllowed || guild.gold < guild.recruitment.manualRefreshCost))} onPress={() => act(() => refreshCandidates(freeReady), "New adventurers arrived at the tavern.")} /></View></Panel></Animated.View>
 
@@ -125,7 +116,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
       <Pressable accessibilityRole="button" accessibilityLabel="Recruitment filters and sorting" accessibilityState={{ expanded: showCandidateTools }} aria-expanded={showCandidateTools} onPress={() => setShowCandidateTools(value => !value)} style={({pressed})=>[styles.toolDisclosure,pressed&&styles.pressed]}>
         <View style={styles.flex}><Text style={styles.toolLabel}>FILTER & SORT</Text><Text numberOfLines={1} style={styles.toolSummary}>{sourceFilter} candidates · {sort} first · {displayedCandidates.length} shown</Text></View><Text style={styles.toolChevron}>{showCandidateTools ? "−" : "+"}</Text>
       </Pressable>
-      {showCandidateTools && <View style={styles.toolPanel}><SegmentedTabs values={["All", "Board", "Scout"] as const} value={sourceFilter} onChange={setSourceFilter} /><SegmentedTabs values={["Potential", "Fee", "Salary", "Expiry"] as const} value={sort} onChange={setSort} /></View>}
+      {showCandidateTools && <View style={styles.toolPanel}><SegmentedTabs values={["All", "Board", "Scout"] as const} value={sourceFilter} onChange={setSourceFilter} /><SegmentedTabs values={["Level", "Fee", "Salary", "Expiry"] as const} value={sort} onChange={setSort} /></View>}
       {!displayedCandidates.length && <Text style={styles.meta}>No adventurers match these filters.</Text>}
     </View>}
     {displayedCandidates.map((candidate) => {
@@ -139,9 +130,9 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
         <View style={styles.row}><Portrait hero={hero} size={78} /><View style={styles.flex}><View style={styles.nameRow}><Text style={[styles.candidateName, { color: getRaceNameColor(hero.raceId) }]}>{hero.name}</Text>{reserved ? <StatusChip label="RESERVED" tone="blue" /> : null}</View><Text style={styles.identity}>{RACES[hero.raceId].name} · {CLASSES[hero.classId].name} · Lv {hero.level}</Text><View style={styles.chips}><StatusChip label={presentation.roleLabel} tone="blue" /><StatusChip label={presentation.qualityLabel} tone={presentation.qualityTone} /><StatusChip label={presentation.fitLabel} tone={presentation.fitTone} /><StatusChip label={presentation.expiryLabel} tone={presentation.expiryTone} /></View>{candidate.source === "regional_scout" ? <Text style={styles.scoutSource}>SCOUT REPORT · {candidate.sourceLocationName}</Text> : null}</View></View>
 
         <View style={styles.offerGrid}><View style={styles.offerCell}><Text style={styles.offerLabel}>SIGNING FEE</Text><Text style={styles.offerValue}>{range(candidate.recruitmentFeeEstimateMin, candidate.recruitmentFeeEstimateMax)} G</Text></View><View style={styles.offerCell}><Text style={styles.offerLabel}>SALARY</Text><Text style={styles.offerValue}>{range(candidate.weeklySalaryEstimateMin, candidate.weeklySalaryEstimateMax)}/WK</Text></View></View>
-        <Text style={styles.fitDetail}>Potential {range(candidate.potentialEstimateMin, candidate.potentialEstimateMax)} · {presentation.fitLabel} · {candidate.contractLengthWeeks} weeks</Text><Pressable accessibilityRole="button" accessibilityState={{expanded:expandedCandidateId===candidate.candidateId}} style={({pressed})=>[styles.disclosure,pressed&&styles.pressed]} onPress={()=>setExpandedCandidateId(expandedCandidateId===candidate.candidateId?undefined:candidate.candidateId)}><Text style={styles.expand}>{expandedCandidateId===candidate.candidateId?"Hide details":"More details +"}</Text></Pressable>{expandedCandidateId===candidate.candidateId&&<><Text style={styles.fitDetail}>{presentation.fitDetail}</Text>{getRecruitmentRecommendation(guild, candidate) && <Text style={styles.fitDetail}>Recommended by {getRecruitmentRecommendation(guild, candidate)!.heroName}: {getRecruitmentRecommendation(guild, candidate)!.reason}.</Text>}<Text style={styles.traits}>TRAITS · {hero.traitIds.map((id) => TRAITS[id].name).join(" · ")}</Text><View style={styles.economyLine}><StatusChip label={presentation.economyLabel} tone={presentation.economyTone} /><Text style={styles.economyText}>After min. fee: {presentation.goldAfterMinimumFee} G · Payroll after hire: {range(presentation.payrollAfterMin, presentation.payrollAfterMax)} G/week</Text></View></>}
+        <Text style={styles.fitDetail}>{presentation.fitLabel} · {candidate.contractLengthWeeks} weeks</Text><Pressable accessibilityRole="button" accessibilityState={{expanded:expandedCandidateId===candidate.candidateId}} style={({pressed})=>[styles.disclosure,pressed&&styles.pressed]} onPress={()=>setExpandedCandidateId(expandedCandidateId===candidate.candidateId?undefined:candidate.candidateId)}><Text style={styles.expand}>{expandedCandidateId===candidate.candidateId?"Hide details":"More details +"}</Text></Pressable>{expandedCandidateId===candidate.candidateId&&<><Text style={styles.fitDetail}>{presentation.fitDetail}</Text>{getRecruitmentRecommendation(guild, candidate) && <Text style={styles.fitDetail}>Recommended by {getRecruitmentRecommendation(guild, candidate)!.heroName}: {getRecruitmentRecommendation(guild, candidate)!.reason}.</Text>}<View style={styles.traitRow}><Text style={styles.traitLabel}>TRAITS</Text>{hero.traitIds.map((id) => <Text key={id} style={[styles.traitChip, { color: TRAITS[id].polarity === "positive" ? colors.green : TRAITS[id].polarity === "negative" ? colors.danger : colors.gold }]}>{TRAITS[id].name}</Text>)}</View><View style={styles.economyLine}><StatusChip label={presentation.economyLabel} tone={presentation.economyTone} /><Text style={styles.economyText}>After min. fee: {presentation.goldAfterMinimumFee} G · Payroll after hire: {range(presentation.payrollAfterMin, presentation.payrollAfterMax)} G/week</Text></View></>}
 
-        <View style={styles.actions}><View style={styles.flex}><SecondaryButton label="Inspect" onPress={() => inspect(candidate)} /></View><View style={styles.flex}><ActionButton iconId={!hireBlock?"recruitment":undefined} label={hireBlock ?? "Hire"} disabled={Boolean(hireBlock)} onPress={() => confirmRecruit(candidate)} /></View></View>
+        <View style={styles.actions}><Animated.View style={[styles.flex, tutorial === "inspect_candidate" && { opacity: refreshPulse }]}><SecondaryButton label="Inspect" onPress={() => inspect(candidate)} /></Animated.View><Animated.View style={[styles.flex, (tutorial === "recruit_first" || tutorial === "recruit_second") && { opacity: refreshPulse }]}><ActionButton iconId={!hireBlock?"recruitment":undefined} label={hireBlock ?? "Hire"} disabled={Boolean(hireBlock)} onPress={() => confirmRecruit(candidate)} /></Animated.View></View>
         <View style={styles.secondaryActions}><Pressable accessibilityRole="checkbox" accessibilityState={{checked:compareIds.includes(candidate.candidateId)}} onPress={() => toggleCompare(candidate.candidateId)} style={({pressed})=>[styles.compare,compareIds.includes(candidate.candidateId)&&styles.compareSelected,pressed&&styles.pressed]}><Text style={styles.compareText}>{compareIds.includes(candidate.candidateId) ? "✓ IN COMPARISON" : "COMPARE"}</Text></Pressable><Pressable accessibilityRole="button" accessibilityState={{disabled:Boolean(tutorial)}} style={({pressed})=>[styles.rejectButton,pressed&&!tutorial&&styles.pressed]} disabled={Boolean(tutorial)} onPress={() => act(() => rejectCandidate(candidate.candidateId), `${hero.name} left the candidate board.`)}><Text style={[styles.reject, tutorial && styles.disabled]}>PASS</Text></Pressable></View>
       </Panel>;
     })}
@@ -167,10 +158,6 @@ const styles = StyleSheet.create({ cost: {color: colors.text, fontWeight: "800",
   goldValue: { color: colors.gold, fontSize: 14, fontWeight: "900", marginTop: 3 },
   roleRow: { flexDirection: "row", flexWrap: "wrap", gap: 5 },
   needText: { color: colors.danger, fontSize: 10, fontWeight: "900" },
-  tutorial: { borderColor: colors.gold, gap: 8, marginBottom: 12 },
-  tutorialStep: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: 1 },
-  tutorialTitle: { color: colors.text, fontSize: 18, fontWeight: "900" },
-  tutorialText: { color: colors.muted, lineHeight: 18 },
   tutorialTarget: { borderColor: colors.green, borderWidth: 2 },
   refresh: {gap: 10, justifyContent: "space-between", marginBottom: 12, flexDirection: "row", alignItems: "center"},
   refreshButtons: { minWidth: 0, maxWidth: 130},
@@ -200,7 +187,7 @@ const styles = StyleSheet.create({ cost: {color: colors.text, fontWeight: "800",
   offerLabel: {color: colors.muted, fontWeight: "900", letterSpacing: .5, fontSize: 9},
   offerValue: { color: colors.text, fontSize: 13, fontWeight: "900", marginTop: 3 },
   fitDetail: { color: colors.muted, fontSize: 10, lineHeight: 15, marginTop: 7 }, disclosure:{justifyContent:"center",minHeight:44}, expand:{color:colors.gold,fontSize:10,fontWeight:"800"},
-  traits: { color: colors.text, fontSize: 10, fontWeight: "500", lineHeight: 15, marginTop: 6 },
+  traitRow:{flexDirection:"row",flexWrap:"wrap",gap:6,marginTop:7,alignItems:"center"}, traitLabel:{color:colors.muted,fontSize:9,fontWeight:"900",letterSpacing:.7}, traitChip:{fontSize:10,fontWeight:"900"},
   economyLine: { alignItems: "flex-start", borderTopColor: colors.border, borderTopWidth: 1, gap: 6, marginTop: 9, paddingTop: 9 },
   economyText: { color: colors.muted, fontSize: 9, lineHeight: 14 },
   actions: { flexDirection: "row", gap: 8, marginTop: 10 },
@@ -217,6 +204,6 @@ const styles = StyleSheet.create({ cost: {color: colors.text, fontWeight: "800",
   compareGrid: { flexDirection: "row", gap: 7, marginTop: 10 },
   compareColumn: { backgroundColor: "transparent", borderColor: colors.border, flex: 1, gap: 4, padding: 7, borderWidth: 0, borderRadius: 10, },
   columnName: { fontSize: 11, fontWeight: "900" },
-  potential: { color: colors.green, fontSize: 10, fontWeight: "900" },
+  matchingAttribute: { color: colors.green, fontSize: 10, fontWeight: "900" },
   fitMini: { fontSize: 8, fontWeight: "900", marginTop: 3 },
 });

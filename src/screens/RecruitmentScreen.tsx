@@ -94,7 +94,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
     <LocationArtwork location="tavern" />
     <View style={styles.titleRow}><GameIcon id="recruitment" size={34}/><View style={styles.flex}><Text style={styles.eyebrow}>GUILDHAVEN TAVERN</Text><Text style={styles.title}>Adventurers for Hire</Text></View></View>
     <Text style={styles.intro}>Inspect each adventurer’s skills and contract before hiring.</Text>
-    {tutorial === "party_complete" && <Animated.View style={[styles.tutorialContinue, { opacity: refreshPulse }]}><ActionButton label="CONTINUE TO FIRST QUEST" onPress={beginCampaign} /></Animated.View>}
+    {tutorial === "party_complete" && <Animated.View style={[styles.tutorialContinue, { opacity: refreshPulse }]}><ActionButton label="CONTINUE TO CAMPAIGN" onPress={beginCampaign} /></Animated.View>}
 
     <Panel style={styles.guildPlate}>
       <View style={styles.guildPlateTop}><View><Text style={styles.plateLabel}>RECRUITMENT BOARD</Text><Text style={styles.plateValue}>{candidates.length} adventurer{candidates.length === 1 ? "" : "s"} available</Text></View><StatusChip label={`DAY ${guild.currentDay}`} tone="gold" /></View>

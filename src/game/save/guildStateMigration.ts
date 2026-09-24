@@ -11,7 +11,6 @@ import { migrateHeroHistory } from "../heroes/heroHistoryService";
 import { createHeroLoyaltyState } from "../heroes/heroLoyaltyService";
 import { createContentEntitlements, createDailyLoginState } from "../monetization/contentUnlockService";
 import { migrateGuildOperationState } from "../operations/guildOperationService";
-import { clampPotential } from "../progression/potential";
 import { getContractStatus } from "../recruitment/contractService";
 import { createRecruitmentState } from "../recruitment/recruitmentService";
 import { attributeEstimates, financialEstimate } from "../recruitment/scoutingService";
@@ -37,6 +36,16 @@ type PersistedGuildShape = Partial<Omit<GuildState, "uiPreferences" | "tutorial"
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function stripLegacyPotential<T>(value: T): T {
+  if (!isRecord(value)) return value;
+  const copy = { ...value };
+  delete copy.potential;
+  delete copy.potentialEstimateMin;
+  delete copy.potentialEstimateMax;
+  delete copy.truePotential;
+  return copy as T;
 }
 
 function parseGuildShape(value: unknown): PersistedGuildShape {
@@ -72,36 +81,30 @@ export function migrateGuildState(value: unknown): GuildState {
   const recruitment = saved.recruitment ?? createRecruitmentState(currentDay);
 
   const candidates = (recruitment.candidates ?? []).map((candidate) => {
-    const truePotential = clampPotential(candidate.truePotential);
     const radius = RECRUITMENT_ARCHETYPES[candidate.archetype].estimateRadius / 100;
     const fee = financialEstimate(candidate.recruitmentFee, radius);
     const salary = financialEstimate(candidate.weeklySalary, radius);
     const gender = migrateGender(candidate.heroPreview.gender);
     const portraitVariant = candidate.heroPreview.portraitVariant ?? 0;
+    const heroPreview = stripLegacyPotential(candidate.heroPreview);
 
     return {
-      ...candidate,
-      truePotential,
+      ...stripLegacyPotential(candidate),
       source: candidate.source ?? "guild_board",
       sourceRaceId: candidate.sourceRaceId ?? null,
       sourceRegionId: candidate.sourceRegionId ?? null,
       sourceLocationName: candidate.sourceLocationName ?? null,
-      potentialEstimateMin: clampPotential(candidate.potentialEstimateMin),
-      potentialEstimateMax: clampPotential(candidate.potentialEstimateMax),
       attributeEstimates: candidate.attributeEstimates ?? attributeEstimates(candidate.heroPreview.baseAttributes, candidate.scoutingLevel ?? 0),
       recruitmentFeeEstimateMin: candidate.recruitmentFeeEstimateMin ?? fee.minimum,
       recruitmentFeeEstimateMax: candidate.recruitmentFeeEstimateMax ?? fee.maximum,
       weeklySalaryEstimateMin: candidate.weeklySalaryEstimateMin ?? salary.minimum,
       weeklySalaryEstimateMax: candidate.weeklySalaryEstimateMax ?? salary.maximum,
       heroPreview: {
-        ...candidate.heroPreview,
+        ...heroPreview,
         gender,
         portraitVariant,
         portraitKey: `${candidate.heroPreview.raceId}-${candidate.heroPreview.classId}-${gender}-v${portraitVariant}`,
         learnedSkillIds: candidate.heroPreview.learnedSkillIds ?? [],
-        potential: truePotential,
-        potentialEstimateMin: clampPotential(candidate.heroPreview.potentialEstimateMin),
-        potentialEstimateMax: clampPotential(candidate.heroPreview.potentialEstimateMax),
         history: migrateHeroHistory(candidate.heroPreview.history, candidate.heroPreview.id, currentDay),
       },
     };
@@ -152,14 +155,11 @@ export function migrateGuildState(value: unknown): GuildState {
     const gender = migrateGender(hero.gender);
     const portraitVariant = hero.portraitVariant ?? 0;
     return {
-      ...hero,
+      ...stripLegacyPotential(hero),
       gender,
       portraitVariant,
       portraitKey: `${hero.raceId}-${hero.classId}-${gender}-v${portraitVariant}`,
       learnedSkillIds: hero.learnedSkillIds ?? [],
-      potential: clampPotential(hero.potential),
-      potentialEstimateMin: clampPotential(hero.potentialEstimateMin),
-      potentialEstimateMax: clampPotential(hero.potentialEstimateMax),
       subclassId: hero.subclassId ?? null,
       isAvailable: hero.isAvailable ?? true,
       adventureStamina: hero.adventureStamina ?? GAME_CONFIG.maxAdventureStamina,

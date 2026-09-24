@@ -13,6 +13,8 @@ import { filterQuests, getQuestReadiness, sortQuestsForRoster, type QuestTab } f
 import { getAvailableCampaignNodes } from "../game/campaign/campaignService";
 import { formatGameId } from "../ui/textFormat";
 import { hasCompletedQuestOnce } from "../game/quests/questCompletionService";
+import { DUNGEON_UNLOCK_HERO_COUNT } from "../game/dungeons/dungeonDraftService";
+import { GUILD_OPERATION_TEAM_SIZE, isGuildOperationsUnlocked } from "../game/operations/guildOperationService";
 
 export const QUEST_SCREEN_TABS: QuestTab[] = ["Campaign", "Side Quests", "Bosses"];
 const TABS = QUEST_SCREEN_TABS;
@@ -42,7 +44,10 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
   const fieldHeroes = [...guild.heroes].sort((a, b) => b.level - a.level).slice(0, 4);
   const fieldLevel = fieldHeroes.length ? fieldHeroes.reduce((sum, hero) => sum + hero.level, 0) / fieldHeroes.length : 1;
   const categoryUnlocked = isQuestBoardCategoryUnlocked(categoryType, guild.world, highestHeroLevel);
-  const dungeonUnlocked = guild.world.completedCampaignNodeIds.includes("broken_wardstone");
+  const chapterOneComplete = guild.world.completedCampaignNodeIds.includes("broken_wardstone");
+  const dungeonUnlocked = chapterOneComplete && guild.heroes.length >= DUNGEON_UNLOCK_HERO_COUNT;
+  const operationHeroRequirement = GUILD_OPERATION_TEAM_SIZE * 2;
+  const operationsUnlocked = isGuildOperationsUnlocked(guild) && guild.heroes.length >= operationHeroRequirement;
   const nextCampaignNode = getAvailableCampaignNodes(guild.world)[0];
   const currentLocation = guild.world.currentSettlementId
     ? SETTLEMENTS[guild.world.currentSettlementId]?.name ?? formatGameId(guild.world.currentSettlementId)
@@ -71,8 +76,8 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
 
     {(openDungeons || openOperations || openRaids) && <View style={styles.activitiesToggle}><Pressable accessibilityRole="button" accessibilityLabel="Special activities" accessibilityState={{ expanded: showActivities }} aria-expanded={showActivities} onPress={() => setShowActivities(value => !value)} style={{ minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 }}><View style={{ flex: 1 }}><Text style={{ color: colors.text, fontSize: 14 }}>Special activities</Text><Text style={{ color: colors.muted, fontSize: 11 }}>Dungeons · Operations · Raids</Text></View><Text style={{ color: colors.muted }}>{showActivities ? "−" : "+"}</Text></Pressable></View>}
     {showActivities && <View style={styles.specialActivities}>
-      {openDungeons && <View style={styles.expedition}><View style={styles.activityHeading}><GameIcon id="quests" size={34} framed={false} /><View style={styles.flex}><Text style={styles.expeditionTitle}>WARDSTONE EXPEDITIONS</Text><Text style={styles.expeditionText}>{dungeonUnlocked ? "Roguelite · choose 1 of 3 themes · temporary Boons & Pacts" : "LOCKED · Complete Chapter 1 and defeat its boss"}</Text></View></View><ActionButton iconId="loot" disabled={!dungeonUnlocked} label={guild.activeDungeonRun ? "Resume Expedition" : "Open Roguelite Expeditions"} onPress={openDungeons} /></View>}
-      {openOperations && <View style={styles.operation}><View style={styles.activityHeading}><GameIcon id="management" size={34} framed={false} /><View style={styles.flex}><Text style={styles.operationTitle}>CRISIS OPERATIONS · 6 HEROES</Text><Text style={styles.expeditionText}>{dungeonUnlocked ? `Two simultaneous teams · D20 command phases${guild.currentDay < guild.guildOperations.nextAvailableDay ? ` · Ready Day ${guild.guildOperations.nextAvailableDay}` : ""}` : "LOCKED · Establish the guild by completing Chapter 1"}</Text></View></View><ActionButton iconId="management" disabled={!dungeonUnlocked || guild.currentDay < guild.guildOperations.nextAvailableDay} label="Open Crisis Operations" onPress={openOperations} /></View>}
+      {openDungeons && <View style={styles.expedition}><View style={styles.activityHeading}><GameIcon id="quests" size={34} framed={false} /><View style={styles.flex}><Text style={styles.expeditionTitle}>WARDSTONE EXPEDITIONS</Text><Text style={styles.expeditionText}>{dungeonUnlocked ? "Roguelite · choose 1 of 3 themes · temporary Boons & Pacts" : !chapterOneComplete ? "LOCKED · Complete Chapter 1 through The Broken Wardstone" : `LOCKED · Recruit ${DUNGEON_UNLOCK_HERO_COUNT} heroes · ${guild.heroes.length}/${DUNGEON_UNLOCK_HERO_COUNT}`}</Text></View></View><ActionButton iconId="loot" disabled={!dungeonUnlocked} label={guild.activeDungeonRun ? "Resume Expedition" : "Open Roguelite Expeditions"} onPress={openDungeons} /></View>}
+      {openOperations && <View style={styles.operation}><View style={styles.activityHeading}><GameIcon id="management" size={34} framed={false} /><View style={styles.flex}><Text style={styles.operationTitle}>CRISIS OPERATIONS · 6 HEROES</Text><Text style={styles.expeditionText}>{operationsUnlocked ? `Two simultaneous teams · D20 command phases${guild.currentDay < guild.guildOperations.nextAvailableDay ? ` · Ready Day ${guild.guildOperations.nextAvailableDay}` : ""}` : !isGuildOperationsUnlocked(guild) ? "LOCKED · Complete Chapter 1 through The Broken Wardstone" : `LOCKED · Recruit ${operationHeroRequirement} heroes · ${guild.heroes.length}/${operationHeroRequirement}`}</Text></View></View><ActionButton iconId="management" disabled={!operationsUnlocked || guild.currentDay < guild.guildOperations.nextAvailableDay} label="Open Crisis Operations" onPress={openOperations} /></View>}
       {openRaids && <View style={styles.raid}><View style={styles.activityHeading}><GameIcon id="boss" size={34} framed={false} /><View style={styles.flex}><Text style={styles.raidTitle}>GUILD RAIDS · 8 HEROES</Text><Text style={styles.expeditionText}>Two squads · largest arenas · bespoke multi-phase objectives · weekly prestige</Text></View></View><ActionButton iconId="boss" label="Open Guild Raids" onPress={openRaids} /></View>}
     </View>}
 

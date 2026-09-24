@@ -5,7 +5,7 @@ export function SearchField({ label, placeholder, value, onChangeText }: { label
   const { colors } = useTheme();
   const [focused, setFocused] = useState(false);
   return <View style={[styles.field, { backgroundColor: colors.panel2, borderColor: focused ? colors.gold : "transparent" }]}>
-    <TextInput accessibilityLabel={label} placeholder={placeholder} value={value} onChangeText={onChangeText} autoCorrect={false} autoCapitalize="none" returnKeyType="done" onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} placeholderTextColor={colors.muted} style={[styles.input, { color: colors.text }]} />
+    <TextInput accessibilityLabel={label} placeholder={placeholder} value={value} onChangeText={onChangeText} autoCorrect={false} autoCapitalize="none" returnKeyType="done" submitBehavior="blurAndSubmit" onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} placeholderTextColor={colors.muted} style={[styles.input, { color: colors.text }]} />
     {value.length > 0 && <Pressable accessibilityRole="button" accessibilityLabel={"Clear " + label.toLowerCase()} onPress={() => onChangeText("")} style={styles.clear}><Text style={{ color: colors.muted, fontSize: 22 }}>×</Text></Pressable>}
   </View>;
 }

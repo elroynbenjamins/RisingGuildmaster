@@ -190,6 +190,7 @@ export function migrateGuildState(value: unknown): GuildState {
     viewedAdMilestoneDays: saved.viewedAdMilestoneDays ?? [],
     entitlements: saved.entitlements ?? createContentEntitlements(),
     dailyLogin: saved.dailyLogin ?? createDailyLoginState(),
+    lastFreeReviveDate: saved.lastFreeReviveDate ?? null,
     finance: {
       ...financeDefaults,
       ...(saved.finance ?? {}),

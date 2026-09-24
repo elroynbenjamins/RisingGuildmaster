@@ -10,7 +10,7 @@ import { calculateHero } from "./src/game/heroes/heroCalculator"; import { getAv
 import { releaseBankedCampaignXp } from "./src/game/progression/levelSystem";
 import { CampaignScreen } from "./src/screens/Campaign/CampaignScreen"; import { CombatScreen } from "./src/screens/CombatScreen"; import { GuildManagementScreen } from "./src/screens/Guild/GuildManagementScreen"; import { GuildScreen } from "./src/screens/Guild/GuildScreen"; import { HeroDetailScreen } from "./src/screens/HeroDetailScreen"; import { HeroesScreen } from "./src/screens/Heroes/HeroesScreen"; import { HeroEquipmentPickerScreen } from "./src/screens/Heroes/HeroEquipmentPickerScreen"; import { InventoryScreen } from "./src/screens/Inventory/InventoryScreen"; import { ItemDetailScreen } from "./src/screens/Inventory/ItemDetailScreen"; import { PartySelectionScreen } from "./src/screens/PartySelectionScreen"; import { QuestDetailScreen } from "./src/screens/QuestDetailScreen"; import { QuestSelectionScreen } from "./src/screens/QuestSelectionScreen"; import { CandidateDetailScreen } from "./src/screens/Recruitment/CandidateDetailScreen"; import { RecruitmentScreen } from "./src/screens/RecruitmentScreen"; import { SkillTreeScreen } from "./src/screens/SkillTree/SkillTreeScreen"; import { StoryEventScreen } from "./src/screens/StoryEvent/StoryEventScreen"; import { SubclassSelectionScreen } from "./src/screens/SubclassSelection/SubclassSelectionScreen"; import { WorldMapScreen } from "./src/screens/WorldMap/WorldMapScreen";
 import { GuildProvider, useGuild } from "./src/state/GuildContext"; import type { MainTab } from "./src/ui/navigation"; import { createSeededRandom, randomSeed } from "./src/utils/random";
-import { QuestResultScreen, type QuestResultSummary } from "./src/screens/QuestResult/QuestResultScreen";
+import { QuestResultScreen, type QuestResultSummary } from "./src/screens/QuestResult/QuestResultScreen"; import { calculateHeroXpGain } from "./src/game/quests/questRewardPresentationService";
 import { GemsSupportScreen } from "./src/screens/GemsSupport/GemsSupportScreen";
 import { TempleScreen } from "./src/screens/Temple/TempleScreen";
 import { MonsterManualScreen } from "./src/screens/MonsterManual/MonsterManualScreen";
@@ -232,8 +232,16 @@ function Game() {
         .filter((entry) => guild.world.worldFlags[entry.unlockFlag] !== true && campaign.worldState.worldFlags[entry.unlockFlag] === true)
         .map((entry) => ({ id: entry.id, title: entry.title, category: entry.category, text: entry.text, perspectives: entry.perspectives }));
       const chronicle = { ...route.summary.chronicle, selectedChoiceId: choiceId, consequences: [...route.summary.chronicle.consequences, consequence], loreDiscoveries: [...route.summary.chronicle.loreDiscoveries, ...newLore.filter((entry) => !route.summary.chronicle.loreDiscoveries.some((known) => known.id === entry.id))] };
-      updateGuild({ ...guild, heroes: releaseBankedCampaignXp(guild.heroes, campaign.worldState), world: campaign.worldState, gold: guild.gold + campaign.goldReward, reputation: guild.reputation + campaign.guildReputationReward, questChronicle: guild.questChronicle.map((entry) => entry.id === chronicle.id ? chronicle : entry) });
-      setRoute({ name: "questResult", summary: { ...route.summary, selectedChoiceId: choiceId, chronicle } });
+      const releasedHeroes = releaseBankedCampaignXp(guild.heroes, campaign.worldState);
+      const heroOutcomes = route.summary.heroOutcomes.map((outcome) => {
+        const after = releasedHeroes.find((hero) => hero.id === outcome.heroId);
+        if (!after) return outcome;
+        const availableSkillPointsAfter = getAvailableClassSkillPoints(after);
+        return { ...outcome, levelAfter: after.level, xpAfter: after.xp, availableSkillPoints: availableSkillPointsAfter, availableSkillPointsAfter };
+      });
+      const campaignChapterCompleted = campaign.worldState.campaignChapter > guild.world.campaignChapter ? guild.world.campaignChapter : route.summary.campaignChapterCompleted;
+      updateGuild({ ...guild, heroes: releasedHeroes, world: campaign.worldState, gold: guild.gold + campaign.goldReward, reputation: guild.reputation + campaign.guildReputationReward, questChronicle: guild.questChronicle.map((entry) => entry.id === chronicle.id ? chronicle : entry) });
+      setRoute({ name: "questResult", summary: { ...route.summary, selectedChoiceId: choiceId, chronicle, heroOutcomes, goldEarned: route.summary.goldEarned + campaign.goldReward, reputationEarned: (route.summary.reputationEarned ?? 0) + campaign.guildReputationReward, ...(campaignChapterCompleted ? { campaignChapterCompleted } : {}) } });
     };
     return <QuestResultScreen openLoot={() => main("Inventory")} openGuildmasterSkills={() => setRoute({name: "guildmasterSkills"})} openCalendar={() => setRoute({name: "finances"})} summary={route.summary} choiceIds={choiceIds} onChoice={choose} openHeroSkills={(heroId)=>{const hero=guild.heroes.find((entry)=>entry.id===heroId);if(hero)setRoute({name:"skills",hero});}} openTemple={()=>setRoute({name:"temple"})} onContinue={() => main(route.summary.campaignNodeId ? "Quests" : "Guild")} />;
   }
@@ -251,14 +259,33 @@ function Game() {
       if (status === "victory") updated = applyBountyReward(updated, quest.id).guild;
       if (status === "victory" && route.campaignNodeId && !campaignNodeRequiresPostBattleChoice(route.campaignNodeId)) { const campaign = completeCampaignNode(updated.world, route.campaignNodeId); updated = { ...updated, world: campaign.worldState, gold: updated.gold + campaign.goldReward, reputation: updated.reputation + campaign.guildReputationReward }; }
       const beforeById = new Map(participants.map((hero) => [hero.id, hero]));
-      const heroOutcomes = updated.heroes.filter((hero) => route.party.heroIds.includes(hero.id)).map((hero) => { const before = beforeById.get(hero.id); const hadInjury = before?.conditions.some((condition) => condition.conditionId === "injured") ?? false; return { heroId: hero.id, name: hero.name, raceId: hero.raceId, classId: hero.classId, gender: hero.gender, portraitVariant: hero.portraitVariant ?? 0, levelBefore: before?.level ?? hero.level, levelAfter: hero.level, currentHP: hero.currentHP, maxHP: calculateHero(hero).stats.maxHP, conditionIds: hero.conditions.map((condition) => condition.conditionId), availableSkillPoints: getAvailableClassSkillPoints(hero), fellInBattle: hero.currentHP <= 0, newlyInjured: !hadInjury && hero.conditions.some((condition) => condition.conditionId === "injured") }; });
+      const heroOutcomes = updated.heroes.filter((hero) => route.party.heroIds.includes(hero.id)).map((hero) => {
+        const before = beforeById.get(hero.id);
+        const levelBefore = before?.level ?? hero.level;
+        const xpBefore = before?.xp ?? hero.xp;
+        const availableSkillPointsBefore = before ? getAvailableClassSkillPoints(before) : 0;
+        const availableSkillPointsAfter = getAvailableClassSkillPoints(hero);
+        const hadInjury = before?.conditions.some((condition) => condition.conditionId === "injured") ?? false;
+        return { heroId: hero.id, name: hero.name, raceId: hero.raceId, classId: hero.classId, gender: hero.gender, portraitVariant: hero.portraitVariant ?? 0, levelBefore, levelAfter: hero.level, xpBefore, xpAfter: hero.xp, xpEarned: calculateHeroXpGain(levelBefore, xpBefore, hero.level, hero.xp), currentHP: hero.currentHP, maxHP: calculateHero(hero).stats.maxHP, conditionIds: hero.conditions.map((condition) => condition.conditionId), availableSkillPoints: availableSkillPointsAfter, availableSkillPointsBefore, availableSkillPointsAfter, fellInBattle: hero.currentHP <= 0, newlyInjured: !hadInjury && hero.conditions.some((condition) => condition.conditionId === "injured") };
+      });
       const relationshipResult = applyQuestRelationshipConsequences(updated, status, heroOutcomes, quest.id, quest.name); updated = relationshipResult.guild;
       const campResult = resolveCampConversation(updated, status, route.party.heroIds, heroOutcomes, quest.id, quest.name, random); updated = campResult.guild;
       const raid = findRaidByQuestId(route.questId); if (raid) updated = recordRaidOutcome(updated, raid.id, status === "victory", heroOutcomes.filter((hero) => !hero.fellInBattle).length);
       const chronicle = createQuestChronicleEntry({ quest, status, day: guild.currentDay, worldBefore: guild.world, worldAfter: updated.world, heroOutcomes, relationshipChanges: relationshipResult.changes, campConversation: campResult.conversation });
       updated = recordQuestChronicle(updated, chronicle);
-      updated = advanceGuildTime({ ...updated, recentPartyHeroIds: route.party.heroIds }).guild; updateGuild(updated);
-      setRoute({ name: "questResult", summary: { questId: route.questId, status, goldEarned: result.activeQuest.goldEarned, xpEarnedPerHero: result.activeQuest.xpEarnedPerHero, lootIds: result.activeQuest.collectedLootIds, materials: result.activeQuest.collectedMaterials, heroOutcomes, chronicle, campaignNodeId: route.campaignNodeId } });
+      const rewardedGuild = updated;
+      const campaignChapterCompleted = rewardedGuild.world.campaignChapter > guild.world.campaignChapter ? guild.world.campaignChapter : undefined;
+      const rewardSummary = {
+        goldEarned: Math.max(0, rewardedGuild.gold - guild.gold),
+        reputationEarned: Math.max(0, rewardedGuild.reputation - guild.reputation),
+        guildmasterXpEarned: status === "victory" ? quest.difficulty * 35 : 0,
+        guildmasterLevelBefore: guild.guildmaster.level,
+        guildmasterLevelAfter: rewardedGuild.guildmaster.level,
+        guildmasterSkillPointsBefore: guild.guildmaster.skillPoints,
+        guildmasterSkillPointsAfter: rewardedGuild.guildmaster.skillPoints,
+      };
+      updated = advanceGuildTime({ ...rewardedGuild, recentPartyHeroIds: route.party.heroIds }).guild; updateGuild(updated);
+      setRoute({ name: "questResult", summary: { questId: route.questId, status, ...rewardSummary, ...(campaignChapterCompleted ? { campaignChapterCompleted } : {}), xpEarnedPerHero: result.activeQuest.xpEarnedPerHero, lootIds: result.activeQuest.collectedLootIds, materials: result.activeQuest.collectedMaterials, heroOutcomes, chronicle, campaignNodeId: route.campaignNodeId } });
     };
     return <CombatScreen questId={route.questId} heroes={participants} combatSetup={route.combatSetup} onEnemiesEncountered={(ids) => updateGuild(discoverEnemies(guild, ids))} onQuestEnd={finish} />;
   }

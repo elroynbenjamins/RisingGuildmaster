@@ -19,7 +19,7 @@ const extraStyles=StyleSheet.create({presetToggle:{alignItems:"center",backgroun
 
 export function PartySelectionScreen({ questId, onBack, start }: { questId: string; onBack(): void; start(party: Party): void }) {
   const { guild,updateGuild } = useGuild(); const quest = QUESTS[questId]!; const [ids, setIds] = useState<string[]>([]); const [presetMessage,setPresetMessage]=useState<string>();const[showPresets,setShowPresets]=useState(false);const[showReadinessDetails,setShowReadinessDetails]=useState(false);const[roleFilter,setRoleFilter]=useState<RosterRole>("All");const[search,setSearch]=useState(""); const staminaCost = getQuestAdventureStaminaCost(quest);
-  const onboardingPulse = useRef(new Animated.Value(1)).current; const guideFirstParty = questId === "guildhaven_cellar_slimes" && guild.tutorial.completed && !guild.world.completedQuestIds.includes(questId);
+  const onboardingPulse = useRef(new Animated.Value(1)).current; const guideFirstParty = questId === "guildhaven_cellar_slimes" && guild.tutorial.completed && guild.tutorial.freeRefreshUsed && !guild.world.completedQuestIds.includes(questId);
   const party = { id: `party-${questId}`, heroIds: ids }; const validation = validateParty(party, guild.heroes, quest.maxPartySize); const sizeValid = ids.length >= quest.minPartySize && ids.length <= quest.maxPartySize;
   const selectedHeroes = ids.map((id) => guild.heroes.find((hero) => hero.id === id)).filter((hero): hero is NonNullable<typeof hero> => Boolean(hero));
   const personalHeroes=getEligiblePersonalQuestHeroes(quest,guild.heroes);const personalHeroSelected=!quest.personalHeroRequirement||personalHeroes.some((hero)=>ids.includes(hero.id));

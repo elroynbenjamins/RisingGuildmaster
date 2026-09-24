@@ -80,7 +80,6 @@ export function migrateGuildState(value: unknown): GuildState {
   const recruitment = saved.recruitment ?? createRecruitmentState(currentDay);
 
   const candidates = (recruitment.candidates ?? []).map((candidate) => {
-    const truePotential = clampPotential(candidate.truePotential);
     const radius = RECRUITMENT_ARCHETYPES[candidate.archetype].estimateRadius / 100;
     const fee = financialEstimate(candidate.recruitmentFee, radius);
     const salary = financialEstimate(candidate.weeklySalary, radius);
@@ -89,13 +88,10 @@ export function migrateGuildState(value: unknown): GuildState {
 
     return {
       ...candidate,
-      truePotential,
       source: candidate.source ?? "guild_board",
       sourceRaceId: candidate.sourceRaceId ?? null,
       sourceRegionId: candidate.sourceRegionId ?? null,
       sourceLocationName: candidate.sourceLocationName ?? null,
-      potentialEstimateMin: clampPotential(candidate.potentialEstimateMin),
-      potentialEstimateMax: clampPotential(candidate.potentialEstimateMax),
       attributeEstimates: candidate.attributeEstimates ?? attributeEstimates(candidate.heroPreview.baseAttributes, candidate.scoutingLevel ?? 0),
       recruitmentFeeEstimateMin: candidate.recruitmentFeeEstimateMin ?? fee.minimum,
       recruitmentFeeEstimateMax: candidate.recruitmentFeeEstimateMax ?? fee.maximum,
@@ -107,9 +103,6 @@ export function migrateGuildState(value: unknown): GuildState {
         portraitVariant,
         portraitKey: `${candidate.heroPreview.raceId}-${candidate.heroPreview.classId}-${gender}-v${portraitVariant}`,
         learnedSkillIds: candidate.heroPreview.learnedSkillIds ?? [],
-        potential: truePotential,
-        potentialEstimateMin: clampPotential(candidate.heroPreview.potentialEstimateMin),
-        potentialEstimateMax: clampPotential(candidate.heroPreview.potentialEstimateMax),
         history: migrateHeroHistory(candidate.heroPreview.history, candidate.heroPreview.id, currentDay),
       },
     };
@@ -165,9 +158,6 @@ export function migrateGuildState(value: unknown): GuildState {
       portraitVariant,
       portraitKey: `${hero.raceId}-${hero.classId}-${gender}-v${portraitVariant}`,
       learnedSkillIds: hero.learnedSkillIds ?? [],
-      potential: clampPotential(hero.potential),
-      potentialEstimateMin: clampPotential(hero.potentialEstimateMin),
-      potentialEstimateMax: clampPotential(hero.potentialEstimateMax),
       subclassId: hero.subclassId ?? null,
       isAvailable: hero.isAvailable ?? true,
       adventureStamina: hero.adventureStamina ?? GAME_CONFIG.maxAdventureStamina,

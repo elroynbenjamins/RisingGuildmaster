@@ -20,7 +20,7 @@ export function LoreJournalScreen({ onBack }: { onBack(): void }) {
   const { guild } = useGuild();
   const entries = getDiscoveredLoreEntries(guild.world);
   const progress = getLoreProgress(guild.world);
-  const [expandedId, setExpandedId] = useState<string | null>(entries[0]?.id ?? null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} />

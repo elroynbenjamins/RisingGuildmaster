@@ -9,6 +9,8 @@ import { useGuild } from "../../state/GuildContext";
 import { compareEquipment } from "../../ui/equipmentComparison";
 import { getEquipmentRarityColor } from "../../ui/equipmentRarity";
 import { getRaceNameColor } from "../../ui/raceColors";
+import { useGameToast } from "../../components/feedback/GameToast";
+import { triggerTactileFeedback } from "../../ui/tactileFeedback";
 
 function score(hero: Hero, equipmentKey: string): number {
   return compareEquipment(hero, equipmentKey).reduce((sum, row) => sum + row.difference, 0);
@@ -28,6 +30,7 @@ export function HeroEquipmentPickerScreen({
   onCraft?(): void;
 }) {
   const { guild, updateGuild } = useGuild();
+  const { showToast } = useGameToast();
   const [selectedKey,setSelectedKey]=useState<string>();
   const hero = guild.heroes.find((entry) => entry.id === heroId);
   if (!hero) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack}/><EmptyState title="Hero unavailable" message="This hero is no longer in the active guild roster."/></ScrollView>;
@@ -53,6 +56,9 @@ export function HeroEquipmentPickerScreen({
     inventory.splice(index, 1);
     if (oldKey) inventory.push(oldKey);
     updateGuild({ ...guild, inventory, heroes: guild.heroes.map((entry) => entry.id === hero.id ? updatedHero : entry) });
+    const equippedItem=resolveEquipmentDefinition(inventoryKey);
+    triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");
+    showToast({title:"Equipment Updated",message:`${hero.name} equipped ${equippedItem?.name ?? "new gear"}${current?.name?` · ${current.name} returned to inventory`:""}.`,tone:"success"});
     onEquipped(updatedHero);
   };
 

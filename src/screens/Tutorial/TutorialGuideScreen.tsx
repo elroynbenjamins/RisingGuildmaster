@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BackButton, Panel, StatusChip, colors } from "../../components/ui";
 import { TUTORIAL_GUIDE_TOPICS } from "../../game/onboarding/tutorialGuide";
+import { GuidedTourControls } from '../../components/tutorial/GuidedTourControls';
 
 export function TutorialGuideScreen({ onBack }: { onBack(): void }) {
   const [openId, setOpenId] = useState<string | null>(null);
@@ -9,7 +10,8 @@ export function TutorialGuideScreen({ onBack }: { onBack(): void }) {
     <BackButton onPress={onBack} />
     <Text style={styles.eyebrow}>GUILDMASTER HANDBOOK</Text>
     <Text style={styles.title}>How to Run the Guild</Text>
-    <Text style={styles.intro}>Contextual tutorials appear the first time important systems unlock. This handbook keeps the current rules in one place so every tutorial can be reviewed later.</Text>
+    <Text style={styles.intro}>Review the rules here, or resume the interactive main-tab guides below. New systems are introduced as they become relevant.</Text>
+    <GuidedTourControls />
     <Panel style={styles.legend}><Text style={styles.legendTitle}>QUICK COMBAT MEMORY</Text><Text style={styles.legendText}>YELLOW TILE = move · RED ENEMY BORDER = double-tap basic attack · highlighted skill target = double-tap selected skill</Text></Panel>
     {TUTORIAL_GUIDE_TOPICS.map((topic, index) => {
       const open = openId === topic.id;

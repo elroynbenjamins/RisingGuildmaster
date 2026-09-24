@@ -1,12 +1,13 @@
 import type { GuildState } from "../guild/types";
 import type { ContextualTutorialId } from "./onboardingTypes";
 import type { TutorialCandidateTab } from "./onboardingTypes";
+import { createGuidedTourProgress, normalizeGuidedTourProgress, reduceGuidedTour } from './guidedTourService';
 
 const hasCoreCandidateReview = (tabs: readonly TutorialCandidateTab[]): boolean => tabs.includes("Overview") && (tabs.includes("Stats") || tabs.includes("Traits"));
 
-export function beginTutorial(guild: GuildState): GuildState { return { ...guild, tutorial: { ...guild.tutorial, active: true, step: "inspect_candidate", inspectedCandidateId: null, inspectedCandidateTabs: [] } }; }
+export function beginTutorial(guild: GuildState): GuildState { return { ...guild, tutorial: { ...guild.tutorial, active: true, step: "inspect_candidate", inspectedCandidateId: null, inspectedCandidateTabs: [], guided: guild.tutorial.guided ?? createGuidedTourProgress() } }; }
 export function completeTutorial(guild: GuildState): GuildState { return { ...guild, tutorial: { ...guild.tutorial, active: false, completed: true, step: "complete" } }; }
-export function skipTutorial(guild: GuildState): GuildState { return completeTutorial(guild); }
+export function skipTutorial(guild: GuildState): GuildState { const completed = completeTutorial(guild); return { ...completed, tutorial: { ...completed.tutorial, guided: reduceGuidedTour(normalizeGuidedTourProgress(guild.tutorial.guided), { type: 'pause' }) } }; }
 export function recordTutorialCandidateTab(guild: GuildState, candidateId: string, tab: TutorialCandidateTab): GuildState {
   if (!guild.tutorial.active || guild.tutorial.step !== "inspect_candidate") return guild;
   const sameCandidate = guild.tutorial.inspectedCandidateId === candidateId || guild.tutorial.inspectedCandidateId === null;

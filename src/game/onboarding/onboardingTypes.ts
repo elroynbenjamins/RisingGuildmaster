@@ -1,3 +1,4 @@
+import type { GuidedTourProgress } from './guidedTourService';
 export type TutorialStep = "welcome" | "inspect_candidate" | "recruit_first" | "refresh_board" | "recruit_second" | "party_complete" | "complete";
 export type TutorialCandidateTab = "Overview" | "Stats" | "Traits" | "Contract";
 
@@ -11,5 +12,7 @@ export interface TutorialState {
   contextualSeen: Partial<Record<ContextualTutorialId, boolean>>;
   inspectedCandidateId: string | null;
   inspectedCandidateTabs: TutorialCandidateTab[];
+  /** Optional so older saves do not unexpectedly start the new tours. */
+  guided?: GuidedTourProgress;
 }
 export const createTutorialState = (): TutorialState => ({ active:true, completed:false, step: "welcome", freeRefreshUsed:false, contextualSeen:{}, inspectedCandidateId:null, inspectedCandidateTabs:[] });

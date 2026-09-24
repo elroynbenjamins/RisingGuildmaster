@@ -12,6 +12,7 @@ import { useTheme } from "../theme/theme";
 import { NotificationDot } from "./navigation/NotificationDot";
 import { GameIcon } from "./icons/GameIcon";
 import type { GameIconId } from "../data/ui/gameIcons";
+import { GuidePressable } from './tutorial/GuidedTutorialContext';
 
 export const colors = { background: "#101416", panel: "#1a2123", panel2: "#232d2f", gold: "#d8ad5c", text: "#f3eee3", muted: "#a8b1ad", green: "#79b887", danger: "#dd7a73", border: "#354044", blue: "#70a4c5" };
 
@@ -25,11 +26,11 @@ export function SectionTitle({ children }: React.PropsWithChildren) {
   return <View style={styles.sectionHeading}><View style={[styles.sectionAccent,{backgroundColor:c.gold}]}/><Text style={[styles.sectionTitle, { color: c.gold }]}>{children}</Text><View style={[styles.sectionRule,{backgroundColor:c.border}]}/></View>;
 }
 
-export function ActionButton({ label, onPress, disabled = false, iconId, guardMs = 0 }: { label: string; onPress(): void; disabled?: boolean; iconId?: GameIconId; guardMs?: number }) {
+export function ActionButton({ label, onPress, disabled = false, iconId, guardMs = 0, guideId }: { label: string; onPress(): void; disabled?: boolean; iconId?: GameIconId; guardMs?: number; guideId?: string }) {
   const { colors: c } = useTheme();
   const lastPress = React.useRef(0);
   const press = () => { const now = Date.now(); if (guardMs > 0 && now - lastPress.current < guardMs) return; lastPress.current = now; onPress(); };
-  return <Pressable accessibilityRole="button" disabled={disabled} accessibilityState={{ disabled }} aria-disabled={disabled} onPress={press} style={({ pressed }) => [styles.button, { backgroundColor: disabled ? c.panel2 : c.gold, borderColor: disabled ? c.border : c.gold }, pressed && !disabled && styles.buttonDim, pressed && styles.buttonPressed]}><View style={styles.buttonContent}>{iconId ? <GameIcon id={iconId} size={19} framed={false}/> : null}<Text style={[styles.buttonText, { color: disabled ? c.muted : c.buttonText }]}>{label}</Text></View></Pressable>;
+  return <GuidePressable guideId={guideId} accessibilityRole="button" disabled={disabled} accessibilityState={{ disabled }} aria-disabled={disabled} onPress={press} style={({ pressed }) => [styles.button, { backgroundColor: disabled ? c.panel2 : c.gold, borderColor: disabled ? c.border : c.gold }, pressed && !disabled && styles.buttonDim, pressed && styles.buttonPressed]}><View style={styles.buttonContent}>{iconId ? <GameIcon id={iconId} size={19} framed={false}/> : null}<Text style={[styles.buttonText, { color: disabled ? c.muted : c.buttonText }]}>{label}</Text></View></GuidePressable>;
 }
 
 export function SecondaryButton({ label, onPress, disabled = false, iconId, guardMs = 0 }: { label: string; onPress(): void; disabled?: boolean; iconId?: GameIconId; guardMs?: number }) {
@@ -49,9 +50,9 @@ export function EmptyState({ title, message, actionLabel, onAction }: { title: s
   return <Panel style={[styles.empty,{borderLeftColor:c.gold}]}><Text style={[styles.emptyTitle, { color: c.text }]}>{title}</Text><Text style={[styles.muted, { color: c.muted }]}>{message}</Text>{actionLabel && onAction ? <ActionButton label={actionLabel} onPress={onAction} /> : null}</Panel>;
 }
 
-export function SegmentedTabs<T extends string>({ values, value, onChange, notificationValues = [] }: { values: readonly T[]; value: T; onChange(value: any): void; notificationValues?: readonly T[] }) {
+export function SegmentedTabs<T extends string>({ values, value, onChange, notificationValues = [], guideIds }: { values: readonly T[]; value: T; onChange(value: any): void; notificationValues?: readonly T[]; guideIds?: Partial<Record<T, string>> }) {
   const { colors: c } = useTheme();
-  return <View style={[styles.tabs, { borderColor: c.border }]}>{values.map((item) => <Pressable key={item} onPress={() => onChange(item)} accessibilityRole="tab" accessibilityState={{ selected: item === value }} aria-selected={item === value} style={({pressed}) => [styles.tab, { borderColor: "transparent" }, selectionStyle(c, item === value), pressed && styles.tabPressed]}><Text style={[styles.tabText, { color: c.muted }, item === value && { color: c.gold }]}>{item}</Text>{notificationValues.includes(item) ? <View style={{ position: "absolute", top: 0, right: 1 }}><NotificationDot label={`${item}: choice available`} /></View> : null}</Pressable>)}</View>;
+  return <View style={[styles.tabs, { borderColor: c.border }]}>{values.map((item) => <GuidePressable guideId={guideIds?.[item]} key={item} onPress={() => onChange(item)} accessibilityRole="tab" accessibilityState={{ selected: item === value }} aria-selected={item === value} style={({pressed}) => [styles.tab, { borderColor: "transparent" }, selectionStyle(c, item === value), pressed && styles.tabPressed]}><Text style={[styles.tabText, { color: c.muted }, item === value && { color: c.gold }]}>{item}</Text>{notificationValues.includes(item) ? <View style={{ position: "absolute", top: 0, right: 1 }}><NotificationDot label={`${item}: choice available`} /></View> : null}</GuidePressable>)}</View>;
 }
 
 export function StatusChip({ label, tone = "neutral" }: { label: string; tone?: "neutral" | "gold" | "good" | "danger" | "blue" }) {

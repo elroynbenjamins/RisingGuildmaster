@@ -49,6 +49,13 @@ describe("progression and retention systems", () => {
     expect(ready).toContain("craft_5");
   });
 
+  it("emits chapter completion as a progression milestone", () => {
+    const guild=createGuild();
+    guild.world.completedCampaignNodeIds=["founding_the_guild","guildhaven_cellar_slimes","rats_beneath_guildhaven","campaign_goblin_patrol","missing_merchant","strange_tracks","attack_on_guildhaven","goblin_chieftain","broken_wardstone"];
+    const notices=getNewUnlockNotices(guild);
+    expect(notices.some((notice)=>notice.id==="chapter:chapter_1"&&notice.title.includes("A Guild of Your Own"))).toBe(true);
+  });
+
   it("emits new unlocks once and acknowledges them", () => {
     const guild = createGuild();
     expect(getNewUnlockNotices(guild)).toHaveLength(0);

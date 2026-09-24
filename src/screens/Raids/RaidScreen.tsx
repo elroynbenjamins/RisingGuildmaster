@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { EnemyPortrait } from "../../components/enemies/EnemyPortrait";
 import { GameIcon } from "../../components/icons/GameIcon";
-import { ActionButton, BackButton, Panel, Portrait, SectionTitle, colors } from "../../components/ui";
+import { ActionButton, BackButton, Panel, Portrait, SectionTitle, SegmentedTabs, colors } from "../../components/ui";
 import { RAIDS } from "../../data/raids/raids";
 import { QUESTS } from "../../data/quests/quests";
 import { getQuestAdventureStaminaCost } from "../../game/heroes/adventureStaminaService";
@@ -15,6 +15,7 @@ export function RaidScreen({ onBack, inspectRaid }: { onBack(): void; inspectRai
   const raids = Object.values(RAIDS);
   const [selectedId,setSelectedId]=useState(raids.find((raid)=>!getRaidLockReason(raid,guild))?.id??raids[0]!.id);
   const [showMechanics,setShowMechanics]=useState(false);
+  const [tab,setTab]=useState<"Overview"|"Party"|"Intel">("Overview");
   const raid=RAIDS[selectedId]!;
   const quest=QUESTS[raid.questId]!;
   const lock=getRaidLockReason(raid,guild);
@@ -48,13 +49,13 @@ export function RaidScreen({ onBack, inspectRaid }: { onBack(): void; inspectRai
       <View style={styles.stats}><Text style={styles.stat}>8 HEROES</Text><Text style={styles.stat}>2 SQUADS</Text><Text style={styles.stat}>{raid.phases.length} PHASES</Text><Text style={styles.stat}>{raid.weeklyLockoutDays}-DAY LOCKOUT</Text></View>
     </Panel>
 
-    <SectionTitle>ROSTER READINESS</SectionTitle>
+    <SegmentedTabs values={["Overview","Party","Intel"] as const} value={tab} onChange={setTab}/>{tab==="Overview"&&<><SectionTitle>ROSTER READINESS</SectionTitle>
     <Panel style={readiness.status==="ready"?styles.readinessReady:readiness.status==="risky"?styles.readinessRisky:styles.readinessUnready}>
       <View style={styles.headingRow}><Text style={styles.readinessTitle}>{readiness.status.toUpperCase()}</Text><Text style={styles.readinessNumbers}>{readiness.readyHeroes}/8 ready · Lv {readiness.averageLevel.toFixed(1)} · {Math.round(readiness.averageStamina)} readiness</Text></View>
       {readiness.warnings.length?readiness.warnings.map((warning)=><Text key={warning} style={styles.readinessWarning}>⚠ {warning}</Text>):<Text style={styles.readinessGood}>Roster meets the baseline. Equipment, skills, squad composition and mechanic execution still decide the fight.</Text>}
     </Panel>
 
-    <SectionTitle>SUGGESTED RAID PARTY</SectionTitle>
+    </>}{tab==="Party"&&<><SectionTitle>SUGGESTED RAID PARTY</SectionTitle>
     <Text style={styles.note}>This is a preparation aid, not an automatic commitment. The final eight heroes and slot order are still chosen on the Party screen.</Text>
     <View style={styles.squadColumns}>
       <Panel style={styles.squad}>
@@ -68,7 +69,7 @@ export function RaidScreen({ onBack, inspectRaid }: { onBack(): void; inspectRai
     </View>
     {suggestedWarnings.length?<Panel style={styles.suggestionWarnings}>{suggestedWarnings.map((warning)=><Text key={warning} style={styles.readinessWarning}>⚠ {warning}</Text>)}</Panel>:suggestedIds.length===8?<Text style={styles.readinessGood}>Suggested split covers frontline, support, ranged, physical and magical pressure.</Text>:null}
 
-    <SectionTitle>FIELD BRIEFING</SectionTitle>
+    </>}{tab==="Intel"&&<><SectionTitle>FIELD BRIEFING</SectionTitle>
     <Panel><Text style={styles.eyebrow}>PATRON</Text><Text style={styles.record}>{quest.storyContext?.patron}</Text><Text style={styles.eyebrow}>WHY THE GUILD IS NEEDED</Text><Text style={styles.record}>{quest.storyContext?.guildReason}</Text><Text style={styles.eyebrow}>PREPARATION</Text>{quest.preparationNotes?.map((note)=><Text key={note} style={styles.note}>• {note}</Text>)}</Panel>
 
     <SectionTitle>BOSS MECHANICS</SectionTitle>
@@ -83,7 +84,7 @@ export function RaidScreen({ onBack, inspectRaid }: { onBack(): void; inspectRai
     </View>
     <Panel style={styles.trophyPanel}><GameIcon id={record.firstVictoryDay?"victory":"loot"} size={44}/><View style={styles.flex}><Text style={record.firstVictoryDay?styles.cleared:styles.firstClear}>{record.firstVictoryDay?`FIRST CLEAR · DAY ${record.firstVictoryDay}`:"FIRST CLEAR REWARD"}</Text><Text style={styles.trophyName}>{raid.firstVictoryReward.trophyName}</Text><Text style={styles.record}>{record.firstVictoryDay?"Trophy earned":`+${raid.firstVictoryReward.gold} bonus gold · trophy permanently recorded`}</Text><Text style={styles.record}>{record.victories} victories / {record.attempts} attempts</Text></View></Panel>
 
-    <View style={styles.action}><ActionButton disabled={Boolean(lock)} label={lock??"Inspect Raid & Assemble 8 Heroes"} onPress={()=>inspectRaid(raid.questId)}/></View>
+    </>}<View style={styles.action}><ActionButton disabled={Boolean(lock)} label={lock??"Inspect Raid & Assemble 8 Heroes"} onPress={()=>inspectRaid(raid.questId)}/></View>
   </ScrollView>;
 }
 

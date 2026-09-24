@@ -4,6 +4,12 @@ import type { TutorialCandidateTab } from "./onboardingTypes";
 
 const hasCoreCandidateReview = (tabs: readonly TutorialCandidateTab[]): boolean => tabs.includes("Overview") && (tabs.includes("Stats") || tabs.includes("Traits"));
 
+export type TutorialResumeDestination = "recruitment" | null;
+export function getTutorialResumeDestination(guild: GuildState): TutorialResumeDestination {
+  if (!guild.tutorial.active || guild.tutorial.step === "welcome" || guild.tutorial.step === "complete") return null;
+  return "recruitment";
+}
+
 export function beginTutorial(guild: GuildState): GuildState { return { ...guild, tutorial: { ...guild.tutorial, active: true, step: "inspect_candidate", inspectedCandidateId: null, inspectedCandidateTabs: [] } }; }
 export function completeTutorial(guild: GuildState): GuildState { return { ...guild, tutorial: { ...guild.tutorial, active: false, completed: true, step: "complete" } }; }
 export function skipTutorial(guild: GuildState): GuildState { return completeTutorial(guild); }

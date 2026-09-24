@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   location: { color: colors.muted, fontSize: 9, fontWeight: "800", letterSpacing: .4, marginTop: 3 },
   resources: { flexDirection: "row", gap: 4, alignItems: "center" },
   resource: {alignItems: "center", flexDirection: "row", gap: 3, minHeight: 34, borderWidth: 0, borderRadius: 10, paddingHorizontal: 4},
-  value: {color: colors.gold, fontSize: 11, fontWeight: "600"},
+  value: {color: colors.gold, fontSize: 11, fontWeight: "800"},
   gemButton: { minHeight: 44, justifyContent: "center", position: "relative" },
   notification: { position: "absolute", right: -4, top: -1 },
 });

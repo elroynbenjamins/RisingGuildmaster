@@ -78,7 +78,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
   const compared = candidates.filter((item) => compareIds.includes(item.candidateId));
 
   useEffect(() => {
-    const shouldPulse = tutorial === "inspect_candidate" || tutorial === "recruit_first" || tutorial === "refresh_board" || tutorial === "recruit_second";
+    const shouldPulse = tutorial === "inspect_candidate" || tutorial === "recruit_first" || tutorial === "refresh_board" || tutorial === "recruit_second" || tutorial === "party_complete";
     if (!shouldPulse) { refreshPulse.setValue(1); return; }
     if (tutorialRefresh) scrollRef.current?.scrollTo({ y: 0, animated: true });
     const pulse = Animated.loop(Animated.sequence([
@@ -94,6 +94,7 @@ export function RecruitmentScreen({ onBack, inspect, openCalendar, openCampaign 
     <LocationArtwork location="tavern" />
     <View style={styles.titleRow}><GameIcon id="recruitment" size={34}/><View style={styles.flex}><Text style={styles.eyebrow}>GUILDHAVEN TAVERN</Text><Text style={styles.title}>Adventurers for Hire</Text></View></View>
     <Text style={styles.intro}>Inspect each adventurer’s skills and contract before hiring.</Text>
+    {tutorial === "party_complete" && <Animated.View style={[styles.tutorialContinue, { opacity: refreshPulse }]}><ActionButton label="CONTINUE TO FIRST QUEST" onPress={beginCampaign} /></Animated.View>}
 
     <Panel style={styles.guildPlate}>
       <View style={styles.guildPlateTop}><View><Text style={styles.plateLabel}>RECRUITMENT BOARD</Text><Text style={styles.plateValue}>{candidates.length} adventurer{candidates.length === 1 ? "" : "s"} available</Text></View><StatusChip label={`DAY ${guild.currentDay}`} tone="gold" /></View>
@@ -158,6 +159,7 @@ const styles = StyleSheet.create({ cost: {color: colors.text, fontWeight: "800",
   roleRow: { flexDirection: "row", flexWrap: "wrap", gap: 5 },
   needText: { color: colors.danger, fontSize: 10, fontWeight: "900" },
   tutorialTarget: { borderColor: colors.green, borderWidth: 2 },
+  tutorialContinue: { marginBottom: 12 },
   refresh: {gap: 10, justifyContent: "space-between", marginBottom: 12, flexDirection: "row", alignItems: "center"},
   refreshButtons: { minWidth: 0, maxWidth: 130},
   candidateTools: { gap: 8, marginBottom: 12 },

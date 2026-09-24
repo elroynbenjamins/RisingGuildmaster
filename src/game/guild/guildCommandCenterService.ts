@@ -8,6 +8,7 @@ import { getHeroLoyalty } from "../heroes/heroLoyaltyService";
 import { getContractStatus } from "../recruitment/contractService";
 import { regionalScoutDaysRemaining } from "../recruitment/regionalScoutingService";
 import { trainingCapacity } from "../training/trainingService";
+import { getStarterJourneyStep } from "../onboarding/starterJourneyService";
 import type { GuildState } from "./types";
 
 export type GuildCommandDestination =
@@ -165,6 +166,20 @@ export function getGuildCommandOrders(guild: GuildState): GuildCommandOrder[] {
       tone: "ready",
       badge: "REPORT READY",
     }, 40));
+  }
+
+  const starterStep = getStarterJourneyStep(guild);
+  if (starterStep) {
+    orders.push(order({
+      id: `starter_journey_${starterStep.id}`,
+      title: starterStep.title,
+      description: starterStep.description,
+      actionLabel: starterStep.actionLabel,
+      destination: starterStep.destination,
+      iconId: starterStep.destination === "recruitment" ? "recruitment" : starterStep.destination === "world" ? "world" : "quests",
+      tone: "ready",
+      badge: "COMPANY TRIAL",
+    }, 48));
   }
 
   const expiringCandidates = guild.recruitment.candidates

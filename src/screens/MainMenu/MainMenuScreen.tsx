@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Linking, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { ActionButton, Panel, SecondaryButton, colors } from "../../components/ui";
@@ -20,16 +20,18 @@ export function MainMenuScreen({
   onDelete,
 }: {
   saveSlots: SaveSlotSummary[];
-  onContinue(slotId: SaveSlotId): void;
+  onContinue(slotId: SaveSlotId): void | Promise<void>;
   onNewGame(slotId: SaveSlotId): void;
-  onDelete(slotId: SaveSlotId): void;
+  onDelete(slotId: SaveSlotId): void | Promise<void>;
 }) {
   const { showDialog } = useGameDialog();
   const {colors:themeColors}=useTheme();
+  const [busy,setBusy]=useState<{slotId:SaveSlotId;action:"continue"|"delete"}>();
+  const runSaveAction=async(slotId:SaveSlotId,action:"continue"|"delete",work:(slotId:SaveSlotId)=>void|Promise<void>)=>{if(busy)return;setBusy({slotId,action});try{await work(slotId);}finally{setBusy(undefined);}};
   const start=(slot:SaveSlotSummary)=>slot.exists
     ? showDialog({title:`Overwrite Save Slot ${slot.slotId}?`,message:`${slot.guildName ?? "This guild"} will be permanently replaced in Slot ${slot.slotId}. The other slot is unaffected.`,eyebrow:"IRREVERSIBLE ORDER",tone:"danger",actions:[{label:"Keep Save",tone:"secondary"},{label:"Overwrite Slot",tone:"danger",onPress:()=>onNewGame(slot.slotId)}]})
     : onNewGame(slot.slotId);
-  const remove=(slot:SaveSlotSummary)=>showDialog({title:`Delete Save Slot ${slot.slotId}?`,message:`${slot.guildName ?? "This guild"} and its recovery snapshot will be permanently deleted. The other slot is unaffected.`,eyebrow:"DELETE SAVE",tone:"danger",actions:[{label:"Cancel",tone:"secondary"},{label:"Delete Slot",tone:"danger",onPress:()=>onDelete(slot.slotId)}]});
+  const remove=(slot:SaveSlotSummary)=>showDialog({title:`Delete Save Slot ${slot.slotId}?`,message:`${slot.guildName ?? "This guild"} and its recovery snapshot will be permanently deleted. The other slot is unaffected.`,eyebrow:"DELETE SAVE",tone:"danger",actions:[{label:"Cancel",tone:"secondary"},{label:"Delete Slot",tone:"danger",onPress:()=>{void runSaveAction(slot.slotId,"delete",onDelete);}}]});
   const joinDiscord=()=>void Linking.openURL("https://discord.gg/7BWHFyFzzP").catch(()=>showDialog({title:"Could not open Discord",message:"Please visit discord.gg/7BWHFyFzzP in your browser.",eyebrow:"COMMUNITY NOTICE",tone:"danger"}));
 
   return <ScrollView style={{backgroundColor:themeColors.background}} contentContainerStyle={styles.screen}>
@@ -44,11 +46,11 @@ export function MainMenuScreen({
         {slot.issue ? <Text style={{color: colors.danger}}>{slot.issue.message}</Text> : slot.exists ? <>
           <View style={styles.guildRow}><GuildCrest crestId={slot.guildCrestId ?? "crownroad"} size={44}/><View style={styles.flex}><Text style={styles.guildName}>{slot.guildName}</Text><Text style={styles.meta}>Day {slot.currentDay} · {String(slot.difficultyId).replace(/_/g," ")} · {slot.heroCount} heroes</Text></View></View>
           <Text style={styles.lastPlayed}>{lastPlayedLabel(slot.lastPlayedAt)}</Text>
-          <ActionButton label="Continue Guild" onPress={()=>onContinue(slotId)}/>
-          <View style={styles.slotActions}><View style={styles.flex}><SecondaryButton label="New Guild Here" onPress={()=>start(slot)}/></View><View style={styles.flex}><SecondaryButton label="Delete" onPress={()=>remove(slot)}/></View></View>
+          <ActionButton guardMs={800} disabled={Boolean(busy)} label={busy?.slotId===slotId&&busy.action==="continue"?"Loading Guild…":"Continue Guild"} onPress={()=>{void runSaveAction(slotId,"continue",onContinue);}}/>
+          <View style={styles.slotActions}><View style={styles.flex}><SecondaryButton disabled={Boolean(busy)} label="New Guild Here" onPress={()=>start(slot)}/></View><View style={styles.flex}><SecondaryButton disabled={Boolean(busy)} label={busy?.slotId===slotId&&busy.action==="delete"?"Deleting…":"Delete"} onPress={()=>remove(slot)}/></View></View>
         </> : <>
           <Text style={styles.emptyCopy}>Start a separate guild without replacing the other save slot.</Text>
-          <ActionButton label="Found New Guild" onPress={()=>start(slot)}/>
+          <ActionButton guardMs={800} disabled={Boolean(busy)} label="Found New Guild" onPress={()=>start(slot)}/>
         </>}
       </Panel>;
     })}</View>
@@ -60,7 +62,7 @@ export function MainMenuScreen({
 const styles=StyleSheet.create({
   screen:{alignItems:"center",backgroundColor:colors.background,flexGrow:1,padding:20,paddingBottom:40,paddingTop:44},
   eyebrow:{color:colors.gold,fontSize:10,fontWeight:"900",letterSpacing:2},
-  title:{color:colors.text,fontSize:40,fontWeight:"900",letterSpacing:3,marginTop:8},
+  title:{color:colors.text,fontSize:36,fontWeight:"900",letterSpacing:2.2,marginTop:8,textAlign:"center"},
   subtitle:{color:colors.muted,lineHeight:20,marginTop:8,maxWidth:360,textAlign:"center"},
   slots:{gap:10,marginTop:26,maxWidth:430,width:"100%"},
   slot:{gap:9},

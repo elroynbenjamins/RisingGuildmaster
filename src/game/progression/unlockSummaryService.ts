@@ -1,4 +1,5 @@
 import { CLASSES } from "../../data/classes/classes";
+import { CAMPAIGN_CHAPTERS } from "../../data/campaign/chapter1";
 import { CRAFTING_RECIPES } from "../../data/crafting/recipes";
 import { RACES } from "../../data/races/races";
 import { RAIDS } from "../../data/raids/raids";
@@ -19,6 +20,11 @@ export interface UnlockNotice {
 
 export function getCurrentUnlockNotices(guild: GuildState): UnlockNotice[] {
   const notices: UnlockNotice[] = [];
+
+  for (const chapter of Object.values(CAMPAIGN_CHAPTERS)) {
+    const complete = chapter.nodeIds.every((id) => guild.world.completedCampaignNodeIds.includes(id));
+    if (complete) notices.push({ id:`chapter:${chapter.id}`, title:`Chapter ${chapter.chapterNumber} Complete · ${chapter.name}`, detail:`Campaign milestone secured. +${chapter.completionGoldReward ?? 0} gold · +${chapter.completionReputationReward ?? 0} reputation.`, iconId:"victory" });
+  }
 
   for (const regionId of guild.world.unlockedRegionIds) {
     notices.push({ id:`region:${regionId}`, title:REGIONS[regionId]?.name ?? regionId, detail:"Region available for travel and quests.", iconId:"world" });

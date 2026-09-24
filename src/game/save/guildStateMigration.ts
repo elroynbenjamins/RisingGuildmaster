@@ -19,6 +19,7 @@ import { createRaidProgressState } from "../raids/raidService";
 import { createTrainingGroundState } from "../training/trainingTypes";
 import { createTutorialState } from "../onboarding/onboardingTypes";
 import { createWorldState } from "../world/worldState";
+import { normalizeActiveQuestCombatRecovery, normalizePendingQuestResult } from "../quests/questRecoveryService";
 
 const SETTLEMENT_FALLBACK: Record<string, string> = {
   greenveil: "guildhaven",
@@ -174,6 +175,9 @@ export function migrateGuildState(value: unknown): GuildState {
     batchRecruitmentUsed: recruitment.batchRecruitmentUsed ?? false,
   };
 
+  const pendingQuestResult = normalizePendingQuestResult(saved.pendingQuestResult, world);
+  const activeQuestCombat = normalizeActiveQuestCombatRecovery(saved.activeQuestCombat, migratedHeroes, world, pendingQuestResult);
+
   return {
     ...(saved as GuildState),
     guildId: saved.guildId ?? "guild-player",
@@ -243,8 +247,8 @@ export function migrateGuildState(value: unknown): GuildState {
     raidProgress: saved.raidProgress ?? createRaidProgressState(),
     activeDungeonRun: migrateActiveDungeonRun(saved.activeDungeonRun ?? null),
     activeRogueliteRun: saved.activeRogueliteRun ?? null,
-    activeQuestCombat: saved.activeQuestCombat ?? null,
-    pendingQuestResult: saved.pendingQuestResult ?? null,
+    activeQuestCombat,
+    pendingQuestResult,
     recruitment: {
       ...migratedRecruitment,
       candidates,

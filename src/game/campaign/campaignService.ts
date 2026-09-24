@@ -8,6 +8,7 @@ export function getLatestCampaignChapter() {
 export function getCampaignNodeForQuest(questId: string) {
   return Object.values(CAMPAIGN_NODES).find((node) => node.questId === questId);
 }
+export function campaignNodeRequiresPostBattleChoice(nodeId: string): boolean { const node = CAMPAIGN_NODES[nodeId]; return Boolean(node?.type === "boss" && node.choiceIds?.length); }
 export function isCampaignQuestUnlocked(questId: string, state: WorldState): boolean {
   const node = getCampaignNodeForQuest(questId);
   if (!node) return true;

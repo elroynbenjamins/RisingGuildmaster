@@ -3,6 +3,9 @@ import { simulateCombatScenario, simulateEconomyScenario } from "../src/game/sim
 
 describe("repeatable balance simulations", () => {
   it("reports early-campaign combat across every difficulty", () => {
+    const brambleway = simulateCombatScenario({ id: "brambleway-standard", questId: "brambleway_road_ambush", heroLevel: 2, partyClasses: ["warrior", "ranger", "cleric"], difficultyId: "standard", runs: 8, seed: 4050 });
+    expect(brambleway.stalled).toBe(0);
+    expect(brambleway.winRate).toBeGreaterThan(0);
     const results = (["standard", "veteran", "iron_guild"] as const).map((difficultyId) => simulateCombatScenario({ id: `chieftain-${difficultyId}`, questId: "goblin_chieftain_boss", heroLevel: 2, partyClasses: ["warrior", "ranger", "cleric", "mage"], difficultyId, runs: 12, seed: 4100 }));
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);

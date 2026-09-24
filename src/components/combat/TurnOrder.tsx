@@ -22,7 +22,7 @@ export function TurnOrder({ ids, cursor, labels, labelColors, aliveIds, sides = 
 }
 const styles = StyleSheet.create({
   row: { gap: 5, paddingVertical: 8 },
-  unit: { width: 91, paddingHorizontal: 8, paddingVertical: 7, borderWidth: 2, borderRadius: 2, overflow: "hidden" },
+  unit: { width: 91, paddingHorizontal: 8, paddingVertical: 7, borderWidth: 2, borderRadius: 9, overflow: "hidden" },
   sideRail: { bottom: 0, left: 0, position: "absolute", top: 0, width: 3 },
   dead: { opacity: .42 },
   orderLine: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },

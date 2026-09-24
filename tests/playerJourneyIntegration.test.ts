@@ -39,6 +39,7 @@ describe("end-to-end roster progression handoffs", () => {
     expect(() => createDungeonDraft(guild, createSeededRandom(11))).toThrow(/6 owned heroes/);
 
     const noticeIds = getCurrentUnlockNotices(guild).map((notice) => notice.id);
+    expect(noticeIds).not.toContain("system:gathering");
     expect(noticeIds).not.toContain("system:operations");
     expect(noticeIds).not.toContain("system:roguelite");
     expect(getGuildCommandOrders(guild).map((order) => order.id)).toContain("strategic_roster_expansion");
@@ -61,6 +62,7 @@ describe("end-to-end roster progression handoffs", () => {
     expect(draft.offeredHeroIds).toHaveLength(3);
 
     const noticeIds = getCurrentUnlockNotices(guild).map((notice) => notice.id);
+    expect(noticeIds).toContain("system:gathering");
     expect(noticeIds).toContain("system:operations");
     expect(noticeIds).toContain("system:roguelite");
   });

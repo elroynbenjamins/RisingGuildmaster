@@ -133,7 +133,7 @@ function Game() {
   }, [gameStarted, isHydrated, guild, route.name, isDialogOpen, updateGuild, showDialog]);
   useEffect(() => {
     if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active || guild.pendingQuestResult || (guild.activeQuestCombat && route.name !== "combat")) return;
-    let id: "campaign_travel" | "combat_basics" | "idle_missions" | "roguelite_expeditions" | null = null;
+    let id: "campaign_travel" | "idle_missions" | "roguelite_expeditions" | null = null;
     let title = "";
     let eyebrow = "QUICK GUIDE";
     let message = "";
@@ -145,10 +145,6 @@ function Game() {
         title = "Travel With Purpose";
         message = "Campaign steps now happen at real places. The World Map highlights the next leg, and you choose up to four heroes as the travel party. Party size determines ration cost; road events remember that party.";
       }
-    } else if ((route.name === "combat" || route.name === "dungeonCombat")) {
-      id = "combat_basics";
-      title = "Tactical Turn";
-      message = "Select a skill to preview targets. You can then double tap an empty teal tile to move; the skill stays queued and valid targets update from your new position. Enemy turns use the speed selected in Settings.";
     } else if (route.name === "gathering" && guild.heroes.length >= IDLE_MISSION_UNLOCK_HERO_COUNT) {
       id = "idle_missions";
       title = "Idle Mission Progress";

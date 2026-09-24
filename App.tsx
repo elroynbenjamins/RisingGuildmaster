@@ -161,9 +161,9 @@ function Game() {
     ? <NewGameSetupScreen onBack={() => setShowNewGameSetup(false)} onStart={(difficultyId, guildName, crestId) => { startNewGame(newGameSlotId, difficultyId, guildName, crestId); setShowNewGameSetup(false); }} />
     : <MainMenuScreen
         saveSlots={saveSlots}
-        onContinue={(slotId) => { void continueGame(slotId).then((error) => { if (error) showDialog({ title: "Could not load guild", message: error, tone: "danger" }); }); }}
+        onContinue={async (slotId) => { const error=await continueGame(slotId); if (error) showDialog({ title: "Could not load guild", message: error, tone: "danger" }); }}
         onNewGame={(slotId) => { setNewGameSlotId(slotId); setShowNewGameSetup(true); }}
-        onDelete={(slotId) => { void deleteSaveSlot(slotId).catch((error) => showDialog({ title: "Could not delete save", message: error instanceof Error ? error.message : "Delete failed", tone: "danger" })); }}
+        onDelete={async (slotId) => { try { await deleteSaveSlot(slotId); } catch (error) { showDialog({ title: "Could not delete save", message: error instanceof Error ? error.message : "Delete failed", tone: "danger" }); } }}
       />;
   if (guild.tutorial.active && guild.tutorial.step === "welcome") return <TutorialScreen onBegin={() => { updateGuild(beginTutorial(guild)); setRoute({ name: "recruitment" }); }} onSkip={() => updateGuild(skipTutorial(guild))} />;
   if (isHydrated && route.name === "dungeon") return <DungeonScreen guild={guild} random={worldRandom.current} updateGuild={updateGuild} onBack={() => main("Quests")} startCombat={() => setRoute({ name: "dungeonCombat" })}/>;

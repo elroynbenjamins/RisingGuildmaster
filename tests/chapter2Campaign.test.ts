@@ -29,14 +29,19 @@ describe("Chapter 2: The Hollow Forge", () => {
   it("resolves every Chapter 2 quest and encounter reference", () => {
     for (const nodeId of CHAPTER_2.nodeIds) { const questId = CAMPAIGN_NODES[nodeId]?.questId; if (!questId) continue; const quest = QUESTS[questId]; expect(quest).toBeDefined(); expect(quest?.encounterIds.every((id) => QUEST_ENCOUNTERS[id])).toBe(true); }
   });
-  it("progresses through Chapter 2, rewards completion, and unlocks Frostmarch", () => {
+  it("keeps Frostmarch closed during Chapter 2 and unlocks it with the finale", () => {
     let world = createWorldState();
     // This chapter-level fixture has already completed the starter journey.
     world.worldFlags.starter_brambleford_side_quest_complete = true;
     world.worldFlags.starter_fourth_hero_ready = true;
     for (const id of CHAPTER_1.nodeIds) world = completeCampaignNode(world, id).worldState;
     expect(getAvailableCampaignNodes(world).map((node) => node.id)).toEqual(["council_of_splinters"]);
-    for (const id of CHAPTER_2.nodeIds.slice(0, -1)) { if (id === "voices_under_stone") world = resolveCampaignChoice(world, "share_stonegate_evidence"); if (id === "chainbreaker_boss") world = resolveCampaignChoice(world, "free_ghoraks_clan"); world = completeCampaignNode(world, id).worldState; }
+    for (const id of CHAPTER_2.nodeIds.slice(0, -1)) {
+      if (id === "voices_under_stone") world = resolveCampaignChoice(world, "share_stonegate_evidence");
+      if (id === "chainbreaker_boss") world = resolveCampaignChoice(world, "free_ghoraks_clan");
+      world = completeCampaignNode(world, id).worldState;
+      if (id === "voices_under_stone") expect(world.unlockedRegionIds).not.toContain("frostmarch");
+    }
     world = resolveCampaignChoice(world, "restore_iron_wardstone");
     const finale = completeCampaignNode(world, "hollow_warden_boss");
     expect(finale).toMatchObject({ goldReward: 900, guildReputationReward: 20 });

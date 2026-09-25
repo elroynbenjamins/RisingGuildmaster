@@ -1,4 +1,6 @@
 import { REGIONS } from "../../data/world/regions";
+import { ARTISANS } from "../../data/crafting/artisans";
+import { CRAFTING_RECIPES } from "../../data/crafting/recipes";
 import type { GameIconId } from "../../data/ui/gameIcons";
 import { getCampaignLevelGuidance } from "../campaign/campaignReadinessService";
 import { isChapterOneComplete } from "../dungeons/rogueliteRotationService";
@@ -8,11 +10,15 @@ import { getHeroLoyalty } from "../heroes/heroLoyaltyService";
 import { getContractStatus } from "../recruitment/contractService";
 import { regionalScoutDaysRemaining } from "../recruitment/regionalScoutingService";
 import { trainingCapacity } from "../training/trainingService";
+import { getNextArtisanBuildingTier } from "../crafting/artisanBuildingService";
+import { materialRequirementsMet } from "../crafting/craftingService";
+import { hasGuildmasterSkill } from "../guildmaster/guildmasterProgression";
 import { getStarterJourneyStep } from "../onboarding/starterJourneyService";
 import type { GuildState } from "./types";
 
 export type GuildCommandDestination =
   | "campaign"
+  | "crafting"
   | "finances"
   | "gathering"
   | "guildmasterSkills"
@@ -256,6 +262,61 @@ export function getGuildCommandOrders(guild: GuildState): GuildCommandOrder[] {
       tone: "warning",
       badge: `LV ${levelGuidance.averageLevel.toFixed(1)} / ${levelGuidance.targetLevel}`,
     }, 20));
+  }
+
+  const artisanTypes = ["blacksmith", "tailor", "jeweler"] as const;
+  const buildableWorkshop = artisanTypes
+    .map((artisanType) => ({ artisanType, state: guild.artisans[artisanType], tier: getNextArtisanBuildingTier(guild, artisanType) }))
+    .find(({ state, tier }) => state.level === 0 && !state.construction && tier && hasGuildmasterSkill(guild.guildmaster, tier.requiredSkillId));
+  if (buildableWorkshop?.tier) {
+    const shortfall = Math.max(0, buildableWorkshop.tier.goldCost - guild.gold);
+    orders.push(order({
+      id: "workshop_construction_ready",
+      title: `Build the ${buildableWorkshop.tier.name}`,
+      description: shortfall
+        ? `${ARTISANS[buildableWorkshop.artisanType].name} charter approved. Construction costs ${buildableWorkshop.tier.goldCost} Gold and takes ${buildableWorkshop.tier.durationDays} days; reserve ${shortfall} more Gold.`
+        : `${ARTISANS[buildableWorkshop.artisanType].name} charter approved. Spend ${buildableWorkshop.tier.goldCost} Gold to begin the ${buildableWorkshop.tier.durationDays}-day construction project.`,
+      actionLabel: "OPEN CRAFTING",
+      destination: "crafting",
+      iconId: buildableWorkshop.artisanType === "blacksmith" ? "blacksmith" : buildableWorkshop.artisanType === "tailor" ? "tailor" : "jeweler",
+      tone: shortfall ? "opportunity" : "ready",
+      badge: shortfall ? `NEED ${shortfall}G` : "READY TO BUILD",
+    }, shortfall ? 8 : 30));
+  }
+
+  if (guild.metrics.craftedItemsCount === 0) {
+    const firstCraftable = Object.values(CRAFTING_RECIPES).find((recipe) => {
+      if (recipe.unlockSource && !(guild.unlockedRecipeIds ?? []).includes(recipe.id)) return false;
+      const artisan = guild.artisans[recipe.artisanType];
+      return artisan.recruited
+        && artisan.level >= recipe.artisanLevel
+        && guild.gold >= recipe.goldCost
+        && materialRequirementsMet(guild, recipe.materials);
+    });
+    const hasWorkshop = artisanTypes.some((artisanType) => guild.artisans[artisanType].recruited);
+    if (firstCraftable) {
+      orders.push(order({
+        id: "first_craft_ready",
+        title: "Craft the Guild's First Upgrade",
+        description: "A workshop is operational and you already have the Gold and materials for a recipe. Turn the new district into a real equipment upgrade.",
+        actionLabel: "CRAFT FIRST ITEM",
+        destination: "crafting",
+        iconId: firstCraftable.artisanType === "blacksmith" ? "blacksmith" : firstCraftable.artisanType === "tailor" ? "tailor" : "jeweler",
+        tone: "ready",
+        badge: "MATERIALS READY",
+      }, 28));
+    } else if (hasWorkshop && !buildableWorkshop) {
+      orders.push(order({
+        id: "first_craft_materials",
+        title: "Prepare Materials for the First Craft",
+        description: "Your workshop is operational, but no recipe is fully funded yet. Open Crafting to see the closest upgrade and jump directly to missing material sources.",
+        actionLabel: "CHECK RECIPES",
+        destination: "crafting",
+        iconId: "materials",
+        tone: "opportunity",
+        badge: "FIRST CRAFT",
+      }, 6));
+    }
   }
 
   const highestThreat = Object.entries(guild.world.regionThreat ?? {})

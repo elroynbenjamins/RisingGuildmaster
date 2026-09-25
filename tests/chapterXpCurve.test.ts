@@ -18,6 +18,14 @@ describe("campaign and roguelite XP curve", () => {
     expect(endLevels).toEqual([4, 5, 7, 8, 10, 12, 14, 17, 19]);
   });
 
+  it("takes a fresh Level-5 core to Level 6 before the Chapter-3 finale without side-quest grind", () => {
+    let hero = { ...testHero(), level: 5, xp: 0 };
+    for (const questId of ["road_of_frozen_names", "night_of_blue_horns", "hroth_iceblood_boss", "beneath_glimmerlake"] as const) {
+      hero = grantHeroXp(hero, getQuestXpForHero(hero, QUESTS[questId]!, 4));
+    }
+    expect(hero.level).toBeGreaterThanOrEqual(6);
+  });
+
   it("reduces roguelite XP only when a hero outlevels the selected theme", () => {
     expect(getRogueliteXpForHero(100, 8, 8)).toBe(100);
     expect(getRogueliteXpForHero(100, 9, 8)).toBe(50);

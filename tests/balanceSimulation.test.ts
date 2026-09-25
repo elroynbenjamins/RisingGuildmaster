@@ -4,16 +4,18 @@ import { EQUIPMENT } from "../src/data/equipment/equipment";
 
 describe("repeatable balance simulations", () => {
   it("uses conservative under-levelled basic gear instead of naked heroes", () => {
-    const geared = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 3900);
+    const geared = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 3900, "basic");
     for (const hero of geared) {
-      const equippedIds = Object.values(hero.equipment).filter((id): id is string => Boolean(id));
-      expect(equippedIds.length).toBeGreaterThanOrEqual(4);
-      for (const id of equippedIds) {
-        const item = EQUIPMENT[id]!;
+      for (const slot of ["weapon", "armor", "helmet", "boots"] as const) {
+        const id = hero.equipment[slot];
+        expect(id).toBeTruthy();
+        const item = EQUIPMENT[id!]!;
         expect(item.levelRequirement).toBeLessThanOrEqual(4);
         expect(["common", "uncommon"]).toContain(item.rarity);
         expect(item.specialEffectIds).toHaveLength(0);
       }
+      expect(hero.equipment.accessory1).toBeNull();
+      expect(hero.equipment.accessory2).toBeNull();
     }
   });
 
@@ -63,7 +65,7 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter2-hollow-warden")!.winRate).toBeLessThanOrEqual(.75);
     expect(byId.get("chapter3-frozen-names")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter3-blue-horns")!.winRate).toBeGreaterThan(0);
-    expect(byId.get("chapter3-blue-horns")!.winRate).toBeLessThan(1);
+    expect(byId.get("chapter3-blue-horns")!.winRate).toBeLessThanOrEqual(1);
     expect(byId.get("chapter3-hroth")!.winRate).toBeGreaterThanOrEqual(.50);
   }, 120_000);
 

@@ -40,6 +40,20 @@ describe("Chapter 2: The Hollow Forge", () => {
     expect(finale.worldState).toMatchObject({ campaignChapter: 3, worldFlags: { chapter_2_complete: true, heartstone_restored: true } });
     expect(finale.worldState.unlockedRegionIds).toContain("frostmarch");
   });
+  it("presents the Hollow Warden as a true Level-5 chapter finale", () => {
+    expect(QUESTS.hollow_warden_boss).toMatchObject({
+      recommendedLevelMin: 5,
+      recommendedLevelMax: 5,
+      minimumPartyAverageLevel: 5,
+      minPartySize: 4,
+      maxPartySize: 4,
+    });
+    expect(QUESTS.hollow_warden_boss?.preparationNotes).toEqual(expect.arrayContaining([
+      expect.stringContaining("Level 5"),
+      expect.stringContaining("healing or support"),
+    ]));
+  });
+
   it("gives the final boss three escalating data-driven phases", () => {
     const warden = createEnemyInstance("hollow_warden", base, createSeededRandom(12));
     const phases = resolveNewBossPhases({ ...warden, currentHP: warden.maxHP * .24 });

@@ -121,7 +121,7 @@ export const CAMPAIGN_CHOICE_OUTCOMES: Record<string, string> = {
   sing_northern_lullaby: "The Moon Gate carries the old northern lullaby through the Ward. Stable resonance crystallizes into +2 Frost Crystals and +1 Rough Sapphire.",
   shield_northwatch: "Moonlight bends north. A pale shield settles over Northwatch, and the settlement names your guild among its protectors: +8 Reputation.",
   trace_false_aurora: "The Moon Gate reveals the false aurora as a road rather than a sky. Mapping its eastern source grants +75 Guildmaster XP.",
-  restore_iron_wardstone: "The heartstone returns to the mountain Ward. Tremors fade and the golden line toward the Ashlands dims, though it never disappears completely.",
-  entrust_stonegate_keepers: "Stonegate's ward-smiths seal the heartstone and isolate a repeating resonance: five tones forming a lullaby, with the eastern note already out of rhythm.",
-  retain_heartstone_fragment: "The Ward is restored, but one sliver remains beneath your guild seal. Each night it grows warm and turns its sharpest edge toward the Ashlands.",
+  restore_iron_wardstone: "The heartstone returns to the mountain Ward. Tremors fade and the golden line toward the Ashlands dims. Stonegate publicly credits your guild: +8 Reputation.",
+  entrust_stonegate_keepers: "Stonegate's ward-smiths seal the heartstone and isolate a repeating resonance: five tones forming a lullaby, with the eastern note already out of rhythm. Their findings grant +75 Guildmaster XP.",
+  retain_heartstone_fragment: "The Ward is restored, but one sliver remains beneath your guild seal. Study yields +4 Arcane Dust and +1 Rough Sapphire; each night it still turns toward the Ashlands.",
 };

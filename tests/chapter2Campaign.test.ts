@@ -12,6 +12,9 @@ import { createEnemyInstance } from "../src/game/enemies/enemyFactory";
 import { ENEMY_SKILLS } from "../src/data/skills/enemySkills";
 import { createWorldState } from "../src/game/world/worldState";
 import { createSeededRandom } from "../src/utils/random";
+import { grantHeroXp } from "../src/game/progression/levelSystem";
+import { getQuestXpForHero } from "../src/game/quests/questResolver";
+import { testHero } from "./testHero";
 
 const base = { hp: 100, physicalDamage: 20, physicalDefense: 15, magicDamage: 18, magicDefense: 15, speed: 18 };
 
@@ -52,6 +55,24 @@ describe("Chapter 2: The Hollow Forge", () => {
       expect.stringContaining("Level 5"),
       expect.stringContaining("healing or support"),
     ]));
+  });
+
+  it("reaches Chapter-2 boss levels with two authored catch-up quests instead of repeat grinding", () => {
+    let hero = { ...testHero(), level: 3, xp: 0 };
+    const award = (questId: keyof typeof QUESTS) => {
+      const quest = QUESTS[questId]!;
+      hero = grantHeroXp(hero, getQuestXpForHero(hero, quest, 4));
+    };
+
+    award("road_of_broken_carts");
+    award("night_of_thirteen_ladders");
+    award("fires_of_flintwatch");
+    expect(hero.level).toBeGreaterThanOrEqual(4);
+
+    award("ghorak_chainbreaker_boss");
+    award("last_lift_of_flintwatch");
+    award("descent_to_hollow_forge");
+    expect(hero.level).toBeGreaterThanOrEqual(5);
   });
 
   it("gives the final boss three escalating data-driven phases", () => {

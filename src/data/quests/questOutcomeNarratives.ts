@@ -109,9 +109,9 @@ export const QUEST_OUTCOME_NARRATIVES: Record<string, QuestOutcomeNarrative> = {
 };
 
 export const CAMPAIGN_CHOICE_OUTCOMES: Record<string, string> = {
-  spare_chieftain: "The Chieftain is released under oath. Before leaving, he calls the whisper in the stone the Crown Beneath Sunrise and warns that the Laurel-men fear it too.",
-  execute_chieftain: "The Chieftain is executed before the surviving warband. The raids may end, but whatever he knew about the title First Crown dies with him.",
-  imprison_chieftain: "The Chieftain is taken to Guildhaven in chains. During questioning, he draws five sleeping serpents and marks the easternmost with an open eye.",
+  spare_chieftain: "The Chieftain is released under oath. Before leaving, he calls the whisper in the stone the Crown Beneath Sunrise and warns that the Laurel-men fear it too. Guildhaven recognizes the restraint: +6 Reputation.",
+  execute_chieftain: "The Chieftain is executed before the surviving warband. His command chest and Laurel-marked payment records are seized: +200 Gold.",
+  imprison_chieftain: "The Chieftain is taken to Guildhaven in chains. During questioning, he draws five sleeping serpents and marks the easternmost with an open eye. The interrogation yields +60 Guildmaster XP.",
   free_ghoraks_clan: "The prison chains are broken. Ghorak swears a road-oath to guide your guild through the deep ways.",
   bind_ghorak_to_trial: "Ghorak submits to Stonegate's keepers, trusting the manifests to prove why his uprising began.",
   banish_ghorak: "Ghorak leads his survivors from the Iron Hills with a promise to remember your judgment.",

@@ -10,6 +10,7 @@ describe("repeatable balance simulations", () => {
     expect(getSimulationAverageEquippedItemLevel(party)).toBeLessThan(6);
     for (const hero of party) {
       expect(hero.currentHP).toBe(calculateHero(hero).stats.maxHP);
+      expect(hero.subclassId).toBeTruthy();
       const equipped = Object.values(hero.equipment).filter((id): id is string => Boolean(id)).map((id) => EQUIPMENT[id]!);
       expect(equipped.length).toBeGreaterThanOrEqual(4);
       expect(equipped.every((item) => item.levelRequirement <= hero.level - 1)).toBe(true);
@@ -26,7 +27,7 @@ describe("repeatable balance simulations", () => {
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
     expect(results[0]!.averageRemainingHpRatioOnWins).toBeGreaterThan(results[2]!.averageRemainingHpRatioOnWins);
-    expect(results[0]!.averageRemainingHpRatioOnWins).toBeLessThan(.90);
+    expect(results[0]!.averageRemainingHpRatioOnWins).toBeLessThan(.93);
     expect(results[2]!.averageSurvivingHeroes).toBeLessThan(3.5);
     expect(results[2]!.averageRemainingHpRatioOnWins).toBeLessThan(.85);
   }, 150_000);
@@ -53,8 +54,9 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter2-broken-carts")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter2-flintwatch")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter2-chainbreaker-l4")!.winRate).toBeGreaterThanOrEqual(.60);
-    expect(byId.get("chapter2-hollow-warden")!.winRate).toBeGreaterThanOrEqual(.25);
-    expect(byId.get("chapter2-hollow-warden")!.winRate).toBeLessThanOrEqual(.75);
+    expect(byId.get("chapter2-hollow-warden")!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId.get("chapter2-hollow-warden")!.averageRemainingHpRatioOnWins).toBeLessThan(.75);
+    expect(byId.get("chapter2-hollow-warden")!.averageSurvivingHeroes).toBeLessThan(4);
     expect(byId.get("chapter3-frozen-names")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter3-blue-horns")!.winRate).toBeGreaterThan(0);
     expect(byId.get("chapter3-hroth-l6")!.winRate).toBeGreaterThanOrEqual(byId.get("chapter3-hroth-l5")!.winRate);

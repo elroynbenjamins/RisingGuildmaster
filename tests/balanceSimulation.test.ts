@@ -1,7 +1,31 @@
 import { describe, expect, it } from "vitest";
-import { simulateCombatScenario, simulateEconomyScenario } from "../src/game/simulation/balanceSimulation";
+import { createSimulationParty, simulateCombatScenario, simulateEconomyScenario } from "../src/game/simulation/balanceSimulation";
+import { EQUIPMENT } from "../src/data/equipment/equipment";
 
 describe("repeatable balance simulations", () => {
+  it("uses conservative under-levelled basic gear instead of naked heroes", () => {
+    const geared = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 3900);
+    for (const hero of geared) {
+      const equippedIds = Object.values(hero.equipment).filter((id): id is string => Boolean(id));
+      expect(equippedIds.length).toBeGreaterThanOrEqual(4);
+      for (const id of equippedIds) {
+        const item = EQUIPMENT[id]!;
+        expect(item.levelRequirement).toBeLessThanOrEqual(4);
+        expect(["common", "uncommon"]).toContain(item.rarity);
+        expect(item.specialEffectIds).toHaveLength(0);
+      }
+    }
+  });
+
+  it("shows realistic gear improves intended-level Frostmarch without assuming best-in-slot", () => {
+    const base = { questId: "beneath_glimmerlake", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6950 };
+    const naked = simulateCombatScenario({ ...base, id: "glimmerlake-l6-naked", gearProfile: "none" });
+    const basic = simulateCombatScenario({ ...base, id: "glimmerlake-l6-basic", gearProfile: "basic" });
+    console.table([naked, basic]);
+    expect(basic.winRate).toBeGreaterThanOrEqual(naked.winRate);
+    expect(basic.winRate).toBeGreaterThan(0);
+  }, 120_000);
+
   it("reports early-campaign combat across every difficulty", () => {
     const brambleway = simulateCombatScenario({ id: "brambleway-standard", questId: "brambleway_road_ambush", heroLevel: 2, partyClasses: ["warrior", "ranger", "cleric"], difficultyId: "standard", runs: 8, seed: 4050 });
     expect(brambleway.stalled).toBe(0);
@@ -26,7 +50,7 @@ describe("repeatable balance simulations", () => {
       { id: "chapter3-frozen-names", questId: "road_of_frozen_names", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 6, seed: 6600 },
       { id: "chapter3-blue-horns", questId: "night_of_blue_horns", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 6, seed: 6700 },
       { id: "chapter3-hroth", questId: "hroth_iceblood_boss", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 6, seed: 6800 },
-      { id: "chapter3-glimmerlake", questId: "beneath_glimmerlake", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 6, seed: 6900 },
+      { id: "chapter3-glimmerlake", questId: "beneath_glimmerlake", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 6, seed: 6900 },
       { id: "chapter3-vaelith", questId: "vaelith_pale_echo_boss", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 7000 },
     ];
     const results = scenarios.map(simulateCombatScenario); console.table(results);

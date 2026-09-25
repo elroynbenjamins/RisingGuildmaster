@@ -1,6 +1,7 @@
 import { CLASS_SKILL_TREES } from "../../data/skills/classSkillTrees";
 import { HERO_SKILLS } from "../../data/skills/heroSkills";
 import { QUESTS } from "../../data/quests/quests";
+import { EQUIPMENT } from "../../data/equipment/equipment";
 import { GAME_CONFIG } from "../../config/gameConfig";
 import type { RandomSource } from "../../utils/random";
 import { createSeededRandom } from "../../utils/random";
@@ -10,7 +11,7 @@ import { getEffectiveMovementRange } from "../combat/conditionResolver";
 import { getReachablePositions } from "../combat/grid/pathfinding";
 import { manhattanDistance } from "../combat/grid/distanceCalculator";
 import type { CombatSkillDefinition } from "../combat/skillTypes";
-import type { Hero, ClassId } from "../heroes/types";
+import type { Hero, ClassId, EquipmentSlot } from "../heroes/types";
 import type { GameDifficultyId } from "../difficulty/difficultyTypes";
 import { generateHero } from "../heroes/heroGenerator";
 import { xpRequiredForNextLevel } from "../progression/xpSystem";
@@ -23,10 +24,29 @@ import { advanceGuildTime, totalSalaryArrears } from "../economy/guildCalendarSe
 import { createHeroContract } from "../recruitment/contractService";
 import { calculateWeeklySalary } from "../recruitment/recruitmentCostCalculator";
 
-export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number }
+export type SimulationGearProfile = "none" | "basic";
+export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile }
 export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; averageRounds: number; averageSurvivingHeroes: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
 export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
 export interface EconomySimulationResult { scenarioId: string; startingGold: number; endingGold: number; netGold: number; questIncome: number; tavernIncome: number; salaryPaid: number; fieldExpenses: number; arrears: number; breakEvenQuestsPerWeek: number; goldAfterFacilityReserve: number }
+
+const SIMULATION_EQUIPMENT_SLOTS: EquipmentSlot[] = ["weapon", "armor", "helmet", "boots", "accessory1", "accessory2"];
+
+function basicSimulationGear(hero: Hero): Hero {
+  const gearLevelCap = Math.max(1, hero.level - 2);
+  const equipment = { ...hero.equipment };
+  for (const slot of SIMULATION_EQUIPMENT_SLOTS) {
+    const candidates = Object.values(EQUIPMENT)
+      .filter((item) => item.slot === slot)
+      .filter((item) => item.levelRequirement <= gearLevelCap)
+      .filter((item) => item.rarity === "common" || item.rarity === "uncommon")
+      .filter((item) => item.specialEffectIds.length === 0)
+      .filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(hero.classId))
+      .sort((a, b) => b.levelRequirement - a.levelRequirement || b.value - a.value || a.id.localeCompare(b.id));
+    if (candidates[0]) equipment[slot] = candidates[0].id;
+  }
+  return { ...hero, equipment };
+}
 
 function levelHero(hero: Hero, level: number, index: number): Hero {
   let xp = 0;
@@ -37,8 +57,11 @@ function levelHero(hero: Hero, level: number, index: number): Hero {
   return { ...leveled, learnedSkillIds };
 }
 
-export function createSimulationParty(classes: readonly ClassId[], level: number, seed: number): Hero[] {
-  return classes.map((classId, index) => levelHero({ ...generateHero(createSeededRandom(seed + index * 97)), id: `sim-${seed}-${index}`, classId }, level, index));
+export function createSimulationParty(classes: readonly ClassId[], level: number, seed: number, gearProfile: SimulationGearProfile = "basic"): Hero[] {
+  return classes.map((classId, index) => {
+    const leveled = levelHero({ ...generateHero(createSeededRandom(seed + index * 97)), id: `sim-${seed}-${index}`, classId }, level, index);
+    return gearProfile === "basic" ? basicSimulationGear(leveled) : leveled;
+  });
 }
 
 function skillTarget(state: CombatState, skill: CombatSkillDefinition): { targetId?: string; targetPosition?: { x: number; y: number } } {
@@ -88,7 +111,7 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
   let wins = 0, losses = 0, stalled = 0, rounds = 0, survivors = 0, hpRatios = 0;
   for (let run = 0; run < scenario.runs; run++) {
     const random = createSeededRandom(scenario.seed + run * 7919);
-    const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31);
+    const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "basic");
     let carried = undefined; let final: CombatState | undefined;
     for (let encounterIndex = 0; encounterIndex < QUESTS[scenario.questId]!.encounterIds.length; encounterIndex++) {
       final = autoplayEncounter(createCombatState(scenario.questId, encounterIndex, heroes, random, carried, undefined, [], scenario.difficultyId), random);

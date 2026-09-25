@@ -54,6 +54,21 @@ describe("persistent two-hero gathering missions", () => {
     expect(claimed.guild.heroes[0]!.xp - beforeXp).toBe(resolved.xpPerHero + getIdleMissionLevelProgressXp(3));
   });
 
+  it("uses Ghorak's guide once on an Iron Hills idle mission", () => {
+    let guild = createGuild();
+    guild.heroes = heroes();
+    guild.world.unlockedRegionIds.push("iron_hills");
+    guild.world.worldFlags.ghorak_guide_unused = true;
+    guild = startGatheringMission(guild, "iron_hills_prospecting", ["g1", "g2"], createSeededRandom(77));
+    guild = advanceGuildDays(guild, 3);
+    const id = guild.gatheringMissions[0]!.id;
+    const guided = resolveGatheringMission(guild, id);
+    const baseModifier = calculateGatheringModifier("iron_hills_prospecting", [guild.heroes[0]!, guild.heroes[1]!] as [ReturnType<typeof heroes>[number], ReturnType<typeof heroes>[number]]);
+    expect(guided.modifier).toBe(baseModifier + 2);
+    const claimed = claimGatheringMission(guild, id);
+    expect(claimed.guild.world.worldFlags.ghorak_guide_unused).toBe(false);
+  });
+
   it("can fail even after the required days while stronger teams improve quality", () => {
     const weakGuild = createGuild(); weakGuild.heroes = heroes().map((hero) => ({ ...hero, level: 1 })); weakGuild.world.unlockedRegionIds.push("shadowfen"); weakGuild.currentDay = 4;
     const failureMission: GatheringMissionInstance = { id: "failure", definitionId: "shadowfen_relic_search", heroIds: ["g1", "g2"], startDay: 1, completionDay: 4, resolutionSeed: 1, status: "active" };

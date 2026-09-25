@@ -95,6 +95,19 @@ describe("end-to-end player journey guarantees", () => {
     expect(orders.find((order) => order.id === "first_craft_ready")?.destination).toBe("crafting");
   });
 
+  it("names a concrete one-time catch-up quest before the Level-4 Chapter-2 fight", () => {
+    const guild = chapterOneGuild(6, 3);
+    guild.world.completedCampaignNodeIds.push("council_of_splinters", "road_of_broken_carts", "voices_under_stone");
+    guild.world.unlockedRegionIds = [...new Set([...guild.world.unlockedRegionIds, "iron_hills", "frostmarch"])];
+    const guidance = getCampaignLevelGuidance(guild);
+    expect(guidance).toMatchObject({ nextQuestId: "fires_of_flintwatch", targetLevel: 4 });
+    expect(guidance?.recommendedSideQuestId).toBeTruthy();
+    expect(guidance?.recommendedSideQuestName).toBeTruthy();
+    const order = getGuildCommandOrders(guild).find((entry) => entry.id === "campaign_level_gap");
+    expect(order?.description).toContain("Best catch-up match:");
+    expect(order?.destination).toBe("sideQuests");
+  });
+
   it("keeps a first early-game death recoverable with the starting Temple economy", () => {
     const guild = createGuild();
     expect(hasLocalHealingService(guild.world)).toBe(true);

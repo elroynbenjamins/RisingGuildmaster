@@ -52,4 +52,17 @@ describe("quest deployment presentation", () => {
     const roster = [hero("required", "bard", 1), hero("a", "warrior", 5), hero("b", "ranger", 5), hero("c", "mage", 5), hero("d", "cleric", 5)];
     expect(buildRecommendedQuestParty(quest, roster, ["required"])).toContain("required");
   });
+
+  it("blocks the Hollow Warden below average Level 5 and clears the level gate at 5", () => {
+    const quest = QUESTS.hollow_warden_boss!;
+    const levelFour = ["warrior","ranger","cleric","mage"].map((classId,index)=>({ ...testHero(), id:`warden-l4-${index}`, classId:classId as typeof testHero()["classId"], level:4, adventureStamina:100 }));
+    const blocked = getQuestDeploymentSummary(quest, levelFour, [], [], [], []);
+    expect(blocked.status).toBe("blocked");
+    expect(blocked.warnings.map((warning)=>warning.id)).toContain("level_gate");
+
+    const levelFive = levelFour.map((hero)=>({ ...hero, level:5 }));
+    const ready = getQuestDeploymentSummary(quest, levelFive, [], [], [], []);
+    expect(ready.warnings.map((warning)=>warning.id)).not.toContain("level_gate");
+  });
+
 });

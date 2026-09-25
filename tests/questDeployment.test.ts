@@ -55,13 +55,18 @@ describe("quest deployment presentation", () => {
 
   it("blocks the Hollow Warden below average Level 5 and clears the level gate at 5", () => {
     const quest = QUESTS.hollow_warden_boss!;
-    const levelFour = ["warrior","ranger","cleric","mage"].map((classId,index)=>({ ...testHero(), id:`warden-l4-${index}`, classId:classId as typeof testHero()["classId"], level:4, adventureStamina:100 }));
-    const blocked = getQuestDeploymentSummary(quest, levelFour, [], [], [], []);
+    const levelFour = [
+      hero("warden-l4-0", "warrior", 4),
+      hero("warden-l4-1", "ranger", 4),
+      hero("warden-l4-2", "cleric", 4),
+      hero("warden-l4-3", "mage", 4),
+    ];
+    const blocked = getQuestDeploymentSummary(quest, levelFour, [], potions);
     expect(blocked.status).toBe("blocked");
     expect(blocked.warnings.map((warning)=>warning.id)).toContain("level_gate");
 
-    const levelFive = levelFour.map((hero)=>({ ...hero, level:5 }));
-    const ready = getQuestDeploymentSummary(quest, levelFive, [], [], [], []);
+    const levelFive = levelFour.map((entry)=>({ ...entry, level:5 }));
+    const ready = getQuestDeploymentSummary(quest, levelFive, [], potions);
     expect(ready.warnings.map((warning)=>warning.id)).not.toContain("level_gate");
   });
 

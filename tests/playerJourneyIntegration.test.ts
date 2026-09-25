@@ -98,7 +98,7 @@ describe("end-to-end player journey guarantees", () => {
   it("names a concrete one-time catch-up quest before the Level-4 Chapter-2 fight", () => {
     const guild = chapterOneGuild(6, 3);
     guild.world.completedCampaignNodeIds.push("council_of_splinters", "road_of_broken_carts", "voices_under_stone");
-    guild.world.unlockedRegionIds = [...new Set([...guild.world.unlockedRegionIds, "iron_hills", "frostmarch"])];
+    guild.world.unlockedRegionIds = [...new Set([...guild.world.unlockedRegionIds, "iron_hills"])];
     const guidance = getCampaignLevelGuidance(guild);
     expect(guidance).toMatchObject({ nextQuestId: "fires_of_flintwatch", targetLevel: 4 });
     expect(guidance?.recommendedSideQuestId).toBeTruthy();
@@ -170,14 +170,15 @@ describe("end-to-end player journey guarantees", () => {
     guild.world = {
       ...guild.world,
       campaignChapter: 2,
-      unlockedRegionIds: [...new Set([...guild.world.unlockedRegionIds, "iron_hills", "frostmarch"])],
+      unlockedRegionIds: [...new Set([...guild.world.unlockedRegionIds, "iron_hills"])],
       completedCampaignNodeIds: [...guild.world.completedCampaignNodeIds, "council_of_splinters", "road_of_broken_carts", "voices_under_stone", "siege_of_flintwatch", "chainbreaker_boss", "laurel_below", "descent_to_hollow_forge"],
       worldFlags: { ...guild.world.worldFlags, frostmarch_aurora_crisis: true },
     };
     const guidance = getCampaignLevelGuidance(guild);
     expect(guidance).toMatchObject({ nextQuestId: "hollow_warden_boss", targetLevel: 5, averageLevel: 4 });
     expect(guidance?.sideQuestIds.length).toBeGreaterThan(0);
-    expect(guidance?.sideQuestIds).toEqual(expect.arrayContaining(["knives_of_stonegate", "the_aurora_that_fell"]));
+    expect(guidance?.sideQuestIds).toContain("knives_of_stonegate");
+    expect(guidance?.sideQuestIds).not.toContain("the_aurora_that_fell");
   });
 
   it("does not unlock the first Raid until both its campaign chapter and eight-hero roster are ready", () => {

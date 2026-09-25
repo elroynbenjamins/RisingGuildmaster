@@ -27,6 +27,12 @@ describe("repeatable balance simulations", () => {
     ];
     const results = scenarios.map(simulateCombatScenario); console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
+    const byId = new Map(results.map((result) => [result.scenarioId, result]));
+    expect(byId.get("chapter2-broken-carts")!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId.get("chapter2-flintwatch")!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId.get("chapter2-chainbreaker-l4")!.winRate).toBeGreaterThanOrEqual(.60);
+    expect(byId.get("chapter2-hollow-warden")!.winRate).toBeGreaterThanOrEqual(.25);
+    expect(byId.get("chapter2-hollow-warden")!.winRate).toBeLessThanOrEqual(.75);
   }, 90_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

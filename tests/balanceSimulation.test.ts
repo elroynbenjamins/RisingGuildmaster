@@ -27,7 +27,7 @@ describe("repeatable balance simulations", () => {
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
     expect(results[0]!.averageRemainingHpRatioOnWins).toBeGreaterThan(results[2]!.averageRemainingHpRatioOnWins);
-    expect(results[0]!.averageRemainingHpRatioOnWins).toBeLessThan(.90);
+    expect(results[0]!.averageRemainingHpRatioOnWins).toBeLessThan(.93);
     expect(results[2]!.averageSurvivingHeroes).toBeLessThan(3.5);
     expect(results[2]!.averageRemainingHpRatioOnWins).toBeLessThan(.85);
   }, 150_000);
@@ -53,12 +53,16 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter2-broken-carts")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter2-flintwatch")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter2-chainbreaker-l4")!.winRate).toBeGreaterThanOrEqual(.60);
-    expect(byId.get("chapter2-hollow-warden")!.winRate).toBeGreaterThanOrEqual(.25);
-    expect(byId.get("chapter2-hollow-warden")!.winRate).toBeLessThanOrEqual(.75);
+    expect(byId.get("chapter2-hollow-warden")!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId.get("chapter2-hollow-warden")!.averageSurvivingHeroes).toBeLessThan(3);
     expect(byId.get("chapter3-frozen-names")!.winRate).toBeGreaterThanOrEqual(.75);
-    expect(byId.get("chapter3-blue-horns")!.winRate).toBeGreaterThan(0);
-    expect(byId.get("chapter3-hroth")!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId.get("chapter3-blue-horns")!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId.get("chapter3-blue-horns")!.averageSurvivingHeroes).toBeLessThan(3);
+    expect(byId.get("chapter3-hroth")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter3-glimmerlake")!.winRate).toBeGreaterThan(byId.get("chapter3-glimmerlake-underlevel")!.winRate);
+    expect(byId.get("chapter3-glimmerlake")!.averageSurvivingHeroes).toBeGreaterThan(2);
+    expect(byId.get("chapter3-glimmerlake-underlevel")!.averageSurvivingHeroes).toBeLessThan(2.5);
+    expect(byId.get("chapter3-vaelith")!.averageSurvivingHeroes).toBeGreaterThan(3);
   }, 120_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

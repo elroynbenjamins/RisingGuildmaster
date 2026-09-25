@@ -255,7 +255,7 @@ export function getGuildCommandOrders(guild: GuildState): GuildCommandOrder[] {
     orders.push(order({
       id: "campaign_level_gap",
       title: `Field Team Below Campaign Level`,
-      description: `Your four strongest heroes average Level ${levelGuidance.averageLevel.toFixed(1)}; ${levelGuidance.nextQuestName} recommends Level ${levelGuidance.targetLevel}. ${hasSideQuests ? "Use one-time Side Quests to catch up without repetitive grinding." : "Use training and available field work to close the gap."}`,
+      description: `Your four strongest heroes average Level ${levelGuidance.averageLevel.toFixed(1)}; ${levelGuidance.nextQuestName} recommends Level ${levelGuidance.targetLevel}. ${hasSideQuests ? `Best catch-up match: ${levelGuidance.recommendedSideQuestName ?? "a one-time Side Quest"}. One-time Side Quests are preferred over repetitive grinding.` : "Use available field work and contracts to raise the strongest roster; Training is best for heroes who are behind the team."}`,
       actionLabel: hasSideQuests ? "BROWSE SIDE QUESTS" : "OPEN TRAINING",
       destination: hasSideQuests ? "sideQuests" : "training",
       iconId: hasSideQuests ? "quests" : "training",

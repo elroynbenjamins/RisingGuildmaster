@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { BackHandler, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { ManagementShell } from "./src/components/navigation/ManagementShell"; import { colors } from "./src/components/ui"; import { CAMPAIGN_NODES } from "./src/data/campaign/chapter1"; import { QUESTS } from "./src/data/quests/quests";
-import { resolveCampaignChoice } from "./src/game/campaign/campaignChoiceResolver"; import { campaignNodeRequiresPostBattleChoice, completeCampaignNode, getAvailableCampaignNodes } from "./src/game/campaign/campaignService";
+import { applyCampaignChoiceToGuild, resolveCampaignChoice } from "./src/game/campaign/campaignChoiceResolver"; import { campaignNodeRequiresPostBattleChoice, completeCampaignNode, getAvailableCampaignNodes } from "./src/game/campaign/campaignService";
 import { travelGuildTowardCampaignObjective } from "./src/game/campaign/campaignTravelService"; import { getCampaignNodeLocationRequirement, isAtCampaignLocation } from "./src/game/campaign/campaignLocationService"; import type { HeroCombatInstance, QuestCombatSetup } from "./src/game/combat/combatTypes"; import type { Hero } from "./src/game/heroes/types"; import type { Party } from "./src/game/party/partyTypes"; import { resolveQuestDefeat, resolveQuestVictory } from "./src/game/quests/questResolver"; import { startQuest } from "./src/game/quests/questService"; import type { WorldEventDefinition } from "./src/game/world/worldTypes";
 import type { EquipmentSlot } from "./src/game/heroes/types"; import type { MaterialId } from "./src/game/crafting/craftingTypes";
 import { releaseBankedCampaignXp } from "./src/game/progression/levelSystem";
@@ -312,21 +312,23 @@ function Game() {
     const choose = (choiceId: string): boolean => {
       if (!route.summary.campaignNodeId) return false;
       try {
-      const world = resolveCampaignChoice(guild.world, choiceId);
-      const campaign = completeCampaignNode(world, route.summary.campaignNodeId);
+      const choiceGuild = applyCampaignChoiceToGuild(guild, choiceId);
+      const choiceGoldDelta = choiceGuild.gold - guild.gold;
+      const choiceReputationDelta = choiceGuild.reputation - guild.reputation;
+      const campaign = completeCampaignNode(choiceGuild.world, route.summary.campaignNodeId);
       const consequence = { id: `choice-${choiceId}`, text: CAMPAIGN_CHOICE_OUTCOMES[choiceId] ?? "The guild's decision is recorded.", tone: "neutral" as const };
       const newLore = Object.values(LORE_ENTRIES)
         .filter((entry) => guild.world.worldFlags[entry.unlockFlag] !== true && campaign.worldState.worldFlags[entry.unlockFlag] === true)
         .map((entry) => ({ id: entry.id, title: entry.title, category: entry.category, text: entry.text, perspectives: entry.perspectives }));
       const chronicle = { ...route.summary.chronicle, selectedChoiceId: choiceId, consequences: [...route.summary.chronicle.consequences, consequence], loreDiscoveries: [...route.summary.chronicle.loreDiscoveries, ...newLore.filter((entry) => !route.summary.chronicle.loreDiscoveries.some((known) => known.id === entry.id))] };
-      const releasedHeroes = releaseBankedCampaignXp(guild.heroes, campaign.worldState);
+      const releasedHeroes = releaseBankedCampaignXp(choiceGuild.heroes, campaign.worldState);
       const heroOutcomes = route.summary.heroOutcomes.map((outcome) => {
         const after = releasedHeroes.find((hero) => hero.id === outcome.heroId);
         return after ? reconcileQuestHeroOutcomeAfterProgression(outcome, after) : outcome;
       });
       const campaignChapterCompleted = campaign.worldState.campaignChapter > guild.world.campaignChapter ? guild.world.campaignChapter : route.summary.campaignChapterCompleted;
-      updateGuild({ ...guild, heroes: releasedHeroes, world: campaign.worldState, gold: guild.gold + campaign.goldReward, reputation: guild.reputation + campaign.guildReputationReward, questChronicle: guild.questChronicle.map((entry) => entry.id === chronicle.id ? chronicle : entry), pendingQuestResult: null });
-      setRoute({ name: "questResult", summary: { ...route.summary, selectedChoiceId: choiceId, chronicle, heroOutcomes, goldEarned: route.summary.goldEarned + campaign.goldReward, reputationEarned: (route.summary.reputationEarned ?? 0) + campaign.guildReputationReward, ...(campaignChapterCompleted ? { campaignChapterCompleted } : {}) } });
+      updateGuild({ ...choiceGuild, heroes: releasedHeroes, world: campaign.worldState, gold: choiceGuild.gold + campaign.goldReward, reputation: choiceGuild.reputation + campaign.guildReputationReward, questChronicle: choiceGuild.questChronicle.map((entry) => entry.id === chronicle.id ? chronicle : entry), pendingQuestResult: null });
+      setRoute({ name: "questResult", summary: { ...route.summary, selectedChoiceId: choiceId, chronicle, heroOutcomes, goldEarned: route.summary.goldEarned + choiceGoldDelta + campaign.goldReward, reputationEarned: (route.summary.reputationEarned ?? 0) + choiceReputationDelta + campaign.guildReputationReward, ...(campaignChapterCompleted ? { campaignChapterCompleted } : {}) } });
       return true;
       } catch (error) {
         showDialog({title:"Decision Could Not Be Recorded",message:error instanceof Error?error.message:"The campaign decision could not be applied.",tone:"danger"});

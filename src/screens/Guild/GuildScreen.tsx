@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { compactResourceAmount } from "../../ui/compactResourceAmount";
 import { LocationArtwork } from "../../components/art/LocationArtwork";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { GameIcon } from "../../components/icons/GameIcon";
 import { ActionButton, EmptyState, Panel, Portrait, SecondaryButton, SectionTitle, colors } from "../../components/ui";
@@ -18,7 +18,7 @@ import { getRaceNameColor } from "../../ui/raceColors";
 import { useTheme } from "../../theme/theme";
 import { NotificationDot } from "../../components/navigation/NotificationDot";
 import { useActionNotifications } from "../../state/useActionNotifications";
-import { acknowledgeTimeAdvanceGuidance, getTimeAdvanceGuidance, payrollWarningLine } from "../../game/onboarding/timeAndPayrollGuidanceService";
+import { acknowledgeTimeAdvanceGuidance, CALENDAR_BASICS_GUIDANCE_FLAG, getTimeAdvanceGuidance, payrollWarningLine } from "../../game/onboarding/timeAndPayrollGuidanceService";
 
 type Destination = "guildmasterSkills" | GuildPriorityDestination | GuildCommandDestination | "heroes" | "management";
 const QUICK_ACTIONS: { label: string; target: Destination; iconId: GameIconId; sublabel: string }[] = [
@@ -75,7 +75,21 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
   const living = guild.heroes.filter((hero) => hero.currentHP > 0);
   const ready = living.filter((hero) => hero.isAvailable);
   const warTablePrimerSeen = guild.world.worldFlags.war_table_v2_tutorial_seen === true;
-  const acknowledgeWarTablePrimer = () => updateGuild({ ...guild, world: { ...guild.world, worldFlags: { ...guild.world.worldFlags, war_table_v2_tutorial_seen: true } } });
+  const guidedOpening = guild.tutorial.completed && guild.tutorial.freeRefreshUsed && guild.world.completedQuestIds.includes("guildhaven_cellar_slimes");
+  const calendarPrimerSeen = guild.world.worldFlags[CALENDAR_BASICS_GUIDANCE_FLAG] === true;
+  const guideWarTable = guidedOpening && !warTablePrimerSeen;
+  const guideEndDay = guidedOpening && warTablePrimerSeen && !calendarPrimerSeen;
+  const onboardingPulse = useRef(new Animated.Value(1)).current;
+  const acknowledgeWarTablePrimer = () => updateGuild((current) => current.world.worldFlags.war_table_v2_tutorial_seen === true ? current : ({ ...current, world: { ...current.world, worldFlags: { ...current.world.worldFlags, war_table_v2_tutorial_seen: true } } }));
+  useEffect(() => {
+    if (!guideWarTable && !guideEndDay) { onboardingPulse.setValue(1); return; }
+    const animation = Animated.loop(Animated.sequence([
+      Animated.timing(onboardingPulse, { toValue: .45, duration: 650, useNativeDriver: true }),
+      Animated.timing(onboardingPulse, { toValue: 1, duration: 650, useNativeDriver: true }),
+    ]));
+    animation.start();
+    return () => animation.stop();
+  }, [guideEndDay, guideWarTable, onboardingPulse]);
   const location = guild.world.currentSettlementId
     ? SETTLEMENTS[guild.world.currentSettlementId]?.name
     : REGIONS[guild.world.currentRegionId]?.name;
@@ -83,12 +97,14 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
   const endDay = () => {
     const guidance = getTimeAdvanceGuidance(guild, 1);
     const payrollLine = payrollWarningLine(guidance);
-    const primer = guidance.showCalendarPrimer ? `Time advances through End Day, completed quests, travel, and Crisis Operations. Each day restores readiness and progresses recovery, projects, candidates, contracts, and regional threats.\n\n` : "";
-    const payrollPrimer = guidance.showPayrollPrimer ? "Weekly salaries are charged automatically on each hero's contract anniversary. If the treasury cannot cover them, unpaid wages become arrears.\n\n" : "";
+    const dayPreview = guidance.showCalendarPrimer
+      ? `Day ${guild.currentDay} → ${nextDay.targetDay}\nHeroes: +${Math.round(GAME_CONFIG.dailyHeroHealthRecoveryRatio * 100)}% max HP · +${GAME_CONFIG.adventureStaminaRecoveryPerDay} readiness\nTavern: +${tavernIncome} gold\nProjects, training, candidates and contracts advance.`
+      : `Advance to Day ${nextDay.targetDay}. Living heroes recover ${Math.round(GAME_CONFIG.dailyHeroHealthRecoveryRatio * 100)}% maximum health and ${GAME_CONFIG.adventureStaminaRecoveryPerDay} readiness; the tavern earns ${tavernIncome} gold.`;
+    const payrollPrimer = guidance.showPayrollPrimer ? "\n\nPayroll is charged automatically when a contract pay day is crossed." : "";
     showDialog({
       title: payrollLine ? "Advance Time & Process Payroll?" : "End Guild Day?",
-      message: `${primer}${payrollPrimer}Advance to Day ${nextDay.targetDay}. Living heroes recover ${Math.round(GAME_CONFIG.dailyHeroHealthRecoveryRatio * 100)}% maximum health and ${GAME_CONFIG.adventureStaminaRecoveryPerDay} readiness; the tavern earns ${tavernIncome} gold.${payrollLine ? `\n\n${payrollLine}\nTreasury now: ${guild.gold} gold` : ""}`,
-      eyebrow: guidance.showCalendarPrimer ? "TIME & PAYROLL TUTORIAL" : payrollLine ? "PAYROLL WARNING" : "ADVANCE CALENDAR",
+      message: `${dayPreview}${payrollPrimer}${payrollLine ? `\n\n${payrollLine}\nTreasury now: ${guild.gold} gold` : ""}`,
+      eyebrow: payrollLine ? "PAYROLL WARNING" : guidance.showCalendarPrimer ? "END DAY" : "ADVANCE CALENDAR",
       tone: guidance.projectedShortfall > 0 ? "danger" : "default",
       actions: [
         { label: "Cancel", tone: "secondary" },
@@ -119,8 +135,6 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
       </View>
     </View>
 
-    {!warTablePrimerSeen && <Panel style={styles.warTablePrimer}><Text style={styles.warTablePrimerLabel}>WAR TABLE TUTORIAL</Text><Text style={styles.warTablePrimerTitle}>Lead by Priority</Text><Text style={styles.warTablePrimerText}>CURRENT ORDER is the Guildmaster's strongest recommendation. GUILD ORDERS lists other actionable work, navigation badges count unresolved tasks, and the Active Orders strip shows jobs already underway. You never need to remember which menu hides the next important action.</Text><SecondaryButton label="UNDERSTOOD · USE THE WAR TABLE" onPress={acknowledgeWarTablePrimer}/></Panel>}
-
     <Pressable onPress={() => navigate("guildmasterSkills")} style={({ pressed }) => pressed && styles.pressed}>
       <Panel style={styles.guildmaster}>
         <View style={styles.levelBadge}><Text style={styles.levelLabel}>GUILDMASTER</Text><Text style={styles.level}>LV {guild.guildmaster.level}</Text></View>
@@ -136,7 +150,7 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
         <Text style={[styles.priorityKicker, priority.tone === "urgent" && styles.priorityKickerUrgent]}>{priority.tone === "urgent" ? "IMMEDIATE ACTION" : priority.tone === "progress" ? "CAMPAIGN ORDER" : "GUILD OPPORTUNITY"}</Text>
         <Text style={styles.priorityTitle}>{priority.title}</Text>
         <Text style={styles.priorityText}>{priority.description}</Text>
-        <ActionButton label={priority.actionLabel} onPress={() => navigate(priority.destination)} />
+        <Animated.View style={{ opacity: guideWarTable ? onboardingPulse : 1 }}><ActionButton label={priority.actionLabel} onPress={() => { if (!warTablePrimerSeen) acknowledgeWarTablePrimer(); navigate(priority.destination); }} /></Animated.View>
       </View>
     </Panel>
 
@@ -156,7 +170,7 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
       <Text style={styles.calendarText}>{nextMilestone?.events[0]?.text ?? `Routine recovery and ${tavernIncome} gold tavern income continue each day.`}</Text>
       <View style={styles.calendarRules}><Text style={styles.calendarRule}>+{Math.round(GAME_CONFIG.dailyHeroHealthRecoveryRatio * 100)}% MAX HP</Text><Text style={styles.calendarRule}>+{GAME_CONFIG.adventureStaminaRecoveryPerDay} READINESS</Text><Text style={styles.calendarRule}>+{tavernIncome} GOLD</Text></View>
       {nextDay.payrollDue > 0 && <Text style={styles.warning}>PAYROLL TOMORROW · {nextDay.payrollDue} GOLD</Text>}
-      <View style={styles.calendarButtons}><View style={styles.calendarButton}><ActionButton label="End Day" onPress={endDay} /></View><View style={styles.calendarButton}><SecondaryButton label="Open 7-Day Planner" onPress={() => navigate("finances")} /></View></View>
+      <View style={styles.calendarButtons}><Animated.View style={[styles.calendarButton, { opacity: guideEndDay ? onboardingPulse : 1 }]}><ActionButton label="End Day" onPress={endDay} /></Animated.View><View style={styles.calendarButton}><SecondaryButton label="Open 7-Day Planner" onPress={() => navigate("finances")} /></View></View>
     </Panel>
 
     <SectionTitle>RECENT PARTY</SectionTitle>
@@ -165,10 +179,6 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
 }
 
 const styles = StyleSheet.create({
-  warTablePrimer: { borderColor: colors.blue, gap: 7, marginBottom: 12 },
-  warTablePrimerLabel: { color: colors.blue, fontSize: 9, fontWeight: "900", letterSpacing: 1 },
-  warTablePrimerTitle: { color: colors.text, fontSize: 17, fontWeight: "900" },
-  warTablePrimerText: { color: colors.muted, fontSize: 11, lineHeight: 17 },
   content: { padding: 16, paddingBottom: 42 },
   banner: { backgroundColor: "#171d1f", borderColor: "#77643a", marginBottom: 12, padding: 13, position: "relative", borderWidth: 0, borderRadius: 12, },
   eyebrow: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: .7 },

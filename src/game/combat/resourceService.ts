@@ -7,8 +7,11 @@ export function calculateMaxStamina(attributes: Attributes): number { return 30 
 export function regenerateHeroResources(instance: HeroCombatInstance): HeroCombatInstance {
   return { ...instance, currentMana: Math.min(instance.maxMana, instance.currentMana + Math.max(1, Math.round(instance.maxMana * .05))), currentStamina: Math.min(instance.maxStamina, instance.currentStamina + Math.max(1, Math.round(instance.maxStamina * .10))) };
 }
-export function recoverBetweenEncounters(instance: HeroCombatInstance): HeroCombatInstance {
-  return { ...instance, currentMana: Math.min(instance.maxMana, instance.currentMana + Math.round(instance.maxMana * .10)), currentStamina: Math.min(instance.maxStamina, instance.currentStamina + Math.round(instance.maxStamina * .20)) };
+export function recoverBetweenEncounters(instance: HeroCombatInstance, healthRecoveryRatio = 0): HeroCombatInstance {
+  const currentHP = instance.currentHP > 0
+    ? Math.min(instance.maxHP, instance.currentHP + Math.max(0, Math.round(instance.maxHP * healthRecoveryRatio)))
+    : 0;
+  return { ...instance, currentHP, currentMana: Math.min(instance.maxMana, instance.currentMana + Math.round(instance.maxMana * .10)), currentStamina: Math.min(instance.maxStamina, instance.currentStamina + Math.round(instance.maxStamina * .20)) };
 }
 export function canPaySkillCost(instance: HeroCombatInstance, skill: CombatSkillDefinition): boolean {
   const cost = skill.resourceCost ?? 0;

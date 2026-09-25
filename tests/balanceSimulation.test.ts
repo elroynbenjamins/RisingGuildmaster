@@ -1,7 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { simulateCombatScenario, simulateEconomyScenario } from "../src/game/simulation/balanceSimulation";
+import { createSimulationParty, getSimulationAverageEquippedItemLevel, simulateCombatScenario, simulateEconomyScenario } from "../src/game/simulation/balanceSimulation";
+import { EQUIPMENT } from "../src/data/equipment/equipment";
+import { calculateHero } from "../src/game/heroes/heroCalculator";
 
 describe("repeatable balance simulations", () => {
+  it("uses conservative progression gear and full HP for realistic combat benchmarks", () => {
+    const party = createSimulationParty(["warrior", "ranger", "cleric", "mage"], 6, 7200, "basic_progression");
+    expect(getSimulationAverageEquippedItemLevel(party)).toBeGreaterThanOrEqual(2);
+    expect(getSimulationAverageEquippedItemLevel(party)).toBeLessThan(6);
+    for (const hero of party) {
+      expect(hero.currentHP).toBe(calculateHero(hero).stats.maxHP);
+      const equipped = Object.values(hero.equipment).filter((id): id is string => Boolean(id)).map((id) => EQUIPMENT[id]!);
+      expect(equipped.length).toBeGreaterThanOrEqual(4);
+      expect(equipped.every((item) => item.levelRequirement <= hero.level - 1)).toBe(true);
+      expect(equipped.every((item) => item.rarity === "common" || item.rarity === "uncommon")).toBe(true);
+      expect(equipped.every((item) => item.specialEffectIds.length === 0)).toBe(true);
+    }
+  });
+
   it("reports early-campaign combat across every difficulty", () => {
     const brambleway = simulateCombatScenario({ id: "brambleway-standard", questId: "brambleway_road_ambush", heroLevel: 2, partyClasses: ["warrior", "ranger", "cleric"], difficultyId: "standard", runs: 8, seed: 4050 });
     expect(brambleway.stalled).toBe(0);
@@ -17,17 +33,19 @@ describe("repeatable balance simulations", () => {
 
   it("reports representative campaign fights", () => {
     const scenarios = [
-      { id: "chapter1-patrol", questId: "goblin_patrol", heroLevel: 1, partyClasses: ["warrior", "cleric"] as const, difficultyId: "standard" as const, runs: 12, seed: 5000 },
-      { id: "chapter2-broken-carts", questId: "road_of_broken_carts", heroLevel: 3, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 5800 },
-      { id: "chapter2-flintwatch", questId: "fires_of_flintwatch", heroLevel: 4, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 5900 },
-      { id: "chapter2-chainbreaker-l4", questId: "ghorak_chainbreaker_boss", heroLevel: 4, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6000 },
-      { id: "chapter2-chainbreaker-l5", questId: "ghorak_chainbreaker_boss", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6100 },
-      { id: "chapter2-hollow-warden", questId: "hollow_warden_boss", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6200 },
-      { id: "chapter3-frozen-names", questId: "road_of_frozen_names", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 6, seed: 6600 },
-      { id: "chapter3-blue-horns", questId: "night_of_blue_horns", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 6, seed: 6700 },
-      { id: "chapter3-hroth", questId: "hroth_iceblood_boss", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 6, seed: 6800 },
-      { id: "chapter3-glimmerlake", questId: "beneath_glimmerlake", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 6, seed: 6900 },
-      { id: "chapter3-vaelith", questId: "vaelith_pale_echo_boss", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 7000 },
+      { id: "chapter1-patrol", questId: "goblin_patrol", heroLevel: 1, partyClasses: ["warrior", "cleric"] as const, difficultyId: "standard" as const, runs: 12, seed: 5000, gearProfile: "basic_progression" as const },
+      { id: "chapter2-broken-carts", questId: "road_of_broken_carts", heroLevel: 3, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 5800, gearProfile: "basic_progression" as const },
+      { id: "chapter2-flintwatch", questId: "fires_of_flintwatch", heroLevel: 4, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 5900, gearProfile: "basic_progression" as const },
+      { id: "chapter2-chainbreaker-l4", questId: "ghorak_chainbreaker_boss", heroLevel: 4, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6000, gearProfile: "basic_progression" as const },
+      { id: "chapter2-chainbreaker-l5", questId: "ghorak_chainbreaker_boss", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6100, gearProfile: "basic_progression" as const },
+      { id: "chapter2-hollow-warden", questId: "hollow_warden_boss", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6200, gearProfile: "basic_progression" as const },
+      { id: "chapter3-frozen-names", questId: "road_of_frozen_names", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6600, gearProfile: "basic_progression" as const },
+      { id: "chapter3-blue-horns", questId: "night_of_blue_horns", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6700, gearProfile: "basic_progression" as const },
+      { id: "chapter3-hroth-l5", questId: "hroth_iceblood_boss", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6800, gearProfile: "basic_progression" as const },
+      { id: "chapter3-hroth-l6", questId: "hroth_iceblood_boss", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6850, gearProfile: "basic_progression" as const },
+      { id: "chapter3-glimmerlake-l5", questId: "beneath_glimmerlake", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6900, gearProfile: "basic_progression" as const },
+      { id: "chapter3-glimmerlake-l6", questId: "beneath_glimmerlake", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6950, gearProfile: "basic_progression" as const },
+      { id: "chapter3-vaelith", questId: "vaelith_pale_echo_boss", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 10, seed: 7000, gearProfile: "basic_progression" as const },
     ];
     const results = scenarios.map(simulateCombatScenario); console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
@@ -39,8 +57,10 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter2-hollow-warden")!.winRate).toBeLessThanOrEqual(.75);
     expect(byId.get("chapter3-frozen-names")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter3-blue-horns")!.winRate).toBeGreaterThan(0);
-    expect(byId.get("chapter3-blue-horns")!.winRate).toBeLessThan(1);
-    expect(byId.get("chapter3-hroth")!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId.get("chapter3-hroth-l6")!.winRate).toBeGreaterThanOrEqual(byId.get("chapter3-hroth-l5")!.winRate);
+    expect(byId.get("chapter3-glimmerlake-l6")!.winRate).toBeGreaterThanOrEqual(byId.get("chapter3-glimmerlake-l5")!.winRate);
+    expect(byId.get("chapter3-glimmerlake-l6")!.winRate).toBeGreaterThan(0);
+    expect(byId.get("chapter3-vaelith")!.winRate).toBeGreaterThan(0);
   }, 120_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

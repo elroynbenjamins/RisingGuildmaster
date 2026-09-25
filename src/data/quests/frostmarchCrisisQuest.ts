@@ -21,7 +21,7 @@ export const FROSTMARCH_CRISIS_QUESTS: Record<string, QuestDefinition> = {
     lootTableId: "fallen_aurora_loot",
     storyArcId: "fivefold_accord",
     campaignChapter: 3,
-    prerequisiteCampaignNodeIds: ["hollow_warden_boss"],
+    prerequisiteCampaignNodeIds: ["northwatch_two_skies"],
     requiredWorldFlags: ["frostmarch_aurora_crisis"],
     setWorldFlagsOnVictory: {
       frostmarch_aurora_stabilized: true,

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ActionButton, BackButton, Panel, Portrait, SectionTitle, colors } from "../../components/ui";
 import { REGIONS } from "../../data/world/regions";
 import { SETTLEMENTS } from "../../data/world/settlements";
@@ -26,6 +26,7 @@ import { QUESTS } from "../../data/quests/quests";
 import { isQuestAvailableForGuild, isQuestBoardCategoryUnlocked } from "../../game/quests/questAvailability";
 import { triggerTactileFeedback } from "../../ui/tactileFeedback";
 import { useGameToast } from "../../components/feedback/GameToast";
+import { hasSeenContextualTutorial, markContextualTutorialSeen } from "../../game/onboarding/tutorialService";
 
 interface WorldMapProps {
   guild: GuildState;
@@ -67,6 +68,17 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
   const nextCampaignNode = getAvailableCampaignNodes(guild.world)[0];
   const campaignRequirement = nextCampaignNode ? getCampaignNodeLocationRequirement(nextCampaignNode.id) : null;
   const campaignAtLocation = isAtCampaignLocation(guild.world, campaignRequirement);
+  const guideCampaignTravel = Boolean(nextCampaignNode && campaignRequirement && !campaignAtLocation && !hasSeenContextualTutorial(guild, "campaign_travel"));
+  const campaignTravelPulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (!guideCampaignTravel) { campaignTravelPulse.setValue(1); return; }
+    const animation = Animated.loop(Animated.sequence([
+      Animated.timing(campaignTravelPulse, { toValue: .45, duration: 650, useNativeDriver: true }),
+      Animated.timing(campaignTravelPulse, { toValue: 1, duration: 650, useNativeDriver: true }),
+    ]));
+    animation.start();
+    return () => animation.stop();
+  }, [campaignTravelPulse, guideCampaignTravel]);
   const campaignDestination = campaignRequirement ? ((campaignRequirement.settlementIds.length ? campaignRequirement.settlementIds.map((id) => SETTLEMENTS[id]?.name ?? id.replace(/_/g, " ")).join(" / ") + " · " : "") + (REGIONS[campaignRequirement.regionId]?.name ?? campaignRequirement.regionId.replace(/_/g, " "))) : null;
   const availableHeroes = getEligibleTravelHeroes(guild);
   const travelPartySize = travelPartyIds.length;
@@ -84,6 +96,9 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
   const travelDays = current ? 0 : getRegionalTravelDays(guild.world.currentRegionId, selectedId);
   const rationCost = current || travelPartySize === 0 ? 0 : getTravelRationCost(travelDays, travelPartySize, guild.guildmaster);
   const travelBlocker = current ? null : !unlocked ? "Region locked by campaign progress." : !travelAllowed ? "No direct unlocked road from the current region." : !availableHeroes.length ? "No living, available heroes can form a travel party." : !travelPartySize ? "Select at least one hero for the journey." : guild.rations < rationCost ? `Need ${rationCost-guild.rations} more rations.` : null;
+  const campaignGuideRegionId = campaignRouteRegionId ?? campaignRequirement?.regionId;
+  const guideCampaignRoute = guideCampaignTravel && (guild.world.currentRegionId === campaignRequirement?.regionId || selectedId !== campaignGuideRegionId);
+  const guideTravelAction = guideCampaignTravel && selectedId === campaignGuideRegionId && !current && !travelBlocker;
 
   const selectRegion = (regionId: string) => {
     const timestamp = Date.now();
@@ -98,7 +113,8 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
     try {
       const result = travelGuildPartyToRegion(guild, selectedId, travelPartyIds, random);
       const world = discoverRegionSettlements(result.guild.world, selectedId);
-      updateGuild({ ...result.guild, world, recentPartyHeroIds: travelPartyIds });
+      const travelledGuild = { ...result.guild, world, recentPartyHeroIds: travelPartyIds };
+      updateGuild(guideCampaignTravel ? markContextualTutorialSeen(travelledGuild, "campaign_travel") : travelledGuild);
       triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");
       showToast({title:`Arrived in ${selected.name}`,message:`Day ${guild.currentDay} → ${result.guild.currentDay} · Rations -${result.rationCost}${result.tier ? ` · ${result.tier.toUpperCase()} road event` : " · Safe journey"}`,tone:result.tier?"gold":"success"});
       if (result.event) openEvent(result.event);
@@ -120,7 +136,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
         <View style={styles.overviewStat}><Text style={styles.overviewValue}>{guild.rations}</Text><Text style={styles.overviewLabel}>RATIONS</Text></View>
       </View>
 
-      {nextCampaignNode && campaignRequirement ? <Panel style={[styles.campaignRoute, campaignAtLocation && styles.campaignRouteReady]}><Text style={campaignAtLocation ? styles.campaignRouteReadyLabel : styles.campaignRouteLabel}>{campaignAtLocation ? "✓ CAMPAIGN LOCATION REACHED" : "NEXT CAMPAIGN STOP"}</Text><Text style={styles.campaignRouteTitle}>{nextCampaignNode.title}</Text><Text style={styles.campaignRouteDestination}>{campaignDestination}</Text>{campaignTravelStep ? <View style={styles.nextLeg}><WorldStatusIcon id="campaign" size={24}/><Text style={styles.nextLegText}>NEXT LEG · {campaignTravelStep.label.toUpperCase()} · {campaignTravelStep.days}d · {campaignTravelStep.rationCost} rations</Text></View> : null}{!campaignAtLocation ? <ActionButton label={guild.world.currentRegionId === campaignRequirement.regionId ? "Open Target Region" : "Focus Next Leg on Map"} onPress={() => guild.world.currentRegionId === campaignRequirement.regionId ? openRegion(campaignRequirement.regionId) : setSelectedId(campaignRouteRegionId ?? campaignRequirement.regionId)} /> : null}</Panel> : null}
+      {nextCampaignNode && campaignRequirement ? <Panel style={[styles.campaignRoute, campaignAtLocation && styles.campaignRouteReady]}><Text style={campaignAtLocation ? styles.campaignRouteReadyLabel : styles.campaignRouteLabel}>{campaignAtLocation ? "✓ CAMPAIGN LOCATION REACHED" : "NEXT CAMPAIGN STOP"}</Text><Text style={styles.campaignRouteTitle}>{nextCampaignNode.title}</Text><Text style={styles.campaignRouteDestination}>{campaignDestination}</Text>{campaignTravelStep ? <View style={styles.nextLeg}><WorldStatusIcon id="campaign" size={24}/><Text style={styles.nextLegText}>NEXT LEG · {campaignTravelStep.label.toUpperCase()} · {campaignTravelStep.days}d · {campaignTravelStep.rationCost} rations</Text></View> : null}{!campaignAtLocation ? <Animated.View style={{ alignSelf: "stretch", opacity: guideCampaignRoute ? campaignTravelPulse : 1 }}><ActionButton label={guild.world.currentRegionId === campaignRequirement.regionId ? "Open Target Region" : "Focus Next Leg on Map"} onPress={() => { if (guild.world.currentRegionId === campaignRequirement.regionId) { if (guideCampaignTravel) updateGuild(markContextualTutorialSeen(guild, "campaign_travel")); openRegion(campaignRequirement.regionId); } else setSelectedId(campaignRouteRegionId ?? campaignRequirement.regionId); }} /></Animated.View> : null}</Panel> : null}
 
       <View style={mapChromeStyles.frame}>
         <ImageBackground source={WORLD_ART.eldoria} resizeMode="cover" style={mapChromeStyles.canvas} imageStyle={mapChromeStyles.image}>
@@ -202,7 +218,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
         </View>}
         <View style={styles.buttons}>
           <ActionButton label="Open Region Map" onPress={() => openRegion(selectedId)} />
-          {!current && unlocked && <ActionButton guardMs={700} label={`Travel · ${travelDays}d · ${rationCost} rations`} disabled={Boolean(travelBlocker)} onPress={travel} />}
+          {!current && unlocked && <Animated.View style={{ alignSelf: "stretch", opacity: guideTravelAction ? campaignTravelPulse : 1 }}><ActionButton guardMs={700} label={`Travel · ${travelDays}d · ${rationCost} rations`} disabled={Boolean(travelBlocker)} onPress={travel} /></Animated.View>}
           {current && guild.world.currentSettlementId && <ActionButton guardMs={500} label={`Buy ${getRationBundleAmount(guild)} rations · ${GAME_CONFIG.rationBundleGoldCost}g`} onPress={() => { try { const before = guild.rations; const next = buyRations(guild); updateGuild(next); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); showToast({title:"Rations Restocked",message:`+${next.rations-before} rations · ${GAME_CONFIG.rationBundleGoldCost} gold spent`,tone:"success"}); } catch (error) { triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning"); showToast({title:"Purchase Failed",message:error instanceof Error ? error.message : "Purchase failed",tone:"danger"}); } }} />}
           {unlocked && availableRegionalQuestId && <ActionButton label="View Regional Quest" onPress={() => openQuest(availableRegionalQuestId)} />}
           <ActionButton label="Campaign" onPress={openCampaign} />

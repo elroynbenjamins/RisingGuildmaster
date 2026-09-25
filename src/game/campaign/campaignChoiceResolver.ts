@@ -67,6 +67,23 @@ export function getGhorakChoiceEcho(state: WorldState): { title: string; detail:
 }
 
 
+
+export function getHeartstoneChoiceEcho(state: WorldState): { title: string; detail: string } | null {
+  if (state.worldFlags.heartstone_restored) return {
+    title: "The Mountain Ward Burns Steady",
+    detail: "Stonegate announces that the Hollow Forge heartstone has been restored. The Iron Hills credit your guild with stabilizing the ancient Ward road.",
+  };
+  if (state.worldFlags.heartstone_entrusted) return {
+    title: "Stonegate Studies the Dragon Lullaby",
+    detail: "Ward-smiths isolate the five-note pattern inside the heartstone. Their findings strengthen the Guildmaster's understanding of the failing Ward network.",
+  };
+  if (state.worldFlags.heartstone_retained) return {
+    title: "A Fragment Travels Under Guild Seal",
+    detail: "Your retained sliver yields Arcane Dust and a Rough Sapphire during examination, but still turns its sharpest edge toward the east each night.",
+  };
+  return null;
+}
+
 export function getNorthwatchCouncilChoiceEcho(state: WorldState): { title: string; detail: string } | null {
   if (state.worldFlags.northwatch_gates_opened) return {
     title: "Guest-Right Before the Siege",

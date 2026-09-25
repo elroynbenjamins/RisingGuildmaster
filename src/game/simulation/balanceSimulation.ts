@@ -1,5 +1,6 @@
 import { CLASS_SKILL_TREES } from "../../data/skills/classSkillTrees";
 import { HERO_SKILLS } from "../../data/skills/heroSkills";
+import { SUBCLASSES } from "../../data/subclasses/subclasses";
 import { QUESTS } from "../../data/quests/quests";
 import { EQUIPMENT } from "../../data/equipment/equipment";
 import { GAME_CONFIG } from "../../config/gameConfig";
@@ -24,6 +25,7 @@ import { advanceGuildTime, totalSalaryArrears } from "../economy/guildCalendarSe
 import { createHeroContract } from "../recruitment/contractService";
 import { calculateWeeklySalary } from "../recruitment/recruitmentCostCalculator";
 import { calculateHero } from "../heroes/heroCalculator";
+import { getHeroSkillIds } from "../progression/subclasses/subclassService";
 
 export type SimulationGearProfile = "starter" | "basic_progression";
 export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile }
@@ -63,7 +65,11 @@ function levelHero(hero: Hero, level: number, index: number, gearProfile: Simula
   const tree = CLASS_SKILL_TREES[leveled.classId];
   const learnedSkillIds = tree.recommendedPaths[index % tree.recommendedPaths.length]!.skillIds.filter((skillId) => (tree.nodes.find((node) => node.skillId === skillId)?.requiredLevel ?? Infinity) <= level);
   const progressed = { ...leveled, learnedSkillIds };
-  const equipped = gearProfile === "basic_progression" ? { ...progressed, equipment: basicProgressionEquipment(progressed) } : progressed;
+  const subclassId = gearProfile === "basic_progression" && level >= 5
+    ? Object.values(SUBCLASSES).find((subclass) => subclass.baseClassId === progressed.classId)?.id ?? null
+    : progressed.subclassId;
+  const specialized = { ...progressed, subclassId };
+  const equipped = gearProfile === "basic_progression" ? { ...specialized, equipment: basicProgressionEquipment(specialized) } : specialized;
   return { ...equipped, currentHP: calculateHero(equipped).stats.maxHP };
 }
 
@@ -89,7 +95,8 @@ function skillTarget(state: CombatState, skill: CombatSkillDefinition): { target
 function tryHeroAction(state: CombatState, random: RandomSource): CombatState | null {
   const actor = state.heroes.find((item) => item.hero.id === state.awaitingHeroId)!;
   const tree = CLASS_SKILL_TREES[actor.hero.classId];
-  const skillIds = [...actor.hero.learnedSkillIds].reverse().concat(tree.basicSkillId);
+  const basicSkillId = tree.basicSkillId;
+  const skillIds = getHeroSkillIds(actor.hero).filter((skillId) => skillId !== basicSkillId).reverse().concat(basicSkillId);
   for (const skillId of skillIds) {
     const skill = HERO_SKILLS[skillId]; if (!skill) continue;
     const availability = getHeroSkillAvailability(actor.hero, actor.instance, actor.unit, skillId, state.heroes.map((item) => item.unit), state.enemies.map((item) => item.unit), state.board);

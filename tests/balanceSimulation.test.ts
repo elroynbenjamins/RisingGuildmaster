@@ -37,6 +37,10 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter2-chainbreaker-l4")!.winRate).toBeGreaterThanOrEqual(.60);
     expect(byId.get("chapter2-hollow-warden")!.winRate).toBeGreaterThanOrEqual(.25);
     expect(byId.get("chapter2-hollow-warden")!.winRate).toBeLessThanOrEqual(.75);
+    expect(byId.get("chapter3-frozen-names")!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId.get("chapter3-blue-horns")!.winRate).toBeGreaterThan(0);
+    expect(byId.get("chapter3-blue-horns")!.winRate).toBeLessThan(1);
+    expect(byId.get("chapter3-hroth")!.winRate).toBeGreaterThanOrEqual(.50);
   }, 120_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

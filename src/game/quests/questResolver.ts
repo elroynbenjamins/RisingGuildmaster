@@ -94,7 +94,7 @@ export function advanceToNextEncounter(activeQuest: ActiveQuest, instances: read
   const quest = getQuestDefinition(activeQuest.questDefinitionId);
   const nextIndex = activeQuest.currentEncounterIndex + 1;
   if (nextIndex >= quest.encounterIds.length) return { activeQuest, heroInstances: [...instances], complete: true };
-  return { activeQuest: { ...activeQuest, currentEncounterIndex: nextIndex }, heroInstances: instances.map(recoverBetweenEncounters), complete: false };
+  return { activeQuest: { ...activeQuest, currentEncounterIndex: nextIndex }, heroInstances: instances.map((instance) => recoverBetweenEncounters(instance, quest.betweenEncounterHpRecoveryRatio ?? 0)), complete: false };
 }
 
 export function rollHuntFragment(progress: HuntRewardProgress, firstVictoryCount: number, repeatDropChance: number, pityAfterFailures: number, random: RandomSource): { amount: number; progress: HuntRewardProgress } {

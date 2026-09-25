@@ -98,9 +98,9 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
     const guidance = getTimeAdvanceGuidance(guild, 1);
     const payrollLine = payrollWarningLine(guidance);
     const dayPreview = guidance.showCalendarPrimer
-      ? `Day ${guild.currentDay} → ${nextDay.targetDay}\nHeroes: +${Math.round(GAME_CONFIG.dailyHeroHealthRecoveryRatio * 100)}% max HP · +${GAME_CONFIG.adventureStaminaRecoveryPerDay} readiness\nTavern: +${tavernIncome} gold\nProjects, training, candidates and contracts advance.`
+      ? `Day ${guild.currentDay} → ${nextDay.targetDay} · +${Math.round(GAME_CONFIG.dailyHeroHealthRecoveryRatio * 100)}% HP · +${GAME_CONFIG.adventureStaminaRecoveryPerDay} readiness · +${tavernIncome} gold\nTimed work, candidates and contracts advance.`
       : `Advance to Day ${nextDay.targetDay}. Living heroes recover ${Math.round(GAME_CONFIG.dailyHeroHealthRecoveryRatio * 100)}% maximum health and ${GAME_CONFIG.adventureStaminaRecoveryPerDay} readiness; the tavern earns ${tavernIncome} gold.`;
-    const payrollPrimer = guidance.showPayrollPrimer ? "\n\nPayroll is charged automatically when a contract pay day is crossed." : "";
+    const payrollPrimer = guidance.showPayrollPrimer ? "\n\nPayroll is automatic on contract pay days." : "";
     showDialog({
       title: payrollLine ? "Advance Time & Process Payroll?" : "End Guild Day?",
       message: `${dayPreview}${payrollPrimer}${payrollLine ? `\n\n${payrollLine}\nTreasury now: ${guild.gold} gold` : ""}`,

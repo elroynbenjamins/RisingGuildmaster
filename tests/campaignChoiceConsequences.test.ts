@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyCampaignChoiceToGuild, getChieftainChoiceEcho, getGhorakChoiceEcho, getMoonGateChoiceEcho, getNorthwatchCouncilChoiceEcho } from "../src/game/campaign/campaignChoiceResolver";
+import { applyCampaignChoiceToGuild, getChieftainChoiceEcho, getGhorakChoiceEcho, getHeartstoneChoiceEcho, getMoonGateChoiceEcho, getNorthwatchCouncilChoiceEcho } from "../src/game/campaign/campaignChoiceResolver";
 import { createGuild } from "../src/game/guild/guildService";
 
 describe("Goblin Chieftain campaign consequences", () => {
@@ -76,6 +76,33 @@ describe("Ghorak campaign consequences", () => {
   });
 });
 
+
+describe("Hollow Warden campaign consequences", () => {
+  it("uses restoration as the public-trust path", () => {
+    const guild = createGuild();
+    const result = applyCampaignChoiceToGuild(guild, "restore_iron_wardstone");
+    expect(result.reputation).toBe(guild.reputation + 8);
+    expect(result.world.worldFlags.first_crown_signal_dimmed).toBe(true);
+    expect(getHeartstoneChoiceEcho(result.world)?.title).toContain("Mountain Ward");
+  });
+
+  it("uses Stonegate study as the Guildmaster progression path", () => {
+    const guild = createGuild();
+    const result = applyCampaignChoiceToGuild(guild, "entrust_stonegate_keepers");
+    expect(result.guildmaster).toMatchObject({ level: 1, xp: 75, skillPoints: 0 });
+    expect(result.world.worldFlags.dragon_lullaby_studied).toBe(true);
+    expect(getHeartstoneChoiceEcho(result.world)?.title).toContain("Dragon Lullaby");
+  });
+
+  it("uses retained evidence as the crafting-material path", () => {
+    const guild = createGuild();
+    const result = applyCampaignChoiceToGuild(guild, "retain_heartstone_fragment");
+    expect(result.materials.arcane_dust).toBe(guild.materials.arcane_dust + 4);
+    expect(result.materials.rough_sapphire).toBe(guild.materials.rough_sapphire + 1);
+    expect(result.world.worldFlags.first_crown_fragment_resonating).toBe(true);
+    expect(getHeartstoneChoiceEcho(result.world)?.title).toContain("Fragment");
+  });
+});
 
 describe("Chapter 3 campaign consequences", () => {
   it("uses open gates as the public-trust path", () => {

@@ -65,3 +65,36 @@ export function getGhorakChoiceEcho(state: WorldState): { title: string; detail:
   };
   return null;
 }
+
+
+export function getNorthwatchCouncilChoiceEcho(state: WorldState): { title: string; detail: string } | null {
+  if (state.worldFlags.northwatch_gates_opened) return {
+    title: "Guest-Right Before the Siege",
+    detail: "Northwatch opens its gates under the guild's guarantee. The settlement is more crowded, but Frostmarch remembers who refused to abandon its refugees.",
+  };
+  if (state.worldFlags.northwatch_fortified_first) return {
+    title: "The Wall Keeps Its Reserves",
+    detail: "Northwatch fortifies before opening the inner ring. Emergency stores remain organized for the coming defense, including six rations transferred to the guild.",
+  };
+  if (state.worldFlags.refugees_sent_to_silverbough) return {
+    title: "Silverbough Shares the Burden",
+    detail: "The hidden enclaves take part of the refugee column. Coordinating the evacuation strengthened the Guildmaster's northern command network.",
+  };
+  return null;
+}
+
+export function getMoonGateChoiceEcho(state: WorldState): { title: string; detail: string } | null {
+  if (state.worldFlags.northern_lullaby_restored) return {
+    title: "The Northern Lullaby Returns",
+    detail: "The Moon Gate's resonance is stabilized. The guild recovered Frost Crystals and a Rough Sapphire from the quieted mechanism.",
+  };
+  if (state.worldFlags.northwatch_ward_shielded) return {
+    title: "Northwatch Stands Behind the Ward",
+    detail: "The Moon Gate turns its protection toward Northwatch. The settlement publicly credits your guild with securing its northern shield.",
+  };
+  if (state.worldFlags.false_aurora_traced) return {
+    title: "The False Aurora Has a Source",
+    detail: "The Moon Gate maps the hostile signal eastward. The trace strengthens Guildmaster intelligence and identifies the route followed by the false aurora.",
+  };
+  return null;
+}

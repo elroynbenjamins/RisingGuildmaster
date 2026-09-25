@@ -20,8 +20,8 @@ export const FROSTMARCH_CRISIS_QUESTS: Record<string, QuestDefinition> = {
     xpRewardPerHero: 470,
     lootTableId: "fallen_aurora_loot",
     storyArcId: "fivefold_accord",
-    campaignChapter: 2,
-    prerequisiteCampaignNodeIds: ["voices_under_stone"],
+    campaignChapter: 3,
+    prerequisiteCampaignNodeIds: ["northwatch_two_skies"],
     requiredWorldFlags: ["frostmarch_aurora_crisis"],
     setWorldFlagsOnVictory: {
       frostmarch_aurora_stabilized: true,

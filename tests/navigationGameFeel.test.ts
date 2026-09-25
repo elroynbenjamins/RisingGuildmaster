@@ -50,10 +50,12 @@ describe("active guild order strip", () => {
     guild.trainingGround.sessions = [{ id: "train", heroId: "h1", programId: "sparring_drills", startDay: guild.currentDay, completionDay: guild.currentDay + 2, goldCost: 10, xpReward: 20, growthReward: 1 }];
     guild.gatheringMissions = [{ id: "field", definitionId: "greenveil_foraging", heroIds: ["h1", "h2"], startDay: guild.currentDay - 2, completionDay: guild.currentDay, resolutionSeed: 5, status: "active" }];
     guild.recruitment.regionalScoutMission = { id: "scout", raceId: "human", classId: null, regionId: "greenveil", locationName: "Brambleford", startDay: guild.currentDay, completionDay: guild.currentDay + 1, resolutionSeed: 9 };
+    guild.artisans.blacksmith.construction = { targetLevel: 1, startDay: guild.currentDay, completionDay: guild.currentDay + 2, goldCost: 500 };
 
     const activities = getGuildActivities(guild);
-    expect(activities.map((item) => item.id)).toEqual(expect.arrayContaining(["training", "gathering", "scout"]));
+    expect(activities.map((item) => item.id)).toEqual(expect.arrayContaining(["training", "gathering", "scout", "workshop"]));
     expect(activities.find((item) => item.id === "gathering")).toMatchObject({ tone: "ready", detail: "1 READY", destination: "gathering" });
     expect(activities.find((item) => item.id === "training")).toMatchObject({ detail: "2D", destination: "training" });
+    expect(activities.find((item) => item.id === "workshop")).toMatchObject({ detail: "2D", destination: "crafting" });
   });
 });

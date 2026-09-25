@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyCampaignChoiceToGuild, getChieftainChoiceEcho, getGhorakChoiceEcho } from "../src/game/campaign/campaignChoiceResolver";
+import { applyCampaignChoiceToGuild, getChieftainChoiceEcho, getGhorakChoiceEcho, getMoonGateChoiceEcho, getNorthwatchCouncilChoiceEcho } from "../src/game/campaign/campaignChoiceResolver";
 import { createGuild } from "../src/game/guild/guildService";
 
 describe("Goblin Chieftain campaign consequences", () => {
@@ -73,5 +73,54 @@ describe("Ghorak campaign consequences", () => {
     expect(result.materials.coal).toBe(guild.materials.coal + 4);
     expect(result.world.worldFlags).toMatchObject({ ghorak_banished: true, ghorak_supplies_reclaimed: true });
     expect(getGhorakChoiceEcho(result.world)?.title).toContain("Flintwatch");
+  });
+});
+
+
+describe("Chapter 3 campaign consequences", () => {
+  it("uses open gates as the public-trust path", () => {
+    const guild = createGuild();
+    const result = applyCampaignChoiceToGuild(guild, "open_northwatch_gates");
+    expect(result.reputation).toBe(guild.reputation + 8);
+    expect(result.world.worldFlags.northwatch_guest_right_honored).toBe(true);
+    expect(getNorthwatchCouncilChoiceEcho(result.world)?.title).toContain("Guest-Right");
+  });
+
+  it("uses fortification as the supply path", () => {
+    const guild = createGuild();
+    const result = applyCampaignChoiceToGuild(guild, "fortify_northwatch_first");
+    expect(result.rations).toBe(guild.rations + 6);
+    expect(result.world.worldFlags.northwatch_reserve_stores_secured).toBe(true);
+    expect(getNorthwatchCouncilChoiceEcho(result.world)?.title).toContain("Wall");
+  });
+
+  it("uses Silverbough as the coordination path", () => {
+    const guild = createGuild();
+    const result = applyCampaignChoiceToGuild(guild, "send_refugees_to_silverbough");
+    expect(result.guildmaster).toMatchObject({ level: 1, xp: 60, skillPoints: 0 });
+    expect(result.world.worldFlags.silverbough_alliance_strengthened).toBe(true);
+  });
+
+  it("uses the northern lullaby as the material path", () => {
+    const guild = createGuild();
+    const result = applyCampaignChoiceToGuild(guild, "sing_northern_lullaby");
+    expect(result.materials.frost_crystal).toBe(guild.materials.frost_crystal + 2);
+    expect(result.materials.rough_sapphire).toBe(guild.materials.rough_sapphire + 1);
+    expect(getMoonGateChoiceEcho(result.world)?.title).toContain("Lullaby");
+  });
+
+  it("uses the Northwatch shield as the reputation path", () => {
+    const guild = createGuild();
+    const result = applyCampaignChoiceToGuild(guild, "shield_northwatch");
+    expect(result.reputation).toBe(guild.reputation + 8);
+    expect(getMoonGateChoiceEcho(result.world)?.title).toContain("Ward");
+  });
+
+  it("uses the false-aurora trace as the intelligence path", () => {
+    const guild = createGuild();
+    const result = applyCampaignChoiceToGuild(guild, "trace_false_aurora");
+    expect(result.guildmaster).toMatchObject({ level: 1, xp: 75, skillPoints: 0 });
+    expect(result.world.worldFlags.ash_herald_route_known).toBe(true);
+    expect(getMoonGateChoiceEcho(result.world)?.title).toContain("Source");
   });
 });

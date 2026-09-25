@@ -21,7 +21,7 @@ describe("Chapter 3 Frostmarch campaign", () => {
   it("builds Northwatch as a three-wave warfront defense with controlled recovery", () => {
     const quest = QUESTS.night_of_blue_horns!;
     expect(quest.encounterIds).toEqual(["northwatch_wall_wave_one", "northwatch_wall_wave_two", "northwatch_wall_wave_three"]);
-    expect(quest.betweenEncounterHealthRecoveryRatio).toBe(.15);
+    expect(quest.betweenEncounterHealthRecoveryRatio).toBe(.20);
     for (const id of quest.encounterIds) expect(BATTLEFIELDS[QUEST_ENCOUNTERS[id]!.battlefieldId]?.boardSizeId).toBe("warfront");
     expect(QUEST_ENCOUNTERS.northwatch_wall_wave_one?.enemies.reduce((sum, group) => sum + group.count, 0)).toBe(5);
     expect(QUEST_ENCOUNTERS.northwatch_wall_wave_two?.enemies.reduce((sum, group) => sum + group.count, 0)).toBe(4);

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { BackHandler, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { ManagementShell } from "./src/components/navigation/ManagementShell"; import { colors } from "./src/components/ui"; import { CAMPAIGN_NODES } from "./src/data/campaign/chapter1"; import { QUESTS } from "./src/data/quests/quests";
-import { applyCampaignChoiceToGuild, resolveCampaignChoice } from "./src/game/campaign/campaignChoiceResolver"; import { campaignNodeRequiresPostBattleChoice, completeCampaignNode, getAvailableCampaignNodes } from "./src/game/campaign/campaignService";
+import { applyCampaignChoiceToGuild, resolveCampaignChoice } from "./src/game/campaign/campaignChoiceResolver"; import { campaignNodeRequiresPostBattleChoice, completeCampaignNode } from "./src/game/campaign/campaignService";
 import { travelGuildTowardCampaignObjective } from "./src/game/campaign/campaignTravelService"; import type { HeroCombatInstance, QuestCombatSetup } from "./src/game/combat/combatTypes"; import type { Hero } from "./src/game/heroes/types"; import type { Party } from "./src/game/party/partyTypes"; import { resolveQuestDefeat, resolveQuestVictory } from "./src/game/quests/questResolver"; import { startQuest } from "./src/game/quests/questService"; import type { WorldEventDefinition } from "./src/game/world/worldTypes";
 import type { EquipmentSlot } from "./src/game/heroes/types"; import type { MaterialId } from "./src/game/crafting/craftingTypes";
 import { releaseBankedCampaignXp } from "./src/game/progression/levelSystem";
@@ -21,18 +21,15 @@ import { QuestExplorationScreen } from "./src/screens/QuestExploration/QuestExpl
 import { QuestDecisionScreen } from "./src/screens/QuestDecision/QuestDecisionScreen";
 import { CraftingScreen } from "./src/screens/Crafting/CraftingScreen";
 import { GatheringScreen } from "./src/screens/Gathering/GatheringScreen";
-import { IDLE_MISSION_UNLOCK_HERO_COUNT } from "./src/game/gathering/gatheringService";
 import { RegionMapScreen } from "./src/screens/Region/RegionMapScreen";
 import { GuildmasterSkillTreeScreen } from "./src/screens/Guildmaster/GuildmasterSkillTreeScreen";
 import { FinancesScreen } from "./src/screens/Guild/FinancesScreen";
 import { DungeonScreen } from "./src/screens/Dungeon/DungeonScreen";
 import { TrainingGroundsScreen } from "./src/screens/Training/TrainingGroundsScreen";
 import { beginDungeonCombatCheckpoint, checkpointDungeonCombat, getDungeonCombatSetup, resolveDungeonCombat } from "./src/game/dungeons/dungeonRunService";
-import { isChapterOneComplete } from "./src/game/dungeons/rogueliteRotationService";
-import { DUNGEON_UNLOCK_HERO_COUNT } from "./src/game/dungeons/dungeonDraftService";
 import { MainMenuScreen } from "./src/screens/MainMenu/MainMenuScreen";
 import { TutorialScreen } from "./src/screens/Tutorial/TutorialScreen";
-import { beginTutorial, getTutorialResumeDestination, hasSeenContextualTutorial, markContextualTutorialSeen, skipTutorial } from "./src/game/onboarding/tutorialService";
+import { beginTutorial, getTutorialResumeDestination, markContextualTutorialSeen, skipTutorial } from "./src/game/onboarding/tutorialService";
 import { markFourthHeroReady } from "./src/game/onboarding/starterJourneyService";
 import { commitQuestPartyToCombat, type QuestPreCombatCondition } from "./src/game/quests/questCombatCommitService";
 import { advanceGuildTime } from "./src/game/economy/guildCalendarService";
@@ -96,7 +93,6 @@ function Game() {
   const currentGuildRef = useRef(guild); currentGuildRef.current = guild;
   const promptedDayRef = useRef<string | null>(null);
   const threatIntroPromptedRef = useRef(false);
-  const contextualPromptedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (!gameStarted || !isHydrated || !guild.pendingQuestResult || route.name !== "main") return;
     setRoute({ name: "questResult", summary: guild.pendingQuestResult });
@@ -131,27 +127,6 @@ function Game() {
       tone: "default",
     });
   }, [gameStarted, isHydrated, guild, route.name, isDialogOpen, updateGuild, showDialog]);
-  useEffect(() => {
-    if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active || guild.pendingQuestResult || (guild.activeQuestCombat && route.name !== "combat")) return;
-    let id: "idle_missions" | "roguelite_expeditions" | null = null;
-    let title = "";
-    let eyebrow = "QUICK GUIDE";
-    let message = "";
-    if (route.name === "gathering" && guild.heroes.length >= IDLE_MISSION_UNLOCK_HERO_COUNT) {
-      id = "idle_missions";
-      title = "Idle Mission Progress";
-      message = "Idle Missions award their listed XP plus a guaranteed 5% of each assigned hero’s next-level requirement. The mission screen previews that progress before deployment.";
-    } else if (route.name === "dungeon" && guild.heroes.length >= DUNGEON_UNLOCK_HERO_COUNT && isChapterOneComplete(guild)) {
-      id = "roguelite_expeditions";
-      title = "Roguelite Expeditions";
-      eyebrow = "MODE UNLOCKED";
-      message = "Draft four heroes, read the branching route map, and choose risk versus recovery room by room. HP, mana and stamina carry through the run; recipes, records and loot are the main rewards.";
-    }
-    if (!id || hasSeenContextualTutorial(guild, id) || contextualPromptedRef.current.has(id)) return;
-    contextualPromptedRef.current.add(id);
-    updateGuild(markContextualTutorialSeen(guild, id));
-    showDialog({ title, eyebrow, message, tone: "default" });
-  }, [gameStarted, isHydrated, isDialogOpen, guild, route, updateGuild, showDialog]);
   useEffect(() => {
     if (!gameStarted || !isHydrated || isDialogOpen || guild.tutorial.active || (guild.pendingQuestResult || guild.activeQuestCombat)) return;
     const safeBreak = route.name === "main" || route.name === "campaign" || route.name === "management" || route.name === "finances";

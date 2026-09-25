@@ -5,6 +5,7 @@ import { RAIDS } from "../src/data/raids/raids";
 import { createDungeonDraft } from "../src/game/dungeons/dungeonDraftService";
 import { createGuild } from "../src/game/guild/guildService";
 import { getGuildCommandOrders } from "../src/game/guild/guildCommandCenterService";
+import { getCampaignLevelGuidance } from "../src/game/campaign/campaignReadinessService";
 import { getGuildPriority } from "../src/game/guild/guildPriorityService";
 import { getEligibleOperationHeroIds, isGuildOperationsUnlocked } from "../src/game/operations/guildOperationService";
 import { createGuildmasterProfile, grantGuildmasterXp, unlockGuildmasterSkill } from "../src/game/guildmaster/guildmasterProgression";
@@ -149,6 +150,21 @@ describe("end-to-end player journey guarantees", () => {
     expect(noticeIds).toContain("system:gathering");
     expect(noticeIds).toContain("system:operations");
     expect(noticeIds).toContain("system:roguelite");
+  });
+
+  it("recommends one-time Chapter 2 side content before the Level-5 Warden", () => {
+    const guild = chapterOneGuild(6, 4);
+    guild.world = {
+      ...guild.world,
+      campaignChapter: 2,
+      unlockedRegionIds: [...new Set([...guild.world.unlockedRegionIds, "iron_hills", "frostmarch"])],
+      completedCampaignNodeIds: [...guild.world.completedCampaignNodeIds, "council_of_splinters", "road_of_broken_carts", "voices_under_stone", "siege_of_flintwatch", "chainbreaker_boss", "laurel_below", "descent_to_hollow_forge"],
+      worldFlags: { ...guild.world.worldFlags, frostmarch_aurora_crisis: true },
+    };
+    const guidance = getCampaignLevelGuidance(guild);
+    expect(guidance).toMatchObject({ nextQuestId: "hollow_warden_boss", targetLevel: 5, averageLevel: 4 });
+    expect(guidance?.sideQuestIds.length).toBeGreaterThan(0);
+    expect(guidance?.sideQuestIds).toEqual(expect.arrayContaining(["knives_of_stonegate", "the_aurora_that_fell"]));
   });
 
   it("does not unlock the first Raid until both its campaign chapter and eight-hero roster are ready", () => {

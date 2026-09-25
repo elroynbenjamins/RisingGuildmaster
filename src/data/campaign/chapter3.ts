@@ -5,7 +5,7 @@ export const CHAPTER_3: CampaignChapterDefinition = {
   description: "Answer Northwatch's broken beacons as the false aurora drives beasts, ancient dead and a young ward-drake against Frostmarch's last warm walls.",
   recommendedLevelMin: 5, recommendedLevelMax: 6,
   nodeIds: ["northwatch_two_skies", "road_of_frozen_names", "council_at_northwatch", "night_of_blue_horns", "hroth_iceblood_boss", "beneath_glimmerlake", "the_moon_gate", "vaelith_boss"],
-  sideQuestIds: ["the_last_guestfire", "bells_beneath_glimmerlake"],
+  sideQuestIds: ["the_aurora_that_fell", "the_last_guestfire", "bells_beneath_glimmerlake"],
   completionGoldReward: 1400, completionReputationReward: 30,
 };
 

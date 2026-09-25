@@ -41,6 +41,7 @@ import { travelGuildTowardQuest } from "./src/game/quests/questTravelService";
 import { applyBountyReward } from "./src/game/quests/bountyService";
 import { getDefaultTravelPartyHeroIds } from "./src/game/world/travelPartyService";
 import { CAMPAIGN_CHOICE_OUTCOMES } from "./src/data/quests/questOutcomeNarratives";
+import { CAMPAIGN_CHOICES } from "./src/data/campaign/campaignChoices";
 import { applyQuestRelationshipConsequences } from "./src/game/relationships/relationshipService";
 import { resolveCampConversation } from "./src/game/relationships/campConversationService";
 import { LORE_ENTRIES } from "./src/data/world/lore";
@@ -280,8 +281,11 @@ function Game() {
       if (!route.summary.campaignNodeId) return false;
       try {
       const choiceGuild = applyCampaignChoiceToGuild(guild, choiceId);
+      const choiceDefinition = CAMPAIGN_CHOICES[choiceId];
       const choiceGoldDelta = choiceGuild.gold - guild.gold;
       const choiceReputationDelta = choiceGuild.reputation - guild.reputation;
+      const choiceGuildmasterXp = choiceDefinition?.guildEffects?.guildmasterXp ?? 0;
+      const choiceMaterialDelta = Object.fromEntries(Object.entries(choiceGuild.materials).flatMap(([materialId, amount]) => { const before = guild.materials[materialId as keyof typeof guild.materials] ?? 0; const delta = amount - before; return delta > 0 ? [[materialId, delta]] : []; }));
       const campaign = completeCampaignNode(choiceGuild.world, route.summary.campaignNodeId);
       const consequence = { id: `choice-${choiceId}`, text: CAMPAIGN_CHOICE_OUTCOMES[choiceId] ?? "The guild's decision is recorded.", tone: "neutral" as const };
       const newLore = Object.values(LORE_ENTRIES)
@@ -295,7 +299,7 @@ function Game() {
       });
       const campaignChapterCompleted = campaign.worldState.campaignChapter > guild.world.campaignChapter ? guild.world.campaignChapter : route.summary.campaignChapterCompleted;
       updateGuild({ ...choiceGuild, heroes: releasedHeroes, world: campaign.worldState, gold: choiceGuild.gold + campaign.goldReward, reputation: choiceGuild.reputation + campaign.guildReputationReward, questChronicle: choiceGuild.questChronicle.map((entry) => entry.id === chronicle.id ? chronicle : entry), pendingQuestResult: null });
-      setRoute({ name: "questResult", summary: { ...route.summary, selectedChoiceId: choiceId, chronicle, heroOutcomes, goldEarned: route.summary.goldEarned + choiceGoldDelta + campaign.goldReward, reputationEarned: (route.summary.reputationEarned ?? 0) + choiceReputationDelta + campaign.guildReputationReward, ...(campaignChapterCompleted ? { campaignChapterCompleted } : {}) } });
+      setRoute({ name: "questResult", summary: { ...route.summary, selectedChoiceId: choiceId, chronicle, heroOutcomes, goldEarned: route.summary.goldEarned + choiceGoldDelta + campaign.goldReward, reputationEarned: (route.summary.reputationEarned ?? 0) + choiceReputationDelta + campaign.guildReputationReward, guildmasterXpEarned: (route.summary.guildmasterXpEarned ?? 0) + choiceGuildmasterXp, guildmasterLevelAfter: choiceGuild.guildmaster.level, guildmasterSkillPointsAfter: choiceGuild.guildmaster.skillPoints, materials: { ...(route.summary.materials ?? {}), ...Object.fromEntries(Object.entries(choiceMaterialDelta).map(([materialId, amount]) => [materialId, (route.summary.materials?.[materialId as keyof NonNullable<typeof route.summary.materials>] ?? 0) + amount])) }, ...(campaignChapterCompleted ? { campaignChapterCompleted } : {}) } });
       return true;
       } catch (error) {
         showDialog({title:"Decision Could Not Be Recorded",message:error instanceof Error?error.message:"The campaign decision could not be applied.",tone:"danger"});

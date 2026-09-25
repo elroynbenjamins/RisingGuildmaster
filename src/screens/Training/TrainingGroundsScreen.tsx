@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useGameDialog } from "../../components/dialogs/GameDialog";
 import { ActionButton, BackButton, EmptyState, MiniMeter, Panel, Portrait, SecondaryButton, SectionTitle, SegmentedTabs, StatusChip, colors } from "../../components/ui";
 import { TRAINING_PROGRAMS } from "../../data/training/trainingPrograms";
@@ -29,12 +29,24 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
   const sessions = useMemo(() => guild.trainingGround.sessions.map((session) => getTrainingSessionPresentation(guild, session)), [guild]);
   const catchup = useMemo(() => getTrainingCatchupAdvice(guild), [guild]);
   const tutorialSeen = guild.world.worldFlags.training_hall_v2_tutorial_seen === true;
-  const acknowledgeTutorial = () => updateGuild({ ...guild, world: { ...guild.world, worldFlags: { ...guild.world.worldFlags, training_hall_v2_tutorial_seen: true } } });
+  const [trainingGuideStep, setTrainingGuideStep] = useState<"hero" | "program" | "begin">("hero");
+  const guideTraining = !tutorialSeen && available.length > 0 && sessions.length < capacity;
+  const trainingPulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (!guideTraining) { trainingPulse.setValue(1); return; }
+    const animation = Animated.loop(Animated.sequence([
+      Animated.timing(trainingPulse, { toValue: .45, duration: 650, useNativeDriver: true }),
+      Animated.timing(trainingPulse, { toValue: 1, duration: 650, useNativeDriver: true }),
+    ]));
+    animation.start();
+    return () => animation.stop();
+  }, [guideTraining, trainingPulse]);
 
   const begin = () => {
     if (!hero || !quote) return;
     try {
-      updateGuild(startHeroTraining(guild, hero.id, programId));
+      const started = startHeroTraining(guild, hero.id, programId);
+      updateGuild(tutorialSeen ? started : { ...started, world: { ...started.world, worldFlags: { ...started.world.worldFlags, training_hall_v2_tutorial_seen: true } } });
       triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");
       showDialog({ title: "Training Started", message: `${hero.name} begins ${program.name}. Projected reward: +${quote.xpReward} XP. Cost: ${quote.goldCost} gold. Returns Day ${quote.completionDay}.`, tone: "success" });
       const nextHero = available.find((entry) => entry.id !== hero.id);
@@ -65,12 +77,6 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
     <View style={styles.header}><View style={styles.headerIcon}><GameIcon id="training" size={34}/></View><View style={styles.flex}><Text style={styles.eyebrow}>GUILDHAVEN FACILITY</Text><Text style={styles.title}>Guild Training Yard</Text><Text style={styles.day}>DAY {guild.currentDay} · {guild.gold.toLocaleString()} GOLD</Text></View><StatusChip label={`${guild.trainingGround.sessions.length}/${capacity} SLOTS`} tone={guild.trainingGround.sessions.length >= capacity ? "gold" : "good"} /></View>
     <Text style={styles.intro}>Train reserves while the field team adventures. Earn XP up to the campaign and roster cap; attributes stay unchanged.</Text>
 
-    {!tutorialSeen && <Panel style={styles.tutorial}>
-      <Text style={styles.tutorialLabel}>TRAINING YARD TUTORIAL</Text><Text style={styles.tutorialTitle}>Use downtime, not endless waiting</Text>
-      <Text style={styles.tutorialText}>A hero is unavailable for field duty until their program finishes. Training grants XP only and stops at a campaign/roster catch-up cap. If the campaign says your main team is under-levelled, one-clear Side Quests remain the fastest active solution; Training is best for reserves, recovery days, and heroes lagging behind the core roster.</Text>
-      <SecondaryButton label="GOT IT · OPEN TRAINING YARD" onPress={acknowledgeTutorial} />
-    </Panel>}
-
     <Panel style={styles.facility}>
       <View style={styles.facilityHead}><View style={styles.levelPlate}><Text style={styles.levelSmall}>TRAINING HALL</Text><Text style={styles.level}>LEVEL {guild.trainingGround.level}</Text></View><View style={styles.flex}><Text style={styles.facilityName}>{guild.trainingGround.level === 1 ? "Guild Practice Yard" : guild.trainingGround.level === 2 ? "Veteran Training Hall" : "Master Adventurer Academy"}</Text><Text style={styles.meta}>{capacity} concurrent training slot{capacity === 1 ? "" : "s"} · {guild.trainingGround.completedTrainingCount} completed program{guild.trainingGround.completedTrainingCount === 1 ? "" : "s"}</Text></View></View>
       {facilityUpgrade ? <View style={styles.upgradeBox}><View style={styles.line}><View style={styles.flex}><Text style={styles.panelLabel}>FACILITY UPGRADE ACTIVE</Text><Text style={styles.panelTitle}>Training Hall Level {facilityUpgrade.targetLevel}</Text></View><StatusChip label={`DAY ${facilityUpgrade.completionDay}`} tone="gold" /></View><Text style={styles.meta}>{Math.max(0, facilityUpgrade.completionDay - guild.currentDay)} day(s) remaining</Text><MiniMeter value={facilityProgress} max={facilityDuration} color={colors.green} height={8}/><SecondaryButton iconId="calendar" label="OPEN GUILD CALENDAR" onPress={openCalendar}/></View>
@@ -94,14 +100,14 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
     {sessions.length > 0 && <SecondaryButton label="OPEN GUILD CALENDAR" onPress={openCalendar}/>}</>}
 
     {tab==="Train"&&<><SectionTitle>SELECT HERO</SectionTitle>
-    {available.length ? <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.heroRow}>{available.map((entry) => <Pressable key={entry.id} accessibilityRole="button" accessibilityLabel={`Select ${entry.name} for training`} accessibilityState={{ selected: heroId === entry.id }} aria-pressed={heroId === entry.id} onPress={() => setHeroId(entry.id)} style={({pressed})=>pressed&&styles.pressed}><Panel style={[styles.hero, heroId === entry.id && styles.selected, heroId === entry.id && styles.selectedPop]}><Portrait hero={entry} size={58}/><Text style={[styles.heroName, { color: getRaceNameColor(entry.raceId) }]}>{entry.name}</Text><Text style={styles.heroLevel}>LV {entry.level}</Text><Text style={styles.heroMeta}>Readiness {Math.round(entry.adventureStamina)}</Text></Panel></Pressable>)}</ScrollView> : <EmptyState title="No heroes available" message="Heroes who are fallen, away on guild work, or already training cannot begin another program."/>}
+    {available.length ? <Animated.View style={{ opacity: guideTraining && trainingGuideStep === "hero" ? trainingPulse : 1 }}><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.heroRow}>{available.map((entry) => <Pressable key={entry.id} accessibilityRole="button" accessibilityLabel={`Select ${entry.name} for training`} accessibilityState={{ selected: heroId === entry.id }} aria-pressed={heroId === entry.id} onPress={() => { setHeroId(entry.id); if (guideTraining && trainingGuideStep === "hero") setTrainingGuideStep("program"); }} style={({pressed})=>pressed&&styles.pressed}><Panel style={[styles.hero, heroId === entry.id && styles.selected, heroId === entry.id && styles.selectedPop]}><Portrait hero={entry} size={58}/><Text style={[styles.heroName, { color: getRaceNameColor(entry.raceId) }]}>{entry.name}</Text><Text style={styles.heroLevel}>LV {entry.level}</Text><Text style={styles.heroMeta}>Readiness {Math.round(entry.adventureStamina)}</Text></Panel></Pressable>)}</ScrollView></Animated.View> : <EmptyState title="No heroes available" message="Heroes who are fallen, away on guild work, or already training cannot begin another program."/>}
 
     <SectionTitle>CHOOSE PROGRAM</SectionTitle>
-    {Object.values(TRAINING_PROGRAMS).map((entry) => {
+    <Animated.View style={{ opacity: guideTraining && trainingGuideStep === "program" ? trainingPulse : 1 }}>{Object.values(TRAINING_PROGRAMS).map((entry) => {
       const locked = guild.trainingGround.level < entry.trainingGroundLevel;
       const entryQuote = programQuotes.get(entry.id);
-      return <Pressable key={entry.id} accessibilityRole="button" accessibilityLabel={`${entry.name}${locked ? ` · Requires training hall level ${entry.trainingGroundLevel}` : ""}`} accessibilityState={{ selected: programId === entry.id, disabled: locked }} aria-pressed={programId === entry.id} aria-disabled={locked} disabled={locked} onPress={() => setProgramId(entry.id)} style={({pressed})=>pressed&&!locked&&styles.pressed}><Panel style={[styles.program, programId === entry.id && styles.selected, programId === entry.id && styles.selectedPop, locked && styles.locked]}><View style={styles.programHead}><View style={styles.flex}><Text style={styles.programName}>{entry.name}</Text>{programId===entry.id&&<Text style={styles.description}>{entry.description}</Text>}</View><StatusChip label={locked ? `HALL LV ${entry.trainingGroundLevel}` : `${entry.durationDays}D`} tone={locked ? "danger" : programId === entry.id ? "good" : "blue"}/></View><View style={styles.programFooter}><Text style={styles.programStat}>{entryQuote ? `${entryQuote.goldCost}G` : `${getTrainingGoldCost(entry.id)}G`}</Text><Text style={styles.programStat}>{entryQuote ? `+${entryQuote.xpReward} XP` : `BASE ${entry.baseXp} XP`}</Text><Text style={styles.programTag}>XP ONLY</Text></View></Panel></Pressable>;
-    })}
+      return <Pressable key={entry.id} accessibilityRole="button" accessibilityLabel={`${entry.name}${locked ? ` · Requires training hall level ${entry.trainingGroundLevel}` : ""}`} accessibilityState={{ selected: programId === entry.id, disabled: locked }} aria-pressed={programId === entry.id} aria-disabled={locked} disabled={locked} onPress={() => { setProgramId(entry.id); if (guideTraining && trainingGuideStep === "program") setTrainingGuideStep("begin"); }} style={({pressed})=>pressed&&!locked&&styles.pressed}><Panel style={[styles.program, programId === entry.id && styles.selected, programId === entry.id && styles.selectedPop, locked && styles.locked]}><View style={styles.programHead}><View style={styles.flex}><Text style={styles.programName}>{entry.name}</Text>{programId===entry.id&&<Text style={styles.description}>{entry.description}</Text>}</View><StatusChip label={locked ? `HALL LV ${entry.trainingGroundLevel}` : `${entry.durationDays}D`} tone={locked ? "danger" : programId === entry.id ? "good" : "blue"}/></View><View style={styles.programFooter}><Text style={styles.programStat}>{entryQuote ? `${entryQuote.goldCost}G` : `${getTrainingGoldCost(entry.id)}G`}</Text><Text style={styles.programStat}>{entryQuote ? `+${entryQuote.xpReward} XP` : `BASE ${entry.baseXp} XP`}</Text><Text style={styles.programTag}>XP ONLY</Text></View></Panel></Pressable>;
+    })}</Animated.View>
 
     {hero && quote ? <>
       <SectionTitle>TRAINING ORDER</SectionTitle>
@@ -114,7 +120,7 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
         <View style={styles.capBox}><Text style={styles.cap}>TRAINING CAP · LEVEL {quote.levelCap}</Text><Text style={styles.capDetail}>Training can catch this hero toward the campaign and strongest-roster limit, but cannot overtake current progression.</Text></View>
         {quote.blockers.map((blocker) => <Text key={blocker.id} style={[styles.blocker, blocker.tone === "danger" && styles.danger]}>• {blocker.label}</Text>)}
         <Text style={styles.quoteNote}>Daily calendar recovery still applies while training, so readiness can improve before the hero returns. Training never grants permanent attributes.</Text>
-        <ActionButton guardMs={600} iconId="training" label={quote.canBegin ? `BEGIN ${program.name.toUpperCase()} · READY DAY ${quote.completionDay}` : "TRAINING REQUIREMENTS NOT MET"} disabled={!quote.canBegin} onPress={begin}/>
+        <Animated.View style={{ opacity: guideTraining && trainingGuideStep === "begin" ? trainingPulse : 1 }}><ActionButton guardMs={600} iconId="training" label={quote.canBegin ? `BEGIN ${program.name.toUpperCase()} · READY DAY ${quote.completionDay}` : "TRAINING REQUIREMENTS NOT MET"} disabled={!quote.canBegin} onPress={begin}/></Animated.View>
       </Panel>
     </> : null}</>}
   </ScrollView>;
@@ -128,10 +134,6 @@ const styles = StyleSheet.create({
   title: { color: colors.text, fontSize: 26, fontWeight: "900", marginTop: 2 },
   day: { color: colors.gold, fontSize: 10, fontWeight: "800", marginTop: 3 },
   intro: { color: colors.muted, lineHeight: 20, marginVertical: 11 },
-  tutorial: { borderColor: colors.blue, gap: 7, marginBottom: 11 },
-  tutorialLabel: { color: colors.blue, fontSize: 11, fontWeight: "900", letterSpacing: .8 },
-  tutorialTitle: { color: colors.text, fontSize: 17, fontWeight: "900" },
-  tutorialText: { color: colors.muted, fontSize: 11, lineHeight: 17 },
   facility: { borderColor: colors.gold, gap: 9 },
   facilityHead: { alignItems: "center", flexDirection: "row", gap: 10 },
   levelPlate: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.gold, borderWidth: 0, borderRadius: 10, minWidth: 78, padding: 8 },

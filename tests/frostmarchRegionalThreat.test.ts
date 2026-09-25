@@ -10,7 +10,6 @@ import { QUEST_OUTCOME_NARRATIVES } from "../src/data/quests/questOutcomeNarrati
 import { QUESTS } from "../src/data/quests/quests";
 import { LORE_ENTRIES } from "../src/data/world/lore";
 import { REGIONS } from "../src/data/world/regions";
-import { completeCampaignNode } from "../src/game/campaign/campaignService";
 import { isQuestAvailable } from "../src/game/quests/questAvailability";
 import { createQuestEncounter } from "../src/game/quests/encounterFactory";
 import { advanceRegionalThreats, getRegionThreatEffects, resolveRegionalThreatForQuest, unlockRegionalThreats } from "../src/game/world/regionalThreatService";
@@ -19,25 +18,30 @@ import type { WorldState } from "../src/game/world/worldTypes";
 import { createSeededRandom } from "../src/utils/random";
 
 describe("The Aurora That Fell regional crisis", () => {
-  it("branches from Chapter 2 and opens Frostmarch after Voices Under Stone", () => {
-    const node = CHAPTER_2_NODES.voices_under_stone!;
-    expect(node.unlockRegionIds).toContain("frostmarch");
-    expect(node.setWorldFlags).toMatchObject({ frostmarch_aurora_crisis: true });
-    expect(CHAPTER_2.sideQuestIds).toContain("the_aurora_that_fell");
+  it("foreshadows Frostmarch in Chapter 2, then stages the crisis after the Chapter 3 introduction", () => {
+    const voices = CHAPTER_2_NODES.voices_under_stone!;
+    expect(voices.unlockRegionIds ?? []).not.toContain("frostmarch");
+    expect(voices.setWorldFlags).toMatchObject({ frostmarch_aurora_crisis: true });
+    expect(CHAPTER_2.sideQuestIds).not.toContain("the_aurora_that_fell");
+    expect(CHAPTER_2_NODES.hollow_warden_boss?.unlockRegionIds).toContain("frostmarch");
 
-    const prepared = {
+    const chapterThreeOpening = {
       ...createWorldState(),
-      campaignChapter: 2,
-      completedCampaignNodeIds: ["broken_wardstone", "council_of_splinters", "road_of_broken_carts"],
+      campaignChapter: 3,
+      unlockedRegionIds: ["greenveil", "iron_hills", "shadowfen", "frostmarch"],
+      completedCampaignNodeIds: ["hollow_warden_boss"],
+      worldFlags: { frostmarch_aurora_crisis: true },
     };
-    const result = completeCampaignNode(prepared, "voices_under_stone").worldState;
-    expect(result.unlockedRegionIds).toContain("frostmarch");
-    expect(isQuestAvailable(QUESTS.the_aurora_that_fell!, result)).toBe(true);
+    expect(isQuestAvailable(QUESTS.the_aurora_that_fell!, chapterThreeOpening)).toBe(false);
+    expect(isQuestAvailable(QUESTS.the_aurora_that_fell!, {
+      ...chapterThreeOpening,
+      completedCampaignNodeIds: [...chapterThreeOpening.completedCampaignNodeIds, "northwatch_two_skies"],
+    })).toBe(true);
   });
 
   it("connects three D20 stages, two unique warfront maps, encounters, loot, lore, and dialogue", () => {
     const quest = QUESTS.the_aurora_that_fell!;
-    expect(quest).toMatchObject({ regionId: "frostmarch", campaignChapter: 2, minPartySize: 4, maxPartySize: 4 });
+    expect(quest).toMatchObject({ regionId: "frostmarch", campaignChapter: 3, minPartySize: 4, maxPartySize: 4 });
     expect(quest.explorationStageIds).toHaveLength(3);
     expect(quest.explorationStageIds!.map((id) => QUEST_EXPLORATION_STAGES[id]!.attribute)).toEqual(["intelligence", "charisma", "constitution"]);
     expect(quest.explorationStageIds!.map((id) => QUEST_EXPLORATION_STAGES[id]!.difficultyClass)).toEqual([14, 15, 16]);

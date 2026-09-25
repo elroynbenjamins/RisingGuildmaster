@@ -2,7 +2,6 @@ import { CLASS_SKILL_TREES } from "../../data/skills/classSkillTrees";
 import { HERO_SKILLS } from "../../data/skills/heroSkills";
 import { QUESTS } from "../../data/quests/quests";
 import { EQUIPMENT } from "../../data/equipment/equipment";
-import { CLASSES } from "../../data/classes/classes";
 import { GAME_CONFIG } from "../../config/gameConfig";
 import type { RandomSource } from "../../utils/random";
 import { createSeededRandom } from "../../utils/random";
@@ -36,7 +35,6 @@ const SIMULATION_EQUIPMENT_SLOTS: readonly EquipmentSlot[] = ["weapon", "armor",
 
 function basicProgressionEquipment(hero: Hero): Hero["equipment"] {
   const maximumItemLevel = Math.max(1, hero.level - 1);
-  const classDefinition = CLASSES[hero.classId];
   const equipment = { ...hero.equipment };
   for (const slot of SIMULATION_EQUIPMENT_SLOTS) {
     const candidates = Object.values(EQUIPMENT)
@@ -48,11 +46,8 @@ function basicProgressionEquipment(hero: Hero): Hero["equipment"] {
       .sort((a, b) => {
         const aClassFit = a.classRestrictions.includes(hero.classId) ? 1 : 0;
         const bClassFit = b.classRestrictions.includes(hero.classId) ? 1 : 0;
-        const aPriority = a.modifiers.filter((modifier) => classDefinition.favoredAttributeIds.includes(modifier.target as never)).length;
-        const bPriority = b.modifiers.filter((modifier) => classDefinition.favoredAttributeIds.includes(modifier.target as never)).length;
         return b.levelRequirement - a.levelRequirement
           || bClassFit - aClassFit
-          || bPriority - aPriority
           || b.value - a.value
           || a.id.localeCompare(b.id);
       });

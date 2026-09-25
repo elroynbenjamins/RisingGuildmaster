@@ -69,6 +69,25 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter3-hroth")!.winRate).toBeGreaterThanOrEqual(.50);
   }, 120_000);
 
+  it("reports a realistic partially geared Chapter-3 progression party", () => {
+    const scenarios = [
+      { id: "realistic-blue-horns", questId: "night_of_blue_horns", heroLevel: 5, seed: 6725 },
+      { id: "realistic-hroth", questId: "hroth_iceblood_boss", heroLevel: 5, seed: 6825 },
+      { id: "realistic-glimmerlake", questId: "beneath_glimmerlake", heroLevel: 6, seed: 6975 },
+      { id: "realistic-vaelith", questId: "vaelith_pale_echo_boss", heroLevel: 6, seed: 7025 },
+    ].map((entry) => simulateCombatScenario({
+      ...entry,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 8,
+      gearProfile: "basic",
+    }));
+    console.table(scenarios);
+    expect(scenarios.every((result) => result.stalled === 0)).toBe(true);
+    expect(scenarios.every((result) => result.winRate > 0)).toBe(true);
+    expect(scenarios.find((result) => result.scenarioId === "realistic-glimmerlake")!.winRate).toBeLessThan(1);
+  }, 150_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

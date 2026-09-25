@@ -12,6 +12,9 @@ export interface CampaignLevelGuidance {
   nextQuestId: string;
   nextQuestName: string;
   sideQuestIds: string[];
+  recommendedSideQuestId?: string;
+  recommendedSideQuestName?: string;
+  levelsShort: number;
 }
 
 /** Average of the four strongest heroes, or the entire roster while it is smaller than four. */
@@ -70,5 +73,6 @@ export function getCampaignLevelGuidance(guild: GuildState): CampaignLevelGuidan
     })
     .map((quest) => quest.id);
 
-  return { averageLevel, targetLevel, nextQuestId: nextQuest.id, nextQuestName: nextQuest.name, sideQuestIds };
+  const recommendedSideQuest = sideQuestIds.length ? QUESTS[sideQuestIds[0]!] : undefined;
+  return { averageLevel, targetLevel, nextQuestId: nextQuest.id, nextQuestName: nextQuest.name, sideQuestIds, recommendedSideQuestId: recommendedSideQuest?.id, recommendedSideQuestName: recommendedSideQuest?.name, levelsShort: Math.max(0, targetLevel - averageLevel) };
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyCampaignChoiceToGuild, getChieftainChoiceEcho } from "../src/game/campaign/campaignChoiceResolver";
+import { applyCampaignChoiceToGuild, getChieftainChoiceEcho, getGhorakChoiceEcho } from "../src/game/campaign/campaignChoiceResolver";
 import { createGuild } from "../src/game/guild/guildService";
 
 describe("Goblin Chieftain campaign consequences", () => {
@@ -46,5 +46,32 @@ describe("Goblin Chieftain campaign consequences", () => {
       chieftain_interrogation_recorded: true,
     });
     expect(getChieftainChoiceEcho(result.world)?.title).toContain("Interrogation");
+  });
+});
+
+describe("Ghorak campaign consequences", () => {
+  it("uses alliance as the reputation and guided-expedition path", () => {
+    const guild = createGuild();
+    const result = applyCampaignChoiceToGuild(guild, "free_ghoraks_clan");
+    expect(result.reputation).toBe(guild.reputation + 6);
+    expect(result.world.worldFlags).toMatchObject({ ghorak_allied: true, orc_clans_respected: true, ghorak_guide_unused: true });
+    expect(getGhorakChoiceEcho(result.world)?.title).toContain("Oath");
+  });
+
+  it("uses trial as the Guildmaster progression path", () => {
+    const guild = createGuild();
+    const result = applyCampaignChoiceToGuild(guild, "bind_ghorak_to_trial");
+    expect(result.guildmaster).toMatchObject({ level: 1, xp: 75, skillPoints: 0 });
+    expect(result.world.worldFlags).toMatchObject({ ghorak_imprisoned: true, ghorak_trial_recorded: true });
+    expect(getGhorakChoiceEcho(result.world)?.title).toContain("Stonegate");
+  });
+
+  it("uses banishment as the immediate forge-material path", () => {
+    const guild = createGuild();
+    const result = applyCampaignChoiceToGuild(guild, "banish_ghorak");
+    expect(result.materials.iron_ore).toBe(guild.materials.iron_ore + 6);
+    expect(result.materials.coal).toBe(guild.materials.coal + 4);
+    expect(result.world.worldFlags).toMatchObject({ ghorak_banished: true, ghorak_supplies_reclaimed: true });
+    expect(getGhorakChoiceEcho(result.world)?.title).toContain("Flintwatch");
   });
 });

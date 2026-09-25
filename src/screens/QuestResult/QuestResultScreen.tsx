@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { ActionButton, Panel, SecondaryButton, SectionTitle, colors } from "../../components/ui";
+import { ActionButton, Panel, SectionTitle, colors } from "../../components/ui";
 import { CAMPAIGN_CHOICES } from "../../data/campaign/campaignChoices";
 import { CAMPAIGN_CHOICE_OUTCOMES } from "../../data/quests/questOutcomeNarratives";
 import { QUESTS } from "../../data/quests/quests";
@@ -26,12 +26,24 @@ export function QuestResultScreen({ summary, choiceIds = [], onChoice, onContinu
   const [campExpanded, setCampExpanded] = useState(false);
   const choiceResolvingRef = useRef(false);
   const reveal = useRef(new Animated.Value(0)).current;
+  const onboardingPulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     Animated.spring(reveal, { toValue: 1, friction: 7, tension: 70, useNativeDriver: true }).start();
   }, [reveal]);
   const quest = QUESTS[summary.questId]!; const victory = summary.status === "victory"; const pendingChoice = victory && choiceIds.length > 0 && !summary.selectedChoiceId; const debrief = getQuestDialogue(summary.questId)[victory ? "victory" : "defeat"];
+  const guideFirstResult = summary.questId === "guildhaven_cellar_slimes" && guild.tutorial.completed && guild.tutorial.freeRefreshUsed && victory && !pendingChoice;
+  useEffect(() => {
+    if (!guideFirstResult) { onboardingPulse.setValue(1); return; }
+    const animation = Animated.loop(Animated.sequence([
+      Animated.timing(onboardingPulse, { toValue: .45, duration: 650, useNativeDriver: true }),
+      Animated.timing(onboardingPulse, { toValue: 1, duration: 650, useNativeDriver: true }),
+    ]));
+    animation.start();
+    return () => animation.stop();
+  }, [guideFirstResult, onboardingPulse]);
   const chooseCampaignOutcome=(choiceId:string)=>{if(choiceResolvingRef.current)return;choiceResolvingRef.current=true;const accepted=onChoice?.(choiceId);if(accepted===false)choiceResolvingRef.current=false;};
-  const managementActions = getPostBattleManagementActions(summary, guild);
+  const managementActions = guideFirstResult ? [] : getPostBattleManagementActions(summary, guild);
+  const primaryManagementAction = managementActions[0];
   const followAction = (action: PostBattleManagementAction) => {
     updateGuild(markPostBattleGuidanceSeen(guild, action.id));
     if (action.id === "recovery") openTemple();
@@ -51,8 +63,8 @@ export function QuestResultScreen({ summary, choiceIds = [], onChoice, onContinu
     {summary.chronicle.relationshipChanges.length > 0 && <><CollapsibleResultHeader title="Party Bonds" count={summary.chronicle.relationshipChanges.length} expanded={partyBondsExpanded} onPress={() => setPartyBondsExpanded((value) => !value)} />{partyBondsExpanded && <Panel style={styles.consequences}>{summary.chronicle.relationshipChanges.map((change) => <View key={`${change.heroIdA}-${change.heroIdB}`} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 4 }}><View style={styles.flex}><Text style={{ color: colors.text, fontWeight: "900" }}>{change.heroNameA} &amp; {change.heroNameB}</Text><Text style={styles.momentDescription}>{change.reason}</Text></View><View style={{ alignItems: "flex-end", minWidth: 72 }}><Text style={change.delta >= 0 ? styles.good : styles.injury}>{change.delta >= 0 ? "+" : ""}{change.delta}</Text><Text style={{ color: colors.muted, fontSize: 8, fontWeight: "900", marginTop: 2 }}>{formatGameIdUpper(change.newBand)}</Text></View></View>)}</Panel>}</>}
     {summary.chronicle.campConversation && <><CollapsibleResultHeader title="Campfire Scene" count={1} expanded={campExpanded} onPress={() => setCampExpanded((value) => !value)} />{campExpanded&&<Panel style={styles.camp}><View style={styles.campHeroes}>{[summary.chronicle.campConversation.heroIdA,summary.chronicle.campConversation.heroIdB].map((heroId)=>{const hero=summary.heroOutcomes.find((entry)=>entry.heroId===heroId);return hero?<HeroPortrait key={heroId} raceId={hero.raceId} classId={hero.classId} gender={hero.gender} variant={hero.portraitVariant} label={hero.name} size={54}/>:null;})}<View style={styles.flex}><Text style={styles.campTitle}>{summary.chronicle.campConversation.title}</Text><Text style={styles.momentDescription}>{summary.chronicle.campConversation.heroNameA} &amp; {summary.chronicle.campConversation.heroNameB} · bond {summary.chronicle.campConversation.relationshipDelta>=0?"+":""}{summary.chronicle.campConversation.relationshipDelta}</Text></View></View>{summary.chronicle.campConversation.lines.map((line,index)=><View key={`${line.speaker}-${index}`} style={styles.campLine}><Text style={styles.campSpeaker}>{line.speaker}</Text><Text style={styles.campText}>“{line.text}”</Text></View>)}</Panel>}</>}
     {pendingChoice && <><SectionTitle>POST-BATTLE DECISION</SectionTitle><Text style={styles.decisionIntro}>This decision will be remembered and may change future quests, dialogue, and faction relations.</Text>{choiceIds.map((choiceId) => <Pressable accessibilityRole="button" key={choiceId} onPress={() => chooseCampaignOutcome(choiceId)} style={({pressed})=>[styles.choice,pressed&&styles.choicePressed]}><Text style={styles.choiceText}>{CAMPAIGN_CHOICES[choiceId]?.text ?? choiceId}</Text><Text style={styles.choiceArrow}>›</Text></Pressable>)}</>}
-    {!pendingChoice && managementActions.length > 0 && <><SectionTitle>NEXT ORDER</SectionTitle><Panel style={managementStyles.panel}><Text style={managementStyles.title}>Recommended Follow-up</Text><Text style={managementStyles.intro}>Resolve the most important consequence now, or continue and handle it later from the Guild Hall.</Text>{managementActions.map((action, index) => <View key={action.id} style={[managementStyles.action, index === 0 && managementStyles.primaryAction]}><View style={managementStyles.copy}><View style={managementStyles.heading}>{index === 0 && <Text style={managementStyles.recommended}>RECOMMENDED</Text>}{action.isNew && <Text style={managementStyles.newLesson}>FIRST-TIME GUIDE</Text>}<Text style={[managementStyles.actionTitle, index === 0 && managementStyles.primaryTitle]}>{action.title}</Text></View><Text style={managementStyles.text}>{action.description}</Text></View><View style={managementStyles.button}>{index === 0 ? <ActionButton label={action.actionLabel} onPress={() => followAction(action)} /> : <SecondaryButton label={action.actionLabel} onPress={() => followAction(action)} />}</View></View>)}</Panel></>}
-    {!pendingChoice && <View style={styles.continue}><ActionButton guardMs={700} label={continueLabel ?? (summary.campaignNodeId ? "Continue Campaign" : "Return to Guild")} onPress={onContinue} /></View>}
+    {!pendingChoice && primaryManagementAction && <><SectionTitle>NEXT ORDER</SectionTitle><Panel style={managementStyles.panel}><Text style={managementStyles.title}>Recommended Follow-up</Text><View style={[managementStyles.action, managementStyles.primaryAction]}><View style={managementStyles.copy}><View style={managementStyles.heading}><Text style={managementStyles.recommended}>RECOMMENDED</Text>{primaryManagementAction.isNew && <Text style={managementStyles.newLesson}>FIRST-TIME GUIDE</Text>}<Text style={[managementStyles.actionTitle, managementStyles.primaryTitle]}>{primaryManagementAction.title}</Text></View><Text style={managementStyles.text}>{primaryManagementAction.description}</Text></View><View style={managementStyles.button}><ActionButton label={primaryManagementAction.actionLabel} onPress={() => followAction(primaryManagementAction)} /></View></View></Panel></>}
+    {!pendingChoice && <Animated.View style={[styles.continue, { opacity: guideFirstResult ? onboardingPulse : 1 }]}><ActionButton guardMs={700} label={continueLabel ?? (summary.campaignNodeId ? "Continue Campaign" : "Return to Guild")} onPress={onContinue} /></Animated.View>}
   </ScrollView>;
 }
 

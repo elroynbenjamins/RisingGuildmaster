@@ -65,6 +65,15 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter3-vaelith")!.averageSurvivingHeroes).toBeGreaterThan(3);
   }, 120_000);
 
+  it("probes Chapter 3 boss pressure with realistic lagged gear", () => {
+    const results = [
+      simulateCombatScenario({ id: "chapter3-hroth-pressure", questId: "hroth_iceblood_boss", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"], difficultyId: "standard", runs: 20, seed: 7800, gearProfile: "lagged_basic" }),
+      simulateCombatScenario({ id: "chapter3-vaelith-pressure", questId: "vaelith_pale_echo_boss", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"], difficultyId: "standard", runs: 20, seed: 7900, gearProfile: "lagged_basic" }),
+    ];
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+  }, 120_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

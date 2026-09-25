@@ -30,7 +30,7 @@ export interface CombatSimulationResult { scenarioId: string; wins: number; loss
 export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
 export interface EconomySimulationResult { scenarioId: string; startingGold: number; endingGold: number; netGold: number; questIncome: number; tavernIncome: number; salaryPaid: number; fieldExpenses: number; arrears: number; breakEvenQuestsPerWeek: number; goldAfterFacilityReserve: number }
 
-const SIMULATION_EQUIPMENT_SLOTS: EquipmentSlot[] = ["weapon", "armor", "helmet", "boots", "accessory1", "accessory2"];
+const SIMULATION_EQUIPMENT_SLOTS: EquipmentSlot[] = ["weapon", "armor", "helmet", "boots"];
 
 function basicSimulationGear(hero: Hero): Hero {
   const gearLevelCap = Math.max(1, hero.level - 2);
@@ -57,7 +57,7 @@ function levelHero(hero: Hero, level: number, index: number): Hero {
   return { ...leveled, learnedSkillIds };
 }
 
-export function createSimulationParty(classes: readonly ClassId[], level: number, seed: number, gearProfile: SimulationGearProfile = "basic"): Hero[] {
+export function createSimulationParty(classes: readonly ClassId[], level: number, seed: number, gearProfile: SimulationGearProfile = "none"): Hero[] {
   return classes.map((classId, index) => {
     const leveled = levelHero({ ...generateHero(createSeededRandom(seed + index * 97)), id: `sim-${seed}-${index}`, classId }, level, index);
     return gearProfile === "basic" ? basicSimulationGear(leveled) : leveled;
@@ -111,7 +111,7 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
   let wins = 0, losses = 0, stalled = 0, rounds = 0, survivors = 0, hpRatios = 0;
   for (let run = 0; run < scenario.runs; run++) {
     const random = createSeededRandom(scenario.seed + run * 7919);
-    const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "basic");
+    const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "none");
     let carried = undefined; let final: CombatState | undefined;
     for (let encounterIndex = 0; encounterIndex < QUESTS[scenario.questId]!.encounterIds.length; encounterIndex++) {
       final = autoplayEncounter(createCombatState(scenario.questId, encounterIndex, heroes, random, carried, undefined, [], scenario.difficultyId), random);

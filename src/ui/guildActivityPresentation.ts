@@ -1,7 +1,7 @@
 import type { GameIconId } from "../data/ui/gameIcons";
 import type { GuildState } from "../game/guild/types";
 
-export type GuildActivityDestination = "training" | "gathering" | "recruitment" | "dungeon";
+export type GuildActivityDestination = "training" | "gathering" | "recruitment" | "dungeon" | "crafting";
 export type GuildActivityTone = "active" | "ready" | "warning";
 
 export interface GuildActivityItem {
@@ -68,6 +68,23 @@ export function getGuildActivities(guild: GuildState): GuildActivityItem[] {
       iconId: "scouting",
       tone: days <= 0 ? "ready" : "active",
       sortWeight: days <= 0 ? 95 : 35,
+    });
+  }
+
+  const workshopProjects = (Object.entries(guild.artisans) as [keyof typeof guild.artisans, (typeof guild.artisans)[keyof typeof guild.artisans]][])
+    .filter(([, state]) => Boolean(state.construction));
+  if (workshopProjects.length) {
+    const next = Math.min(...workshopProjects.map(([, state]) => state.construction!.completionDay));
+    const days = Math.max(0, next - guild.currentDay);
+    const firstType = workshopProjects[0]![0];
+    items.push({
+      id: "workshop",
+      label: `WORKSHOP · ${workshopProjects.length}`,
+      detail: dayText(days),
+      destination: "crafting",
+      iconId: firstType === "blacksmith" ? "blacksmith" : firstType === "tailor" ? "tailor" : "jeweler",
+      tone: days <= 0 ? "ready" : "active",
+      sortWeight: days <= 0 ? 92 : 42,
     });
   }
 

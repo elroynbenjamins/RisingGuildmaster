@@ -13,7 +13,7 @@ describe("Chapter 3 Frostmarch campaign", () => {
     expect(CHAPTER_3.sideQuestIds).toEqual(["the_aurora_that_fell", "the_last_guestfire", "bells_beneath_glimmerlake"]);
     CHAPTER_3.nodeIds.forEach((id, index) => expect(CHAPTER_3_NODES[id]?.prerequisiteNodeIds).toEqual(index ? [CHAPTER_3.nodeIds[index - 1]] : ["hollow_warden_boss"]));
     CHAPTER_3.sideQuestIds!.forEach((id) => expect(QUESTS[id]).toMatchObject({ questType: "side", regionId: "frostmarch", minPartySize: 4 }));
-    expect(QUESTS.the_aurora_that_fell).toMatchObject({ campaignChapter: 3, prerequisiteCampaignNodeIds: ["hollow_warden_boss"] });
+    expect(QUESTS.the_aurora_that_fell).toMatchObject({ campaignChapter: 3, prerequisiteCampaignNodeIds: ["northwatch_two_skies"] });
   });
   it("builds Northwatch as a three-wave warfront defense", () => {
     expect(QUESTS.night_of_blue_horns?.encounterIds).toEqual(["northwatch_wall_wave_one", "northwatch_wall_wave_two", "northwatch_wall_wave_three"]);

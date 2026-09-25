@@ -102,6 +102,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
   }, [state.combatStarted, state.status, state.awaitingHeroId, state.turnCursor, state.round, guild.uiPreferences.enemyTurnSpeed]);
   const combatTutorialStep = getCombatTutorialStep(guild);
   const combatTutorialPulse = useRef(new Animated.Value(1)).current;
+  const firstRewardPulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     if (!state.combatStarted || state.status !== "active" || combatTutorialStep === "complete") { combatTutorialPulse.setValue(1); return; }
     const animation = Animated.loop(Animated.sequence([
@@ -112,6 +113,16 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
     return () => animation.stop();
   }, [combatTutorialPulse, combatTutorialStep, state.combatStarted, state.status]);
   useEffect(() => { if (state.status === "victory" && combatTutorialStep === "end_turn") updateGuild((currentGuild)=>recordCombatTutorialAction(currentGuild,"ended_turn")); }, [state.status, combatTutorialStep, updateGuild]);
+  const guideFirstReward = questId === "guildhaven_cellar_slimes" && guild.tutorial.completed && guild.tutorial.freeRefreshUsed && state.status === "victory";
+  useEffect(() => {
+    if (!guideFirstReward) { firstRewardPulse.setValue(1); return; }
+    const animation = Animated.loop(Animated.sequence([
+      Animated.timing(firstRewardPulse, { toValue: .45, duration: 650, useNativeDriver: true }),
+      Animated.timing(firstRewardPulse, { toValue: 1, duration: 650, useNativeDriver: true }),
+    ]));
+    animation.start();
+    return () => animation.stop();
+  }, [firstRewardPulse, guideFirstReward]);
   const currentMovementRange = current ? getEffectiveMovementRange(current.unit) : 0;
   const reachableKeys = useMemo(() => new Set(current && !state.actions.movementUsed ? getReachablePositions(state.board, current.unit.position, currentMovementRange, current.unit.ignoredTerrainMovementCosts).map(positionKey) : []), [current, currentMovementRange, state.actions.movementUsed, state.board]);
   const selectedPositionOccupied = Boolean(selectedPosition && units.some((unit) => unit.isAlive && positionKey(unit.position) === positionKey(selectedPosition)));
@@ -190,7 +201,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
       {selectedPosition && selectedSkillId && <ActionButton label={`Confirm ${HERO_SKILLS[selectedSkillId]!.name}`} onPress={confirmSkill} />}
       <Text style={styles.hint}>{mode === "skill" ? "Your selected skill stays queued after movement. Double tap an empty teal tile to move, then choose a highlighted target." : state.actions.movementUsed ? "Movement used. Choose a skill or end the turn." : "Highlighted tiles are reachable. Double tap one to move, or choose a skill."}</Text></>}
     {error && <Text style={styles.error}>{error}</Text>}
-    {state.status === "victory" && <Panel style={styles.result}><Text style={styles.victory}>Encounter Victory</Text>{lastEncounter ? <ActionButton guardMs={900} label="Claim Rewards" onPress={() => onQuestEnd("victory", state.heroes.map((item) => item.instance))} /> : <ActionButton guardMs={700} label="Continue Quest" onPress={continueQuest} />}</Panel>}
+    {state.status === "victory" && <Panel style={styles.result}><Text style={styles.victory}>Encounter Victory</Text>{lastEncounter ? <Animated.View style={{ width: "100%", opacity: guideFirstReward ? firstRewardPulse : 1 }}><ActionButton guardMs={900} label="Claim Rewards" onPress={() => onQuestEnd("victory", state.heroes.map((item) => item.instance))} /></Animated.View> : <ActionButton guardMs={700} label="Continue Quest" onPress={continueQuest} />}</Panel>}
     {state.status === "defeat" && <Panel style={styles.result}><Text style={styles.errorTitle}>Party Defeated</Text><ActionButton guardMs={900} label="Return to Guild" onPress={() => onQuestEnd("defeat", state.heroes.map((item) => item.instance))} /></Panel>}
     <Pressable accessibilityRole="button" accessibilityState={{expanded:showCombatants}} onPress={()=>setShowCombatants((value)=>!value)} style={styles.collapsibleHeader}><Text style={styles.collapsibleTitle}>ENEMY DETAILS · {state.enemies.filter((entry)=>entry.instance.isAlive).length} ALIVE</Text><Text style={styles.collapsibleSymbol}>{showCombatants?"−":"+"}</Text></Pressable>{showCombatants&&state.enemies.map(({ instance,unit }) => <Text key={instance.instanceId} style={[styles.unitLine, !instance.isAlive && styles.dead]}>{getEnemyDefinition(instance.enemyDefinitionId).name}: {Math.round(instance.currentHP)}/{Math.round(instance.maxHP)} HP · <Text style={styles.physicalInline}>P {Math.round(unit.stats.physicalDamage)}/{Math.round(unit.stats.physicalDefense)}</Text> · <Text style={styles.magicInline}>M {Math.round(unit.stats.magicDamage)}/{Math.round(unit.stats.magicDefense)}</Text></Text>)}
     <Pressable accessibilityRole="button" accessibilityState={{expanded:showCombatLog}} onPress={()=>setShowCombatLog((value)=>!value)} style={styles.collapsibleHeader}><Text style={styles.collapsibleTitle}>COMBAT LOG · {state.log.length} EVENTS</Text><Text style={styles.collapsibleSymbol}>{showCombatLog?"−":"+"}</Text></Pressable>{showCombatLog&&<Panel>{state.log.slice(-10).map((entry, index) => <Text key={`${entry.turn}-${index}`} style={styles.log}>{entry.message}</Text>)}{!state.log.length && <Text style={styles.detail}>Combat begins…</Text>}</Panel>}

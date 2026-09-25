@@ -5,6 +5,8 @@ import { QUEST_ENCOUNTERS } from "../src/data/encounters/questEncounters";
 import { ENEMIES } from "../src/data/enemies";
 import { ENEMY_PORTRAITS } from "../src/data/enemies/enemyPortraits";
 import { QUESTS } from "../src/data/quests/quests";
+import { QUEST_LOOT_TABLES } from "../src/data/loot/questLootTables";
+import { EQUIPMENT } from "../src/data/equipment/equipment";
 import { getSkillIconArt } from "../src/data/skills/skillArt";
 
 describe("Chapter 3 Frostmarch campaign", () => {
@@ -24,6 +26,12 @@ describe("Chapter 3 Frostmarch campaign", () => {
     expect(QUEST_ENCOUNTERS.northwatch_wall_wave_two?.enemies.reduce((sum, group) => sum + group.count, 0)).toBe(4);
     expect(QUEST_ENCOUNTERS.northwatch_wall_wave_three?.enemies.reduce((sum, group) => sum + group.count, 0)).toBe(5);
   });
+  it("starts Frostmarch with Level-5 equipment choices across multiple roles", () => {
+    const ids = QUEST_LOOT_TABLES.frostmarch_campaign_loot!.itemIds;
+    expect(ids).toEqual(expect.arrayContaining(["wardplate", "spellweaver-hood", "wardmarch-boots", "sapphire-ward-ring"]));
+    expect(ids.every((id) => EQUIPMENT[id]?.levelRequirement === 5)).toBe(true);
+  });
+
   it("defeats an echo rather than killing a true frost drake", () => {
     expect(ENEMIES.vaelith_pale_echo?.name).toContain("Echo");
     expect(CHAPTER_3_NODES.vaelith_boss?.setWorldFlags).toMatchObject({ vaelith_echo_broken: true, vaelith_freed: true });

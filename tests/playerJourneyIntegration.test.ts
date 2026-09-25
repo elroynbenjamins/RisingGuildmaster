@@ -79,6 +79,21 @@ describe("end-to-end player journey guarantees", () => {
     expect(profile.unlockedSkillIds).toEqual(expect.arrayContaining(["workshop_planning", "forge_charter"]));
   });
 
+
+  it("hands a workshop charter into construction and the first craft", () => {
+    const guild = chapterOneGuild(6, 3);
+    guild.guildmaster = { level: 3, xp: 0, skillPoints: 0, unlockedSkillIds: ["workshop_planning", "forge_charter"] };
+    expect(getGuildCommandOrders(guild).map((order) => order.id)).toContain("workshop_construction_ready");
+
+    guild.artisans.blacksmith = { level: 1, recruited: true, construction: null };
+    guild.materials.iron_ore = 5;
+    guild.materials.coal = 2;
+    guild.materials.oak_timber = 1;
+    const orders = getGuildCommandOrders(guild);
+    expect(orders.map((order) => order.id)).toContain("first_craft_ready");
+    expect(orders.find((order) => order.id === "first_craft_ready")?.destination).toBe("crafting");
+  });
+
   it("keeps a first early-game death recoverable with the starting Temple economy", () => {
     const guild = createGuild();
     expect(hasLocalHealingService(guild.world)).toBe(true);

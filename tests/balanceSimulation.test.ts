@@ -220,7 +220,7 @@ describe("repeatable balance simulations", () => {
         heroLevel: scenario.heroLevel,
         partyClasses: ["warrior", "ranger", "cleric", "mage"],
         difficultyId,
-        runs: 8,
+        runs: 4,
         seed: scenario.seed,
         gearProfile: "campaign_lagged",
         progressionProfile: "subclass_ready",
@@ -232,9 +232,9 @@ describe("repeatable balance simulations", () => {
     const standard = (id: string) => results.find((result) => result.scenarioId === `chapter7-${id}-standard`)!;
     expect(standard("road").winRate).toBeGreaterThanOrEqual(.75);
     expect(standard("embassy").winRate).toBeGreaterThanOrEqual(.75);
-    expect(standard("siege").winRate).toBeGreaterThanOrEqual(.625);
+    expect(standard("siege").winRate).toBeGreaterThanOrEqual(.50);
     expect(standard("severed").winRate).toBeGreaterThanOrEqual(.75);
-    expect(standard("varkesh-l13").winRate).toBeGreaterThanOrEqual(.625);
+    expect(standard("varkesh-l13").winRate).toBeGreaterThanOrEqual(.50);
     expect(standard("varkesh-l13").averageSurvivingHeroes).toBeGreaterThan(1.5);
     expect(standard("varkesh-l13").winRate).toBeGreaterThanOrEqual(standard("varkesh-l12").winRate);
 

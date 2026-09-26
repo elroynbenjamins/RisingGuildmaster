@@ -31,7 +31,7 @@ import type { EquipmentSlot } from "../heroes/types";
 export type SimulationGearProfile = "starter" | "lagged_basic";
 export type SimulationProgressionProfile = "base" | "subclass_ready";
 export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile }
-export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; averageRounds: number; averageSurvivingHeroes: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
+export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; heroFallRate: number; averageRounds: number; averageSurvivingHeroes: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
 export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
 export interface EconomySimulationResult { scenarioId: string; startingGold: number; endingGold: number; netGold: number; questIncome: number; tavernIncome: number; salaryPaid: number; fieldExpenses: number; arrears: number; breakEvenQuestsPerWeek: number; goldAfterFacilityReserve: number }
 
@@ -126,7 +126,7 @@ function autoplayEncounter(initial: CombatState, random: RandomSource): CombatSt
 }
 
 export function simulateCombatScenario(scenario: CombatSimulationScenario): CombatSimulationResult {
-  let wins = 0, losses = 0, stalled = 0, rounds = 0, survivors = 0, hpRatios = 0;
+  let wins = 0, losses = 0, stalled = 0, heroFallRuns = 0, rounds = 0, survivors = 0, hpRatios = 0;
   for (let run = 0; run < scenario.runs; run++) {
     const random = createSeededRandom(scenario.seed + run * 7919);
     const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "starter", scenario.progressionProfile ?? "base");
@@ -139,10 +139,11 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
       carried = advanced.heroInstances;
     }
     rounds += final?.round ?? 0;
+    if (final?.heroes.some((item) => !item.unit.isAlive || item.unit.currentHP <= 0)) heroFallRuns++;
     if (final?.status === "victory") { wins++; const alive = final.heroes.filter((item) => item.unit.isAlive); survivors += alive.length; hpRatios += alive.reduce((sum, item) => sum + item.unit.currentHP / item.unit.maxHP, 0) / Math.max(1, alive.length); }
     else if (final?.status === "defeat") losses++; else stalled++;
   }
-  return { scenarioId: scenario.id, wins, losses, stalled, winRate: wins / scenario.runs, averageRounds: rounds / scenario.runs, averageSurvivingHeroes: wins ? survivors / wins : 0, averageRemainingHpRatioOnWins: wins ? hpRatios / wins : 0, enemyXpPool: getQuestEnemyXpPool(QUESTS[scenario.questId]!) };
+  return { scenarioId: scenario.id, wins, losses, stalled, winRate: wins / scenario.runs, heroFallRate: heroFallRuns / scenario.runs, averageRounds: rounds / scenario.runs, averageSurvivingHeroes: wins ? survivors / wins : 0, averageRemainingHpRatioOnWins: wins ? hpRatios / wins : 0, enemyXpPool: getQuestEnemyXpPool(QUESTS[scenario.questId]!) };
 }
 
 export function simulateEconomyScenario(scenario: EconomySimulationScenario): EconomySimulationResult {

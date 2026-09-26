@@ -189,6 +189,38 @@ describe("repeatable balance simulations", () => {
     }
   }, 180_000);
 
+
+  it("reports Chapter 4 to 6 transition combat with realistic lagged gear", () => {
+    const scenarios = [
+      { id: "chapter4-blackwater-l6", questId: "return_to_blackwater", heroLevel: 6, seed: 10100 },
+      { id: "chapter4-procession-l6", questId: "procession_at_low_water", heroLevel: 6, seed: 10200 },
+      { id: "chapter4-widow-l6", questId: "bell_widow_boss", heroLevel: 6, seed: 10300 },
+      { id: "chapter4-widow-l7", questId: "bell_widow_boss", heroLevel: 7, seed: 10400 },
+      { id: "chapter4-morrowveil-l7", questId: "morrowveil_drowned_archivist_boss", heroLevel: 7, seed: 10500 },
+      { id: "chapter5-road-l8", questId: "road_of_glass", heroLevel: 8, seed: 10600 },
+      { id: "chapter5-siege-l8", questId: "siege_of_emberfall", heroLevel: 8, seed: 10700 },
+      { id: "chapter5-keeper-l8", questId: "keeper_of_cinders_boss", heroLevel: 8, seed: 10800 },
+      { id: "chapter5-causeway-l9", questId: "the_burning_causeway", heroLevel: 9, seed: 10900 },
+      { id: "chapter5-solkar-l9", questId: "solkar_ash_herald_boss", heroLevel: 9, seed: 11000 },
+      { id: "chapter6-laurel-law-l10", questId: "laurel_law", heroLevel: 10, seed: 11100 },
+      { id: "chapter6-five-roads-l10", questId: "the_five_roads_run", heroLevel: 10, seed: 11200 },
+      { id: "chapter6-cassian-l11", questId: "cassian_vane_boss", heroLevel: 11, seed: 11300 },
+      { id: "chapter5-siege-underprepared-l7", questId: "siege_of_emberfall", heroLevel: 7, seed: 11400 },
+      { id: "chapter6-laurel-law-underprepared-l9", questId: "laurel_law", heroLevel: 9, seed: 11500 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 6,
+      gearProfile: "lagged_basic",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    expect(results.filter((result) => !result.scenarioId.includes("underprepared")).every((result) => result.winRate > 0)).toBe(true);
+  }, 300_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

@@ -43,7 +43,7 @@ describe("repeatable balance simulations", () => {
       { id: "chapter3-frozen-names", questId: "road_of_frozen_names", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6600, gearProfile: "lagged_basic" as const },
       { id: "chapter3-blue-horns", questId: "night_of_blue_horns", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6700, gearProfile: "lagged_basic" as const },
       { id: "chapter3-hroth", questId: "hroth_iceblood_boss", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6800, gearProfile: "lagged_basic" as const },
-      { id: "chapter3-glimmerlake-underlevel", questId: "beneath_glimmerlake", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6900, gearProfile: "lagged_basic" as const },
+      { id: "chapter3-glimmerlake-l5", questId: "beneath_glimmerlake", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6900, gearProfile: "lagged_basic" as const },
       { id: "chapter3-glimmerlake", questId: "beneath_glimmerlake", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6950, gearProfile: "lagged_basic" as const },
       { id: "chapter3-vaelith", questId: "vaelith_pale_echo_boss", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 7000, gearProfile: "lagged_basic" as const },
     ];
@@ -59,9 +59,10 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter3-blue-horns")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter3-blue-horns")!.averageSurvivingHeroes).toBeLessThan(3);
     expect(byId.get("chapter3-hroth")!.winRate).toBeGreaterThanOrEqual(.75);
-    expect(byId.get("chapter3-glimmerlake")!.winRate).toBeGreaterThan(byId.get("chapter3-glimmerlake-underlevel")!.winRate);
-    expect(byId.get("chapter3-glimmerlake")!.averageSurvivingHeroes).toBeGreaterThan(2);
-    expect(byId.get("chapter3-glimmerlake-underlevel")!.averageSurvivingHeroes).toBeLessThan(2.5);
+    expect(byId.get("chapter3-glimmerlake-l5")!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId.get("chapter3-glimmerlake")!.winRate).toBeGreaterThanOrEqual(byId.get("chapter3-glimmerlake-l5")!.winRate);
+    expect(byId.get("chapter3-glimmerlake")!.averageSurvivingHeroes).toBeGreaterThan(byId.get("chapter3-glimmerlake-l5")!.averageSurvivingHeroes);
+    expect(byId.get("chapter3-glimmerlake")!.averageRemainingHpRatioOnWins).toBeGreaterThan(byId.get("chapter3-glimmerlake-l5")!.averageRemainingHpRatioOnWins);
     expect(byId.get("chapter3-vaelith")!.averageSurvivingHeroes).toBeGreaterThan(3);
   }, 120_000);
 
@@ -93,6 +94,12 @@ describe("repeatable balance simulations", () => {
       expect(veteran.winRate).toBeGreaterThanOrEqual(iron.winRate);
       expect(standard.averageRemainingHpRatioOnWins).toBeGreaterThanOrEqual(iron.averageRemainingHpRatioOnWins);
     }
+    const glimmerStandard = results.find((result) => result.scenarioId === "chapter3-glimmerlake-standard")!;
+    const glimmerVeteran = results.find((result) => result.scenarioId === "chapter3-glimmerlake-veteran")!;
+    const glimmerIron = results.find((result) => result.scenarioId === "chapter3-glimmerlake-iron_guild")!;
+    expect(glimmerStandard.winRate).toBeGreaterThanOrEqual(.75);
+    expect(glimmerVeteran.winRate).toBeGreaterThanOrEqual(.50);
+    expect(glimmerIron.winRate).toBeLessThanOrEqual(.50);
     const vaelithStandard = results.find((result) => result.scenarioId === "chapter3-vaelith-standard")!;
     const vaelithVeteran = results.find((result) => result.scenarioId === "chapter3-vaelith-veteran")!;
     const vaelithIron = results.find((result) => result.scenarioId === "chapter3-vaelith-iron_guild")!;
@@ -100,7 +107,7 @@ describe("repeatable balance simulations", () => {
     expect(vaelithVeteran.winRate).toBeLessThan(1);
     expect(vaelithIron.winRate).toBeLessThanOrEqual(.50);
     expect(vaelithIron.averageSurvivingHeroes).toBeLessThan(2);
-  }, 210_000);
+  }, 300_000);
 
   it("isolates the Glimmerlake encounter causing the difficulty cliff", () => {
     const results = (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>

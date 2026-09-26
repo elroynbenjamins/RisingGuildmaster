@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DUNGEON_NODES } from "../src/data/dungeons/dungeons";
-import { beginDungeonCombatCheckpoint, beginDungeonExpedition, checkpointDungeonCombat, getDungeonCombatSetup, resolveDungeonCombat, resolveDungeonUtilityNode } from "../src/game/dungeons/dungeonRunService";
+import { beginDungeonCombatCheckpoint, beginDungeonExpedition, checkpointDungeonCombat, getDungeonCombatSetup, resolveDungeonCombat, resolveDungeonUtilityNode, chooseDungeonCacheEquipmentId } from "../src/game/dungeons/dungeonRunService";
 import { chooseDungeonNode } from "../src/game/dungeons/dungeonService";
 import { createGuild } from "../src/game/guild/guildService";
 import { generateHero } from "../src/game/heroes/heroGenerator";
@@ -8,6 +8,7 @@ import { createSeededRandom } from "../src/utils/random";
 import { sequenceRandom } from "./combatTestUtils";
 import { ENEMIES } from "../src/data/enemies";
 import { createCombatState } from "../src/game/combat/combatEngine";
+import { EQUIPMENT } from "../src/data/equipment/equipment";
 
 function expeditionGuild() { const guild = createGuild(); const heroes = Array.from({ length: 8 }, (_, index) => generateHero(createSeededRandom(11 + index))).map((hero, index) => ({ ...hero, id: `dungeon-hero-${index}`, level: 6 })); return { ...guild, heroes, discoveredEnemyIds: Object.keys(ENEMIES), world: { ...guild.world, completedCampaignNodeIds: ["broken_wardstone"] }, rogueliteRotation: { ...guild.rogueliteRotation, offeredDungeonIds: ["wardstone_depths", "thornwood_trials", "temple_of_coils"] } }; }
 const partyIds = (guild: ReturnType<typeof expeditionGuild>) => guild.heroes.slice(0, 4).map((hero) => hero.id);
@@ -38,6 +39,10 @@ describe("playable dungeon run integration", () => {
     expect(result.guild.activeDungeonRun?.combatState).toBeNull();
     expect(result.guild.activeDungeonRun?.combatRandomState).toBeNull();
   });
+
+  it("awards a usable equipment cache on a successful boss clear", () => { const base = expeditionGuild(); let guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base)); const run = guild.activeDungeonRun!; guild = { ...guild, activeDungeonRun: { ...run, currentNodeId: "depths_boss" } }; const result = resolveDungeonCombat(guild, "victory", run.heroInstances, createSeededRandom(73)); expect(result.guild.activeDungeonRun?.status).toBe("victory"); expect(result.guild.activeDungeonRun?.cacheEquipmentId).toBeTruthy(); expect(result.guild.inventory).toContain(result.guild.activeDungeonRun?.cacheEquipmentId); });
+
+  it("keeps late-game caches relevant after story recipes are earned", () => { const base = expeditionGuild(); const guild = { ...base, heroes: base.heroes.map((hero) => ({ ...hero, level: 16 })), unlockedRecipeIds: ["forge_sixth_tide_blade"] }; const itemId = chooseDungeonCacheEquipmentId(guild, partyIds(base), createSeededRandom(177)); expect(itemId).toBeTruthy(); expect(EQUIPMENT[itemId!]?.levelRequirement).toBeGreaterThanOrEqual(14); });
 
   it("persists defeat instead of treating entry into a boss room as victory", () => { const base = expeditionGuild(); let guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base)); const run = guild.activeDungeonRun!; guild = { ...guild, activeDungeonRun: { ...run, currentNodeId: "depths_boss" } }; const result = resolveDungeonCombat(guild, "defeat", run.heroInstances.map((instance) => ({ ...instance, currentHP: 0, isAlive: false })), sequenceRandom([0])); expect(result.guild.activeDungeonRun?.status).toBe("defeat"); expect(result.guild.activeDungeonRun?.resolvedNodeIds).not.toContain("depths_boss"); });
 });

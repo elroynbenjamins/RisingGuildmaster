@@ -268,6 +268,38 @@ describe("repeatable balance simulations", () => {
     expect(results.every((result) => result.stalled === 0)).toBe(true);
   }, 120_000);
 
+  it("checks Chapter 7 Standard full quests after tuning", () => {
+    const scenarios = [
+      { id: "road", questId: "road_above_the_clouds", heroLevel: 12, seed: 12100 },
+      { id: "embassy", questId: "embassy_of_empty_armor", heroLevel: 12, seed: 12200 },
+      { id: "siege", questId: "siege_of_skyvault", heroLevel: 12, seed: 12300 },
+      { id: "severed", questId: "the_severed_voice", heroLevel: 13, seed: 12400 },
+      { id: "varkesh-l12", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 12500 },
+      { id: "varkesh-l13", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 12600 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      id: `chapter7-standard-full-${scenario.id}`,
+      questId: scenario.questId,
+      heroLevel: scenario.heroLevel,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 4,
+      seed: scenario.seed,
+      gearProfile: "campaign_lagged",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    const get = (id: string) => results.find((result) => result.scenarioId === `chapter7-standard-full-${id}`)!;
+    expect(get("road").winRate).toBeGreaterThanOrEqual(.75);
+    expect(get("embassy").winRate).toBeGreaterThanOrEqual(.75);
+    expect(get("siege").winRate).toBeGreaterThanOrEqual(.50);
+    expect(get("severed").winRate).toBeGreaterThanOrEqual(.75);
+    expect(get("varkesh-l13").winRate).toBeGreaterThanOrEqual(.50);
+    expect(get("varkesh-l13").averageSurvivingHeroes).toBeGreaterThan(1.5);
+    expect(get("varkesh-l13").winRate).toBeGreaterThanOrEqual(get("varkesh-l12").winRate);
+  }, 180_000);
+
   it("reports Chapter 7 Standard stress cases with deliberately basic lagged gear", () => {
     const scenarios = [
       { id: "road-basic", questId: "road_above_the_clouds", heroLevel: 12, seed: 10700 },

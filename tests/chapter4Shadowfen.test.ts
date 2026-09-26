@@ -9,6 +9,7 @@ import { ENEMIES } from "../src/data/enemies";
 import { ENEMY_PORTRAITS } from "../src/data/enemies/enemyPortraits";
 import { EQUIPMENT } from "../src/data/equipment/equipment";
 import { QUESTS } from "../src/data/quests/quests";
+import { QUEST_LOOT_TABLES } from "../src/data/loot/questLootTables";
 import { GENERATED_SKILL_ICON_ART } from "../src/data/skills/generatedSkillIconArt";
 import { getQuestXpForHero } from "../src/game/quests/questResolver";
 import { testHero } from "./testHero";

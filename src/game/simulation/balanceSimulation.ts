@@ -30,7 +30,7 @@ import type { EquipmentSlot } from "../heroes/types";
 
 export type SimulationGearProfile = "starter" | "lagged_basic";
 export type SimulationProgressionProfile = "base" | "subclass_ready";
-export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile }
+export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; heroLevels?: readonly number[]; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile }
 export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; averageRounds: number; averageSurvivingHeroes: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
 export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
 export interface EconomySimulationResult { scenarioId: string; startingGold: number; endingGold: number; netGold: number; questIncome: number; tavernIncome: number; salaryPaid: number; fieldExpenses: number; arrears: number; breakEvenQuestsPerWeek: number; goldAfterFacilityReserve: number }
@@ -73,14 +73,18 @@ function levelHero(hero: Hero, level: number, index: number, gearProfile: Simula
   return { ...prepared, currentHP: calculateHero(prepared).stats.maxHP };
 }
 
-export function createSimulationParty(classes: readonly ClassId[], level: number, seed: number, gearProfile: SimulationGearProfile = "starter", progressionProfile: SimulationProgressionProfile = "base"): Hero[] {
+export function createSimulationPartyAtLevels(classes: readonly ClassId[], levels: readonly number[], seed: number, gearProfile: SimulationGearProfile = "starter", progressionProfile: SimulationProgressionProfile = "base"): Hero[] {
   return classes.map((classId, index) => levelHero(
     { ...generateHero(createSeededRandom(seed + index * 97), { classId }), id: `sim-${seed}-${index}` },
-    level,
+    levels[index] ?? levels[0] ?? 1,
     index,
     gearProfile,
     progressionProfile,
   ));
+}
+
+export function createSimulationParty(classes: readonly ClassId[], level: number, seed: number, gearProfile: SimulationGearProfile = "starter", progressionProfile: SimulationProgressionProfile = "base"): Hero[] {
+  return createSimulationPartyAtLevels(classes, classes.map(() => level), seed, gearProfile, progressionProfile);
 }
 
 function skillTarget(state: CombatState, skill: CombatSkillDefinition): { targetId?: string; targetPosition?: { x: number; y: number } } {
@@ -129,7 +133,7 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
   let wins = 0, losses = 0, stalled = 0, rounds = 0, survivors = 0, hpRatios = 0;
   for (let run = 0; run < scenario.runs; run++) {
     const random = createSeededRandom(scenario.seed + run * 7919);
-    const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "starter", scenario.progressionProfile ?? "base");
+    const heroes = createSimulationPartyAtLevels(scenario.partyClasses, scenario.heroLevels ?? scenario.partyClasses.map(() => scenario.heroLevel), scenario.seed + run * 31, scenario.gearProfile ?? "starter", scenario.progressionProfile ?? "base");
     let carried = undefined; let final: CombatState | undefined;
     const encounterCount = Math.min(QUESTS[scenario.questId]!.encounterIds.length, scenario.encounterLimit ?? Number.POSITIVE_INFINITY);
     for (let encounterIndex = 0; encounterIndex < encounterCount; encounterIndex++) {

@@ -247,6 +247,30 @@ describe("repeatable balance simulations", () => {
     }
   }, 300_000);
 
+  it("Chapter 7 diagnostic first encounters", () => {
+    const scenarios = [
+      { id: "road-first", questId: "road_above_the_clouds", heroLevel: 12, seed: 11000 },
+      { id: "embassy-first", questId: "embassy_of_empty_armor", heroLevel: 12, seed: 11100 },
+      { id: "siege-first", questId: "siege_of_skyvault", heroLevel: 12, seed: 11200 },
+      { id: "severed-first", questId: "the_severed_voice", heroLevel: 13, seed: 11300 },
+      { id: "varkesh-first", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 11400 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      id: `chapter7-diagnostic-${scenario.id}`,
+      questId: scenario.questId,
+      heroLevel: scenario.heroLevel,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 4,
+      seed: scenario.seed,
+      gearProfile: "campaign_lagged",
+      progressionProfile: "subclass_ready",
+      encounterLimit: 1,
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+  }, 120_000);
+
   it("reports Chapter 7 Standard stress cases with deliberately basic lagged gear", () => {
     const scenarios = [
       { id: "road-basic", questId: "road_above_the_clouds", heroLevel: 12, seed: 10700 },

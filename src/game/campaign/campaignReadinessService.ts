@@ -69,7 +69,9 @@ export function getCampaignLevelGuidance(guild: GuildState): CampaignLevelGuidan
       const bLevel = b.recommendedLevelMin ?? 1;
       const aFit = Math.abs(aLevel - averageLevel);
       const bFit = Math.abs(bLevel - averageLevel);
-      return aFit - bFit || aLevel - bLevel || a.name.localeCompare(b.name);
+      const aRegion = a.regionId === nextQuest.regionId ? 0 : 1;
+      const bRegion = b.regionId === nextQuest.regionId ? 0 : 1;
+      return aFit - bFit || aRegion - bRegion || aLevel - bLevel || a.name.localeCompare(b.name);
     })
     .map((quest) => quest.id);
 

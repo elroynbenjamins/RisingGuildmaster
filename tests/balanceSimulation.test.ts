@@ -189,6 +189,46 @@ describe("repeatable balance simulations", () => {
     }
   }, 180_000);
 
+  it("checks the Chapter 3 to Chapter 4 handoff with realistic progression gear", () => {
+    const scenarios = [
+      { id: "chapter3-vaelith-l6", questId: "vaelith_pale_echo_boss", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8500 },
+      { id: "chapter3-vaelith-one-lagging", questId: "vaelith_pale_echo_boss", heroLevel: 6, heroLevels: [6, 6, 6, 5] as const, seed: 8510 },
+      { id: "chapter4-return-blackwater", questId: "return_to_blackwater", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8520 },
+      { id: "chapter4-return-blackwater-one-lagging", questId: "return_to_blackwater", heroLevel: 6, heroLevels: [6, 6, 6, 5] as const, seed: 8530 },
+      { id: "chapter4-lanterns-catchup-l6", questId: "lanterns_for_the_lost", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8535 },
+      { id: "chapter4-remembering-house-l7", questId: "the_house_that_remembers", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8537 },
+      { id: "chapter4-low-water-l6", questId: "procession_at_low_water", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8540 },
+      { id: "chapter4-low-water-l7", questId: "procession_at_low_water", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8550 },
+      { id: "chapter4-bell-widow-l6", questId: "bell_widow_boss", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8560 },
+      { id: "chapter4-bell-widow-l7", questId: "bell_widow_boss", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8565 },
+      { id: "chapter4-archive-below", questId: "archive_below", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8570 },
+      { id: "chapter4-morrowveil", questId: "morrowveil_drowned_archivist_boss", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8580 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 4,
+      gearProfile: "lagged_basic",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    const byId = Object.fromEntries(results.map((result) => [result.scenarioId, result]));
+    expect(byId["chapter3-vaelith-l6"]!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId["chapter3-vaelith-one-lagging"]!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId["chapter4-return-blackwater"]!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId["chapter4-return-blackwater-one-lagging"]!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId["chapter4-lanterns-catchup-l6"]!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId["chapter4-remembering-house-l7"]!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId["chapter4-low-water-l6"]!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId["chapter4-low-water-l7"]!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId["chapter4-bell-widow-l6"]!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId["chapter4-bell-widow-l7"]!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId["chapter4-archive-below"]!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId["chapter4-morrowveil"]!.winRate).toBeGreaterThanOrEqual(.50);
+  }, 240_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

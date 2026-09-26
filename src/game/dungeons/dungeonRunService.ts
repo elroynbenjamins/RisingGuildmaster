@@ -48,7 +48,7 @@ export function chooseDungeonCacheEquipmentId(guild: GuildState, partyHeroIds: r
   const targetMax = Math.max(targetMin, averageLevel - 1);
   const ownedIds = new Set([...guild.inventory, ...party.flatMap((hero) => Object.values(hero.equipment).filter((id): id is string => Boolean(id)))]);
   const usable = (item: (typeof EQUIPMENT)[string]) => !item.classRestrictions.length || party.some((hero) => item.classRestrictions.includes(hero.classId));
-  const isOrdinary = (item: (typeof EQUIPMENT)[string]) => { const specialRecipeId = DUNGEON_CACHE_SPECIAL_RECIPE_BY_OUTPUT.get(item.id); return (!specialRecipeId || guild.unlockedRecipeIds.includes(specialRecipeId)) && !item.specialEffectIds.some((id) => id.includes("trophy")); };
+  const isOrdinary = (item: (typeof EQUIPMENT)[string]) => { const specialRecipeId = DUNGEON_CACHE_SPECIAL_RECIPE_BY_OUTPUT.get(item.id); return (!specialRecipeId || guild.unlockedRecipeIds?.includes(specialRecipeId) === true) && !item.specialEffectIds.some((id) => id.includes("trophy")); };
   const normal = Object.values(EQUIPMENT).filter((item) => isOrdinary(item) && usable(item) && item.levelRequirement >= targetMin && item.levelRequirement <= targetMax && (item.rarity === "common" || item.rarity === "uncommon"));
   const rare = Object.values(EQUIPMENT).filter((item) => isOrdinary(item) && usable(item) && item.levelRequirement >= targetMin && item.levelRequirement <= targetMax && item.rarity === "rare");
   let pool = random.next() < .15 && rare.length ? [...normal, ...rare] : normal;

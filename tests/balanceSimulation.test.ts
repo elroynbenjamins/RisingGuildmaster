@@ -195,6 +195,7 @@ describe("repeatable balance simulations", () => {
       { id: "chapter3-vaelith-one-lagging", questId: "vaelith_pale_echo_boss", heroLevel: 6, heroLevels: [6, 6, 6, 5] as const, seed: 8510 },
       { id: "chapter4-return-blackwater", questId: "return_to_blackwater", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8520 },
       { id: "chapter4-return-blackwater-one-lagging", questId: "return_to_blackwater", heroLevel: 6, heroLevels: [6, 6, 6, 5] as const, seed: 8530 },
+      { id: "chapter4-lanterns-catchup-l6", questId: "lanterns_for_the_lost", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8535 },
       { id: "chapter4-low-water-l6", questId: "procession_at_low_water", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8540 },
       { id: "chapter4-low-water-l7", questId: "procession_at_low_water", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8550 },
       { id: "chapter4-bell-widow-l6", questId: "bell_widow_boss", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8560 },

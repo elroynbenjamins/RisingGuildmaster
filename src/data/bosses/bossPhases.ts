@@ -83,15 +83,15 @@ export const BOSS_PHASES: Record<string, BossPhaseDefinition> = {
 
   vaelith_pale_wind: {
     id: "vaelith_pale_wind", bossEnemyDefinitionId: "vaelith_pale_echo", hpRatioAtMost: .65,
-    name: "Pale Wind", announcement: "The Echo tears open a false winter and the battlefield stiffens under spectral frost.",
-    playerHint: "Movement is briefly reduced. Avoid overcommitting melee heroes until the frost pressure passes.",
-    summonGroups: [], selfModifiers: [], heroModifiers: [timedFlat("movementRange", -1, 1)],
+    name: "Pale Wind", announcement: "The Echo tears open a false winter and an Aurora Seer reforms in the spectral gale.",
+    playerHint: "Movement is briefly reduced while the Seer adds ranged pressure. Clear it quickly or protect the backline while Vaelith's magic phase intensifies.",
+    summonGroups: [{ enemyDefinitionId: "aurora_seer", count: 1 }], selfModifiers: [], heroModifiers: [timedFlat("movementRange", -1, 1)],
   },
   vaelith_crown_echo: {
     id: "vaelith_crown_echo", bossEnemyDefinitionId: "vaelith_pale_echo", hpRatioAtMost: .30,
     name: "Crown Echo", announcement: "A second voice answers from inside Vaelith's reflection and the air fractures with cold light.",
-    playerHint: "The Echo's final passive bonuses are active. Keep magic-defense specialists standing and commit your strongest attacks.",
-    summonGroups: [], selfModifiers: [], heroPulseDamageMaxHpRatio: .05,
+    playerHint: "The Echo's final passive bonuses are active and the Crown shock hits the whole company. Stabilize once, then commit your strongest attacks.",
+    summonGroups: [], selfModifiers: [], heroPulseDamageMaxHpRatio: .08,
   },
 
   bell_widow_funeral_chorus: {

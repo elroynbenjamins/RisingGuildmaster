@@ -217,9 +217,14 @@ describe("repeatable balance simulations", () => {
     expect(results.every((result) => result.stalled === 0)).toBe(true);
     const byId = new Map(results.map((result) => [result.scenarioId, result]));
     expect(byId.get("chapter4-bell-widow-l7")!.averageSurvivingHeroes).toBeGreaterThanOrEqual(byId.get("chapter4-bell-widow-l6")!.averageSurvivingHeroes);
-    expect(byId.get("chapter5-road-ready")!.averageSurvivingHeroes).toBeGreaterThanOrEqual(byId.get("chapter5-road-underprepared")!.averageSurvivingHeroes);
-    expect(byId.get("chapter6-laurel-law-ready")!.averageSurvivingHeroes).toBeGreaterThanOrEqual(byId.get("chapter6-laurel-law-underprepared")!.averageSurvivingHeroes);
-    expect(byId.get("chapter5-road-underprepared")!.averageSurvivingHeroes).toBeLessThan(4);
+    expect(byId.get("chapter5-road-ready")!.winRate).toBeGreaterThan(byId.get("chapter5-road-underprepared")!.winRate);
+    expect(byId.get("chapter5-road-underprepared")!.winRate).toBeLessThan(.50);
+    expect(byId.get("chapter5-road-ready")!.averageSurvivingHeroes).toBeLessThan(4);
+    expect(byId.get("chapter6-laurel-law-ready")!.winRate).toBeGreaterThanOrEqual(byId.get("chapter6-laurel-law-underprepared")!.winRate);
+    expect(byId.get("chapter4-procession-l6")!.winRate).toBeGreaterThan(0);
+    expect(byId.get("chapter5-siege")!.winRate).toBeGreaterThan(0);
+    expect(byId.get("chapter5-causeway")!.winRate).toBeGreaterThan(0);
+    expect(byId.get("chapter6-laurel-law-ready")!.winRate).toBeGreaterThan(0);
   }, 240_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

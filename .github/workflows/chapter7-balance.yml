@@ -6,7 +6,7 @@ on:
       - balance/ch7-iron-hills-pass
 
 concurrency:
-  group: chapter7-balance-${{ github.ref }}
+  group: chapter7-balance-v2-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

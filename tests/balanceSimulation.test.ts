@@ -189,6 +189,39 @@ describe("repeatable balance simulations", () => {
     }
   }, 180_000);
 
+  it("reports Chapter 4–6 transition combat with lagged basic gear", () => {
+    const scenarios = [
+      { id: "chapter4-blackwater-l6", questId: "return_to_blackwater", heroLevel: 6, seed: 8500 },
+      { id: "chapter4-procession-l6", questId: "procession_at_low_water", heroLevel: 6, seed: 8510 },
+      { id: "chapter4-bell-widow-l6", questId: "bell_widow_boss", heroLevel: 6, seed: 8520 },
+      { id: "chapter4-bell-widow-l7", questId: "bell_widow_boss", heroLevel: 7, seed: 8530 },
+      { id: "chapter4-morrowveil-l7", questId: "morrowveil_drowned_archivist_boss", heroLevel: 7, seed: 8540 },
+      { id: "chapter5-road-underprepared", questId: "road_of_glass", heroLevel: 7, seed: 8600 },
+      { id: "chapter5-road-ready", questId: "road_of_glass", heroLevel: 8, seed: 8610 },
+      { id: "chapter5-siege", questId: "siege_of_emberfall", heroLevel: 8, seed: 8620 },
+      { id: "chapter5-keeper", questId: "keeper_of_cinders_boss", heroLevel: 8, seed: 8630 },
+      { id: "chapter5-causeway", questId: "the_burning_causeway", heroLevel: 9, seed: 8640 },
+      { id: "chapter5-solkar", questId: "solkar_ash_herald_boss", heroLevel: 9, seed: 8650 },
+      { id: "chapter6-laurel-law-underprepared", questId: "laurel_law", heroLevel: 9, seed: 8700 },
+      { id: "chapter6-laurel-law-ready", questId: "laurel_law", heroLevel: 10, seed: 8710 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 6,
+      gearProfile: "lagged_basic",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    const byId = new Map(results.map((result) => [result.scenarioId, result]));
+    expect(byId.get("chapter4-bell-widow-l7")!.averageSurvivingHeroes).toBeGreaterThanOrEqual(byId.get("chapter4-bell-widow-l6")!.averageSurvivingHeroes);
+    expect(byId.get("chapter5-road-ready")!.averageSurvivingHeroes).toBeGreaterThanOrEqual(byId.get("chapter5-road-underprepared")!.averageSurvivingHeroes);
+    expect(byId.get("chapter6-laurel-law-ready")!.averageSurvivingHeroes).toBeGreaterThanOrEqual(byId.get("chapter6-laurel-law-underprepared")!.averageSurvivingHeroes);
+    expect(byId.get("chapter5-road-underprepared")!.averageSurvivingHeroes).toBeLessThan(4);
+  }, 240_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

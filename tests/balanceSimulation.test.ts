@@ -19,6 +19,12 @@ describe("repeatable balance simulations", () => {
     }
   });
 
+  it("adds representative Level-5 subclasses to the normal progression simulation profile", () => {
+    const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 4450, "lagged_basic", "subclass_ready");
+    expect(party.map((hero) => hero.subclassId)).toEqual(["guardian", "sharpshooter", "pyromancer", "life_priest"]);
+    expect(party.every((hero) => hero.currentHP === calculateHero(hero).stats.maxHP)).toBe(true);
+  });
+
   it("reports early-campaign combat across every difficulty", () => {
     const brambleway = simulateCombatScenario({ id: "brambleway-standard", questId: "brambleway_road_ambush", heroLevel: 2, partyClasses: ["warrior", "ranger", "cleric"], difficultyId: "standard", runs: 8, seed: 4050 });
     expect(brambleway.stalled).toBe(0);
@@ -108,6 +114,30 @@ describe("repeatable balance simulations", () => {
     expect(vaelithIron.winRate).toBeLessThanOrEqual(.50);
     expect(vaelithIron.averageSurvivingHeroes).toBeLessThan(2);
   }, 300_000);
+
+  it("measures Frostmarch Standard with and without normal subclass progression", () => {
+    const encounters = [
+      { id: "hroth", questId: "hroth_iceblood_boss", heroLevel: 5, seed: 7600 },
+      { id: "glimmerlake", questId: "beneath_glimmerlake", heroLevel: 6, seed: 7700 },
+      { id: "vaelith", questId: "vaelith_pale_echo_boss", heroLevel: 6, seed: 7800 },
+    ] as const;
+    const results = encounters.flatMap((encounter) => (["base", "subclass_ready"] as const).map((progressionProfile) =>
+      simulateCombatScenario({
+        id: `chapter3-${encounter.id}-${progressionProfile}`,
+        questId: encounter.questId,
+        heroLevel: encounter.heroLevel,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId: "standard",
+        runs: 4,
+        seed: encounter.seed,
+        gearProfile: "lagged_basic",
+        progressionProfile,
+      }),
+    ));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    expect(results.filter((result) => result.scenarioId.endsWith("-subclass_ready")).every((result) => result.winRate > 0)).toBe(true);
+  }, 150_000);
 
   it("isolates the Glimmerlake encounter causing the difficulty cliff", () => {
     const results = (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>

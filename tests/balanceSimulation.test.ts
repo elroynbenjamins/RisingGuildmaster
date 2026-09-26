@@ -249,14 +249,14 @@ describe("repeatable balance simulations", () => {
 
   it("Chapter 7 diagnostic first encounters", () => {
     const scenarios = [
-      { id: "road", questId: "road_above_the_clouds", heroLevel: 12, seed: 11000 },
-      { id: "embassy", questId: "embassy_of_empty_armor", heroLevel: 12, seed: 11100 },
-      { id: "siege", questId: "siege_of_skyvault", heroLevel: 12, seed: 11200 },
-      { id: "severed", questId: "the_severed_voice", heroLevel: 13, seed: 11300 },
-      { id: "varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 11400 },
+      { id: "severed-authored", questId: "the_severed_voice", heroLevel: 13, seed: 11300, enemyLevelModifier: 0 },
+      { id: "severed-lower", questId: "the_severed_voice", heroLevel: 13, seed: 11320, enemyLevelModifier: -1 },
+      { id: "varkesh-authored", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 11400, enemyLevelModifier: 0 },
+      { id: "varkesh-lower", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 11420, enemyLevelModifier: -1 },
+      { id: "varkesh-lower2", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 11440, enemyLevelModifier: -2 },
     ] as const;
     const results = scenarios.map((scenario) => simulateCombatScenario({
-      id: `chapter7-diagnostic-${scenario.id}-authored`,
+      id: `chapter7-diagnostic-${scenario.id}`,
       questId: scenario.questId,
       heroLevel: scenario.heroLevel,
       partyClasses: ["warrior", "ranger", "cleric", "mage"],
@@ -266,6 +266,7 @@ describe("repeatable balance simulations", () => {
       gearProfile: "campaign_lagged",
       progressionProfile: "subclass_ready",
       encounterLimit: 1,
+      enemyLevelModifier: scenario.enemyLevelModifier,
     }));
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);

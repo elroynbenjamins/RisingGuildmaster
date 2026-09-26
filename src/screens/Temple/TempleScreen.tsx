@@ -11,6 +11,8 @@ import { getRaceNameColor } from "../../ui/raceColors";
 import { GameIcon } from "../../components/icons/GameIcon";
 import { triggerTactileFeedback } from "../../ui/tactileFeedback";
 import { useGameToast } from "../../components/feedback/GameToast";
+import { creditVerifiedGems } from "../../game/monetization/gemService";
+import { showAdMobRewardedAd } from "../../game/monetization/admobRewardedAdProvider";
 
 type Tab = "Treatment" | "Revival";
 export function TempleScreen({ onBack, openWorld }: { onBack(): void; openWorld(): void }) {
@@ -19,7 +21,25 @@ export function TempleScreen({ onBack, openWorld }: { onBack(): void; openWorld(
   const [tab, setTab] = useState<Tab>("Treatment");
   const [confirmHeroId, setConfirmHeroId] = useState<string | null>(null);
   const [expandedHeroId,setExpandedHeroId]=useState<string | null>(null);
+  const [reviveAdHeroId,setReviveAdHeroId]=useState<string | null>(null);
   const currentSettlement = guild.world.currentSettlementId ? SETTLEMENTS[guild.world.currentSettlementId] : undefined;
+  const watchAdAndRevive = async (heroId: string) => {
+    if (reviveAdHeroId) return;
+    setReviveAdHeroId(heroId);
+    try {
+      const credited = creditVerifiedGems(guild, await showAdMobRewardedAd());
+      const next = reviveHero(credited, heroId);
+      const hero = next.heroes.find((item) => item.id === heroId);
+      updateGuild(next);
+      triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");
+      showToast({title:"Revival Complete",message:`${hero?.name ?? "Hero"} returned from the brink · rewarded ad covered ◇${TEMPLE_CONFIG.revivalGemCost}`,tone:"success"});
+    } catch (error) {
+      triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");
+      showToast({title:"Rewarded Revival Failed",message:error instanceof Error ? error.message : "Rewarded ad unavailable.",tone:"danger"});
+    } finally {
+      setReviveAdHeroId(null);
+    }
+  };
   const localHealingAvailable = hasLocalHealingService(guild.world);
   const living = guild.heroes.filter((hero) => hero.currentHP > 0);
   const fallen = guild.heroes.filter((hero) => hero.currentHP <= 0);
@@ -30,7 +50,7 @@ export function TempleScreen({ onBack, openWorld }: { onBack(): void; openWorld(
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} />
     <View style={styles.titleRow}><GameIcon id="temple" size={36}/><View style={styles.heroInfo}><Text style={styles.eyebrow}>{(currentSettlement?.name ?? "Local").toUpperCase()} · HEALING SERVICES</Text><Text style={styles.title}>Temple of Renewal</Text></View></View>
-    <Text style={styles.intro}>Restore wounded adventurers with guild gold. Reviving a fallen hero costs 5 gems, or uses today’s free revive when Remove Ads is owned.</Text>
+    <Text style={styles.intro}>Restore wounded adventurers with guild gold. Reviving costs 5 gems; when no free daily revive is ready, an optional rewarded ad can cover one revive directly.</Text>
     <View style={styles.wallet}><Text style={styles.gold}>◆ {guild.gold.toLocaleString()} gold</Text><Text style={styles.gems}>◇ {guild.gems} gems</Text></View>
     <SegmentedTabs values={["Treatment", "Revival"] as const} value={tab} onChange={setTab} />{tab==="Revival"&&guild.entitlements.adsRemoved&&<Text style={canUseFreeDailyRevive(guild)?styles.freeRevive:styles.conditions}>{canUseFreeDailyRevive(guild)?"REMOVE ADS BENEFIT · 1 FREE REVIVE READY":"REMOVE ADS BENEFIT · Today’s free revive has been used"}</Text>}
     {tab === "Treatment" ? (living.length ? living.map((hero) => {
@@ -44,7 +64,7 @@ export function TempleScreen({ onBack, openWorld }: { onBack(): void; openWorld(
         <TempleAction primary label={`Full treatment · ◆${fullCost}`} disabled={!fullCost || guild.gold < fullCost} onPress={() => act(() => fullyTreatHero(guild, hero.id), `${hero.name} received full treatment.`)} /></>}
       </Panel>;
     }) : <EmptyState title="No heroes to treat" message="Recruit heroes or return after an expedition." />) : null}
-    {tab === "Revival" ? (fallen.length ? fallen.map((hero) => <Panel key={hero.id} style={styles.heroCard}><View style={styles.heroHeader}><Portrait hero={hero} size={58} /><View style={styles.heroInfo}><Text style={[styles.heroName,{color:getRaceNameColor(hero.raceId)}]}>{hero.name}</Text><Text style={styles.fallen}>FALLEN • Level {hero.level}</Text></View></View><Text style={styles.conditions}>Revival restores 25% HP and leaves the hero Injured. Further healing costs gold.</Text>{confirmHeroId === hero.id ? <View style={styles.confirm}><Text style={styles.confirmText}>{canUseFreeDailyRevive(guild)?`Use today’s free revive for ${hero.name}?`:`Spend ◇ ${TEMPLE_CONFIG.revivalGemCost} to revive ${hero.name}?`}</Text><View style={styles.actions}><TempleAction label="Cancel" onPress={() => setConfirmHeroId(null)} /><TempleAction primary label={canUseFreeDailyRevive(guild)?"Confirm · FREE":`Confirm · ◇${TEMPLE_CONFIG.revivalGemCost}`} disabled={!canUseFreeDailyRevive(guild) && guild.gems < TEMPLE_CONFIG.revivalGemCost} onPress={() => { act(() => reviveHero(guild, hero.id), `${hero.name} has returned from the brink.`); setConfirmHeroId(null); }} /></View></View> : <TempleAction primary label={canUseFreeDailyRevive(guild)?"Revive · FREE":`Revive · ◇${TEMPLE_CONFIG.revivalGemCost}`} disabled={!canUseFreeDailyRevive(guild) && guild.gems < TEMPLE_CONFIG.revivalGemCost} onPress={() => setConfirmHeroId(hero.id)} />}</Panel>) : <EmptyState title="No fallen heroes" message="All guild members are alive. May the temple bells remain silent." />) : null}
+    {tab === "Revival" ? (fallen.length ? fallen.map((hero) => <Panel key={hero.id} style={styles.heroCard}><View style={styles.heroHeader}><Portrait hero={hero} size={58} /><View style={styles.heroInfo}><Text style={[styles.heroName,{color:getRaceNameColor(hero.raceId)}]}>{hero.name}</Text><Text style={styles.fallen}>FALLEN • Level {hero.level}</Text></View></View><Text style={styles.conditions}>Revival restores 25% HP and leaves the hero Injured. Further healing costs gold.</Text>{confirmHeroId === hero.id ? <View style={styles.confirm}><Text style={styles.confirmText}>{canUseFreeDailyRevive(guild)?`Use today’s free revive for ${hero.name}?`:`Spend ◇ ${TEMPLE_CONFIG.revivalGemCost} to revive ${hero.name}?`}</Text><View style={styles.actions}><TempleAction label="Cancel" onPress={() => setConfirmHeroId(null)} /><TempleAction primary label={canUseFreeDailyRevive(guild)?"Confirm · FREE":`Confirm · ◇${TEMPLE_CONFIG.revivalGemCost}`} disabled={!canUseFreeDailyRevive(guild) && guild.gems < TEMPLE_CONFIG.revivalGemCost} onPress={() => { act(() => reviveHero(guild, hero.id), `${hero.name} has returned from the brink.`); setConfirmHeroId(null); }} /></View></View> : <><TempleAction primary label={canUseFreeDailyRevive(guild)?"Revive · FREE":`Revive · ◇${TEMPLE_CONFIG.revivalGemCost}`} disabled={!canUseFreeDailyRevive(guild) && guild.gems < TEMPLE_CONFIG.revivalGemCost} onPress={() => setConfirmHeroId(hero.id)} />{!canUseFreeDailyRevive(guild) && <TempleAction label={reviveAdHeroId===hero.id?"Preparing Ad…":"Watch Ad & Revive · FREE"} disabled={Boolean(reviveAdHeroId)} onPress={() => { void watchAdAndRevive(hero.id); }} />}</>}</Panel>) : <EmptyState title="No fallen heroes" message="All guild members are alive. May the temple bells remain silent." />) : null}
 
   </ScrollView>;
 }

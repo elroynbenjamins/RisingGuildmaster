@@ -87,9 +87,19 @@ describe("repeatable balance simulations", () => {
     expect(results.every((result) => result.stalled === 0)).toBe(true);
     for (const encounter of encounters) {
       const standard = results.find((result) => result.scenarioId === `chapter3-${encounter.id}-standard`)!;
+      const veteran = results.find((result) => result.scenarioId === `chapter3-${encounter.id}-veteran`)!;
       const iron = results.find((result) => result.scenarioId === `chapter3-${encounter.id}-iron_guild`)!;
+      expect(standard.winRate).toBeGreaterThanOrEqual(veteran.winRate);
+      expect(veteran.winRate).toBeGreaterThanOrEqual(iron.winRate);
       expect(standard.averageRemainingHpRatioOnWins).toBeGreaterThanOrEqual(iron.averageRemainingHpRatioOnWins);
     }
+    const vaelithStandard = results.find((result) => result.scenarioId === "chapter3-vaelith-standard")!;
+    const vaelithVeteran = results.find((result) => result.scenarioId === "chapter3-vaelith-veteran")!;
+    const vaelithIron = results.find((result) => result.scenarioId === "chapter3-vaelith-iron_guild")!;
+    expect(vaelithStandard.winRate).toBeGreaterThanOrEqual(.75);
+    expect(vaelithVeteran.winRate).toBeLessThan(1);
+    expect(vaelithIron.winRate).toBeLessThanOrEqual(.50);
+    expect(vaelithIron.averageSurvivingHeroes).toBeLessThan(2);
   }, 150_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

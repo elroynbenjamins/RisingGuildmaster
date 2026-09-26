@@ -72,7 +72,7 @@ export function chooseDungeonCacheEquipmentId(guild: GuildState, partyHeroIds: r
   };
   const ranked = [...pool].sort((a, b) => score(b) - score(a) || b.levelRequirement - a.levelRequirement || b.value - a.value || a.id.localeCompare(b.id));
   const bestScore = score(ranked[0]!);
-  return random.pick(ranked.filter((item) => score(item) >= bestScore - 1).slice(0, 4));
+  return random.pick(ranked.filter((item) => score(item) >= bestScore - 1).slice(0, 4)).id;
 }
 
 export function beginDungeonExpedition(guild: GuildState, dungeonId: string, partyHeroIds: string[], modifierIds: string[] = [], random?: RandomSource): GuildState {

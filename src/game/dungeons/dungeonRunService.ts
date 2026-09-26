@@ -165,9 +165,11 @@ export function resolveDungeonCombat(guild: GuildState, status: "victory" | "def
   let next = syncHeroes(updateRun({ ...guild, gold: guild.gold + goldDelta }, resolvedRun), instances, xp, DUNGEONS[run.dungeonId]!.recommendedLevelMax);
   let recipeId: string | null = null;
   if (node.type === "elite" || node.type === "boss") { const rareLootModifier = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.rareLootModifier ?? 0), 0) + sumDungeonBoonValue(run, "rareLootModifier"); const party = next.heroes.filter((hero) => run.partyHeroIds.includes(hero.id)); const partyAverageLevel = party.reduce((sum, hero) => sum + hero.level, 0) / Math.max(1, party.length); const encounterId = run.selectedEncounterIds[node.id]; const drop = resolveRogueliteRecipeDrop(next, node.type, random, rareLootModifier, DUNGEONS[run.dungeonId]!.themeId, { encounterId, partyAverageLevel }); next = drop.guild; recipeId = drop.result.droppedRecipeId; if (recipeId && next.activeDungeonRun) next = updateRun(next, { ...next.activeDungeonRun, recipeIdsUnlocked: [...next.activeDungeonRun.recipeIdsUnlocked, recipeId] }); }
-  if (next.activeDungeonRun?.status === "victory") {
-    next = awardExpeditionCache(next, next.activeDungeonRun, random);
-    const score = calculateDungeonRunScore(next.activeDungeonRun); const record = next.rogueliteRotation.records[run.dungeonId] ?? createRogueliteDungeonRecord();
+  const victoriousRun = next.activeDungeonRun;
+  if (victoriousRun?.status === "victory") {
+    next = awardExpeditionCache(next, victoriousRun, random);
+    const scoredRun = next.activeDungeonRun ?? victoriousRun;
+    const score = calculateDungeonRunScore(scoredRun); const record = next.rogueliteRotation.records[run.dungeonId] ?? createRogueliteDungeonRecord();
     next = { ...next, rogueliteRotation: { ...next.rogueliteRotation, records: { ...next.rogueliteRotation.records, [run.dungeonId]: { ...record, victories: record.victories + 1, bestScore: Math.max(record.bestScore, score.total), bestGrade: score.total >= record.bestScore ? score.grade : record.bestGrade, lastVictoryDay: next.currentDay } } } };
   }
   return { guild: next, check: null, text, goldDelta, recipeId };

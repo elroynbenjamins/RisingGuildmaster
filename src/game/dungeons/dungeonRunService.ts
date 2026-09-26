@@ -31,11 +31,12 @@ function dungeonNodeXpShare(nodeId: string, nodeType: string): number {
   if (nodeId.endsWith("_guard")) return .30;
   return .25;
 }
+export function getDungeonCatchupXpTarget(heroLevel: number): number { return Math.max(1, Math.round(xpRequiredForNextLevel(Math.max(1, heroLevel)) * .20)); }
 function getDungeonCombatXp(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>, nodeId: string, nodeType: string): number {
   const party = guild.heroes.filter((hero) => run.partyHeroIds.includes(hero.id));
   const averageLevel = party.length ? party.reduce((sum, hero) => sum + hero.level, 0) / party.length : 1;
   const referenceLevel = Math.max(1, Math.round(averageLevel));
-  const fullRunTarget = Math.round(xpRequiredForNextLevel(referenceLevel) * .20);
+  const fullRunTarget = getDungeonCatchupXpTarget(referenceLevel);
   return Math.max(1, Math.round(fullRunTarget * dungeonNodeXpShare(nodeId, nodeType)));
 }
 function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>, random: RandomSource): GuildState {

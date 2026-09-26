@@ -1,10 +1,12 @@
 import { DUNGEONS, DUNGEON_NODES, DUNGEON_RUN_MODIFIERS } from "../../data/dungeons/dungeons";
+import { EQUIPMENT } from "../../data/equipment/equipment";
 import type { RandomSource } from "../../utils/random";
 import type { HeroCombatInstance, QuestCombatSetup } from "../combat/combatTypes";
 import type { CombatState } from "../combat/combatEngine";
 import { createHeroCombatInstance } from "../combat/heroCombatFactory";
 import type { GuildState } from "../guild/types";
 import { grantHeroXp } from "../progression/levelSystem";
+import { xpRequiredForNextLevel } from "../progression/xpSystem";
 import { finishRogueliteRun, resolveRogueliteRecipeDrop, startRogueliteRun } from "../roguelite/recipeRewardService";
 import { resolveAbilityCheck, type AbilityCheckResult } from "../world/worldEventResolver";
 import { markDungeonNodeResolved, startDungeonRun } from "./dungeonService";
@@ -23,6 +25,53 @@ function rewardMultiplier(guild: GuildState): number { const run = activeRun(gui
 function healingMultiplier(guild: GuildState): number { const run = activeRun(guild); const themeHealing = DUNGEONS[run.dungeonId]?.combatModifiers.heroHealingPowerModifier ?? 0; return Math.max(0, 1 + themeHealing + run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.healingPowerModifier ?? 0), 0) + sumDungeonBoonValue(run, "heroHealingPowerModifier")); }
 function scaledGold(guild: GuildState, amount: number): number { return Math.max(0, Math.round(amount * rewardMultiplier(guild) * getDifficulty(guild.difficultyId).questGoldMultiplier)); }
 function updateRun(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>): GuildState { return { ...guild, activeDungeonRun: run }; }
+
+function dungeonNodeXpShare(nodeId: string, nodeType: string): number {
+  if (nodeType === "boss") return .45;
+  if (nodeId.endsWith("_guard")) return .30;
+  return .25;
+}
+function getDungeonCombatXp(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>, nodeId: string, nodeType: string): number {
+  const party = guild.heroes.filter((hero) => run.partyHeroIds.includes(hero.id));
+  const averageLevel = party.length ? party.reduce((sum, hero) => sum + hero.level, 0) / party.length : 1;
+  const referenceLevel = Math.max(1, Math.round(averageLevel));
+  const fullRunTarget = Math.round(xpRequiredForNextLevel(referenceLevel) * .20);
+  return Math.max(1, Math.round(fullRunTarget * dungeonNodeXpShare(nodeId, nodeType)));
+}
+function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>, random: RandomSource): GuildState {
+  const party = guild.heroes.filter((hero) => run.partyHeroIds.includes(hero.id));
+  if (!party.length) return guild;
+  const averageLevel = Math.max(1, Math.floor(party.reduce((sum, hero) => sum + hero.level, 0) / party.length));
+  const minLevel = Math.max(1, averageLevel - 2);
+  const maxLevel = Math.max(minLevel, averageLevel - 1);
+  const allowRare = random.next() < .15;
+  const owned = new Set([...guild.inventory, ...party.flatMap((hero) => Object.values(hero.equipment).filter((id): id is string => Boolean(id)))]);
+  const candidates = Object.values(EQUIPMENT).filter((item) =>
+    item.levelRequirement >= minLevel
+    && item.levelRequirement <= maxLevel
+    && (item.rarity === "common" || item.rarity === "uncommon" || (allowRare && item.rarity === "rare"))
+    && (!item.classRestrictions.length || party.some((hero) => item.classRestrictions.includes(hero.classId)))
+    && !owned.has(item.id)
+  );
+  if (!candidates.length) return guild;
+  const score = (item: (typeof candidates)[number]) => {
+    let value = item.rarity === "rare" ? 3 : item.rarity === "uncommon" ? 2 : 1;
+    for (const hero of party) {
+      if (item.classRestrictions.length && !item.classRestrictions.includes(hero.classId)) continue;
+      const equippedId = hero.equipment[item.slot];
+      const equipped = equippedId ? EQUIPMENT[equippedId] : undefined;
+      if (!equipped) value += 5;
+      else if (equipped.levelRequirement < item.levelRequirement) value += 4;
+      else if (equipped.levelRequirement === item.levelRequirement && equipped.rarity === "common" && item.rarity !== "common") value += 2;
+    }
+    return value;
+  };
+  const ranked = [...candidates].sort((a,b) => score(b) - score(a) || b.levelRequirement - a.levelRequirement || a.id.localeCompare(b.id));
+  const bestScore = score(ranked[0]!);
+  const top = ranked.filter((item) => score(item) >= bestScore - 1).slice(0, 4);
+  const awarded = random.pick(top);
+  return { ...guild, inventory: [...guild.inventory, awarded.id], activeDungeonRun: { ...run, gearIdsAwarded: [...(run.gearIdsAwarded ?? []), awarded.id], lastResolutionText: `${run.lastResolutionText ?? "Expedition cleared."} Expedition Cache: ${awarded.name}.` } };
+}
 function recoverInstances(instances: readonly HeroCombatInstance[], hpRatio: number, manaRatio: number, staminaRatio: number): HeroCombatInstance[] {
   return instances.map((instance) => instance.isAlive ? { ...instance, currentHP: Math.min(instance.maxHP, instance.currentHP + Math.round(instance.maxHP * hpRatio)), currentMana: Math.min(instance.maxMana, instance.currentMana + Math.round(instance.maxMana * manaRatio)), currentStamina: Math.min(instance.maxStamina, instance.currentStamina + Math.round(instance.maxStamina * staminaRatio)) } : instance);
 }
@@ -108,7 +157,7 @@ export function resolveDungeonCombat(guild: GuildState, status: "victory" | "def
   const run = activeRun(guild); const node = DUNGEON_NODES[run.currentNodeId]; if (!node || !["combat", "elite", "boss"].includes(node.type)) throw new Error("Current dungeon node is not combat");
   if (run.resolvedNodeIds.includes(node.id)) throw new Error("Dungeon node has already been resolved");
   if (status === "defeat") { const defeatedRun = { ...run, heroInstances: instances, combatState: null, combatRandomState: null, status: "defeat" as const, lastResolutionText: "The expedition was defeated in the depths." }; const next = syncHeroes(updateRun(guild, defeatedRun), instances); return { guild: next, check: null, text: defeatedRun.lastResolutionText, goldDelta: 0, recipeId: null }; }
-  const goldDelta = scaledGold(guild, node.goldReward ?? 0); const xp = node.xpRewardPerHero ?? 0; const text = `${node.title} cleared. ${goldDelta} gold and up to ${xp} XP per surviving hero.`;
+  const goldDelta = scaledGold(guild, node.goldReward ?? 0); const xp = getDungeonCombatXp(guild, run, node.id, node.type); const text = `${node.title} cleared. ${goldDelta} gold and up to ${xp} XP per surviving hero.`;
   let resolvedRun = markDungeonNodeResolved({ ...run, heroInstances: instances, combatState: null, combatRandomState: null }, text);
   resolvedRun = { ...resolvedRun, goldEarned: resolvedRun.goldEarned + goldDelta, xpEarnedPerHero: resolvedRun.xpEarnedPerHero + xp };
   if (node.type !== "boss") resolvedRun = offerDungeonBoonChoices(resolvedRun, random);
@@ -116,6 +165,7 @@ export function resolveDungeonCombat(guild: GuildState, status: "victory" | "def
   let recipeId: string | null = null;
   if (node.type === "elite" || node.type === "boss") { const rareLootModifier = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.rareLootModifier ?? 0), 0) + sumDungeonBoonValue(run, "rareLootModifier"); const party = next.heroes.filter((hero) => run.partyHeroIds.includes(hero.id)); const partyAverageLevel = party.reduce((sum, hero) => sum + hero.level, 0) / Math.max(1, party.length); const encounterId = run.selectedEncounterIds[node.id]; const drop = resolveRogueliteRecipeDrop(next, node.type, random, rareLootModifier, DUNGEONS[run.dungeonId]!.themeId, { encounterId, partyAverageLevel }); next = drop.guild; recipeId = drop.result.droppedRecipeId; if (recipeId && next.activeDungeonRun) next = updateRun(next, { ...next.activeDungeonRun, recipeIdsUnlocked: [...next.activeDungeonRun.recipeIdsUnlocked, recipeId] }); }
   if (next.activeDungeonRun?.status === "victory") {
+    next = awardExpeditionCache(next, next.activeDungeonRun, random);
     const score = calculateDungeonRunScore(next.activeDungeonRun); const record = next.rogueliteRotation.records[run.dungeonId] ?? createRogueliteDungeonRecord();
     next = { ...next, rogueliteRotation: { ...next.rogueliteRotation, records: { ...next.rogueliteRotation.records, [run.dungeonId]: { ...record, victories: record.victories + 1, bestScore: Math.max(record.bestScore, score.total), bestGrade: score.total >= record.bestScore ? score.grade : record.bestGrade, lastVictoryDay: next.currentDay } } } };
   }

@@ -196,6 +196,7 @@ describe("repeatable balance simulations", () => {
       { id: "chapter4-return-blackwater", questId: "return_to_blackwater", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8520 },
       { id: "chapter4-return-blackwater-one-lagging", questId: "return_to_blackwater", heroLevel: 6, heroLevels: [6, 6, 6, 5] as const, seed: 8530 },
       { id: "chapter4-lanterns-catchup-l6", questId: "lanterns_for_the_lost", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8535 },
+      { id: "chapter4-remembering-house-l7", questId: "the_house_that_remembers", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8537 },
       { id: "chapter4-low-water-l6", questId: "procession_at_low_water", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8540 },
       { id: "chapter4-low-water-l7", questId: "procession_at_low_water", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8550 },
       { id: "chapter4-bell-widow-l6", questId: "bell_widow_boss", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8560 },
@@ -219,6 +220,7 @@ describe("repeatable balance simulations", () => {
     expect(byId["chapter4-return-blackwater"]!.winRate).toBeGreaterThanOrEqual(.50);
     expect(byId["chapter4-return-blackwater-one-lagging"]!.winRate).toBeGreaterThanOrEqual(.50);
     expect(byId["chapter4-lanterns-catchup-l6"]!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId["chapter4-remembering-house-l7"]!.winRate).toBeGreaterThanOrEqual(.50);
     expect(byId["chapter4-low-water-l6"]!.winRate).toBeGreaterThanOrEqual(.50);
     expect(byId["chapter4-low-water-l7"]!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId["chapter4-bell-widow-l6"]!.winRate).toBeGreaterThanOrEqual(.75);

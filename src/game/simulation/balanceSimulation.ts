@@ -27,7 +27,7 @@ import { calculateHero } from "../heroes/heroCalculator";
 import type { EquipmentSlot } from "../heroes/types";
 
 export type SimulationGearProfile = "starter" | "lagged_basic";
-export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile }
+export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number }
 export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; averageRounds: number; averageSurvivingHeroes: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
 export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
 export interface EconomySimulationResult { scenarioId: string; startingGold: number; endingGold: number; netGold: number; questIncome: number; tavernIncome: number; salaryPaid: number; fieldExpenses: number; arrears: number; breakEvenQuestsPerWeek: number; goldAfterFacilityReserve: number }
@@ -124,7 +124,8 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
     const random = createSeededRandom(scenario.seed + run * 7919);
     const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "starter");
     let carried = undefined; let final: CombatState | undefined;
-    for (let encounterIndex = 0; encounterIndex < QUESTS[scenario.questId]!.encounterIds.length; encounterIndex++) {
+    const encounterCount = Math.min(QUESTS[scenario.questId]!.encounterIds.length, scenario.encounterLimit ?? Number.POSITIVE_INFINITY);
+    for (let encounterIndex = 0; encounterIndex < encounterCount; encounterIndex++) {
       final = autoplayEncounter(createCombatState(scenario.questId, encounterIndex, heroes, random, carried, undefined, [], scenario.difficultyId), random);
       if (final.status !== "victory") break;
       const advanced = advanceToNextEncounter({ questDefinitionId: scenario.questId, partyId: "sim", currentEncounterIndex: encounterIndex, status: "active", goldEarned: 0, xpEarnedPerHero: 0, collectedLootIds: [], collectedMaterials: {} }, final.heroes.map((item) => item.instance));

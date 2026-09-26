@@ -157,4 +157,21 @@ export const EQUIPMENT_ICON_ART: Readonly<Record<string, ImageSourcePropType>> =
   "wolfhide-boots": require("../../../assets-runtime/images/equipment/complete/wolfhide-boots.webp"),
   "worn-sword": require("../../../assets-runtime/images/equipment/complete/worn-sword.webp"),
   "yew-shortbow": require("../../../assets-runtime/images/equipment/complete/yew-shortbow.webp"),
+
+  // Temporary shared silhouettes for the Chapter 6-7 balance gear; dedicated art can replace these mappings later.
+  "sixth-chorus-crozier": require("../../../assets-runtime/images/equipment/complete/wardstone-scepter.webp"),
+  "oathwind-quarterstaff": require("../../../assets-runtime/images/equipment/complete/seven-bells-quarterstaff.webp"),
+  "laurel-breaker-rapier": require("../../../assets-runtime/images/equipment/complete/echoing-verse-rapier.webp"),
+  "wardglass-recurve": require("../../../assets-runtime/images/equipment/complete/stormstring-recurve.webp"),
+  "sixth-gate-shield": require("../../../assets-runtime/images/equipment/complete/adamant-door-shield.webp"),
+  "skyvault-crozier": require("../../../assets-runtime/images/equipment/complete/wardstone-scepter.webp"),
+  "thunderstep-quarterstaff": require("../../../assets-runtime/images/equipment/complete/seven-bells-quarterstaff.webp"),
+  "concord-rapier": require("../../../assets-runtime/images/equipment/complete/echoing-verse-rapier.webp"),
+  "stormscript-recurve": require("../../../assets-runtime/images/equipment/complete/stormstring-recurve.webp"),
+  "skyvault-aegis": require("../../../assets-runtime/images/equipment/complete/adamant-door-shield.webp"),
+  "brassbound-mail": require("../../../assets-runtime/images/equipment/complete/formation-plate.webp"),
+  "resonant-fieldcoat": require("../../../assets-runtime/images/equipment/complete/free-oath-coat.webp"),
+  "skyroad-greaves": require("../../../assets-runtime/images/equipment/complete/stormglass-boots.webp"),
+  "envoy-crest": require("../../../assets-runtime/images/equipment/complete/thornwarden-hood.webp"),
+  "concord-seal": require("../../../assets-runtime/images/equipment/complete/harmonic-locket.webp"),
 };

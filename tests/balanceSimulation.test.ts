@@ -248,26 +248,25 @@ describe("repeatable balance simulations", () => {
   }, 300_000);
 
   it("Chapter 7 diagnostic first encounters", () => {
-    const bases = [
+    const scenarios = [
       { id: "road", questId: "road_above_the_clouds", heroLevel: 12, seed: 11000 },
       { id: "embassy", questId: "embassy_of_empty_armor", heroLevel: 12, seed: 11100 },
       { id: "siege", questId: "siege_of_skyvault", heroLevel: 12, seed: 11200 },
       { id: "severed", questId: "the_severed_voice", heroLevel: 13, seed: 11300 },
       { id: "varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 11400 },
     ] as const;
-    const results = bases.flatMap((scenario) => [-1, -2].map((enemyLevelModifier) => simulateCombatScenario({
-      id: `chapter7-diagnostic-${scenario.id}-enemy${enemyLevelModifier}`,
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      id: `chapter7-diagnostic-${scenario.id}-authored`,
       questId: scenario.questId,
       heroLevel: scenario.heroLevel,
       partyClasses: ["warrior", "ranger", "cleric", "mage"],
       difficultyId: "standard",
-      runs: 4,
-      seed: scenario.seed + Math.abs(enemyLevelModifier) * 17,
+      runs: 6,
+      seed: scenario.seed,
       gearProfile: "campaign_lagged",
       progressionProfile: "subclass_ready",
       encounterLimit: 1,
-      enemyLevelModifier,
-    })));
+    }));
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
   }, 120_000);

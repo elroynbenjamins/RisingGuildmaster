@@ -8,6 +8,7 @@ import { QUESTS } from "../src/data/quests/quests";
 import { QUEST_LOOT_TABLES } from "../src/data/loot/questLootTables";
 import { EQUIPMENT } from "../src/data/equipment/equipment";
 import { getSkillIconArt } from "../src/data/skills/skillArt";
+import { BOSS_PHASES } from "../src/data/bosses/bossPhases";
 
 describe("Chapter 3 Frostmarch campaign", () => {
   it("provides an ordered eight-node campaign and three staged regional side quests", () => {
@@ -33,7 +34,6 @@ describe("Chapter 3 Frostmarch campaign", () => {
   });
 
   it("gives Vaelith a real two-stage finale escalation", () => {
-    const { BOSS_PHASES } = require("../src/data/bosses/bossPhases") as typeof import("../src/data/bosses/bossPhases");
     expect(BOSS_PHASES.vaelith_pale_wind?.summonGroups).toEqual([{ enemyDefinitionId: "aurora_seer", count: 1 }]);
     expect(BOSS_PHASES.vaelith_crown_echo?.heroPulseDamageMaxHpRatio).toBe(.08);
   });

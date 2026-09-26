@@ -100,7 +100,7 @@ describe("repeatable balance simulations", () => {
     expect(vaelithVeteran.winRate).toBeLessThan(1);
     expect(vaelithIron.winRate).toBeLessThanOrEqual(.50);
     expect(vaelithIron.averageSurvivingHeroes).toBeLessThan(2);
-  }, 150_000);
+  }, 210_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [

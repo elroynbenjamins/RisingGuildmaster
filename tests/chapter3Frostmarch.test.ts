@@ -8,6 +8,7 @@ import { QUESTS } from "../src/data/quests/quests";
 import { QUEST_LOOT_TABLES } from "../src/data/loot/questLootTables";
 import { EQUIPMENT } from "../src/data/equipment/equipment";
 import { getSkillIconArt } from "../src/data/skills/skillArt";
+import { BOSS_PHASES } from "../src/data/bosses/bossPhases";
 
 describe("Chapter 3 Frostmarch campaign", () => {
   it("provides an ordered eight-node campaign and three staged regional side quests", () => {
@@ -30,6 +31,11 @@ describe("Chapter 3 Frostmarch campaign", () => {
     const ids = QUEST_LOOT_TABLES.frostmarch_campaign_loot!.itemIds;
     expect(ids).toEqual(expect.arrayContaining(["wardplate", "spellweaver-hood", "wardmarch-boots", "sapphire-ward-ring"]));
     expect(ids.every((id) => EQUIPMENT[id]?.levelRequirement === 5)).toBe(true);
+  });
+
+  it("gives Vaelith a real two-stage finale escalation", () => {
+    expect(BOSS_PHASES.vaelith_pale_wind?.summonGroups).toEqual([{ enemyDefinitionId: "aurora_seer", count: 1 }]);
+    expect(BOSS_PHASES.vaelith_crown_echo?.heroPulseDamageMaxHpRatio).toBe(.08);
   });
 
   it("defeats an echo rather than killing a true frost drake", () => {

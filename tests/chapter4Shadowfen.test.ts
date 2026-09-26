@@ -10,6 +10,8 @@ import { ENEMY_PORTRAITS } from "../src/data/enemies/enemyPortraits";
 import { EQUIPMENT } from "../src/data/equipment/equipment";
 import { QUESTS } from "../src/data/quests/quests";
 import { GENERATED_SKILL_ICON_ART } from "../src/data/skills/generatedSkillIconArt";
+import { getQuestXpForHero } from "../src/game/quests/questResolver";
+import { testHero } from "./testHero";
 
 describe("Chapter 4 Shadowfen campaign", () => {
   it("keeps Chapters 2-4 on the intended low-level campaign curve", () => {
@@ -29,6 +31,24 @@ describe("Chapter 4 Shadowfen campaign", () => {
     CHAPTER_4.nodeIds.forEach((id, index) => expect(CHAPTER_4_NODES[id]?.prerequisiteNodeIds).toEqual(index ? [CHAPTER_4.nodeIds[index - 1]] : [CHAPTER_3.nodeIds.at(-1)]));
     expect(CHAPTER_4_NODES.drowned_archivist_boss).toMatchObject({ unlockRegionIds: ["ashlands"], setWorldFlags: { chapter_4_complete: true, ashlands_unlocked: true } });
     expect(CHAPTER_3_NODES.vaelith_boss?.setWorldFlags).toMatchObject({ vaelith_freed: true });
+  });
+
+  it("smooths the two long attrition missions without reducing hero XP", () => {
+    expect(QUESTS.procession_at_low_water).toMatchObject({ betweenEncounterHpRecoveryRatio: .10, xpRewardPerHero: 1185 });
+    expect(QUESTS.archive_below).toMatchObject({ betweenEncounterHpRecoveryRatio: .10, xpRewardPerHero: 1217 });
+    expect(QUEST_ENCOUNTERS.low_water_procession_one?.enemies.reduce((sum, group) => sum + group.count, 0)).toBe(4);
+    expect(QUEST_ENCOUNTERS.low_water_procession_two?.enemies.reduce((sum, group) => sum + group.count, 0)).toBe(4);
+    expect(QUEST_ENCOUNTERS.low_water_procession_final?.enemies.reduce((sum, group) => sum + group.count, 0)).toBe(5);
+    expect(QUEST_ENCOUNTERS.archive_drowned_stacks?.enemies.reduce((sum, group) => sum + group.count, 0)).toBe(4);
+    expect(QUEST_ENCOUNTERS.archive_memory_vault?.enemies.reduce((sum, group) => sum + group.count, 0)).toBe(4);
+    expect(getQuestXpForHero({ ...testHero(), level: 6 }, QUESTS.procession_at_low_water!, 4)).toBe(2753);
+    expect(getQuestXpForHero({ ...testHero(), level: 7 }, QUESTS.archive_below!, 4)).toBe(2359);
+  });
+
+  it("keeps the Chapter 4 opening loot one tier behind rather than falling back to obsolete gear", () => {
+    const itemIds = QUEST_LOOT_TABLES.deep_shadowfen_loot!.itemIds;
+    expect(itemIds).toEqual(expect.arrayContaining(["shadowweave-mantle", "ironheart-amulet", "sapphire-ward-ring"]));
+    expect(itemIds.every((id) => EQUIPMENT[id]?.levelRequirement === 5)).toBe(true);
   });
 
   it("gives both side quests and both bosses persistent recipe rewards", () => {

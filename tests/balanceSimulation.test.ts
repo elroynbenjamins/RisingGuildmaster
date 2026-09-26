@@ -19,6 +19,21 @@ describe("repeatable balance simulations", () => {
     }
   });
 
+  it("builds a realistic late-campaign profile with useful but slightly lagged story gear", () => {
+    const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 12, 4425, "campaign_lagged", "subclass_ready");
+    for (const hero of party) {
+      expect(hero.currentHP).toBe(calculateHero(hero).stats.maxHP);
+      const equipped = Object.values(hero.equipment).filter((id): id is string => Boolean(id)).map((id) => EQUIPMENT[id]!);
+      expect(equipped.length).toBeGreaterThanOrEqual(4);
+      expect(equipped.every((item) => item.rarity !== "legendary")).toBe(true);
+      expect(equipped.some((item) => item.levelRequirement >= 7)).toBe(true);
+      for (const item of equipped) {
+        const target = item.slot === "weapon" || item.slot === "armor" ? hero.level - 1 : hero.level - 2;
+        expect(item.levelRequirement).toBeLessThanOrEqual(Math.max(1, target));
+      }
+    }
+  });
+
   it("adds representative Level-5 subclasses to the normal progression simulation profile", () => {
     const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 4450, "lagged_basic", "subclass_ready");
     expect(party.map((hero) => hero.subclassId)).toEqual(["guardian", "sharpshooter", "pyromancer", "life_priest"]);
@@ -189,7 +204,7 @@ describe("repeatable balance simulations", () => {
     }
   }, 180_000);
 
-  it("checks Chapter 7 Iron Hills with lagged gear at intended progression", () => {
+  it("checks Chapter 7 Iron Hills with realistic campaign-lagged gear at intended progression", () => {
     const scenarios = [
       { id: "road", questId: "road_above_the_clouds", heroLevel: 12, seed: 10100 },
       { id: "embassy", questId: "embassy_of_empty_armor", heroLevel: 12, seed: 10200 },
@@ -207,7 +222,7 @@ describe("repeatable balance simulations", () => {
         difficultyId,
         runs: 8,
         seed: scenario.seed,
-        gearProfile: "lagged_basic",
+        gearProfile: "campaign_lagged",
         progressionProfile: "subclass_ready",
       }),
     ));
@@ -231,6 +246,27 @@ describe("repeatable balance simulations", () => {
       expect(veteranResult.winRate).toBeGreaterThanOrEqual(ironResult.winRate);
     }
   }, 300_000);
+
+  it("reports Chapter 7 Standard stress cases with deliberately basic lagged gear", () => {
+    const scenarios = [
+      { id: "road-basic", questId: "road_above_the_clouds", heroLevel: 12, seed: 10700 },
+      { id: "siege-basic", questId: "siege_of_skyvault", heroLevel: 12, seed: 10800 },
+      { id: "varkesh-basic", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 10900 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      id: `chapter7-${scenario.id}-standard`,
+      questId: scenario.questId,
+      heroLevel: scenario.heroLevel,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 4,
+      seed: scenario.seed,
+      gearProfile: "lagged_basic",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+  }, 180_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [

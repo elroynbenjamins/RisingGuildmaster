@@ -32,6 +32,12 @@ describe("Chapter 3 Frostmarch campaign", () => {
     expect(ids.every((id) => EQUIPMENT[id]?.levelRequirement === 5)).toBe(true);
   });
 
+  it("gives Vaelith a real two-stage finale escalation", () => {
+    const { BOSS_PHASES } = require("../src/data/bosses/bossPhases") as typeof import("../src/data/bosses/bossPhases");
+    expect(BOSS_PHASES.vaelith_pale_wind?.summonGroups).toEqual([{ enemyDefinitionId: "aurora_seer", count: 1 }]);
+    expect(BOSS_PHASES.vaelith_crown_echo?.heroPulseDamageMaxHpRatio).toBe(.08);
+  });
+
   it("defeats an echo rather than killing a true frost drake", () => {
     expect(ENEMIES.vaelith_pale_echo?.name).toContain("Echo");
     expect(CHAPTER_3_NODES.vaelith_boss?.setWorldFlags).toMatchObject({ vaelith_echo_broken: true, vaelith_freed: true });

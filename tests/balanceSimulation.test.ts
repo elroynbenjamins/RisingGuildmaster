@@ -65,6 +65,33 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter3-vaelith")!.averageSurvivingHeroes).toBeGreaterThan(3);
   }, 120_000);
 
+  it("compares intended-level Frostmarch bosses across difficulty with lagged basic gear", () => {
+    const encounters = [
+      { id: "hroth", questId: "hroth_iceblood_boss", heroLevel: 5, seed: 7200 },
+      { id: "glimmerlake", questId: "beneath_glimmerlake", heroLevel: 6, seed: 7300 },
+      { id: "vaelith", questId: "vaelith_pale_echo_boss", heroLevel: 6, seed: 7400 },
+    ] as const;
+    const results = encounters.flatMap((encounter) => (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>
+      simulateCombatScenario({
+        id: `chapter3-${encounter.id}-${difficultyId}`,
+        questId: encounter.questId,
+        heroLevel: encounter.heroLevel,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId,
+        runs: 4,
+        seed: encounter.seed,
+        gearProfile: "lagged_basic",
+      }),
+    ));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    for (const encounter of encounters) {
+      const standard = results.find((result) => result.scenarioId === `chapter3-${encounter.id}-standard`)!;
+      const iron = results.find((result) => result.scenarioId === `chapter3-${encounter.id}-iron_guild`)!;
+      expect(standard.averageRemainingHpRatioOnWins).toBeGreaterThanOrEqual(iron.averageRemainingHpRatioOnWins);
+    }
+  }, 150_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

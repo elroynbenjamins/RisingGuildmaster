@@ -221,6 +221,33 @@ describe("repeatable balance simulations", () => {
     expect(results.filter((result) => !result.scenarioId.includes("underprepared")).every((result) => result.winRate > 0)).toBe(true);
   }, 300_000);
 
+
+  it("reports Chapter 7 and 8 combat lethality with realistic lagged gear", () => {
+    const scenarios = [
+      { id: "chapter7-skyroad-l12", questId: "road_above_the_clouds", heroLevel: 12, seed: 12100 },
+      { id: "chapter7-siege-l12", questId: "siege_of_skyvault", heroLevel: 12, seed: 12200 },
+      { id: "chapter7-voice-l13", questId: "the_severed_voice", heroLevel: 13, seed: 12300 },
+      { id: "chapter7-varkesh-l13", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 12400 },
+      { id: "chapter7-skyroad-underprepared-l11", questId: "road_above_the_clouds", heroLevel: 11, seed: 12500 },
+      { id: "chapter8-tidewatch-road-l14", questId: "road_to_tidewatch", heroLevel: 14, seed: 12600 },
+      { id: "chapter8-siege-l14", questId: "siege_of_tidewatch", heroLevel: 14, seed: 12700 },
+      { id: "chapter8-board-l15", questId: "board_the_nameless", heroLevel: 15, seed: 12800 },
+      { id: "chapter8-admiral-l15", questId: "admiral_nhal_veyr_boss", heroLevel: 15, seed: 12900 },
+      { id: "chapter8-siege-underprepared-l13", questId: "siege_of_tidewatch", heroLevel: 13, seed: 13000 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 5,
+      gearProfile: "lagged_basic",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    expect(results.filter((result) => !result.scenarioId.includes("underprepared")).every((result) => result.winRate > 0)).toBe(true);
+  }, 300_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

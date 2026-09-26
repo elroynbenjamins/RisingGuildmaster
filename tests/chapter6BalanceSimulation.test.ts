@@ -73,7 +73,7 @@ describe("Chapter 6 balance probe", () => {
       }
 
       rows.push({ checkpoint: "chapter-6-entry", level: hero.level, xp: hero.xp });
-      const chapter6 = CAMPAIGN_CHAPTERS.chapter_6!;
+      const chapter6 = CAMPAIGN_CHAPTERS[6]!;
       const chapter6MainIds = chapter6.nodeIds
         .map((id) => CAMPAIGN_NODES[id]?.questId)
         .filter((id): id is string => Boolean(id));

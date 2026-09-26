@@ -1,7 +1,6 @@
 import { DUNGEONS, DUNGEON_NODES, DUNGEON_RUN_MODIFIERS } from "../../data/dungeons/dungeons";
 import { EQUIPMENT } from "../../data/equipment/equipment";
-import { CAMPAIGN_RECIPE_EQUIPMENT } from "../../data/equipment/campaignRecipeEquipment";
-import { ROGUELITE_THEME_EQUIPMENT } from "../../data/equipment/rogueliteThemeEquipment";
+import { CRAFTING_RECIPES } from "../../data/crafting/recipes";
 import type { RandomSource } from "../../utils/random";
 import type { HeroCombatInstance, QuestCombatSetup } from "../combat/combatTypes";
 import type { CombatState } from "../combat/combatEngine";
@@ -39,7 +38,7 @@ function syncHeroes(guild: GuildState, instances: readonly HeroCombatInstance[],
   return { ...guild, heroes: guild.heroes.map((hero) => { const instance = byId.get(hero.id); if (!instance) return hero; const synced = { ...hero, currentHP: Math.round(instance.currentHP), isAvailable: instance.isAlive }; const earnedXp = recommendedLevelMax === undefined ? xp : getRogueliteXpForHero(xp, hero.level, recommendedLevelMax); return instance.isAlive ? grantHeroXp(synced, earnedXp) : synced; }) };
 }
 
-const DUNGEON_CACHE_EXCLUDED_IDS = new Set([...Object.keys(CAMPAIGN_RECIPE_EQUIPMENT), ...Object.keys(ROGUELITE_THEME_EQUIPMENT)]);
+const DUNGEON_CACHE_EXCLUDED_IDS = new Set(Object.values(CRAFTING_RECIPES).filter((recipe) => Boolean(recipe.unlockSource) || recipe.id.startsWith("hunt_")).map((recipe) => recipe.outputEquipmentId));
 
 export function chooseDungeonCacheEquipmentId(guild: GuildState, partyHeroIds: readonly string[], random: RandomSource): string | null {
   const party = guild.heroes.filter((hero) => partyHeroIds.includes(hero.id));

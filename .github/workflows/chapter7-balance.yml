@@ -1,0 +1,32 @@
+name: Chapter 7 Balance
+
+on:
+  push:
+    branches:
+      - balance/ch7-iron-hills-pass
+
+concurrency:
+  group: chapter7-balance-v2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chapter7:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Run Chapter 7 balance simulations
+        run: pnpm vitest run tests/balanceSimulation.test.ts -t "calibrates Chapter 7 first-wave survival quality" --reporter=verbose

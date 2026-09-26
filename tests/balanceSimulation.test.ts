@@ -19,6 +19,21 @@ describe("repeatable balance simulations", () => {
     }
   });
 
+  it("builds a realistic late-campaign profile with useful but slightly lagged story gear", () => {
+    const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 12, 4425, "campaign_lagged", "subclass_ready");
+    for (const hero of party) {
+      expect(hero.currentHP).toBe(calculateHero(hero).stats.maxHP);
+      const equipped = Object.values(hero.equipment).filter((id): id is string => Boolean(id)).map((id) => EQUIPMENT[id]!);
+      expect(equipped.length).toBeGreaterThanOrEqual(4);
+      expect(equipped.every((item) => item.rarity !== "legendary")).toBe(true);
+      expect(equipped.some((item) => item.levelRequirement >= 7)).toBe(true);
+      for (const item of equipped) {
+        const target = item.slot === "weapon" || item.slot === "armor" ? hero.level - 1 : hero.level - 2;
+        expect(item.levelRequirement).toBeLessThanOrEqual(Math.max(1, target));
+      }
+    }
+  });
+
   it("adds representative Level-5 subclasses to the normal progression simulation profile", () => {
     const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 4450, "lagged_basic", "subclass_ready");
     expect(party.map((hero) => hero.subclassId)).toEqual(["guardian", "sharpshooter", "pyromancer", "life_priest"]);
@@ -187,6 +202,154 @@ describe("repeatable balance simulations", () => {
       const partyResults = results.filter((result) => result.scenarioId.includes(`-${party.id}-`));
       expect(partyResults.every((result) => result.winRate > 0)).toBe(true);
     }
+  }, 180_000);
+
+  it("checks Chapter 7 Iron Hills with realistic campaign-lagged gear at intended progression", () => {
+    const scenarios = [
+      { id: "road", questId: "road_above_the_clouds", heroLevel: 12, seed: 10100 },
+      { id: "embassy", questId: "embassy_of_empty_armor", heroLevel: 12, seed: 10200 },
+      { id: "siege", questId: "siege_of_skyvault", heroLevel: 12, seed: 10300 },
+      { id: "severed", questId: "the_severed_voice", heroLevel: 13, seed: 10400 },
+      { id: "varkesh-l12", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 10500 },
+      { id: "varkesh-l13", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 10600 },
+    ] as const;
+    const results = scenarios.flatMap((scenario) => (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>
+      simulateCombatScenario({
+        id: `chapter7-${scenario.id}-${difficultyId}`,
+        questId: scenario.questId,
+        heroLevel: scenario.heroLevel,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId,
+        runs: 4,
+        seed: scenario.seed,
+        gearProfile: "campaign_lagged",
+        progressionProfile: "subclass_ready",
+      }),
+    ));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+
+    const standard = (id: string) => results.find((result) => result.scenarioId === `chapter7-${id}-standard`)!;
+    expect(standard("road").winRate).toBeGreaterThanOrEqual(.75);
+    expect(standard("embassy").winRate).toBeGreaterThanOrEqual(.75);
+    expect(standard("siege").winRate).toBeGreaterThanOrEqual(.50);
+    expect(standard("severed").winRate).toBeGreaterThanOrEqual(.75);
+    expect(standard("varkesh-l13").winRate).toBeGreaterThanOrEqual(.50);
+    expect(standard("varkesh-l13").averageSurvivingHeroes).toBeGreaterThan(1.5);
+    expect(standard("varkesh-l13").winRate).toBeGreaterThanOrEqual(standard("varkesh-l12").winRate);
+
+    for (const scenario of scenarios) {
+      const standardResult = results.find((result) => result.scenarioId === `chapter7-${scenario.id}-standard`)!;
+      const veteranResult = results.find((result) => result.scenarioId === `chapter7-${scenario.id}-veteran`)!;
+      const ironResult = results.find((result) => result.scenarioId === `chapter7-${scenario.id}-iron_guild`)!;
+      expect(standardResult.winRate).toBeGreaterThanOrEqual(veteranResult.winRate);
+      expect(veteranResult.winRate).toBeGreaterThanOrEqual(ironResult.winRate);
+    }
+  }, 300_000);
+
+  it("Chapter 7 diagnostic first encounters", () => {
+    const scenarios = [
+      { id: "severed", questId: "the_severed_voice", heroLevel: 13, seed: 11300 },
+      { id: "varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 11400 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      id: `chapter7-diagnostic-${scenario.id}-authored`,
+      questId: scenario.questId,
+      heroLevel: scenario.heroLevel,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 8,
+      seed: scenario.seed,
+      gearProfile: "campaign_lagged",
+      progressionProfile: "subclass_ready",
+      encounterLimit: 1,
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+  }, 120_000);
+
+  it("checks Chapter 7 Standard full quests after tuning", () => {
+    const scenarios = [
+      { id: "road", questId: "road_above_the_clouds", heroLevel: 12, seed: 12100 },
+      { id: "embassy", questId: "embassy_of_empty_armor", heroLevel: 12, seed: 12200 },
+      { id: "siege", questId: "siege_of_skyvault", heroLevel: 12, seed: 12300 },
+      { id: "severed", questId: "the_severed_voice", heroLevel: 13, seed: 12400 },
+      { id: "varkesh-l12", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 12500 },
+      { id: "varkesh-l13", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 12600 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      id: `chapter7-standard-full-${scenario.id}`,
+      questId: scenario.questId,
+      heroLevel: scenario.heroLevel,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 4,
+      seed: scenario.seed,
+      gearProfile: "campaign_lagged",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    const get = (id: string) => results.find((result) => result.scenarioId === `chapter7-standard-full-${id}`)!;
+    expect(get("road").winRate).toBeGreaterThanOrEqual(.75);
+    expect(get("embassy").winRate).toBeGreaterThanOrEqual(.75);
+    expect(get("siege").winRate).toBeGreaterThanOrEqual(.50);
+    expect(get("severed").winRate).toBeGreaterThanOrEqual(.75);
+    expect(get("varkesh-l13").winRate).toBeGreaterThanOrEqual(.50);
+    expect(get("varkesh-l13").averageSurvivingHeroes).toBeGreaterThan(1.5);
+    expect(get("varkesh-l13").winRate).toBeGreaterThanOrEqual(get("varkesh-l12").winRate);
+  }, 180_000);
+
+  it("calibrates Chapter 7 first-wave survival quality", () => {
+    const scenarios = [
+      { id: "frostmarch-reference", questId: "night_of_blue_horns", heroLevel: 5, seed: 13000, gearProfile: "lagged_basic" as const, enemyLevelModifier: 0 },
+      { id: "road-authored", questId: "road_above_the_clouds", heroLevel: 12, seed: 13100, gearProfile: "campaign_lagged" as const, enemyLevelModifier: 0 },
+      { id: "road-lower", questId: "road_above_the_clouds", heroLevel: 12, seed: 13120, gearProfile: "campaign_lagged" as const, enemyLevelModifier: -1 },
+      { id: "embassy-authored", questId: "embassy_of_empty_armor", heroLevel: 12, seed: 13200, gearProfile: "campaign_lagged" as const, enemyLevelModifier: 0 },
+      { id: "embassy-lower", questId: "embassy_of_empty_armor", heroLevel: 12, seed: 13220, gearProfile: "campaign_lagged" as const, enemyLevelModifier: -1 },
+      { id: "siege-authored", questId: "siege_of_skyvault", heroLevel: 12, seed: 13300, gearProfile: "campaign_lagged" as const, enemyLevelModifier: 0 },
+      { id: "siege-lower", questId: "siege_of_skyvault", heroLevel: 12, seed: 13320, gearProfile: "campaign_lagged" as const, enemyLevelModifier: -1 },
+      { id: "severed-authored", questId: "the_severed_voice", heroLevel: 13, seed: 13400, gearProfile: "campaign_lagged" as const, enemyLevelModifier: 0 },
+      { id: "severed-lower", questId: "the_severed_voice", heroLevel: 13, seed: 13420, gearProfile: "campaign_lagged" as const, enemyLevelModifier: -1 },
+      { id: "varkesh-authored", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 13500, gearProfile: "campaign_lagged" as const, enemyLevelModifier: 0 },
+      { id: "varkesh-lower", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 13520, gearProfile: "campaign_lagged" as const, enemyLevelModifier: -1 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      id: `chapter7-survival-${scenario.id}`,
+      questId: scenario.questId,
+      heroLevel: scenario.heroLevel,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 6,
+      seed: scenario.seed,
+      gearProfile: scenario.gearProfile,
+      progressionProfile: "subclass_ready",
+      encounterLimit: 1,
+      enemyLevelModifier: scenario.enemyLevelModifier,
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+  }, 180_000);
+
+  it("reports Chapter 7 Standard stress cases with deliberately basic lagged gear", () => {
+    const scenarios = [
+      { id: "road-basic", questId: "road_above_the_clouds", heroLevel: 12, seed: 10700 },
+      { id: "siege-basic", questId: "siege_of_skyvault", heroLevel: 12, seed: 10800 },
+      { id: "varkesh-basic", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 10900 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      id: `chapter7-${scenario.id}-standard`,
+      questId: scenario.questId,
+      heroLevel: scenario.heroLevel,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 4,
+      seed: scenario.seed,
+      gearProfile: "lagged_basic",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
   }, 180_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

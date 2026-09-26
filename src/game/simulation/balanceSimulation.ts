@@ -28,9 +28,9 @@ import { FIRST_SUBCLASS_LEVEL, SUBCLASSES } from "../../data/subclasses/subclass
 import { getHeroSkillIds } from "../progression/subclasses/subclassService";
 import type { EquipmentSlot } from "../heroes/types";
 
-export type SimulationGearProfile = "starter" | "lagged_basic";
+export type SimulationGearProfile = "starter" | "lagged_basic" | "campaign_lagged";
 export type SimulationProgressionProfile = "base" | "subclass_ready";
-export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile }
+export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile; enemyLevelModifier?: number }
 export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; averageRounds: number; averageSurvivingHeroes: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
 export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
 export interface EconomySimulationResult { scenarioId: string; startingGold: number; endingGold: number; netGold: number; questIncome: number; tavernIncome: number; salaryPaid: number; fieldExpenses: number; arrears: number; breakEvenQuestsPerWeek: number; goldAfterFacilityReserve: number }
@@ -58,6 +58,33 @@ function equipLaggedBasicGear(hero: Hero): Hero {
   return { ...equipped, currentHP: calculateHero(equipped).stats.maxHP };
 }
 
+function campaignGearTargetLevel(heroLevel: number, slot: EquipmentSlot): number {
+  const lag = slot === "weapon" || slot === "armor" ? 1 : 2;
+  return Math.max(1, heroLevel - lag);
+}
+
+function equipCampaignLaggedGear(hero: Hero): Hero {
+  const equipment = { ...hero.equipment };
+  const rarityRank = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4 } as const;
+  for (const slot of SIMULATION_GEAR_SLOTS) {
+    const targetLevel = campaignGearTargetLevel(hero.level, slot);
+    const candidates = Object.values(EQUIPMENT)
+      .filter((item) => item.slot === slot)
+      .filter((item) => item.levelRequirement <= targetLevel)
+      .filter((item) => item.rarity !== "legendary")
+      .filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(hero.classId))
+      .sort((a, b) =>
+        b.levelRequirement - a.levelRequirement
+        || rarityRank[b.rarity] - rarityRank[a.rarity]
+        || b.value - a.value
+        || a.id.localeCompare(b.id)
+      );
+    if (candidates[0]) equipment[slot] = candidates[0].id;
+  }
+  const equipped = { ...hero, equipment };
+  return { ...equipped, currentHP: calculateHero(equipped).stats.maxHP };
+}
+
 function levelHero(hero: Hero, level: number, index: number, gearProfile: SimulationGearProfile, progressionProfile: SimulationProgressionProfile): Hero {
   let xp = 0;
   for (let current = 1; current < level; current++) xp += xpRequiredForNextLevel(current);
@@ -69,7 +96,7 @@ function levelHero(hero: Hero, level: number, index: number, gearProfile: Simula
     ? Object.values(SUBCLASSES).find((definition) => definition.baseClassId === skilled.classId)
     : undefined;
   const progressed = subclass ? { ...skilled, subclassId: subclass.id } : skilled;
-  const prepared = gearProfile === "lagged_basic" ? equipLaggedBasicGear(progressed) : progressed;
+  const prepared = gearProfile === "lagged_basic" ? equipLaggedBasicGear(progressed) : gearProfile === "campaign_lagged" ? equipCampaignLaggedGear(progressed) : progressed;
   return { ...prepared, currentHP: calculateHero(prepared).stats.maxHP };
 }
 
@@ -133,7 +160,7 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
     let carried = undefined; let final: CombatState | undefined;
     const encounterCount = Math.min(QUESTS[scenario.questId]!.encounterIds.length, scenario.encounterLimit ?? Number.POSITIVE_INFINITY);
     for (let encounterIndex = 0; encounterIndex < encounterCount; encounterIndex++) {
-      final = autoplayEncounter(createCombatState(scenario.questId, encounterIndex, heroes, random, carried, undefined, [], scenario.difficultyId), random);
+      final = autoplayEncounter(createCombatState(scenario.questId, encounterIndex, heroes, random, carried, undefined, [], scenario.difficultyId, scenario.enemyLevelModifier ?? 0), random);
       if (final.status !== "victory") break;
       const advanced = advanceToNextEncounter({ questDefinitionId: scenario.questId, partyId: "sim", currentEncounterIndex: encounterIndex, status: "active", goldEarned: 0, xpEarnedPerHero: 0, collectedLootIds: [], collectedMaterials: {} }, final.heroes.map((item) => item.instance));
       carried = advanced.heroInstances;

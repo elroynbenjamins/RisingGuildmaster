@@ -189,6 +189,49 @@ describe("repeatable balance simulations", () => {
     }
   }, 180_000);
 
+  it("checks Chapter 7 Iron Hills with lagged gear at intended progression", () => {
+    const scenarios = [
+      { id: "road", questId: "road_above_the_clouds", heroLevel: 12, seed: 10100 },
+      { id: "embassy", questId: "embassy_of_empty_armor", heroLevel: 12, seed: 10200 },
+      { id: "siege", questId: "siege_of_skyvault", heroLevel: 12, seed: 10300 },
+      { id: "severed", questId: "the_severed_voice", heroLevel: 13, seed: 10400 },
+      { id: "varkesh-l12", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 10500 },
+      { id: "varkesh-l13", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 10600 },
+    ] as const;
+    const results = scenarios.flatMap((scenario) => (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>
+      simulateCombatScenario({
+        id: `chapter7-${scenario.id}-${difficultyId}`,
+        questId: scenario.questId,
+        heroLevel: scenario.heroLevel,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId,
+        runs: 8,
+        seed: scenario.seed,
+        gearProfile: "lagged_basic",
+        progressionProfile: "subclass_ready",
+      }),
+    ));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+
+    const standard = (id: string) => results.find((result) => result.scenarioId === `chapter7-${id}-standard`)!;
+    expect(standard("road").winRate).toBeGreaterThanOrEqual(.75);
+    expect(standard("embassy").winRate).toBeGreaterThanOrEqual(.75);
+    expect(standard("siege").winRate).toBeGreaterThanOrEqual(.625);
+    expect(standard("severed").winRate).toBeGreaterThanOrEqual(.75);
+    expect(standard("varkesh-l13").winRate).toBeGreaterThanOrEqual(.625);
+    expect(standard("varkesh-l13").averageSurvivingHeroes).toBeGreaterThan(1.5);
+    expect(standard("varkesh-l13").winRate).toBeGreaterThanOrEqual(standard("varkesh-l12").winRate);
+
+    for (const scenario of scenarios) {
+      const standardResult = results.find((result) => result.scenarioId === `chapter7-${scenario.id}-standard`)!;
+      const veteranResult = results.find((result) => result.scenarioId === `chapter7-${scenario.id}-veteran`)!;
+      const ironResult = results.find((result) => result.scenarioId === `chapter7-${scenario.id}-iron_guild`)!;
+      expect(standardResult.winRate).toBeGreaterThanOrEqual(veteranResult.winRate);
+      expect(veteranResult.winRate).toBeGreaterThanOrEqual(ironResult.winRate);
+    }
+  }, 300_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

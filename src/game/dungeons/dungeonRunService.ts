@@ -1,4 +1,7 @@
 import { DUNGEONS, DUNGEON_NODES, DUNGEON_RUN_MODIFIERS } from "../../data/dungeons/dungeons";
+import { EQUIPMENT } from "../../data/equipment/equipment";
+import { CAMPAIGN_RECIPE_EQUIPMENT } from "../../data/equipment/campaignRecipeEquipment";
+import { ROGUELITE_THEME_EQUIPMENT } from "../../data/equipment/rogueliteThemeEquipment";
 import type { RandomSource } from "../../utils/random";
 import type { HeroCombatInstance, QuestCombatSetup } from "../combat/combatTypes";
 import type { CombatState } from "../combat/combatEngine";
@@ -34,6 +37,42 @@ export function getRogueliteXpForHero(baseXp: number, heroLevel: number, recomme
 function syncHeroes(guild: GuildState, instances: readonly HeroCombatInstance[], xp = 0, recommendedLevelMax?: number): GuildState {
   const byId = new Map(instances.map((instance) => [instance.heroId, instance]));
   return { ...guild, heroes: guild.heroes.map((hero) => { const instance = byId.get(hero.id); if (!instance) return hero; const synced = { ...hero, currentHP: Math.round(instance.currentHP), isAvailable: instance.isAlive }; const earnedXp = recommendedLevelMax === undefined ? xp : getRogueliteXpForHero(xp, hero.level, recommendedLevelMax); return instance.isAlive ? grantHeroXp(synced, earnedXp) : synced; }) };
+}
+
+const DUNGEON_CACHE_EXCLUDED_IDS = new Set([...Object.keys(CAMPAIGN_RECIPE_EQUIPMENT), ...Object.keys(ROGUELITE_THEME_EQUIPMENT)]);
+
+export function chooseDungeonCacheEquipmentId(guild: GuildState, partyHeroIds: readonly string[], random: RandomSource): string | null {
+  const party = guild.heroes.filter((hero) => partyHeroIds.includes(hero.id));
+  if (!party.length) return null;
+  const averageLevel = Math.max(1, Math.round(party.reduce((sum, hero) => sum + hero.level, 0) / party.length));
+  const targetMin = Math.max(1, averageLevel - 2);
+  const targetMax = Math.max(targetMin, averageLevel - 1);
+  const ownedIds = new Set([...guild.inventory, ...party.flatMap((hero) => Object.values(hero.equipment).filter((id): id is string => Boolean(id)))]);
+  const usable = (item: (typeof EQUIPMENT)[string]) => !item.classRestrictions.length || party.some((hero) => item.classRestrictions.includes(hero.classId));
+  const isOrdinary = (item: (typeof EQUIPMENT)[string]) => !DUNGEON_CACHE_EXCLUDED_IDS.has(item.id) && !item.specialEffectIds.some((id) => id.includes("trophy"));
+  const normal = Object.values(EQUIPMENT).filter((item) => isOrdinary(item) && usable(item) && item.levelRequirement >= targetMin && item.levelRequirement <= targetMax && (item.rarity === "common" || item.rarity === "uncommon"));
+  const rare = Object.values(EQUIPMENT).filter((item) => isOrdinary(item) && usable(item) && item.levelRequirement >= targetMin && item.levelRequirement <= targetMax && item.rarity === "rare");
+  let pool = random.next() < .15 && rare.length ? [...normal, ...rare] : normal;
+  if (!pool.length) pool = rare;
+  if (!pool.length) pool = Object.values(EQUIPMENT).filter((item) => isOrdinary(item) && usable(item) && item.levelRequirement >= Math.max(1, averageLevel - 3) && item.levelRequirement <= targetMax && ["common","uncommon","rare"].includes(item.rarity));
+  if (!pool.length) return null;
+  const uniquePool = pool.filter((item) => !ownedIds.has(item.id));
+  if (uniquePool.length) pool = uniquePool;
+  const score = (item: (typeof EQUIPMENT)[string]) => {
+    let value = ownedIds.has(item.id) ? -4 : 2;
+    for (const hero of party) {
+      if (item.classRestrictions.length && !item.classRestrictions.includes(hero.classId)) continue;
+      const currentId = hero.equipment[item.slot];
+      const current = currentId ? EQUIPMENT[currentId] : undefined;
+      if (!current) value += 8;
+      else if (item.levelRequirement > current.levelRequirement) value += 4 + (item.levelRequirement - current.levelRequirement) * 2;
+      else if (item.levelRequirement === current.levelRequirement && item.rarity === "rare" && current.rarity !== "rare") value += 2;
+    }
+    return value;
+  };
+  const ranked = [...pool].sort((a, b) => score(b) - score(a) || b.levelRequirement - a.levelRequirement || b.value - a.value || a.id.localeCompare(b.id));
+  const bestScore = score(ranked[0]!);
+  return random.pick(ranked.filter((item) => score(item) >= bestScore - 1).slice(0, 4));
 }
 
 export function beginDungeonExpedition(guild: GuildState, dungeonId: string, partyHeroIds: string[], modifierIds: string[] = [], random?: RandomSource): GuildState {
@@ -115,11 +154,16 @@ export function resolveDungeonCombat(guild: GuildState, status: "victory" | "def
   let next = syncHeroes(updateRun({ ...guild, gold: guild.gold + goldDelta }, resolvedRun), instances, xp, DUNGEONS[run.dungeonId]!.recommendedLevelMax);
   let recipeId: string | null = null;
   if (node.type === "elite" || node.type === "boss") { const rareLootModifier = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.rareLootModifier ?? 0), 0) + sumDungeonBoonValue(run, "rareLootModifier"); const party = next.heroes.filter((hero) => run.partyHeroIds.includes(hero.id)); const partyAverageLevel = party.reduce((sum, hero) => sum + hero.level, 0) / Math.max(1, party.length); const encounterId = run.selectedEncounterIds[node.id]; const drop = resolveRogueliteRecipeDrop(next, node.type, random, rareLootModifier, DUNGEONS[run.dungeonId]!.themeId, { encounterId, partyAverageLevel }); next = drop.guild; recipeId = drop.result.droppedRecipeId; if (recipeId && next.activeDungeonRun) next = updateRun(next, { ...next.activeDungeonRun, recipeIdsUnlocked: [...next.activeDungeonRun.recipeIdsUnlocked, recipeId] }); }
+  let cacheEquipmentId: string | null = null;
   if (next.activeDungeonRun?.status === "victory") {
-    const score = calculateDungeonRunScore(next.activeDungeonRun); const record = next.rogueliteRotation.records[run.dungeonId] ?? createRogueliteDungeonRecord();
+    cacheEquipmentId = chooseDungeonCacheEquipmentId(next, run.partyHeroIds, random);
+    if (cacheEquipmentId) next = { ...next, inventory: [...next.inventory, cacheEquipmentId], activeDungeonRun: { ...next.activeDungeonRun, cacheEquipmentId } };
+    const score = calculateDungeonRunScore(next.activeDungeonRun!); const record = next.rogueliteRotation.records[run.dungeonId] ?? createRogueliteDungeonRecord();
     next = { ...next, rogueliteRotation: { ...next.rogueliteRotation, records: { ...next.rogueliteRotation.records, [run.dungeonId]: { ...record, victories: record.victories + 1, bestScore: Math.max(record.bestScore, score.total), bestGrade: score.total >= record.bestScore ? score.grade : record.bestGrade, lastVictoryDay: next.currentDay } } } };
   }
-  return { guild: next, check: null, text, goldDelta, recipeId };
+  const resultText = cacheEquipmentId ? `${text} Expedition cache: ${EQUIPMENT[cacheEquipmentId]?.name ?? cacheEquipmentId}.` : text;
+  if (cacheEquipmentId && next.activeDungeonRun) next = updateRun(next, { ...next.activeDungeonRun, lastResolutionText: resultText });
+  return { guild: next, check: null, text: resultText, goldDelta, recipeId };
 }
 
 export function selectDungeonBoon(guild: GuildState, boonId: string): GuildState {

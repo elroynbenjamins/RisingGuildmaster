@@ -102,6 +102,24 @@ describe("repeatable balance simulations", () => {
     expect(vaelithIron.averageSurvivingHeroes).toBeLessThan(2);
   }, 210_000);
 
+  it("isolates the Glimmerlake encounter causing the difficulty cliff", () => {
+    const results = (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>
+      simulateCombatScenario({
+        id: `chapter3-glimmerlake-hall-${difficultyId}`,
+        questId: "beneath_glimmerlake",
+        heroLevel: 6,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId,
+        runs: 8,
+        seed: 7350,
+        gearProfile: "lagged_basic",
+        encounterLimit: 1,
+      }),
+    );
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+  }, 120_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

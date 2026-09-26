@@ -248,6 +248,28 @@ describe("repeatable balance simulations", () => {
     expect(results.filter((result) => !result.scenarioId.includes("underprepared")).every((result) => result.winRate > 0)).toBe(true);
   }, 300_000);
 
+
+  it("reports Chapter 9 endgame lethality with realistic lagged gear", () => {
+    const scenarios = [
+      { id: "chapter9-descent-l16", questId: "descent_below_bells", heroLevel: 16, seed: 13100 },
+      { id: "chapter9-citadel-l16", questId: "citadel_unwritten_law", heroLevel: 16, seed: 13200 },
+      { id: "chapter9-chain-l17", questId: "chain_beneath_fleet", heroLevel: 17, seed: 13300 },
+      { id: "chapter9-serekh-l17", questId: "serekh_chartmaker_boss", heroLevel: 17, seed: 13400 },
+      { id: "chapter9-descent-underprepared-l15", questId: "descent_below_bells", heroLevel: 15, seed: 13500 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 5,
+      gearProfile: "lagged_basic",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    expect(results.filter((result) => !result.scenarioId.includes("underprepared")).every((result) => result.winRate > 0)).toBe(true);
+  }, 300_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

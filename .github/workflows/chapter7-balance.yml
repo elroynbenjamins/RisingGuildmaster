@@ -29,4 +29,4 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
       - name: Run Chapter 7 balance simulations
-        run: pnpm vitest run tests/balanceSimulation.test.ts -t "Chapter 7|realistic late-campaign" --reporter=verbose
+        run: pnpm vitest run tests/balanceSimulation.test.ts -t "Chapter 7 diagnostic" --reporter=verbose

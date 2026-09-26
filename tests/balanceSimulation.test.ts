@@ -197,7 +197,8 @@ describe("repeatable balance simulations", () => {
       { id: "chapter4-return-blackwater-one-lagging", questId: "return_to_blackwater", heroLevel: 6, heroLevels: [6, 6, 6, 5] as const, seed: 8530 },
       { id: "chapter4-low-water-l6", questId: "procession_at_low_water", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8540 },
       { id: "chapter4-low-water-l7", questId: "procession_at_low_water", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8550 },
-      { id: "chapter4-bell-widow", questId: "bell_widow_boss", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8560 },
+      { id: "chapter4-bell-widow-l6", questId: "bell_widow_boss", heroLevel: 6, heroLevels: [6, 6, 6, 6] as const, seed: 8560 },
+      { id: "chapter4-bell-widow-l7", questId: "bell_widow_boss", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8565 },
       { id: "chapter4-archive-below", questId: "archive_below", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8570 },
       { id: "chapter4-morrowveil", questId: "morrowveil_drowned_archivist_boss", heroLevel: 7, heroLevels: [7, 7, 7, 7] as const, seed: 8580 },
     ] as const;

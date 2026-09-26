@@ -78,7 +78,7 @@ describe("repeatable balance simulations", () => {
         heroLevel: encounter.heroLevel,
         partyClasses: ["warrior", "ranger", "cleric", "mage"],
         difficultyId,
-        runs: 4,
+        runs: 8,
         seed: encounter.seed,
         gearProfile: "lagged_basic",
       }),

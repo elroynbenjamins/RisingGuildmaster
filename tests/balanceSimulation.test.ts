@@ -213,6 +213,18 @@ describe("repeatable balance simulations", () => {
     }));
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
+    const byId = Object.fromEntries(results.map((result) => [result.scenarioId, result]));
+    expect(byId["chapter3-vaelith-l6"]!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId["chapter3-vaelith-one-lagging"]!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId["chapter4-return-blackwater"]!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId["chapter4-return-blackwater-one-lagging"]!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId["chapter4-lanterns-catchup-l6"]!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId["chapter4-low-water-l6"]!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId["chapter4-low-water-l7"]!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId["chapter4-bell-widow-l6"]!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId["chapter4-bell-widow-l7"]!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId["chapter4-archive-below"]!.winRate).toBeGreaterThanOrEqual(.75);
+    expect(byId["chapter4-morrowveil"]!.winRate).toBeGreaterThanOrEqual(.50);
   }, 240_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

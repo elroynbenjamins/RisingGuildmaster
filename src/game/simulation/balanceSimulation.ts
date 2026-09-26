@@ -24,10 +24,13 @@ import { createHeroContract } from "../recruitment/contractService";
 import { calculateWeeklySalary } from "../recruitment/recruitmentCostCalculator";
 import { EQUIPMENT } from "../../data/equipment/equipment";
 import { calculateHero } from "../heroes/heroCalculator";
+import { FIRST_SUBCLASS_LEVEL, SUBCLASSES } from "../../data/subclasses/subclasses";
+import { getHeroSkillIds } from "../progression/subclasses/subclassService";
 import type { EquipmentSlot } from "../heroes/types";
 
 export type SimulationGearProfile = "starter" | "lagged_basic";
-export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number }
+export type SimulationProgressionProfile = "base" | "subclass_ready";
+export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile }
 export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; averageRounds: number; averageSurvivingHeroes: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
 export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
 export interface EconomySimulationResult { scenarioId: string; startingGold: number; endingGold: number; netGold: number; questIncome: number; tavernIncome: number; salaryPaid: number; fieldExpenses: number; arrears: number; breakEvenQuestsPerWeek: number; goldAfterFacilityReserve: number }
@@ -55,23 +58,28 @@ function equipLaggedBasicGear(hero: Hero): Hero {
   return { ...equipped, currentHP: calculateHero(equipped).stats.maxHP };
 }
 
-function levelHero(hero: Hero, level: number, index: number, gearProfile: SimulationGearProfile): Hero {
+function levelHero(hero: Hero, level: number, index: number, gearProfile: SimulationGearProfile, progressionProfile: SimulationProgressionProfile): Hero {
   let xp = 0;
   for (let current = 1; current < level; current++) xp += xpRequiredForNextLevel(current);
   const leveled = grantHeroXp(hero, xp, level);
   const tree = CLASS_SKILL_TREES[leveled.classId];
   const learnedSkillIds = tree.recommendedPaths[index % tree.recommendedPaths.length]!.skillIds.filter((skillId) => (tree.nodes.find((node) => node.skillId === skillId)?.requiredLevel ?? Infinity) <= level);
   const skilled = { ...leveled, learnedSkillIds };
-  const prepared = gearProfile === "lagged_basic" ? equipLaggedBasicGear(skilled) : skilled;
+  const subclass = progressionProfile === "subclass_ready" && level >= FIRST_SUBCLASS_LEVEL
+    ? Object.values(SUBCLASSES).find((definition) => definition.baseClassId === skilled.classId)
+    : undefined;
+  const progressed = subclass ? { ...skilled, subclassId: subclass.id } : skilled;
+  const prepared = gearProfile === "lagged_basic" ? equipLaggedBasicGear(progressed) : progressed;
   return { ...prepared, currentHP: calculateHero(prepared).stats.maxHP };
 }
 
-export function createSimulationParty(classes: readonly ClassId[], level: number, seed: number, gearProfile: SimulationGearProfile = "starter"): Hero[] {
+export function createSimulationParty(classes: readonly ClassId[], level: number, seed: number, gearProfile: SimulationGearProfile = "starter", progressionProfile: SimulationProgressionProfile = "base"): Hero[] {
   return classes.map((classId, index) => levelHero(
     { ...generateHero(createSeededRandom(seed + index * 97), { classId }), id: `sim-${seed}-${index}` },
     level,
     index,
     gearProfile,
+    progressionProfile,
   ));
 }
 
@@ -87,8 +95,7 @@ function skillTarget(state: CombatState, skill: CombatSkillDefinition): { target
 
 function tryHeroAction(state: CombatState, random: RandomSource): CombatState | null {
   const actor = state.heroes.find((item) => item.hero.id === state.awaitingHeroId)!;
-  const tree = CLASS_SKILL_TREES[actor.hero.classId];
-  const skillIds = [...actor.hero.learnedSkillIds].reverse().concat(tree.basicSkillId);
+  const skillIds = [...getHeroSkillIds(actor.hero)].reverse();
   for (const skillId of skillIds) {
     const skill = HERO_SKILLS[skillId]; if (!skill) continue;
     const availability = getHeroSkillAvailability(actor.hero, actor.instance, actor.unit, skillId, state.heroes.map((item) => item.unit), state.enemies.map((item) => item.unit), state.board);
@@ -122,7 +129,7 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
   let wins = 0, losses = 0, stalled = 0, rounds = 0, survivors = 0, hpRatios = 0;
   for (let run = 0; run < scenario.runs; run++) {
     const random = createSeededRandom(scenario.seed + run * 7919);
-    const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "starter");
+    const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "starter", scenario.progressionProfile ?? "base");
     let carried = undefined; let final: CombatState | undefined;
     const encounterCount = Math.min(QUESTS[scenario.questId]!.encounterIds.length, scenario.encounterLimit ?? Number.POSITIVE_INFINITY);
     for (let encounterIndex = 0; encounterIndex < encounterCount; encounterIndex++) {

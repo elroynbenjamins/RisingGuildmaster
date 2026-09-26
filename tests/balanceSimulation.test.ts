@@ -157,6 +157,38 @@ describe("repeatable balance simulations", () => {
     expect(results.every((result) => result.stalled === 0)).toBe(true);
   }, 120_000);
 
+  it("checks Frostmarch Standard across several sensible party compositions", () => {
+    const parties = [
+      { id: "classic", classes: ["warrior", "ranger", "cleric", "mage"] as const },
+      { id: "alternate-support", classes: ["paladin", "ranger", "bard", "mage"] as const },
+      { id: "heavy-frontline", classes: ["warrior", "berserker", "cleric", "spellbow"] as const },
+    ];
+    const encounters = [
+      { id: "hroth", questId: "hroth_iceblood_boss", heroLevel: 5, seed: 8200 },
+      { id: "glimmerlake", questId: "beneath_glimmerlake", heroLevel: 6, seed: 8300 },
+      { id: "vaelith", questId: "vaelith_pale_echo_boss", heroLevel: 6, seed: 8400 },
+    ] as const;
+    const results = parties.flatMap((party, partyIndex) => encounters.map((encounter, encounterIndex) =>
+      simulateCombatScenario({
+        id: `chapter3-${party.id}-${encounter.id}`,
+        questId: encounter.questId,
+        heroLevel: encounter.heroLevel,
+        partyClasses: party.classes,
+        difficultyId: "standard",
+        runs: 4,
+        seed: encounter.seed + partyIndex * 100 + encounterIndex * 10,
+        gearProfile: "lagged_basic",
+        progressionProfile: "subclass_ready",
+      }),
+    ));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    for (const party of parties) {
+      const partyResults = results.filter((result) => result.scenarioId.includes(`-${party.id}-`));
+      expect(partyResults.every((result) => result.winRate > 0)).toBe(true);
+    }
+  }, 180_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

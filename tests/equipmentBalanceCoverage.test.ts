@@ -8,7 +8,7 @@ import { createSeededRandom } from "../src/utils/random";
 import { createGuild } from "../src/game/guild/guildService";
 import { resolveGuildEventChoice } from "../src/game/world/worldEventResolver";
 
-const CLASSES: ClassId[] = ["warrior", "ranger", "mage", "cleric", "paladin", "berserker", "monk", "bard"];
+const CLASSES: ClassId[] = ["warrior", "ranger", "mage", "cleric", "paladin", "berserker", "monk", "bard", "spellbow", "bulwark", "summoner"];
 const ATTRIBUTE_TARGETS = new Set(["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]);
 
 describe("equipment balance coverage", () => {
@@ -34,6 +34,19 @@ describe("equipment balance coverage", () => {
       expect(usable.filter((item) => item.slot === "weapon" && item.rarity === "common").length).toBeGreaterThanOrEqual(1);
       expect(usable.filter((item) => item.slot === "weapon" && item.rarity === "uncommon").length).toBeGreaterThanOrEqual(1);
       for (const slot of ["armor", "helmet", "boots", "accessory2"] as const) expect(usable.filter((item) => item.slot === slot).length, `${classId} ${slot}`).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("keeps every class on a current equipment path into Chapter 7", () => {
+    for (const classId of CLASSES) {
+      const usable = Object.values(EQUIPMENT).filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(classId));
+      const bridgeWeapons = usable.filter((item) => item.slot === "weapon" && item.levelRequirement >= 9 && item.levelRequirement <= 11);
+      expect(bridgeWeapons.length, `${classId} Chapter 6 bridge weapon`).toBeGreaterThanOrEqual(1);
+
+      for (const slot of ["weapon", "armor", "helmet", "boots", "accessory1", "accessory2"] as const) {
+        const currentTier = usable.filter((item) => item.slot === slot && item.levelRequirement >= 10 && item.levelRequirement <= 12);
+        expect(currentTier.length, `${classId} Chapter 7 ${slot}`).toBeGreaterThanOrEqual(1);
+      }
     }
   });
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DUNGEON_NODES } from "../src/data/dungeons/dungeons";
-import { beginDungeonCombatCheckpoint, beginDungeonExpedition, checkpointDungeonCombat, getDungeonCombatSetup, resolveDungeonCombat, resolveDungeonUtilityNode } from "../src/game/dungeons/dungeonRunService";
+import { beginDungeonCombatCheckpoint, beginDungeonExpedition, checkpointDungeonCombat, closeDungeonExpedition, DUNGEON_VICTORY_RECOVERY_DAYS, getDungeonCombatSetup, resolveDungeonCombat, resolveDungeonUtilityNode } from "../src/game/dungeons/dungeonRunService";
 import { chooseDungeonNode } from "../src/game/dungeons/dungeonService";
 import { createGuild } from "../src/game/guild/guildService";
 import { generateHero } from "../src/game/heroes/heroGenerator";
@@ -59,6 +59,21 @@ describe("playable dungeon run integration", () => {
     expect(fallen.xp - (before.get(fallenId) ?? 0)).toBe(Math.round(roomXp * .85));
     expect(survivor.xp - (before.get(survivorId) ?? 0)).toBe(roomXp);
     expect(fallen.isAvailable).toBe(false);
+  });
+
+  it("uses a one-day victory recovery so a second catch-up expedition does not require a full week", () => {
+    const base = expeditionGuild();
+    const started = beginDungeonExpedition(base, "wardstone_depths", partyIds(base));
+    const victorious = { ...started, activeDungeonRun: { ...started.activeDungeonRun!, status: "victory" as const } };
+    const closed = closeDungeonExpedition(victorious);
+    expect(DUNGEON_VICTORY_RECOVERY_DAYS).toBe(1);
+    expect(closed.rogueliteRotation.cooldownUntilDay).toBe(base.currentDay + 1);
+
+    const offered = { ...closed, rogueliteRotation: { ...closed.rogueliteRotation, offeredDungeonIds: ["wardstone_depths"] } };
+    expect(() => beginDungeonExpedition(offered, "wardstone_depths", partyIds(base))).toThrow(`Roguelite Expeditions recover on Day ${base.currentDay + 1}`);
+
+    const nextDay = { ...offered, currentDay: base.currentDay + 1 };
+    expect(() => beginDungeonExpedition(nextDay, "wardstone_depths", partyIds(base))).not.toThrow();
   });
 
   it("persists defeat instead of treating entry into a boss room as victory", () => { const base = expeditionGuild(); let guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base)); const run = guild.activeDungeonRun!; guild = { ...guild, activeDungeonRun: { ...run, currentNodeId: "depths_boss" } }; const result = resolveDungeonCombat(guild, "defeat", run.heroInstances.map((instance) => ({ ...instance, currentHP: 0, isAlive: false })), sequenceRandom([0])); expect(result.guild.activeDungeonRun?.status).toBe("defeat"); expect(result.guild.activeDungeonRun?.resolvedNodeIds).not.toContain("depths_boss"); });

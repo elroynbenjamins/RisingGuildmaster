@@ -1,6 +1,6 @@
 /**
- * Late campaign encounters were authored before the current Standard difficulty
- * multipliers and class/equipment progression settled. Keep their story-mode
- * pressure below raid tuning without weakening the shared enemy definitions.
+ * Keep late campaign encounters on the shared stat baseline. This hook remains
+ * explicit so future tuning can be isolated from raids without changing shared
+ * enemy definitions.
  */
-export const LATE_CAMPAIGN_ENCOUNTER_SCALE = 0.88;
+export const LATE_CAMPAIGN_ENCOUNTER_SCALE = 1;

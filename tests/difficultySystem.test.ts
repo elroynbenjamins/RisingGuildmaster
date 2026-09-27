@@ -17,7 +17,10 @@ describe("game difficulty", () => {
     expect(veteran.unit.maxHP).toBeGreaterThan(standard.unit.maxHP);
     expect(veteran.unit.stats.physicalDamage).toBeGreaterThan(standard.unit.stats.physicalDamage);
     expect(iron.unit.maxHP).toBeGreaterThan(veteran.unit.maxHP);
-    expect(iron.unit.stats.physicalAttackBonus - standard.unit.stats.physicalAttackBonus).toBe(2);
+    expect(DIFFICULTIES.standard.enemyAttackRollModifier).toBe(0);
+    expect(DIFFICULTIES.veteran.enemyAttackRollModifier).toBe(2);
+    expect(DIFFICULTIES.iron_guild.enemyAttackRollModifier).toBe(3);
+    expect(iron.unit.stats.physicalAttackBonus - standard.unit.stats.physicalAttackBonus).toBe(3);
     expect(iron.unit.stats.armorClass).toBeGreaterThan(standard.unit.stats.armorClass);
   });
 

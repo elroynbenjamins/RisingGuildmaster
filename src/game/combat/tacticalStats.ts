@@ -2,6 +2,11 @@ import type { Attributes } from "../attributes/types";
 import { calculateAbilityModifier } from "../attributes/dndAttributes";
 export { calculateAbilityModifier as calculateD20AbilityModifier } from "../attributes/dndAttributes";
 
+/** Normal player-character D&D ability scores are bounded at 20 for roll math. */
+export function calculatePlayerD20AbilityModifier(score: number): number {
+  return calculateAbilityModifier(Math.min(20, score));
+}
+
 /** D&D 5e-style proficiency: +2 at 1-4, +3 at 5-8, ... +6 at 17-20+. */
 export function calculateProficiencyBonus(level: number): number {
   return Math.min(6, 2 + Math.floor((Math.max(1, Math.floor(level)) - 1) / 4));
@@ -14,15 +19,15 @@ export function calculateEnemyInitiativeBonus(speed: number): number { return Ma
  * project's mix of melee, finesse and ranged physical classes.
  */
 export function calculatePhysicalAttackBonus(attributes: Attributes, level: number): number {
-  return Math.max(calculateAbilityModifier(attributes.strength), calculateAbilityModifier(attributes.dexterity)) + calculateProficiencyBonus(level);
+  return Math.max(calculatePlayerD20AbilityModifier(attributes.strength), calculatePlayerD20AbilityModifier(attributes.dexterity)) + calculateProficiencyBonus(level);
 }
 
 /** Spell attacks use the hero's best supported spellcasting attribute. */
 export function calculateMagicAttackBonus(attributes: Attributes, level: number): number {
   return Math.max(
-    calculateAbilityModifier(attributes.intelligence),
-    calculateAbilityModifier(attributes.wisdom),
-    calculateAbilityModifier(attributes.charisma),
+    calculatePlayerD20AbilityModifier(attributes.intelligence),
+    calculatePlayerD20AbilityModifier(attributes.wisdom),
+    calculatePlayerD20AbilityModifier(attributes.charisma),
   ) + calculateProficiencyBonus(level);
 }
 

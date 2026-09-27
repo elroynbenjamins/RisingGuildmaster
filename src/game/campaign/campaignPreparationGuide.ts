@@ -134,7 +134,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
     const runs = underLevel ? suggestedDungeonRuns(heroes, recommendedMin) : 1;
     const runText = runs === 1
       ? "Start with one Wardstone Expedition."
-      : "Plan on two Wardstone Expeditions, then reassess before the next story push.";
+      : "Plan on two Wardstone Expeditions with one recovery day between them, then reassess before the next story push.";
     const dungeonReason: "level" | "weapon" | "armor" = underLevel ? "level" : weaponLag ? "weapon" : "armor";
     const detail = dungeonReason === "level"
       ? `Your top four average Level ${fieldLevel.toFixed(1)}; the next story mission recommends Level ${recommendedMin}. ${runText} Each clear gives catch-up XP plus an equipment cache.`

@@ -12,7 +12,7 @@ export function calculateProficiencyBonus(level: number): number {
   return Math.min(6, 2 + Math.floor((Math.max(1, Math.floor(level)) - 1) / 4));
 }
 
-export function calculateEnemyInitiativeBonus(speed: number): number { return Math.floor((speed - 10) / 4); }
+export function calculateEnemyInitiativeBonus(speed: number): number { return Math.max(-5, Math.min(5, Math.floor((speed - 10) / 4))); }
 
 /**
  * Physical attacks use the better of Strength or Dexterity, matching the

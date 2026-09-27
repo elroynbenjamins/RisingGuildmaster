@@ -27,7 +27,10 @@ describe("Chapter 6 — The Sixth Voice", () => {
 
   it("builds a three-biome pursuit and a two-stage rival-guild finale", () => {
     expect(QUESTS.the_five_roads_run?.encounterIds).toEqual(["five_roads_frost", "five_roads_fen", "five_roads_ember"]);
-    expect(QUESTS.laurel_law?.betweenEncounterHpRecoveryRatio).toBe(.10);\n    expect(QUESTS.laurel_law?.xpRewardPerHero).toBe(1240);\n    expect(QUEST_ENCOUNTERS.laurel_market_curfew?.enemies.find((group) => group.enemyDefinitionId === "laurel_vanguard")?.count).toBe(3);\n    expect(QUEST_ENCOUNTERS.laurel_charter_square?.enemies.find((group) => group.enemyDefinitionId === "laurel_vanguard")?.count).toBe(3);
+    expect(QUESTS.laurel_law?.betweenEncounterHpRecoveryRatio).toBe(.10);
+    expect(QUESTS.laurel_law?.xpRewardPerHero).toBe(1240);
+    expect(QUEST_ENCOUNTERS.laurel_market_curfew?.enemies.find((group) => group.enemyDefinitionId === "laurel_vanguard")?.count).toBe(3);
+    expect(QUEST_ENCOUNTERS.laurel_charter_square?.enemies.find((group) => group.enemyDefinitionId === "laurel_vanguard")?.count).toBe(3);
     expect(QUESTS.the_five_roads_run?.betweenEncounterHpRecoveryRatio).toBe(.05);
     expect(QUESTS.guildhall_under_siege?.betweenEncounterHpRecoveryRatio).toBe(.05);
     expect(QUESTS.cassian_vane_boss?.encounterIds).toEqual(["cassian_honor_guard", "cassian_crown_echo_final"]);

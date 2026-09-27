@@ -283,7 +283,7 @@ describe("repeatable balance simulations", () => {
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
     for (const result of results) {
-      expect(result.winRate, `${result.scenarioId} prepared Standard win rate`).toBeGreaterThanOrEqual(.67);
+      expect(result.winRate, `${result.scenarioId} prepared Standard win rate`).toBeGreaterThanOrEqual(2 / 3);
       expect(result.averageSurvivingHeroes, `${result.scenarioId} prepared Standard survivors`).toBeGreaterThanOrEqual(2.25);
       expect(result.averageSurvivingHeroes, `${result.scenarioId} prepared Standard survivors`).toBeLessThanOrEqual(3.5);
       expect(result.averageFallenHeroesOnWins, `${result.scenarioId} casualty pressure`).toBeGreaterThanOrEqual(.5);

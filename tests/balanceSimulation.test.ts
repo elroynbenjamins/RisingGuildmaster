@@ -19,6 +19,16 @@ describe("repeatable balance simulations", () => {
     }
   });
 
+  it("builds a normal optional-progression loadout with slightly lagged rare gear", () => {
+    const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 10, 4425, "optional_progression", "subclass_ready");
+    for (const hero of party) {
+      const equipped = Object.values(hero.equipment).filter((id): id is string => Boolean(id)).map((id) => EQUIPMENT[id]!);
+      expect(equipped.length).toBeGreaterThanOrEqual(4);
+      expect(equipped.every((item) => ["common", "uncommon", "rare"].includes(item.rarity))).toBe(true);
+      expect(equipped.some((item) => item.rarity === "rare")).toBe(true);
+    }
+  });
+
   it("adds representative Level-5 subclasses to the normal progression simulation profile", () => {
     const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 4450, "lagged_basic", "subclass_ready");
     expect(party.map((hero) => hero.subclassId)).toEqual(["guardian", "sharpshooter", "pyromancer", "life_priest"]);
@@ -202,15 +212,16 @@ describe("repeatable balance simulations", () => {
       { id: "chapter5-keeper", questId: "keeper_of_cinders_boss", heroLevel: 8, seed: 8630 },
       { id: "chapter5-causeway", questId: "the_burning_causeway", heroLevel: 9, seed: 8640 },
       { id: "chapter5-solkar", questId: "solkar_ash_herald_boss", heroLevel: 9, seed: 8650 },
-      { id: "chapter6-laurel-law-underprepared", questId: "laurel_law", heroLevel: 9, seed: 8700 },
-      { id: "chapter6-laurel-law-ready", questId: "laurel_law", heroLevel: 10, seed: 8710 },
+      { id: "chapter6-laurel-law-underprepared", questId: "laurel_law", heroLevel: 9, seed: 8700, gearProfile: "lagged_basic" as const },
+      { id: "chapter6-laurel-law-basic-l10", questId: "laurel_law", heroLevel: 10, seed: 8710, gearProfile: "lagged_basic" as const },
+      { id: "chapter6-laurel-law-prepared", questId: "laurel_law", heroLevel: 10, seed: 8710, gearProfile: "optional_progression" as const },
     ] as const;
     const results = scenarios.map((scenario) => simulateCombatScenario({
       ...scenario,
       partyClasses: ["warrior", "ranger", "cleric", "mage"],
       difficultyId: "standard",
       runs: 6,
-      gearProfile: "lagged_basic",
+      gearProfile: scenario.gearProfile ?? "lagged_basic",
       progressionProfile: "subclass_ready",
     }));
     console.table(results);
@@ -220,11 +231,12 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter5-road-ready")!.winRate).toBeGreaterThan(byId.get("chapter5-road-underprepared")!.winRate);
     expect(byId.get("chapter5-road-underprepared")!.winRate).toBeLessThan(.50);
     expect(byId.get("chapter5-road-ready")!.averageSurvivingHeroes).toBeLessThan(4);
-    expect(byId.get("chapter6-laurel-law-ready")!.winRate).toBeGreaterThanOrEqual(byId.get("chapter6-laurel-law-underprepared")!.winRate);
+    expect(byId.get("chapter6-laurel-law-prepared")!.winRate).toBeGreaterThanOrEqual(byId.get("chapter6-laurel-law-basic-l10")!.winRate);
     expect(byId.get("chapter4-procession-l6")!.winRate).toBeGreaterThan(0);
     expect(byId.get("chapter5-siege")!.winRate).toBeGreaterThan(0);
     expect(byId.get("chapter5-causeway")!.winRate).toBeGreaterThan(0);
-    expect(byId.get("chapter6-laurel-law-ready")!.winRate).toBeGreaterThan(0);
+    expect(byId.get("chapter6-laurel-law-prepared")!.winRate).toBeGreaterThan(0);
+    expect(byId.get("chapter6-laurel-law-basic-l10")!.averageSurvivingHeroes).toBeLessThan(4);
   }, 240_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

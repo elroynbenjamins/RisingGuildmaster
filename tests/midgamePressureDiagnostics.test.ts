@@ -5,38 +5,31 @@ import { QUEST_ENCOUNTERS } from "../src/data/encounters/questEncounters";
 const party = ["warrior", "ranger", "cleric", "mage"] as const;
 
 describe("Road of Glass pressure diagnostics", () => {
-  it("tests modest Ashbound pressure on the final approach", () => {
-    const first = QUEST_ENCOUNTERS.glass_road_ambush!;
+  it("settles final Ashbound pressure", () => {
     const final = QUEST_ENCOUNTERS.emberfall_gate_arrival!;
-    const firstSentinel = first.enemies.find((group) => group.enemyDefinitionId === "ashbound_sentinel")!;
-    const finalSentinels = final.enemies.find((group) => group.enemyDefinitionId === "ashbound_sentinel")!;
-    const originalFirst = firstSentinel.difficultyMultiplier;
-    const originalFinal = finalSentinels.difficultyMultiplier;
+    const sentinels = final.enemies.find((group) => group.enemyDefinitionId === "ashbound_sentinel")!;
+    const original = sentinels.difficultyMultiplier;
 
-    const variants = [
-      { id: "baseline", first: 1, final: 1 },
-      { id: "final110", first: 1, final: 1.10 },
-      { id: "final115", first: 1, final: 1.15 },
-      { id: "all110", first: 1.10, final: 1.10 },
-    ] as const;
-
-    for (const variant of variants) {
-      firstSentinel.difficultyMultiplier = variant.first;
-      finalSentinels.difficultyMultiplier = variant.final;
-      console.log("ROAD2", variant.id, simulateCombatScenario({
-        id: `road-${variant.id}`,
-        questId: "road_of_glass",
-        heroLevel: 8,
-        partyClasses: party,
-        difficultyId: "standard",
-        runs: 6,
-        seed: 8800,
-        gearProfile: "optional_progression",
-        progressionProfile: "subclass_ready",
-      }));
+    for (const scale of [1.20, 1.25] as const) {
+      sentinels.difficultyMultiplier = scale;
+      for (const profile of [
+        { id: "prepared", level: 8, gear: "optional_progression" as const, seed: 8800 },
+        { id: "behind", level: 7, gear: "lagged_basic" as const, seed: 8600 },
+      ]) {
+        console.log("ROAD3", scale, profile.id, simulateCombatScenario({
+          id: `road-${scale}-${profile.id}`,
+          questId: "road_of_glass",
+          heroLevel: profile.level,
+          partyClasses: party,
+          difficultyId: "standard",
+          runs: 6,
+          seed: profile.seed,
+          gearProfile: profile.gear,
+          progressionProfile: "subclass_ready",
+        }));
+      }
     }
 
-    firstSentinel.difficultyMultiplier = originalFirst;
-    finalSentinels.difficultyMultiplier = originalFinal;
+    sentinels.difficultyMultiplier = original;
   }, 120_000);
 });

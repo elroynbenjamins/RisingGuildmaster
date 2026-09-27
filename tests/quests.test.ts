@@ -10,6 +10,7 @@ import { createSeededRandom } from "../src/utils/random";
 import { sequenceRandom } from "./combatTestUtils";
 import { testHero } from "./testHero";
 import { EQUIPMENT } from "../src/data/equipment/equipment";
+import { parseEquipmentKey } from "../src/game/equipment/equipmentResolver";
 const instance = (values: Partial<HeroCombatInstance> = {}): HeroCombatInstance => ({ heroId: "hero-test", currentHP: 100, maxHP: 100, currentMana: 10, maxMana: 100, currentStamina: 10, maxStamina: 100, activeConditions: [], activeCooldowns: {}, isAlive: true, position: { x: 1, y: 2 }, movementRange: 3, ...values });
 
 describe("quest loop", () => {
@@ -32,5 +33,5 @@ describe("quest loop", () => {
     expect(fallback.length).toBeGreaterThan(0);
     expect(fallback.every((id) => EQUIPMENT[id] && EQUIPMENT[id]!.levelRequirement >= 2 && EQUIPMENT[id]!.levelRequirement <= 4)).toBe(true);
   });
-  it("can lose one equipped item on death without mutating definitions", () => { const hero = { ...testHero(), equipment: { ...testHero().equipment, weapon: "worn-sword" } }; const guild = { ...createGuild(), heroes: [hero] }; const party = { id: "p", heroIds: [hero.id, "support"] }; const result = resolveQuestDefeat(startQuest(QUESTS.goblin_patrol!, party), party, guild, [instance({ currentHP: 0, isAlive: false })], sequenceRandom([0])); expect(result.guild.heroes[0]?.equipment.weapon).toBeNull(); });
+  it("keeps fallen hero equipment but can damage it for later repair", () => { const hero = { ...testHero(), equipment: { ...testHero().equipment, weapon: "worn-sword" } }; const guild = { ...createGuild(), heroes: [hero] }; const party = { id: "p", heroIds: [hero.id, "support"] }; const result = resolveQuestDefeat(startQuest(QUESTS.goblin_patrol!, party), party, guild, [instance({ currentHP: 0, isAlive: false })], sequenceRandom([0, 0, 0, 1])); const weapon=result.guild.heroes[0]?.equipment.weapon; expect(weapon).toBeTruthy(); expect(parseEquipmentKey(weapon!).durability).toBe(90); });
 });

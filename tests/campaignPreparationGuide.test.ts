@@ -92,12 +92,14 @@ describe("campaign preparation guidance", () => {
         "letters_from_a_sunken_ship",
       ],
     };
-    expect(getCampaignPreparationRecommendation(guild)).toMatchObject({
+    const recommendation = getCampaignPreparationRecommendation(guild);
+    expect(recommendation).toMatchObject({
       type: "dungeon",
       reason: "level",
       suggestedRuns: 2,
       title: "2 Wardstone Expeditions",
     });
+    expect(recommendation?.detail).toContain("one recovery day between them");
   });
 
   it("recommends one Wardstone run when the core party is within one catch-up target of the next level", () => {

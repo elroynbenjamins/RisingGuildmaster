@@ -196,4 +196,19 @@ export const EQUIPMENT_ICON_ART: Readonly<Record<string, ImageSourcePropType>> =
   "last-call-rapier": require("../../../assets-runtime/images/equipment/complete/echoing-verse-rapier.webp"),
   "namewake-recurve": require("../../../assets-runtime/images/equipment/complete/stormstring-recurve.webp"),
   "seventh-gate-aegis": require("../../../assets-runtime/images/equipment/complete/adamant-door-shield.webp"),
+
+  // Temporary shared silhouettes for post-Chapter-9 raid gear; dedicated art can replace these mappings later.
+  "last-margin-compass": require("../../../assets-runtime/images/equipment/complete/ossuary-reliquary.webp"),
+  "chartwater-signet": require("../../../assets-runtime/images/equipment/complete/echopearl-ring.webp"),
+  "drowned-chart-helm": require("../../../assets-runtime/images/equipment/complete/rimeguard-greathelm.webp"),
+  "marginwalker-boots": require("../../../assets-runtime/images/equipment/complete/abysswalker-boots.webp"),
+  "ascendant-chartmail": require("../../../assets-runtime/images/equipment/complete/formation-plate.webp"),
+  "erased-name-coat": require("../../../assets-runtime/images/equipment/complete/last-call-mantle.webp"),
+  "cartographers-glaive": require("../../../assets-runtime/images/equipment/complete/seventh-name-glaive.webp"),
+  "drowned-star-longbow": require("../../../assets-runtime/images/equipment/complete/starfall-longbow.webp"),
+  "abyssal-margin-crozier": require("../../../assets-runtime/images/equipment/complete/wardstone-scepter.webp"),
+  "margin-step-quarterstaff": require("../../../assets-runtime/images/equipment/complete/seven-bells-quarterstaff.webp"),
+  "last-margin-rapier": require("../../../assets-runtime/images/equipment/complete/echoing-verse-rapier.webp"),
+  "living-chart-recurve": require("../../../assets-runtime/images/equipment/complete/stormstring-recurve.webp"),
+  "final-margin-aegis": require("../../../assets-runtime/images/equipment/complete/adamant-door-shield.webp"),
 };

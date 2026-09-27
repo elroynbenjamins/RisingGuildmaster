@@ -5,13 +5,13 @@ import { getDungeonCatchupXpTarget } from "../src/game/dungeons/dungeonRunServic
 import { xpRequiredForNextLevel } from "../src/game/progression/xpSystem";
 import { testHero } from "./testHero";
 
-function heroes(count: number, level: number, weapon: string | null) {
+function heroes(count: number, level: number, weapon: string | null, armor: string | null = "tidewatch-mail") {
   return Array.from({ length: count }, (_, index) => ({
     ...testHero(),
     id: `prep-hero-${index}`,
     name: `Prep ${index + 1}`,
     level,
-    equipment: { ...testHero().equipment, weapon },
+    equipment: { ...testHero().equipment, weapon, armor },
   }));
 }
 
@@ -59,6 +59,23 @@ describe("campaign preparation guidance", () => {
     const guild = chapterEightGuild();
     guild.heroes = heroes(4, 14, "concordance-glaive");
     expect(getCampaignPreparationRecommendation(guild)).toBeNull();
+  });
+
+  it("prefers an armor-recipe side quest when multiple core heroes have badly lagging armor", () => {
+    const guild = chapterEightGuild();
+    guild.heroes = heroes(4, 15, "concordance-glaive").map((hero, index) => index < 2 ? {
+      ...hero,
+      classId: index === 0 ? "mage" as const : "cleric" as const,
+      equipment: { ...hero.equipment, weapon: "lighthouse-prism-crozier", armor: "free-oath-coat" },
+    } : hero);
+    const recommendation = getCampaignPreparationRecommendation(guild);
+    expect(recommendation).toMatchObject({
+      type: "side_quest",
+      questId: "letters_from_a_sunken_ship",
+      reason: "armor",
+    });
+    expect(recommendation?.detail).toContain("armor at least three levels behind");
+    expect(recommendation?.detail).toContain("armor recipe");
   });
 
   it("falls back to a Wardstone expedition when side stories are cleared and the next mission is ahead", () => {

@@ -1,6 +1,7 @@
 export const ADMOB_CONFIG = {
   androidAppId: "ca-app-pub-2222059903000796~6020835595",
   androidRewardedAdUnitId: "ca-app-pub-2222059903000796/2583268983",
+  androidReviveRewardedAdUnitId: "ca-app-pub-2222059903000796/1318993041",
   androidTestRewardedAdUnitId: "ca-app-pub-3940256099942544/5224354917",
   androidRewardedInterstitialAdUnitId: "ca-app-pub-2222059903000796/4776413984",
   androidTestRewardedInterstitialAdUnitId: "ca-app-pub-3940256099942544/5354046379",
@@ -9,6 +10,10 @@ export const ADMOB_CONFIG = {
 
 export function getAndroidRewardedAdUnitId(development: boolean): string {
   return development ? ADMOB_CONFIG.androidTestRewardedAdUnitId : ADMOB_CONFIG.androidRewardedAdUnitId;
+}
+
+export function getAndroidReviveRewardedAdUnitId(development: boolean): string {
+  return development ? ADMOB_CONFIG.androidTestRewardedAdUnitId : ADMOB_CONFIG.androidReviveRewardedAdUnitId;
 }
 
 export function getAndroidRewardedInterstitialAdUnitId(development: boolean): string {

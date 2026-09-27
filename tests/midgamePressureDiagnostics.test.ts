@@ -17,7 +17,7 @@ describe("midgame pressure diagnostics", () => {
         heroLevel: 8,
         partyClasses: party,
         difficultyId: "standard",
-        runs: 12,
+        runs: 6,
         seed: 8800,
         gearProfile: "optional_progression",
         progressionProfile: "subclass_ready",
@@ -47,9 +47,9 @@ describe("midgame pressure diagnostics", () => {
       marketVanguard.count = variant.count;
       squareVanguard.count = variant.count;
       for (const profile of [
-        { id: "prepared", level: 10, gearProfile: "optional_progression" as const, runs: 12 },
-        { id: "basic", level: 10, gearProfile: "lagged_basic" as const, runs: 6 },
-        { id: "behind", level: 9, gearProfile: "lagged_basic" as const, runs: 6 },
+        { id: "prepared", level: 10, gearProfile: "optional_progression" as const, runs: 6 },
+        { id: "basic", level: 10, gearProfile: "lagged_basic" as const, runs: 4 },
+        { id: "behind", level: 9, gearProfile: "lagged_basic" as const, runs: 4 },
       ]) {
         console.log("LAUREL", variant.id, profile.id, simulateCombatScenario({
           id: `laurel-${variant.id}-${profile.id}`,

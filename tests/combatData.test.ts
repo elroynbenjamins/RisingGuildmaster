@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { ENEMIES } from "../src/data/enemies";
 import { ENEMY_BEHAVIORS } from "../src/data/enemyBehaviors/enemyBehaviors";
 import { ENEMY_SKILLS } from "../src/data/skills/enemySkills";
+import { HERO_SKILLS } from "../src/data/skills/heroSkills";
 
 describe("combat data integrity", () => {
   it("gives every enemy exactly one valid basic attack and a valid behavior", () => {
@@ -13,6 +14,11 @@ describe("combat data integrity", () => {
       expect(behavior).toBeDefined();
       expect(behavior?.basicAttackSkillId).toBe(skills.find((skill) => skill?.type === "basic_attack")?.id);
       for (const rule of behavior?.rules ?? []) expect(enemy.skillIds).toContain(rule.skillId);
+    }
+  });
+  it("keeps legacy accuracy hints synchronized with real D20 roll modifiers", () => {
+    for (const skill of [...Object.values(HERO_SKILLS), ...Object.values(ENEMY_SKILLS)]) {
+      if ((skill.accuracyModifier ?? 0) !== 0) expect(skill.attackRollModifier, skill.id).toBeDefined();
     }
   });
   it("uses decimal probabilities and nonnegative cooldowns", () => {

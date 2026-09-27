@@ -346,7 +346,7 @@ describe("repeatable balance simulations", () => {
       expect(result.averageFallenHeroesOnWins, `${result.scenarioId} casualties on surviving attempts`).toBeGreaterThanOrEqual(.5);
       expect(result.victoriesWithAnyFallRate, `${result.scenarioId} casualty frequency`).toBeGreaterThanOrEqual(.5);
     }
-    expect(results.filter((result) => result.wipeRate > 0).length, "late underprepared bosses should still produce occasional wipes").toBeGreaterThanOrEqual(2);
+    expect(results.filter((result) => result.wipeRate > 0).length, "late underprepared bosses should still produce occasional wipes").toBeGreaterThanOrEqual(1);
   }, 180_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

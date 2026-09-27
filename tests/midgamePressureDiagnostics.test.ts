@@ -2,27 +2,27 @@ import { describe, it } from "vitest";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 import { QUEST_ENCOUNTERS } from "../src/data/encounters/questEncounters";
 
+const party = ["warrior", "ranger", "cleric", "mage"] as const;
+
 describe("Road of Glass pressure diagnostics", () => {
-  it("checks whether higher Ashbound scaling changes prepared casualties", () => {
+  it("settles final approach pressure", () => {
     const final = QUEST_ENCOUNTERS.emberfall_gate_arrival!;
     const sentinels = final.enemies.find((group) => group.enemyDefinitionId === "ashbound_sentinel")!;
     const original = sentinels.difficultyMultiplier;
-
-    for (const scale of [1.35, 1.40] as const) {
+    for (const scale of [1.20, 1.25] as const) {
       sentinels.difficultyMultiplier = scale;
-      console.log("ROAD5", scale, simulateCombatScenario({
-        id: `road-${scale}-prepared`,
+      console.log("ROAD3", scale, simulateCombatScenario({
+        id: `road-final-${scale}`,
         questId: "road_of_glass",
         heroLevel: 8,
-        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        partyClasses: party,
         difficultyId: "standard",
-        runs: 6,
+        runs: 8,
         seed: 8800,
         gearProfile: "optional_progression",
         progressionProfile: "subclass_ready",
       }));
     }
-
     sentinels.difficultyMultiplier = original;
-  }, 90_000);
+  }, 120_000);
 });

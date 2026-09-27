@@ -2,57 +2,52 @@ import { describe, it } from "vitest";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 import { QUESTS } from "../src/data/quests/quests";
 
+const party = ["warrior", "ranger", "cleric", "mage"] as const;
+
 describe("global balance diagnostics", () => {
-  it("isolates prepared Serekh pressure across difficulty and recovery", () => {
-    const quest = QUESTS.serekh_chartmaker_boss!;
-    const originalRecovery = quest.betweenEncounterHpRecoveryRatio;
-
-    for (const difficultyId of ["standard", "veteran", "iron_guild"] as const) {
-      console.log("SEREKH_FULL", simulateCombatScenario({
-        id: `serekh-${difficultyId}`,
-        questId: "serekh_chartmaker_boss",
-        heroLevel: 17,
-        partyClasses: ["warrior", "ranger", "cleric", "mage"],
-        difficultyId,
-        runs: 4,
-        seed: 9475,
-        gearProfile: "optional_progression",
-        progressionProfile: "subclass_ready",
-      }));
-    }
-
+  it("isolates prepared Serekh Hard pressure cheaply", () => {
     for (const encounterLimit of [1, 2, 3] as const) {
       console.log("SEREKH_HARD_STAGE", simulateCombatScenario({
         id: `serekh-veteran-limit${encounterLimit}`,
         questId: "serekh_chartmaker_boss",
         heroLevel: 17,
-        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        partyClasses: party,
         difficultyId: "veteran",
-        runs: 4,
-        seed: 9525,
+        runs: 2,
+        seed: 8975,
         gearProfile: "optional_progression",
         progressionProfile: "subclass_ready",
         encounterLimit,
       }));
     }
 
+    const quest = QUESTS.serekh_chartmaker_boss!;
+    const originalRecovery = quest.betweenEncounterHpRecoveryRatio;
     for (const recovery of [.15, .20, .25] as const) {
       quest.betweenEncounterHpRecoveryRatio = recovery;
-      for (const difficultyId of ["veteran", "iron_guild"] as const) {
-        console.log("SEREKH_RECOVERY", recovery, simulateCombatScenario({
-          id: `serekh-${difficultyId}-r${recovery}`,
-          questId: "serekh_chartmaker_boss",
-          heroLevel: 17,
-          partyClasses: ["warrior", "ranger", "cleric", "mage"],
-          difficultyId,
-          runs: 4,
-          seed: 9575,
-          gearProfile: "optional_progression",
-          progressionProfile: "subclass_ready",
-        }));
-      }
+      console.log("SEREKH_HARD_RECOVERY", recovery, simulateCombatScenario({
+        id: `serekh-veteran-r${recovery}`,
+        questId: "serekh_chartmaker_boss",
+        heroLevel: 17,
+        partyClasses: party,
+        difficultyId: "veteran",
+        runs: 2,
+        seed: 8975,
+        gearProfile: "optional_progression",
+        progressionProfile: "subclass_ready",
+      }));
+      console.log("SEREKH_IRON_RECOVERY", recovery, simulateCombatScenario({
+        id: `serekh-iron-r${recovery}`,
+        questId: "serekh_chartmaker_boss",
+        heroLevel: 17,
+        partyClasses: party,
+        difficultyId: "iron_guild",
+        runs: 1,
+        seed: 8975,
+        gearProfile: "optional_progression",
+        progressionProfile: "subclass_ready",
+      }));
     }
-
     quest.betweenEncounterHpRecoveryRatio = originalRecovery;
-  }, 300_000);
+  }, 240_000);
 });

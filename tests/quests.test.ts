@@ -9,7 +9,8 @@ import { startQuest } from "../src/game/quests/questService";
 import { createSeededRandom } from "../src/utils/random";
 import { sequenceRandom } from "./combatTestUtils";
 import { testHero } from "./testHero";
-import { EQUIPMENT } from "../src/data/equipment/equipment";\nimport { parseEquipmentKey } from "../src/game/equipment/equipmentResolver";
+import { EQUIPMENT } from "../src/data/equipment/equipment";
+import { parseEquipmentKey } from "../src/game/equipment/equipmentResolver";
 const instance = (values: Partial<HeroCombatInstance> = {}): HeroCombatInstance => ({ heroId: "hero-test", currentHP: 100, maxHP: 100, currentMana: 10, maxMana: 100, currentStamina: 10, maxStamina: 100, activeConditions: [], activeCooldowns: {}, isAlive: true, position: { x: 1, y: 2 }, movementRange: 3, ...values });
 
 describe("quest loop", () => {

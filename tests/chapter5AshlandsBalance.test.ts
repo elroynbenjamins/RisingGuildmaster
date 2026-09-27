@@ -7,6 +7,6 @@ describe("Chapter 5 Ashlands balance safeguards", () => {
     expect(QUESTS.road_of_glass?.betweenEncounterHpRecoveryRatio).toBe(.10);
     expect(QUESTS.road_of_glass?.xpRewardPerHero).toBe(1100);
     expect(QUEST_ENCOUNTERS.emberfall_gate_arrival?.enemies.reduce((sum, group) => sum + group.count, 0)).toBe(5);
-    expect(QUEST_ENCOUNTERS.emberfall_gate_arrival?.enemies.find((group) => group.enemyDefinitionId === "ashbound_sentinel")?.difficultyMultiplier).toBeCloseTo(1.40, 2);
+    expect(QUEST_ENCOUNTERS.emberfall_gate_arrival?.enemies.find((group) => group.enemyDefinitionId === "ashbound_sentinel")?.difficultyMultiplier).toBeCloseTo(1.60, 2);
   });
 });

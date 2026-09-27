@@ -26,12 +26,7 @@ describe("campaign and roguelite XP curve", () => {
     expect(hero.level).toBeGreaterThanOrEqual(6);
   });
 
-  it("reduces roguelite XP only when a hero outlevels the selected theme", () => {
-    expect(getRogueliteXpForHero(100, 8, 8)).toBe(100);
-    expect(getRogueliteXpForHero(100, 9, 8)).toBe(50);
-    expect(getRogueliteXpForHero(100, 10, 8)).toBe(25);
-    expect(getRogueliteXpForHero(100, 11, 8)).toBe(10);
-    expect(getRogueliteXpForHero(100, 12, 8)).toBe(0);
-    expect(getRogueliteXpForHero(100, 20, 8)).toBe(0);
+  it("keeps full roguelite catch-up XP because expedition enemies scale to the drafted party", () => {
+    for (const heroLevel of [8, 9, 10, 11, 12, 20]) expect(getRogueliteXpForHero(100, heroLevel, 8)).toBe(100);
   });
 });

@@ -33,9 +33,9 @@ describe("full balance polish safeguards", () => {
   it("guarantees story-quest equipment but reduces repeatable gear flooding", () => {
     expect(getQuestEquipmentDropChance(QUESTS.goblin_patrol!)).toBe(1);
     expect(getQuestEquipmentDropChance(QUESTS.goblin_chieftain_boss!)).toBe(1);
-    expect(getQuestEquipmentDropChance(QUESTS.orchard_road_patrol!)).toBe(.55);
-    expect(getQuestEquipmentDropChance({ ...QUESTS.coils_of_the_sunken_grove!, repeatable: true })).toBe(.65);
-    expect(getQuestEquipmentDropChance(QUESTS.coils_of_the_sunken_grove!)).toBe(1);
+    expect(getQuestEquipmentDropChance(QUESTS.orchard_road_patrol!)).toBe(.65);
+    expect(getQuestEquipmentDropChance({ ...QUESTS.coils_of_the_sunken_grove!, repeatable: true })).toBe(.80);
+    expect(getQuestEquipmentDropChance(QUESTS.coils_of_the_sunken_grove!)).toBe(.80);
   });
 
   it("puts late settlement side quests onto the modern level 11-14 reward scale", () => {

@@ -11,9 +11,9 @@ import { testHero } from "./testHero";
 
 const instance = (heroId: string): HeroCombatInstance => ({ heroId, currentHP: 212, maxHP: 212, currentMana: 100, maxMana: 100, currentStamina: 100, maxStamina: 100, activeConditions: [], activeCooldowns: {}, isAlive: true, position: { x: 1, y: 2 }, movementRange: 3 });
 
-describe("one-time side quests", () => {
-  it("makes every visible side quest single-clear and assigns it to a real settlement", () => {
-    const sideQuests = Object.values(QUESTS).filter((quest) => quest.questType === "side" && !quest.hiddenFromQuestBoard);
+describe("side quest clear rules", () => {
+  it("makes ordinary visible side quests single-clear and assigns them to a real settlement", () => {
+    const sideQuests = Object.values(QUESTS).filter((quest) => quest.questType === "side" && !quest.hiddenFromQuestBoard && !quest.huntReward);
     expect(sideQuests.length).toBeGreaterThan(0);
     for (const quest of sideQuests) {
       expect(quest.repeatable, quest.id).toBe(false);
@@ -37,9 +37,9 @@ describe("one-time side quests", () => {
     expect(result.activeQuest.collectedMaterials[zeroMinimumDrop!.materialId]).toBeGreaterThanOrEqual(1);
   });
 
-  it("guarantees a hunt fragment because a visible hunt no longer has repeat attempts", () => {
+  it("keeps monster hunts repeatable while guaranteeing the first trophy fragment", () => {
     const quest = QUESTS.coils_of_the_sunken_grove!;
-    expect(quest.repeatable).toBe(false);
+    expect(quest.repeatable).toBe(true);
     const heroes = ["hunt1", "hunt2", "hunt3"].map((id) => ({ ...testHero(), id, name: id, level: 5 }));
     const guild = { ...createGuild(), heroes };
     const party = { id: "hunt-party", heroIds: heroes.map((hero) => hero.id) };

@@ -70,7 +70,9 @@ export function getLevelAppropriateQuestLootIds(itemIds: readonly string[], hero
   };
   const bestFit = (ids: readonly string[]): string[] => {
     const usable = ids.filter(isUsable); if (!usable.length) return [];
-    const scored = usable.map((id) => ({ id, score: score(id) }));
+    const unowned = usable.filter((id) => !ownedIds.has(id));
+    const pool = unowned.length ? unowned : usable;
+    const scored = pool.map((id) => ({ id, score: score(id) }));
     const best = Math.max(...scored.map((entry) => entry.score));
     return scored.filter((entry) => entry.score >= best - 1).map((entry) => entry.id);
   };

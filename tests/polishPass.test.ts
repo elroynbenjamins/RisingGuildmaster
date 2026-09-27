@@ -33,6 +33,8 @@ describe("polish and progression pass", () => {
     expect(hasLocalHealingService(guild.world)).toBe(true);
     const remote = { ...guild, world: { ...guild.world, currentSettlementId: "brambleford" } };
     expect(hasLocalHealingService(remote.world)).toBe(false);
+    expect(hasLocalHealingService({ ...guild.world, currentSettlementId: "emberfall" })).toBe(true);
+    expect(hasLocalHealingService({ ...guild.world, currentSettlementId: "kharum_deep" })).toBe(true);
     expect(() => healHeroToHalf(remote, hero.id)).toThrow("No Temple or healer");
   });
 

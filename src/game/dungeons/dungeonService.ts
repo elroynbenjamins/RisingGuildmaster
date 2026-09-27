@@ -35,7 +35,7 @@ export function startDungeonRun(dungeonId: string, modifierIds: string[] = [], p
     }
     return [nodeId, edges];
   }));
-  return { id: `dungeon-${dungeonId}`, dungeonId, currentNodeId: dungeon.startNodeId, selectedEncounterIds, routeNextNodeIds, visitedNodeIds: [], resolvedNodeIds: [], selectedModifierIds: [...new Set(modifierIds)], selectedBoonIds: [], pendingBoonChoiceIds: [], partyHeroIds: [...new Set(partyHeroIds)], heroInstances, goldEarned: 0, xpEarnedPerHero: 0, recipeIdsUnlocked: [], lastResolutionText: null, status: "active" };
+  return { id: `dungeon-${dungeonId}`, dungeonId, currentNodeId: dungeon.startNodeId, selectedEncounterIds, routeNextNodeIds, visitedNodeIds: [], resolvedNodeIds: [], selectedModifierIds: [...new Set(modifierIds)], selectedBoonIds: [], pendingBoonChoiceIds: [], partyHeroIds: [...new Set(partyHeroIds)], heroInstances, goldEarned: 0, xpEarnedPerHero: 0, recipeIdsUnlocked: [], gearIdsAwarded: [], lastResolutionText: null, status: "active" };
 }
 export function isCurrentDungeonNodeResolved(run: DungeonRunState): boolean { return run.resolvedNodeIds.includes(run.currentNodeId); }
 export function availableDungeonNodeIds(run: DungeonRunState): string[] { return run.status === "active" && isCurrentDungeonNodeResolved(run) && !(run.pendingBoonChoiceIds?.length) ? run.routeNextNodeIds?.[run.currentNodeId] ?? DUNGEON_NODES[run.currentNodeId]?.nextNodeIds ?? [] : []; }

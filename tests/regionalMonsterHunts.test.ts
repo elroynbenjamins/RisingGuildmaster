@@ -10,10 +10,10 @@ import { REGIONS } from "../src/data/world/regions";
 const hunts = ["coils_of_the_sunken_grove", "teeth_below_guildhaven", "white_maw_of_frostmarch"] as const;
 
 describe("regional monster hunts", () => {
-  it("defines three one-time regional side quests with exploration, encounters, and guaranteed trophy loot", () => {
+  it("defines three repeatable regional hunts with exploration, encounters, and trophy progression", () => {
     for (const questId of hunts) {
       const quest = QUESTS[questId]!;
-      expect(quest).toMatchObject({ questType: "side", repeatable: false });
+      expect(quest).toMatchObject({ questType: "side", repeatable: true });
       expect(quest.explorationStageIds).toHaveLength(3);
       expect(quest.huntReward).toMatchObject({ firstVictoryCount: 1, repeatDropChance: .40, pityAfterFailures: 3 });
       expect(quest.encounterIds).toHaveLength(2);

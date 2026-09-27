@@ -57,7 +57,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
   const { guild, updateGuild } = useGuild();
   const random = useRef(createSeededRandom(initialRandomState ?? randomSeed())); const quest = QUESTS[questId]!;
   const effectiveCombatSetup = applyQuestDifficultyCombatSetup(quest, combatSetup);
-  const threatEnemyLevelModifier = getRegionThreatEffects(guild.world, quest.regionId).enemyLevelModifier;
+  const threatEnemyLevelModifier = getRegionThreatEffects(guild.world, quest.regionId).enemyLevelModifier + (effectiveCombatSetup?.enemyLevelModifier ?? 0);
   const lastTargetTap = useRef<CombatTapRecord | null>(null);
   const [state, setState] = useState(() => initialCombatState ?? createCombatState(questId, 0, heroes, random.current, initialHeroInstances, effectiveCombatSetup, guild.relationships, guild.difficultyId, threatEnemyLevelModifier));
   const checkpointRef = useRef(onCombatCheckpoint); checkpointRef.current = onCombatCheckpoint;

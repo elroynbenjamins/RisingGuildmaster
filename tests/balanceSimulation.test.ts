@@ -19,6 +19,16 @@ describe("repeatable balance simulations", () => {
     }
   });
 
+  it("builds a normal optional-progression loadout with slightly lagged rare gear", () => {
+    const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 10, 4425, "optional_progression", "subclass_ready");
+    for (const hero of party) {
+      const equipped = Object.values(hero.equipment).filter((id): id is string => Boolean(id)).map((id) => EQUIPMENT[id]!);
+      expect(equipped.length).toBeGreaterThanOrEqual(4);
+      expect(equipped.every((item) => ["common", "uncommon", "rare"].includes(item.rarity))).toBe(true);
+      expect(equipped.some((item) => item.rarity === "rare")).toBe(true);
+    }
+  });
+
   it("adds representative Level-5 subclasses to the normal progression simulation profile", () => {
     const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 4450, "lagged_basic", "subclass_ready");
     expect(party.map((hero) => hero.subclassId)).toEqual(["guardian", "sharpshooter", "pyromancer", "life_priest"]);
@@ -188,6 +198,46 @@ describe("repeatable balance simulations", () => {
       expect(partyResults.every((result) => result.winRate > 0)).toBe(true);
     }
   }, 180_000);
+
+  it("reports Chapter 4–6 transition combat with lagged basic gear", () => {
+    const scenarios = [
+      { id: "chapter4-blackwater-l6", questId: "return_to_blackwater", heroLevel: 6, seed: 8500 },
+      { id: "chapter4-procession-l6", questId: "procession_at_low_water", heroLevel: 6, seed: 8510 },
+      { id: "chapter4-bell-widow-l6", questId: "bell_widow_boss", heroLevel: 6, seed: 8520 },
+      { id: "chapter4-bell-widow-l7", questId: "bell_widow_boss", heroLevel: 7, seed: 8530 },
+      { id: "chapter4-morrowveil-l7", questId: "morrowveil_drowned_archivist_boss", heroLevel: 7, seed: 8540 },
+      { id: "chapter5-road-underprepared", questId: "road_of_glass", heroLevel: 7, seed: 8600 },
+      { id: "chapter5-road-ready", questId: "road_of_glass", heroLevel: 8, seed: 8610 },
+      { id: "chapter5-siege", questId: "siege_of_emberfall", heroLevel: 8, seed: 8620 },
+      { id: "chapter5-keeper", questId: "keeper_of_cinders_boss", heroLevel: 8, seed: 8630 },
+      { id: "chapter5-causeway", questId: "the_burning_causeway", heroLevel: 9, seed: 8640 },
+      { id: "chapter5-solkar", questId: "solkar_ash_herald_boss", heroLevel: 9, seed: 8650 },
+      { id: "chapter6-laurel-law-underprepared", questId: "laurel_law", heroLevel: 9, seed: 8700, gearProfile: "lagged_basic" as const },
+      { id: "chapter6-laurel-law-basic-l10", questId: "laurel_law", heroLevel: 10, seed: 8710, gearProfile: "lagged_basic" as const },
+      { id: "chapter6-laurel-law-prepared", questId: "laurel_law", heroLevel: 10, seed: 8710, gearProfile: "optional_progression" as const },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 6,
+      gearProfile: "gearProfile" in scenario ? scenario.gearProfile : "lagged_basic",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    const byId = new Map(results.map((result) => [result.scenarioId, result]));
+    expect(byId.get("chapter4-bell-widow-l7")!.averageSurvivingHeroes).toBeGreaterThanOrEqual(byId.get("chapter4-bell-widow-l6")!.averageSurvivingHeroes);
+    expect(byId.get("chapter5-road-ready")!.winRate).toBeGreaterThan(byId.get("chapter5-road-underprepared")!.winRate);
+    expect(byId.get("chapter5-road-underprepared")!.winRate).toBeLessThan(.50);
+    expect(byId.get("chapter5-road-ready")!.averageSurvivingHeroes).toBeLessThan(4);
+    expect(byId.get("chapter6-laurel-law-prepared")!.winRate).toBeGreaterThanOrEqual(byId.get("chapter6-laurel-law-basic-l10")!.winRate);
+    expect(byId.get("chapter4-procession-l6")!.winRate).toBeGreaterThan(0);
+    expect(byId.get("chapter5-siege")!.winRate).toBeGreaterThan(0);
+    expect(byId.get("chapter5-causeway")!.winRate).toBeGreaterThan(0);
+    expect(byId.get("chapter6-laurel-law-prepared")!.winRate).toBeGreaterThan(0);
+    expect(byId.get("chapter6-laurel-law-basic-l10")!.averageSurvivingHeroes).toBeLessThan(4);
+  }, 240_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [

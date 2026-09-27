@@ -59,11 +59,11 @@ export function getLevelAppropriateQuestLootIds(itemIds: readonly string[], hero
       else if (equipped.levelRequirement === item.levelRequirement && rarityRank[equipped.rarity] < rarityRank[item.rarity]) value += 2;
 
       // Weapons drive combat readiness more strongly than the other slots. If a
-      // hero's weapon is two or more levels behind, make current-tier weapon
+      // hero's weapon is three or more levels behind, make current-tier weapon
       // candidates win the loot tie instead of handing out another sidegrade.
       if (item.slot === "weapon" && item.levelRequirement > equipped.levelRequirement) {
         const weaponLag = Math.max(0, hero.level - equipped.levelRequirement);
-        if (weaponLag >= 2) value += Math.min(6, 2 + weaponLag);
+        if (weaponLag >= 3) value += Math.min(6, 2 + weaponLag);
       }
     }
     return value;

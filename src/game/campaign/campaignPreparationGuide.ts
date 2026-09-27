@@ -21,6 +21,19 @@ function hasWeaponRecipe(questId: string): boolean {
   });
 }
 
+function hasUsableWeaponRecipe(questId: string, heroClassIds: ReadonlySet<string>): boolean {
+  const quest = QUESTS[questId];
+  return (quest?.recipeUnlockIdsOnVictory ?? []).some((recipeId) => {
+    const equipmentId = CRAFTING_RECIPES[recipeId]?.outputEquipmentId;
+    const equipment = equipmentId ? EQUIPMENT[equipmentId] : undefined;
+    return Boolean(
+      equipment
+      && equipment.slot === "weapon"
+      && (!equipment.classRestrictions.length || equipment.classRestrictions.some((classId) => heroClassIds.has(classId))),
+    );
+  });
+}
+
 function coreFieldHeroes(guild: GuildState) {
   const active = guild.heroes.filter((hero) => hero.isAvailable && hero.currentHP > 0);
   const pool = active.length >= 4 ? active : guild.heroes;
@@ -34,6 +47,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
   const heroes = coreFieldHeroes(guild);
   if (!heroes.length) return null;
   const fieldLevel = heroes.reduce((sum, hero) => sum + hero.level, 0) / heroes.length;
+  const coreClassIds = new Set(heroes.map((hero) => hero.classId));
 
   const nextNode = getAvailableCampaignNodes(guild.world).find((node) => Boolean(node.questId));
   const nextQuest = nextNode?.questId ? QUESTS[nextNode.questId] : undefined;
@@ -54,7 +68,8 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
     .filter((quest): quest is NonNullable<typeof quest> => Boolean(quest))
     .filter((quest) => !guild.world.completedQuestIds.includes(quest.id))
     .filter((quest) => isQuestAvailableForGuild(quest, guild.world, guild.heroes))
-    .sort((a, b) => Number(hasWeaponRecipe(b.id)) - Number(hasWeaponRecipe(a.id))
+    .sort((a, b) => Number(hasUsableWeaponRecipe(b.id, coreClassIds)) - Number(hasUsableWeaponRecipe(a.id, coreClassIds))
+      || Number(hasWeaponRecipe(b.id)) - Number(hasWeaponRecipe(a.id))
       || Math.abs((a.recommendedLevelMin ?? recommendedMin) - fieldLevel) - Math.abs((b.recommendedLevelMin ?? recommendedMin) - fieldLevel)
       || (a.difficulty ?? 0) - (b.difficulty ?? 0));
 
@@ -63,7 +78,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
 
   if (reason && sideQuests.length) {
     const quest = sideQuests[0]!;
-    const weaponRecipe = hasWeaponRecipe(quest.id);
+    const weaponRecipe = hasUsableWeaponRecipe(quest.id, coreClassIds);
     const detail = reason === "level"
       ? `Your top four average Level ${fieldLevel.toFixed(1)}; the next story mission recommends Level ${recommendedMin}. This one-clear side quest gives XP and a guaranteed equipment reward${weaponRecipe ? ", plus a weapon recipe" : ""}.`
       : reason === "weapon"

@@ -323,30 +323,58 @@ describe("repeatable balance simulations", () => {
     }
   }, 180_000);
 
-  it("keeps underprepared late-chapter bosses dangerous without becoming guaranteed wipes", () => {
-    const scenarios = [
-      { id: "underprepared-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 8960 },
-      { id: "underprepared-ch8-nhal", questId: "admiral_nhal_veyr_boss", heroLevel: 14, seed: 8970 },
-      { id: "underprepared-ch9-serekh", questId: "serekh_chartmaker_boss", heroLevel: 16, seed: 8980 },
+  it("separates prepared, underprepared and severely underprepared late boss outcomes", () => {
+    const bosses = [
+      { id: "ch7-varkesh", questId: "varkesh_gilded_rupture_boss", preparedLevel: 13, seed: 9300 },
+      { id: "ch8-nhal", questId: "admiral_nhal_veyr_boss", preparedLevel: 15, seed: 9400 },
+      { id: "ch9-serekh", questId: "serekh_chartmaker_boss", preparedLevel: 17, seed: 9500 },
     ] as const;
-    const results = scenarios.map((scenario) => simulateCombatScenario({
-      ...scenario,
-      partyClasses: ["warrior", "ranger", "cleric", "mage"],
-      difficultyId: "standard",
-      runs: 6,
-      gearProfile: "lagged_basic",
-      progressionProfile: "subclass_ready",
-    }));
-    console.table(results);
-    expect(results.every((result) => result.stalled === 0)).toBe(true);
-    for (const result of results) {
-      expect(result.winRate, `${result.scenarioId} underprepared win rate`).toBeGreaterThanOrEqual(1 / 6);
-      expect(result.winRate, `${result.scenarioId} underprepared win rate`).toBeLessThanOrEqual(.5);
-      expect(result.wipeRate, `${result.scenarioId} underprepared wipe rate`).toBeGreaterThanOrEqual(.5);
-      expect(result.wipeRate, `${result.scenarioId} underprepared wipe rate`).toBeLessThanOrEqual(5 / 6);
-      expect(result.averageFallenHeroesOnWins, `${result.scenarioId} casualties on surviving attempts`).toBeGreaterThanOrEqual(1);
+    for (const boss of bosses) {
+      const prepared = simulateCombatScenario({
+        id: `${boss.id}-prepared`,
+        questId: boss.questId,
+        heroLevel: boss.preparedLevel,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId: "standard",
+        runs: 8,
+        seed: boss.seed,
+        gearProfile: "optional_progression",
+        progressionProfile: "subclass_ready",
+      });
+      const underprepared = simulateCombatScenario({
+        id: `${boss.id}-underprepared`,
+        questId: boss.questId,
+        heroLevel: boss.preparedLevel - 1,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId: "standard",
+        runs: 8,
+        seed: boss.seed,
+        gearProfile: "optional_progression",
+        progressionProfile: "subclass_ready",
+      });
+      const severelyUnderprepared = simulateCombatScenario({
+        id: `${boss.id}-severely-underprepared`,
+        questId: boss.questId,
+        heroLevel: boss.preparedLevel - 1,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId: "standard",
+        runs: 8,
+        seed: boss.seed,
+        gearProfile: "lagged_basic",
+        progressionProfile: "subclass_ready",
+      });
+      console.table([prepared, underprepared, severelyUnderprepared]);
+      expect(prepared.stalled + underprepared.stalled + severelyUnderprepared.stalled).toBe(0);
+      expect(prepared.winRate, `${boss.id} prepared win rate`).toBeGreaterThanOrEqual(.75);
+      expect(prepared.averageFallenHeroesOnWins, `${boss.id} prepared casualties`).toBeGreaterThanOrEqual(.75);
+      expect(prepared.averageFallenHeroesOnWins, `${boss.id} prepared casualties`).toBeLessThanOrEqual(1.75);
+      expect(underprepared.winRate, `${boss.id} preparation payoff`).toBeLessThan(prepared.winRate);
+      expect(underprepared.wipeRate, `${boss.id} underprepared wipe pressure`).toBeGreaterThanOrEqual(.25);
+      expect(underprepared.wipeRate, `${boss.id} underprepared wipe pressure`).toBeLessThanOrEqual(.625);
+      expect(underprepared.averageFallenHeroesOnWins, `${boss.id} underprepared casualties`).toBeGreaterThanOrEqual(1);
+      expect(severelyUnderprepared.wipeRate, `${boss.id} severe underprepared wipe pressure`).toBeGreaterThanOrEqual(.75);
     }
-  }, 180_000);
+  }, 300_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [

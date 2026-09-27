@@ -5,7 +5,7 @@ import { QUEST_ENCOUNTERS } from "../src/data/encounters/questEncounters";
 const party = ["warrior", "ranger", "cleric", "mage"] as const;
 
 describe("global balance diagnostics", () => {
-  it("settles Serekh prelude normalization", () => {
+  it("tests boss-focused Serekh redistribution", () => {
     const first = QUEST_ENCOUNTERS.chart_hall_guard!;
     const second = QUEST_ENCOUNTERS.collapsing_tidal_engine!;
     const final = QUEST_ENCOUNTERS.serekh_abyss_platform!;
@@ -14,13 +14,18 @@ describe("global balance diagnostics", () => {
     const boss = final.enemies.find((g) => g.enemyDefinitionId === "serekh_chartmaker")!;
     const originalBoss = boss.difficultyMultiplier;
 
-    for (const pre of [.75, .70] as const) {
-      first.enemies.forEach((g) => { g.difficultyMultiplier = pre; });
-      second.enemies.forEach((g) => { g.difficultyMultiplier = pre; });
-      boss.difficultyMultiplier = 1.10;
+    const variants = [
+      { id: "pre60-boss120", pre: .60, boss: 1.20 },
+      { id: "pre55-boss125", pre: .55, boss: 1.25 },
+    ] as const;
+
+    for (const variant of variants) {
+      first.enemies.forEach((g) => { g.difficultyMultiplier = variant.pre; });
+      second.enemies.forEach((g) => { g.difficultyMultiplier = variant.pre; });
+      boss.difficultyMultiplier = variant.boss;
       for (const difficultyId of ["standard", "veteran", "iron_guild"] as const) {
-        console.log("SEREKH_FINAL_TUNE", pre, difficultyId, simulateCombatScenario({
-          id: `serekh-pre${pre}-${difficultyId}`,
+        console.log("SEREKH_BOSS_FOCUS", variant.id, difficultyId, simulateCombatScenario({
+          id: `serekh-${variant.id}-${difficultyId}`,
           questId: "serekh_chartmaker_boss",
           heroLevel: 17,
           partyClasses: party,

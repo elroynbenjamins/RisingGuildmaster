@@ -20,7 +20,7 @@ import { recordQuestHistory } from "../heroes/heroHistoryService";
 import { getDifficulty } from "../../data/difficulty/difficulties";
 import { QUEST_ENCOUNTERS } from "../../data/encounters/questEncounters";
 import { getEnemyDefinition } from "../../data/enemies";
-import { applyCombatEquipmentWear } from "../equipment/equipmentDurabilityService";
+import { applyCombatEquipmentWear, applyFallEquipmentDamage } from "../equipment/equipmentDurabilityService";
 import { getGuildRank, getQuestReputationReward } from "../renown/guildLegacyService";
 import { getRegionThreatEffects } from "../world/regionalThreatService";
 
@@ -149,14 +149,10 @@ function persistHeroOutcome(hero: Hero, instance: HeroCombatInstance, xp: number
   const injuryChance = Math.max(0, Math.min(1, .15 * (1 + getTraitPercentage(hero, "injuryChance"))));
   if (defeated) conditions = applyOutcomeInjury(conditions, hero.id, "major");
   else if (instance.currentHP / instance.maxHP <= .20 && random.next() < injuryChance) conditions = applyOutcomeInjury(conditions, hero.id, "minor");
-  let equipment = hero.equipment;
-  if (defeated && random.next() < .10) {
-    const equipped = Object.entries(hero.equipment).filter((entry): entry is [keyof Hero["equipment"], string] => Boolean(entry[1]));
-    if (equipped.length) { const [lostSlot] = random.pick(equipped); equipment = { ...equipment, [lostSlot]: null }; }
-  }
-  const afterBattle = { ...hero, equipment, currentHP: defeated ? 0 : instance.currentHP, conditions, isAvailable: !defeated };
+  const afterBattle = { ...hero, currentHP: defeated ? 0 : instance.currentHP, conditions, isAvailable: !defeated };
+  const fallDamaged = defeated ? applyFallEquipmentDamage(afterBattle, random).hero : afterBattle;
   const damageRatio = defeated ? 1 : Math.max(0, (hero.currentHP - instance.currentHP) / Math.max(1, instance.maxHP));
-  const worn = applyCombatEquipmentWear(afterBattle, damageRatio, random).hero;
+  const worn = applyCombatEquipmentWear(fallDamaged, damageRatio, random).hero;
   return grantCampaignHeroXp(worn, defeated ? Math.round(xp * .5) : xp, guild.world);
 }
 

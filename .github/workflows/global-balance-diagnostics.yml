@@ -1,10 +1,10 @@
-name: Global balance diagnostics
+name: Global balance validation
 on:
   push:
     branches:
       - balance/global-ci-casualty-pass
 concurrency:
-  group: global-balance-diagnostics
+  group: global-balance-validation
   cancel-in-progress: true
 jobs:
   balance:
@@ -19,4 +19,9 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/globalBalanceDiagnostics.test.ts
+      - name: Structural and progression guards
+        run: pnpm vitest run tests/chapter5AshlandsBalance.test.ts tests/chapter6Greenveil.test.ts tests/chapter9DrownedSeventh.test.ts tests/lateCampaignScaling.test.ts tests/raids.test.ts tests/chapterXpCurve.test.ts
+      - name: Campaign casualty guards
+        run: pnpm vitest run tests/balanceSimulation.test.ts -t "reports early-campaign combat|reports representative campaign fights|compares intended-level Frostmarch bosses|keeps prepared Hard and Iron parties viable|reports Chapter 4–6 transition combat|reports prepared Standard survivor baselines|reports prepared Standard casualty pressure through Chapters 7–9|keeps underprepared late-chapter bosses"
+      - name: Raid casualty guards
+        run: pnpm vitest run tests/raidBalanceSimulation.test.ts

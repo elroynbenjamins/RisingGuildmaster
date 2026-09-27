@@ -19,6 +19,18 @@ describe("post-battle management guidance", () => {
     expect(actions.find((action) => action.id === "equipment")?.itemId).toBe("worn-sword");
   });
 
+  it("turns a full wipe into a recovery and catch-up plan", () => {
+    const heroes = Array.from({ length: 4 }, (_, index) => ({ ...testHero(), id: `hero-${index}`, currentHP: 0, isAvailable: false }));
+    const guild = { ...createGuild(), heroes };
+    const heroOutcomes = heroes.map((hero) => outcome({ heroId: hero.id, name: hero.name, currentHP: 0, fellInBattle: true, availableSkillPoints: 0 }));
+    const action = getPostBattleManagementActions({ lootIds: [], heroOutcomes }, guild)[0];
+    expect(action).toMatchObject({ id: "recovery", title: "Recover, Then Regroup", actionLabel: "Open Temple" });
+    expect(action?.description).toContain("Side Quest");
+    expect(action?.description).toContain("Roguelite Expedition");
+    expect(action?.description).toContain("catch-up XP");
+    expect(action?.description).toContain("level-appropriate gear");
+  });
+
   it("does not recommend management when the party returned fully ready without rewards", () => {
     const hero = { ...testHero(), adventureStamina: 100 };
     const guild = { ...createGuild(), heroes: [hero] };

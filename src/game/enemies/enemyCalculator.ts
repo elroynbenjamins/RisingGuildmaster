@@ -7,12 +7,12 @@ function scaled(base: number, modifier: number, scaling: EnemyStatScaling, categ
 /** Applies definition percentages to shared base stats; level/difficulty scaling remains caller-configurable. */
 export function calculateEnemyStats(base: EnemyBaseStats, enemy: EnemyDefinition, scaling: EnemyStatScaling = {}): EnemyCalculatedStats {
   return {
-    hp: scaled(base.hp, enemy.hpModifier, scaling, scaling.hpMultiplier, scaling.hpLevelMultiplier),
-    physicalDamage: scaled(base.physicalDamage, enemy.physicalDamageModifier, scaling, scaling.damageMultiplier, scaling.damageLevelMultiplier),
-    physicalDefense: scaled(base.physicalDefense, enemy.physicalDefenseModifier, scaling, scaling.defenseMultiplier, scaling.defenseLevelMultiplier),
+    hp: scaled(base.hp, enemy.hpModifier, scaling, scaling.hpMultiplier, (scaling.hpLevelMultiplier ?? 1)),
+    physicalDamage: scaled(base.physicalDamage, enemy.physicalDamageModifier, scaling, scaling.damageMultiplier, (scaling.damageLevelMultiplier ?? 1)),
+    physicalDefense: scaled(base.physicalDefense, enemy.physicalDefenseModifier, scaling, scaling.defenseMultiplier, (scaling.defenseLevelMultiplier ?? 1)),
     magicDamage: scaled(base.magicDamage, enemy.magicDamageModifier, scaling, scaling.damageMultiplier, scaling.damageLevelMultiplier),
     magicDefense: scaled(base.magicDefense, enemy.magicDefenseModifier, scaling, scaling.defenseMultiplier, scaling.defenseLevelMultiplier),
-    speed: scaled(base.speed, enemy.speedModifier, scaling, scaling.speedMultiplier, scaling.speedLevelMultiplier),
+    speed: scaled(base.speed, enemy.speedModifier, scaling, scaling.speedMultiplier, (scaling.speedLevelMultiplier ?? 1)),
   };
 }
 

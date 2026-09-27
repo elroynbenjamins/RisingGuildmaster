@@ -19,4 +19,4 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateCampaignScaling.test.ts tests/balanceSimulation.test.ts -t "late campaign encounter scaling|prepared Standard casualty pressure through Chapters 7–9|underprepared late-chapter bosses"
+      - run: pnpm vitest run tests/lateUnderpreparedProfileDiagnostics.test.ts

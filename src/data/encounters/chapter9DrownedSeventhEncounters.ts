@@ -12,7 +12,7 @@ export const CHAPTER_9_DROWNED_SEVENTH_ENCOUNTERS: Record<string, EncounterDefin
  tidal_engine_core:{id:"tidal_engine_core",battlefieldId:"tidal_engine_core",heroSpawnPositions:h,enemies:[g("seventh_gate_colossus",1,17,[{x:12,y:5}]),g("drowned_legionary",1,17,[{x:10,y:5}])]},
  chart_hall_guard:{id:"chart_hall_guard",battlefieldId:"chart_hall_guard",heroSpawnPositions:h,enemies:[g("seventh_gate_colossus",1,17,[{x:12,y:5}]),g("drowned_legionary",1,17,[{x:10,y:5}])]},
  collapsing_tidal_engine:{id:"collapsing_tidal_engine",battlefieldId:"collapsing_tidal_engine",heroSpawnPositions:h,enemies:[g("tideglass_stalker",2,17,[{x:10,y:3},{x:10,y:7}])]},
- serekh_abyss_platform:{id:"serekh_abyss_platform",battlefieldId:"serekh_abyss_platform",heroSpawnPositions:h,enemies:[g("serekh_chartmaker",1,17,[{x:12,y:5}],.75)]},
+ serekh_abyss_platform:{id:"serekh_abyss_platform",battlefieldId:"serekh_abyss_platform",heroSpawnPositions:h,enemies:[g("serekh_chartmaker",1,17,[{x:12,y:5}],.70)]},
  diving_bell_wreck:{id:"diving_bell_wreck",battlefieldId:"diving_bell_wreck",heroSpawnPositions:h,enemies:[g("tideglass_stalker",2,16,[{x:10,y:3},{x:10,y:7}]),g("nameleech_swarm",2,16,[{x:13,y:2},{x:13,y:8}])]},
  choir_echo_chamber:{id:"choir_echo_chamber",battlefieldId:"choir_echo_chamber",heroSpawnPositions:h,enemies:[g("nameleech_swarm",3,17,[{x:10,y:3},{x:10,y:5},{x:10,y:7}]),g("abyssal_lanternbearer",1,17,[{x:13,y:5}],1.1)]},
  drowned_tavern_common_room:{id:"drowned_tavern_common_room",battlefieldId:"drowned_tavern_common_room",heroSpawnPositions:h,enemies:[g("drowned_legionary",2,17,[{x:10,y:3},{x:10,y:7}]),g("nameleech_swarm",2,17,[{x:13,y:3},{x:13,y:7}])]},

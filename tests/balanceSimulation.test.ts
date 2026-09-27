@@ -29,6 +29,20 @@ describe("repeatable balance simulations", () => {
     }
   });
 
+  it("builds a prepared late-game loadout with progression epic weapons", () => {
+    const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 15, 4440, "prepared_progression", "subclass_ready");
+    for (const hero of party) {
+      const weaponId = hero.equipment.weapon;
+      expect(weaponId).toBeTruthy();
+      const weapon = EQUIPMENT[weaponId!]!;
+      expect(weapon.rarity).toBe("epic");
+      expect(weapon.levelRequirement).toBeGreaterThanOrEqual(11);
+      expect(weapon.levelRequirement).toBeLessThanOrEqual(14);
+      const equipped = Object.values(hero.equipment).filter((id): id is string => Boolean(id)).map((id) => EQUIPMENT[id]!);
+      expect(equipped.length).toBeGreaterThanOrEqual(4);
+    }
+  });
+
   it("adds representative Level-5 subclasses to the normal progression simulation profile", () => {
     const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 4450, "lagged_basic", "subclass_ready");
     expect(party.map((hero) => hero.subclassId)).toEqual(["guardian", "sharpshooter", "pyromancer", "life_priest"]);
@@ -277,12 +291,24 @@ describe("repeatable balance simulations", () => {
       partyClasses: ["warrior", "ranger", "cleric", "mage"],
       difficultyId: "standard",
       runs: 6,
-      gearProfile: "optional_progression",
+      gearProfile: "prepared_progression",
       progressionProfile: "subclass_ready",
     }));
-    console.table(results);
-    expect(results.every((result) => result.stalled === 0)).toBe(true);
-  }, 180_000);
+    const lacking = [
+      { id: "lacking-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 8960 },
+      { id: "lacking-ch8-nhal", questId: "admiral_nhal_veyr_boss", heroLevel: 14, seed: 8970 },
+      { id: "lacking-ch9-serekh", questId: "serekh_chartmaker_boss", heroLevel: 16, seed: 8980 },
+    ].map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 4,
+      gearProfile: "lagged_basic",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table([...results, ...lacking]);
+    expect([...results, ...lacking].every((result) => result.stalled === 0)).toBe(true);
+  }, 240_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [

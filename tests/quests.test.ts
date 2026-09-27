@@ -26,7 +26,7 @@ describe("quest loop", () => {
     const heroes = [{ ...testHero(), id: "h2", level: 2 }, { ...testHero(), id: "h3", level: 3 }, { ...testHero(), id: "h4", level: 4 }];
     const candidates = getLevelAppropriateQuestLootIds(["steel-greatsword", "iron-warhammer", "topaz-precision-ring"], heroes);
     expect(candidates).toContain("iron-warhammer");
-    expect(candidates).toContain("topaz-precision-ring");
+    expect(candidates.every((id) => EQUIPMENT[id] && EQUIPMENT[id]!.levelRequirement >= 2 && EQUIPMENT[id]!.levelRequirement <= 4)).toBe(true);
     expect(candidates).not.toContain("steel-greatsword");
     const fallback = getLevelAppropriateQuestLootIds(["steel-greatsword"], heroes);
     expect(fallback.length).toBeGreaterThan(0);

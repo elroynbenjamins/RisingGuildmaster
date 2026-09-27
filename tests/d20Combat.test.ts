@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { resolveAttackRoll, rollAttack } from "../src/game/combat/dice/attackRoll";
 import { rollDie } from "../src/game/combat/dice/diceService";
-import { calculateArmorClass, calculateMagicAttackBonus, calculateMagicDefenseScore, calculatePhysicalAttackBonus } from "../src/game/combat/tacticalStats";
+import { calculateArmorClass, calculateEnemyMagicAttackBonus, calculateEnemyPhysicalAttackBonus, calculateMagicAttackBonus, calculateMagicDefenseScore, calculatePhysicalAttackBonus, calculateProficiencyBonus } from "../src/game/combat/tacticalStats";
 import { sequenceRandom } from "./combatTestUtils";
 import { combineD20RollModes } from "../src/game/combat/dice/d20RollMode";
 
@@ -15,5 +15,6 @@ describe("D20 combat", () => {
   it("keeps the higher of two D20s with Advantage", () => expect(rollAttack(sequenceRandom([.15, .75]), 5, 0, 16, "advantage")).toMatchObject({ diceRolls: [4, 16], diceRoll: 16, rollMode: "advantage", hit: true }));
   it("keeps the lower of two D20s with Disadvantage", () => expect(rollAttack(sequenceRandom([.15, .75]), 5, 0, 16, "disadvantage")).toMatchObject({ diceRolls: [4, 16], diceRoll: 4, rollMode: "disadvantage", hit: false }));
   it("cancels Advantage and Disadvantage without stacking either", () => { expect(combineD20RollModes("advantage", "advantage")).toBe("advantage"); expect(combineD20RollModes("advantage", "disadvantage")).toBe("normal"); });
-  it("calculates attack and defense scores from attributes", () => { expect(calculatePhysicalAttackBonus(attributes, 3)).toBe(9); expect(calculateMagicAttackBonus(attributes, 3)).toBe(9); expect(calculateArmorClass(attributes, 3)).toBe(18); expect(calculateMagicDefenseScore(attributes, 2)).toBe(18); });
+  it("calculates D&D-style attack and defense scores from attributes", () => { expect(calculatePhysicalAttackBonus(attributes, 3)).toBe(5); expect(calculateMagicAttackBonus(attributes, 3)).toBe(6); expect(calculateArmorClass(attributes, 3)).toBe(18); expect(calculateMagicDefenseScore(attributes, 2)).toBe(18); });
+  it("uses the D&D proficiency progression instead of adding full level to attacks", () => { expect([1,4,5,8,9,12,13,16,17,20,30].map(calculateProficiencyBonus)).toEqual([2,2,3,3,4,4,5,5,6,6,6]); expect(calculateEnemyPhysicalAttackBonus(1)).toBe(4); expect(calculateEnemyPhysicalAttackBonus(17)).toBe(8); expect(calculateEnemyMagicAttackBonus(17)).toBe(7); });
 });

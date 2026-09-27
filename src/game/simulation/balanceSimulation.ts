@@ -28,10 +28,10 @@ import { FIRST_SUBCLASS_LEVEL, SUBCLASSES } from "../../data/subclasses/subclass
 import { getHeroSkillIds } from "../progression/subclasses/subclassService";
 import type { EquipmentSlot } from "../heroes/types";
 
-export type SimulationGearProfile = "starter" | "lagged_basic" | "optional_progression";
+export type SimulationGearProfile = "starter" | "lagged_basic" | "optional_progression" | "prepared";
 export type SimulationProgressionProfile = "base" | "subclass_ready";
 export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile }
-export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; averageRounds: number; averageSurvivingHeroes: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
+export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; wipeRate: number; casualtyWinRate: number; averageFallenHeroesOnWins: number; averageRounds: number; averageSurvivingHeroes: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
 export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
 export interface EconomySimulationResult { scenarioId: string; startingGold: number; endingGold: number; netGold: number; questIncome: number; tavernIncome: number; salaryPaid: number; fieldExpenses: number; arrears: number; breakEvenQuestsPerWeek: number; goldAfterFacilityReserve: number }
 
@@ -42,19 +42,23 @@ function progressionGearTargetLevel(heroLevel: number, slot: EquipmentSlot): num
   return Math.max(1, heroLevel - lag);
 }
 
-function equipProgressionGear(hero: Hero, profile: "lagged_basic" | "optional_progression"): Hero {
+function equipProgressionGear(hero: Hero, profile: "lagged_basic" | "optional_progression" | "prepared"): Hero {
   const equipment = { ...hero.equipment };
   for (const slot of SIMULATION_GEAR_SLOTS) {
     const mainSlot = slot === "weapon" || slot === "armor";
-    const targetLevel = profile === "optional_progression"
+    const targetLevel = profile === "prepared"
       ? Math.max(1, hero.level - (mainSlot ? 1 : 2))
-      : progressionGearTargetLevel(hero.level, slot);
+      : profile === "optional_progression"
+        ? Math.max(1, hero.level - (mainSlot ? 1 : 2))
+        : progressionGearTargetLevel(hero.level, slot);
     const candidates = Object.values(EQUIPMENT)
       .filter((item) => item.slot === slot)
       .filter((item) => item.levelRequirement <= targetLevel)
-      .filter((item) => profile === "optional_progression"
-        ? item.rarity === "common" || item.rarity === "uncommon" || item.rarity === "rare"
-        : item.rarity === "common" || item.rarity === "uncommon")
+      .filter((item) => profile === "prepared"
+        ? item.rarity === "common" || item.rarity === "uncommon" || item.rarity === "rare" || item.rarity === "epic"
+        : profile === "optional_progression"
+          ? item.rarity === "common" || item.rarity === "uncommon" || item.rarity === "rare"
+          : item.rarity === "common" || item.rarity === "uncommon")
       .filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(hero.classId))
       .sort((a, b) => b.levelRequirement - a.levelRequirement || b.value - a.value || a.id.localeCompare(b.id));
     if (candidates[0]) equipment[slot] = candidates[0].id;
@@ -74,7 +78,7 @@ function levelHero(hero: Hero, level: number, index: number, gearProfile: Simula
     ? Object.values(SUBCLASSES).find((definition) => definition.baseClassId === skilled.classId)
     : undefined;
   const progressed = subclass ? { ...skilled, subclassId: subclass.id } : skilled;
-  const prepared = gearProfile === "lagged_basic" || gearProfile === "optional_progression" ? equipProgressionGear(progressed, gearProfile) : progressed;
+  const prepared = gearProfile === "lagged_basic" || gearProfile === "optional_progression" || gearProfile === "prepared" ? equipProgressionGear(progressed, gearProfile) : progressed;
   return { ...prepared, currentHP: calculateHero(prepared).stats.maxHP };
 }
 
@@ -131,7 +135,7 @@ function autoplayEncounter(initial: CombatState, random: RandomSource): CombatSt
 }
 
 export function simulateCombatScenario(scenario: CombatSimulationScenario): CombatSimulationResult {
-  let wins = 0, losses = 0, stalled = 0, rounds = 0, survivors = 0, hpRatios = 0;
+  let wins = 0, losses = 0, stalled = 0, rounds = 0, survivors = 0, hpRatios = 0, casualtyWins = 0, fallenOnWins = 0;
   for (let run = 0; run < scenario.runs; run++) {
     const random = createSeededRandom(scenario.seed + run * 7919);
     const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "starter", scenario.progressionProfile ?? "base");
@@ -144,10 +148,18 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
       carried = advanced.heroInstances;
     }
     rounds += final?.round ?? 0;
-    if (final?.status === "victory") { wins++; const alive = final.heroes.filter((item) => item.unit.isAlive); survivors += alive.length; hpRatios += alive.reduce((sum, item) => sum + item.unit.currentHP / item.unit.maxHP, 0) / Math.max(1, alive.length); }
+    if (final?.status === "victory") {
+      wins++;
+      const alive = final.heroes.filter((item) => item.unit.isAlive);
+      const fallen = Math.max(0, scenario.partyClasses.length - alive.length);
+      survivors += alive.length;
+      fallenOnWins += fallen;
+      if (fallen > 0) casualtyWins++;
+      hpRatios += alive.reduce((sum, item) => sum + item.unit.currentHP / item.unit.maxHP, 0) / Math.max(1, alive.length);
+    }
     else if (final?.status === "defeat") losses++; else stalled++;
   }
-  return { scenarioId: scenario.id, wins, losses, stalled, winRate: wins / scenario.runs, averageRounds: rounds / scenario.runs, averageSurvivingHeroes: wins ? survivors / wins : 0, averageRemainingHpRatioOnWins: wins ? hpRatios / wins : 0, enemyXpPool: getQuestEnemyXpPool(QUESTS[scenario.questId]!) };
+  return { scenarioId: scenario.id, wins, losses, stalled, winRate: wins / scenario.runs, wipeRate: losses / scenario.runs, casualtyWinRate: wins ? casualtyWins / wins : 0, averageFallenHeroesOnWins: wins ? fallenOnWins / wins : 0, averageRounds: rounds / scenario.runs, averageSurvivingHeroes: wins ? survivors / wins : 0, averageRemainingHpRatioOnWins: wins ? hpRatios / wins : 0, enemyXpPool: getQuestEnemyXpPool(QUESTS[scenario.questId]!) };
 }
 
 export function simulateEconomyScenario(scenario: EconomySimulationScenario): EconomySimulationResult {

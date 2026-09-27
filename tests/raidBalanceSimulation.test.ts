@@ -42,5 +42,9 @@ describe("raid balance simulations", () => {
     });
     console.table([result]);
     expect(result.stalled).toBe(0);
+    expect(result.winRate).toBeGreaterThanOrEqual(.75);
+    expect(result.averageSurvivingHeroes).toBeGreaterThanOrEqual(4.8);
+    expect(result.averageSurvivingHeroes).toBeLessThanOrEqual(6.5);
+    expect(result.averageFallenHeroesOnWins).toBeGreaterThanOrEqual(1.5);
   }, 120_000);
 });

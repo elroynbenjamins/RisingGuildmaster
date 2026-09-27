@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
 import { loadAccountContentEntitlements } from "./accountEntitlementService";
-import { getAndroidRewardedAdUnitId, getAndroidRewardedInterstitialAdUnitId } from "../../config/admobConfig";
+import { getAndroidReviveRewardedAdUnitId, getAndroidRewardedAdUnitId, getAndroidRewardedInterstitialAdUnitId } from "../../config/admobConfig";
 import { TEMPLE_CONFIG } from "../../config/templeConfig";
 import type { VerifiedGemCredit } from "./gemTypes";
 
@@ -70,6 +70,18 @@ export async function showAdMobRewardedAd(): Promise<VerifiedGemCredit> {
   });
 }
 
+export async function showAdMobReviveRewardedAd(): Promise<VerifiedGemCredit> {
+  return runExclusiveAd(async () => {
+    const module = loadNativeAdsModule();
+    await initialize(module);
+    const rewarded = module.RewardedAd.createForAdRequest(getAndroidReviveRewardedAdUnitId(DEVELOPMENT_BUILD), {
+      requestNonPersonalizedAdsOnly: true,
+      keywords: ["fantasy", "role playing game", "strategy"],
+    });
+    return awaitReward(rewarded, module, "revive");
+  });
+}
+
 export async function showDayMilestoneRewardedInterstitial(): Promise<VerifiedGemCredit> {
   return runExclusiveAd(async () => {
     if ((await loadAccountContentEntitlements()).adsRemoved) throw new Error("Ads are permanently removed for this account.");
@@ -85,7 +97,7 @@ export async function showDayMilestoneRewardedInterstitial(): Promise<VerifiedGe
 
 type RewardedInstance = ReturnType<AdsModule["RewardedAd"]["createForAdRequest"]> | ReturnType<AdsModule["RewardedInterstitialAd"]["createForAdRequest"]>;
 
-function awaitReward(rewarded: RewardedInstance, module: AdsModule, placement: "rewarded" | "day_milestone"): Promise<VerifiedGemCredit> {
+function awaitReward(rewarded: RewardedInstance, module: AdsModule, placement: "rewarded" | "revive" | "day_milestone"): Promise<VerifiedGemCredit> {
   return new Promise((resolve, reject) => {
     let earned = false;
     let settled = false;
@@ -104,7 +116,7 @@ function awaitReward(rewarded: RewardedInstance, module: AdsModule, placement: "
       source: "rewarded_ad",
       gems: TEMPLE_CONFIG.rewardedAdGems,
       verified: true,
-      note: DEVELOPMENT_BUILD ? "AdMob test rewarded ad" : placement === "day_milestone" ? "Day milestone rewarded interstitial" : "AdMob rewarded ad",
+      note: DEVELOPMENT_BUILD ? "AdMob test rewarded ad" : placement === "day_milestone" ? "Day milestone rewarded interstitial" : placement === "revive" ? "Revive rewarded ad" : "AdMob rewarded ad",
     }) : finish(undefined, new Error("The advertisement ended before its reward was earned."))));
     cleanups.push(rewarded.addAdEventListener(module.AdEventType.ERROR, (error) => finish(undefined, new Error(error.message || "The advertisement could not be loaded."))));
     cleanups.push(rewarded.addAdEventListener(module.RewardedAdEventType.LOADED, () => {

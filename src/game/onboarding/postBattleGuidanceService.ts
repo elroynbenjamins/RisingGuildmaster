@@ -41,9 +41,9 @@ export function getPostBattleManagementActions(summary: PostBattleSummary, guild
 
   if (needsRecovery) {
     const recoveryDescription = partyWiped
-      ? "The party was wiped. Revive them in the Temple first, then consider one Side Quest or Roguelite Expedition before retrying. Expeditions scale to the drafted party and provide catch-up XP plus level-appropriate gear."
+      ? "The party was wiped. Revive them in the Temple first: use 5 gems, a rewarded revive, or today’s free revive when Remove Ads is owned. Then consider one Side Quest or Roguelite Expedition before retrying; Expeditions scale to the party and provide catch-up XP plus level-appropriate gear."
       : fallenCount >= 2
-        ? "The party took heavy casualties. Restore them in the Temple; if the next campaign mission is still risky, a Side Quest or Roguelite Expedition can add XP and improve their gear before the next attempt."
+        ? "The party took heavy casualties. Restore fallen heroes in the Temple with 5 gems, a rewarded revive, or today’s Remove Ads free revive. If the next mission is still risky, a Side Quest or Roguelite Expedition can add XP and improve their gear."
         : "HP loss, injuries, and fallen heroes persist after battle. The Temple uses gold for treatment; revival costs 5 gems, or today’s free revive when Remove Ads is owned.";
     actions.push({ id: "recovery", title: partyWiped ? "Recover, Then Regroup" : "Restore the Party", description: recoveryDescription, actionLabel: "Open Temple", isNew: guild.world.worldFlags[SEEN_FLAGS.recovery] !== true });
   }

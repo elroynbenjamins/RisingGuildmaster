@@ -17,7 +17,7 @@ function chapterEightGuild() {
   const guild = createGuild();
   return {
     ...guild,
-    heroes: heroes(4, 14, "skyvault-aegis"),
+    heroes: heroes(4, 14, "sixth-voice-blade"),
     world: {
       ...guild.world,
       campaignChapter: 8,

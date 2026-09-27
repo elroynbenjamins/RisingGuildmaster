@@ -1,0 +1,22 @@
+name: Focused late balance current
+on:
+  push:
+    branches:
+      - balance/ch7-9-casualty-band
+concurrency:
+  group: focused-late-balance-current
+  cancel-in-progress: true
+jobs:
+  late-balance-current:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/enemyLevelScaling.test.ts tests/chapter7IronHills.test.ts tests/chapter8WesternSea.test.ts tests/chapter9DrownedSeventh.test.ts tests/balanceSimulation.test.ts -t "enemy level stat scaling|Chapter 7|Chapter 8|Chapter 9|prepared Standard casualty pressure through Chapters 7–9|keeps underprepared late-chapter boss parties"

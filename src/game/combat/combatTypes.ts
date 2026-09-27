@@ -60,6 +60,8 @@ export interface QuestCombatSetup {
   heroHealingPowerModifier?: number;
   heroMovementRangeModifier?: number;
   enemyMovementRangeModifier?: number;
+  /** Adds levels to every enemy in the selected encounter, used by scaling optional modes. */
+  enemyLevelModifier?: number;
 }
 
 export interface SkillHitResult { targetId: string; hit: boolean; critical: boolean; damage: number; healing?: number; appliedConditionIds: string[]; diceRoll?: number; diceRolls?: number[]; rollMode?: D20RollMode; attackBonus?: number; skillAttackModifier?: number; attackTotal?: number; targetValue?: number; rollResult?: "critical" | "hit" | "miss" | "critical_miss" }

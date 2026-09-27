@@ -21,11 +21,9 @@ describe("raid balance simulations", () => {
     })));
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
-    expect(results.slice(0,2).every((result) => result.winRate > 0)).toBe(true);
-    expect(results[0]!.winRate).toBeLessThanOrEqual(.75);
-    expect(results[1]!.winRate).toBeLessThanOrEqual(.75);
-    // Chartmaker is the post-Chapter-9 raid: the gearless autoplay baseline may fail entirely after the global difficulty increase.
-    expect(results[2]!.winRate).toBeLessThanOrEqual(.25);
+    expect(results.every((result) => result.winRate > 0)).toBe(true);
+    expect(results.every((result) => result.averageSurvivingHeroes <= 7.5)).toBe(true);
+    expect(results.slice(0,2).every((result) => result.averageFallenHeroesOnWins >= .5)).toBe(true);
   }, 120_000);
 
   it("measures Chartmaker with a normal Lv 18 progressed raid roster", () => {

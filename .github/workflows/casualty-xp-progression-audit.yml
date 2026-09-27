@@ -16,4 +16,5 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/casualtyXpProgressionDiagnostics.test.ts
+      - run: pnpm typecheck
+      - run: pnpm vitest run tests/quests.test.ts tests/dungeonRunIntegration.test.ts tests/chapterXpCurve.test.ts tests/postBattleGuidance.test.ts

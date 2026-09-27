@@ -25,6 +25,8 @@ describe("post-battle management guidance", () => {
     const heroOutcomes = heroes.map((hero) => outcome({ heroId: hero.id, name: hero.name, currentHP: 0, fellInBattle: true, availableSkillPoints: 0 }));
     const action = getPostBattleManagementActions({ lootIds: [], heroOutcomes }, guild)[0];
     expect(action).toMatchObject({ id: "recovery", title: "Recover, Then Regroup", actionLabel: "Open Temple" });
+    expect(action?.description).toContain("5 gems");
+    expect(action?.description).toContain("rewarded revive");
     expect(action?.description).toContain("Side Quest");
     expect(action?.description).toContain("Roguelite Expedition");
     expect(action?.description).toContain("catch-up XP");

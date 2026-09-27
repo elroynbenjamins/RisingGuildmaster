@@ -201,7 +201,7 @@ export const EQUIPMENT_ICON_ART: Readonly<Record<string, ImageSourcePropType>> =
   "last-margin-compass": require("../../../assets-runtime/images/equipment/complete/ossuary-reliquary.webp"),
   "chartwater-signet": require("../../../assets-runtime/images/equipment/complete/echopearl-ring.webp"),
   "drowned-chart-helm": require("../../../assets-runtime/images/equipment/complete/rimeguard-greathelm.webp"),
-  "marginwalker-boots": require("../../../assets-runtime/images/equipment/complete/abysswalker-boots.webp"),
+  "marginwalker-boots": require("../../../assets-runtime/images/equipment/complete/gravewater-waders.webp"),
   "ascendant-chartmail": require("../../../assets-runtime/images/equipment/complete/formation-plate.webp"),
   "erased-name-coat": require("../../../assets-runtime/images/equipment/complete/last-call-mantle.webp"),
   "cartographers-glaive": require("../../../assets-runtime/images/equipment/complete/seventh-name-glaive.webp"),

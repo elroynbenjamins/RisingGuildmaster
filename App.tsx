@@ -306,7 +306,7 @@ function Game() {
         return false;
       }
     };
-    return <QuestResultScreen openLoot={() => main("Inventory")} openGuildmasterSkills={() => setRoute({name: "guildmasterSkills"})} openCalendar={() => setRoute({name: "finances"})} summary={route.summary} choiceIds={choiceIds} onChoice={choose} openHeroSkills={(heroId)=>{const hero=guild.heroes.find((entry)=>entry.id===heroId);if(hero)setRoute({name:"skills",hero});}} openTemple={()=>setRoute({name:"temple"})} onContinue={() => route.summary.campaignNodeId ? setRoute({name:"campaign"}) : main("Guild")} />;
+    return <QuestResultScreen openLoot={() => main("Inventory")} openGuildmasterSkills={() => setRoute({name: "guildmasterSkills"})} openCalendar={() => setRoute({name:"finances"})} openSideQuests={() => main("Quests","Side Quests")} openDungeons={() => setRoute({name:"dungeon"})} summary={route.summary} choiceIds={choiceIds} onChoice={choose} openHeroSkills={(heroId)=>{const hero=guild.heroes.find((entry)=>entry.id===heroId);if(hero)setRoute({name:"skills",hero});}} openTemple={()=>setRoute({name:"temple"})} onContinue={() => route.summary.campaignNodeId ? setRoute({name:"campaign"}) : main("Guild")} />;
   }
   if (route.name === "combat") {
     const participants = guild.heroes.filter((hero) => route.party.heroIds.includes(hero.id));

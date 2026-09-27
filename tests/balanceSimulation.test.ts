@@ -125,6 +125,37 @@ describe("repeatable balance simulations", () => {
     expect(vaelithIron.averageSurvivingHeroes).toBeLessThan(2);
   }, 300_000);
 
+  it("keeps prepared Hard and Iron parties viable without making them forgiving", () => {
+    const encounters = [
+      { id: "vaelith", questId: "vaelith_pale_echo_boss", heroLevel: 6, seed: 7475 },
+      { id: "serekh", questId: "serekh_chartmaker_boss", heroLevel: 17, seed: 8975 },
+    ] as const;
+    const results = encounters.flatMap((encounter) => (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>
+      simulateCombatScenario({
+        id: `prepared-${encounter.id}-${difficultyId}`,
+        questId: encounter.questId,
+        heroLevel: encounter.heroLevel,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId,
+        runs: 4,
+        seed: encounter.seed,
+        gearProfile: "optional_progression",
+        progressionProfile: "subclass_ready",
+      }),
+    ));
+    console.table(results);
+    for (const encounter of encounters) {
+      const standard = results.find((result) => result.scenarioId === `prepared-${encounter.id}-standard`)!;
+      const hard = results.find((result) => result.scenarioId === `prepared-${encounter.id}-veteran`)!;
+      const iron = results.find((result) => result.scenarioId === `prepared-${encounter.id}-iron_guild`)!;
+      expect(standard.winRate).toBeGreaterThanOrEqual(hard.winRate);
+      expect(hard.winRate).toBeGreaterThanOrEqual(iron.winRate);
+      expect(hard.winRate, `${encounter.id} prepared Hard viability`).toBeGreaterThanOrEqual(.5);
+      expect(iron.wins, `${encounter.id} prepared Iron should remain possible`).toBeGreaterThan(0);
+      expect(iron.averageSurvivingHeroes, `${encounter.id} Iron pressure`).toBeLessThanOrEqual(hard.averageSurvivingHeroes);
+    }
+  }, 150_000);
+
   it("measures Frostmarch Standard with and without normal subclass progression", () => {
     const encounters = [
       { id: "hroth", questId: "hroth_iceblood_boss", heroLevel: 5, seed: 7600 },

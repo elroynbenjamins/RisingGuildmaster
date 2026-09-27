@@ -103,9 +103,11 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
     .filter((quest): quest is NonNullable<typeof quest> => Boolean(quest))
     .filter((quest) => !guild.world.completedQuestIds.includes(quest.id))
     .filter((quest) => isQuestAvailableForGuild(quest, guild.world, guild.heroes))
-    .sort((a, b) => (armorLag
-      ? Number(hasUsableArmorRecipe(b.id, coreClassIds)) - Number(hasUsableArmorRecipe(a.id, coreClassIds))
-      : Number(hasUsableWeaponRecipe(b.id, coreClassIds)) - Number(hasUsableWeaponRecipe(a.id, coreClassIds)))
+    .sort((a, b) => (weaponLag
+      ? Number(hasUsableWeaponRecipe(b.id, coreClassIds)) - Number(hasUsableWeaponRecipe(a.id, coreClassIds))
+      : armorLag
+        ? Number(hasUsableArmorRecipe(b.id, coreClassIds)) - Number(hasUsableArmorRecipe(a.id, coreClassIds))
+        : Number(hasUsableWeaponRecipe(b.id, coreClassIds)) - Number(hasUsableWeaponRecipe(a.id, coreClassIds)))
       || Number(hasWeaponRecipe(b.id)) - Number(hasWeaponRecipe(a.id))
       || Math.abs((a.recommendedLevelMin ?? recommendedMin) - fieldLevel) - Math.abs((b.recommendedLevelMin ?? recommendedMin) - fieldLevel)
       || (a.difficulty ?? 0) - (b.difficulty ?? 0));

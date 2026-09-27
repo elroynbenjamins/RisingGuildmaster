@@ -46,11 +46,25 @@ export function getLevelAppropriateQuestLootIds(itemIds: readonly string[], hero
     let value = ownedIds.has(itemId) ? -3 : 1;
     for (const hero of usableHeroes) {
       const equippedId = hero.equipment[item.slot];
-      if (!equippedId) { value += 4; continue; }
+      if (!equippedId) {
+        value += item.slot === "weapon" ? 7 : 4;
+        continue;
+      }
       const equipped = EQUIPMENT[equippedId];
-      if (!equipped) { value += 2; continue; }
+      if (!equipped) {
+        value += item.slot === "weapon" ? 5 : 2;
+        continue;
+      }
       if (equipped.levelRequirement < item.levelRequirement) value += 3;
       else if (equipped.levelRequirement === item.levelRequirement && rarityRank[equipped.rarity] < rarityRank[item.rarity]) value += 2;
+
+      // Weapons drive combat readiness more strongly than the other slots. If a
+      // hero's weapon is two or more levels behind, make current-tier weapon
+      // candidates win the loot tie instead of handing out another sidegrade.
+      if (item.slot === "weapon" && item.levelRequirement > equipped.levelRequirement) {
+        const weaponLag = Math.max(0, hero.level - equipped.levelRequirement);
+        if (weaponLag >= 2) value += Math.min(6, 2 + weaponLag);
+      }
     }
     return value;
   };
@@ -79,9 +93,9 @@ export function getLevelAppropriateQuestLootIds(itemIds: readonly string[], hero
 
 export function getQuestEquipmentDropChance(quest: ReturnType<typeof getQuestDefinition>): number {
   if (!quest.repeatable) return 1;
-  if (quest.questType === "contract") return .55;
-  if (quest.huntReward) return .65;
-  return .60;
+  if (quest.questType === "contract") return .65;
+  if (quest.huntReward) return .80;
+  return .70;
 }
 
 export function getQuestGoldModifier(guild: GuildState, quest: ReturnType<typeof getQuestDefinition>, partyHeroes: readonly Hero[]): number {
@@ -160,7 +174,8 @@ export function resolveQuestVictory(activeQuest: ActiveQuest, party: Party, guil
   const lootTable = QUEST_LOOT_TABLES[quest.lootTableId];
   const lootCandidates = lootTable ? getLevelAppropriateQuestLootIds(lootTable.itemIds, partyHeroes, guild.inventory) : [];
   const equipmentDropChance = getQuestEquipmentDropChance(quest);
-  const equipmentDropped = lootCandidates.length > 0 && (equipmentDropChance >= 1 || random.next() < equipmentDropChance);
+  const firstHuntVictory = Boolean(quest.huntReward) && (guild.huntRewardProgress[quest.id]?.victories ?? 0) === 0;
+  const equipmentDropped = lootCandidates.length > 0 && (equipmentDropChance >= 1 || firstHuntVictory || random.next() < equipmentDropChance);
   const lootId = equipmentDropped ? random.pick(lootCandidates) : null;
   const collectedMaterials: Partial<Record<MaterialId, number>> = {};
   for (const drop of lootTable?.materialDrops ?? []) { const amount = random.int(!quest.repeatable && quest.questType === "side" ? Math.max(1, drop.quantityMin) : drop.quantityMin, Math.max(!quest.repeatable && quest.questType === "side" ? 1 : 0, drop.quantityMax)); if (amount > 0) collectedMaterials[drop.materialId] = amount; }

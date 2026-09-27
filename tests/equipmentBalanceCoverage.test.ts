@@ -50,6 +50,18 @@ describe("equipment balance coverage", () => {
     }
   });
 
+  it("keeps every class on current-tier equipment through Chapters 8 and 9", () => {
+    for (const classId of CLASSES) {
+      const usable = Object.values(EQUIPMENT).filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(classId));
+      for (const [chapter, minLevel, maxLevel] of [["Chapter 8", 14, 15], ["Chapter 9", 16, 17]] as const) {
+        for (const slot of ["weapon", "armor", "helmet", "boots", "accessory1", "accessory2"] as const) {
+          const currentTier = usable.filter((item) => item.slot === slot && item.levelRequirement >= minLevel && item.levelRequirement <= maxLevel);
+          expect(currentTier.length, `${classId} ${chapter} ${slot}`).toBeGreaterThanOrEqual(1);
+        }
+      }
+    }
+  });
+
   it("has valid outputs for every crafting recipe", () => {
     for (const recipe of Object.values(CRAFTING_RECIPES)) expect(EQUIPMENT[recipe.outputEquipmentId], recipe.id).toBeDefined();
   });

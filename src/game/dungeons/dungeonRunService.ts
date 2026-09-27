@@ -48,12 +48,13 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
   const maxLevel = Math.max(minLevel, averageLevel - 1);
   const allowRare = random.next() < .15;
   const owned = new Set([...guild.inventory, ...party.flatMap((hero) => Object.values(hero.equipment).filter((id): id is string => Boolean(id)))]);
-  const eligible = Object.values(EQUIPMENT).filter((item) =>
+  const levelAppropriate = Object.values(EQUIPMENT).filter((item) =>
     item.levelRequirement >= minLevel
     && item.levelRequirement <= maxLevel
-    && (item.rarity === "common" || item.rarity === "uncommon" || (allowRare && item.rarity === "rare"))
     && (!item.classRestrictions.length || party.some((hero) => item.classRestrictions.includes(hero.classId)))
   );
+  const preferred = levelAppropriate.filter((item) => item.rarity === "common" || item.rarity === "uncommon" || (allowRare && item.rarity === "rare"));
+  const eligible = preferred.length ? preferred : levelAppropriate.filter((item) => item.rarity === "rare");
   const newItems = eligible.filter((item) => !owned.has(item.id));
   const candidates = newItems.length ? newItems : eligible;
   if (!candidates.length) return guild;

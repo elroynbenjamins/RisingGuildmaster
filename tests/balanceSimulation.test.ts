@@ -286,6 +286,28 @@ describe("repeatable balance simulations", () => {
     }
   });
 
+  it("reports first-stage late prepared pressure", () => {
+    const scenarios = [
+      { id: "first-ch7-siege", questId: "siege_of_skyvault", heroLevel: 13, seed: 9000 },
+      { id: "first-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 9010 },
+      { id: "first-ch8-siege", questId: "siege_of_tidewatch", heroLevel: 15, seed: 9020 },
+      { id: "first-ch8-nhal", questId: "admiral_nhal_veyr_boss", heroLevel: 15, seed: 9030 },
+      { id: "first-ch9-chain", questId: "chain_beneath_fleet", heroLevel: 17, seed: 9040 },
+      { id: "first-ch9-serekh", questId: "serekh_chartmaker_boss", heroLevel: 17, seed: 9050 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 6,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+      encounterLimit: 1,
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+  }, 180_000);
+
   it("reports prepared Standard casualty pressure through Chapters 7–9", () => {
     const scenarios = [
       { id: "prepared-ch7-siege", questId: "siege_of_skyvault", heroLevel: 13, seed: 8900 },

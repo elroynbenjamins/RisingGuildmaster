@@ -6,6 +6,7 @@ import { QUESTS } from "../src/data/quests/quests";
 import { getHeroAttention } from "../src/ui/heroAttention";
 import { getGuildNotifications } from "../src/ui/guildStatus";
 import { testHero } from "./testHero";
+import { getLevelAppropriateQuestLootIds } from "../src/game/quests/questResolver";
 
 describe("quest, roster, and equipment polish", () => {
   it("previews the next legal travel leg for remote quests", () => {
@@ -35,6 +36,29 @@ describe("quest, roster, and equipment polish", () => {
     expect(summary.frontline).toBeGreaterThan(0);
     expect(summary.support).toBeGreaterThan(0);
     expect(summary.ranged).toBeGreaterThan(0);
+  });
+
+  it("only strongly favors weapon catch-up once a weapon is three levels behind", () => {
+    const twoLevelsBehind = {
+      ...testHero(),
+      level: 13,
+      equipment: { ...testHero().equipment, weapon: "sixth-voice-blade" },
+    };
+    const twoLevelPool = getLevelAppropriateQuestLootIds(
+      ["concordance-glaive", "firstsong-ring"],
+      [twoLevelsBehind],
+    );
+    expect(twoLevelPool).toContain("firstsong-ring");
+
+    const threeLevelsBehind = {
+      ...testHero(),
+      level: 14,
+      equipment: { ...testHero().equipment, weapon: "sixth-voice-blade" },
+    };
+    expect(getLevelAppropriateQuestLootIds(
+      ["concordance-glaive", "beaconheart-ring"],
+      [threeLevelsBehind],
+    )).toEqual(["concordance-glaive"]);
   });
 
   it("aggregates hero attention and exposes an actionable guild alert", () => {

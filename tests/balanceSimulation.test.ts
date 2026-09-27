@@ -280,9 +280,22 @@ describe("repeatable balance simulations", () => {
       gearProfile: "optional_progression",
       progressionProfile: "subclass_ready",
     }));
-    console.table(results);
-    expect(results.every((result) => result.stalled === 0)).toBe(true);
-  }, 180_000);
+    const lacking = [
+      { id: "lacking-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 8960 },
+      { id: "lacking-ch8-nhal", questId: "admiral_nhal_veyr_boss", heroLevel: 14, seed: 8970 },
+      { id: "lacking-ch9-serekh", questId: "serekh_chartmaker_boss", heroLevel: 16, seed: 8980 },
+    ] as const;
+    const lackingResults = lacking.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 4,
+      gearProfile: "lagged_basic",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table([...results, ...lackingResults]);
+    expect([...results, ...lackingResults].every((result) => result.stalled === 0)).toBe(true);
+  }, 240_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [

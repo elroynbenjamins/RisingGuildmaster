@@ -48,7 +48,9 @@ function preparationAction(summary: PostBattleSummary, guild: GuildState): PostB
       : `This victory cost ${fallenCount} heroes.`;
   const destination: PostBattlePreparationDestination = recommendation.type === "dungeon" ? "dungeon" : "side_quests";
   const routeText = recommendation.type === "dungeon"
-    ? "Recover first, then use a Wardstone Expedition as a catch-up run before the next story push."
+    ? recommendation.suggestedRuns === 1
+      ? "Recover first, then complete one Wardstone Expedition before the next story push."
+      : "Recover first, then complete two Wardstone Expeditions and reassess before the next story push."
     : `Recover first, then take ${recommendation.title} before the next story push.`;
 
   return {

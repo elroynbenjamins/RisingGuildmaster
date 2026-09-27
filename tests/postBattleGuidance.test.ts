@@ -129,10 +129,12 @@ describe("post-battle management guidance", () => {
       lootIds: [],
       heroOutcomes: guild.heroes.slice(0, 4).map((hero) => outcomeFor(hero)),
     }, guild);
-    expect(actions.find((action) => action.id === "preparation")).toMatchObject({
+    const preparation = actions.find((action) => action.id === "preparation");
+    expect(preparation).toMatchObject({
       destination: "dungeon",
       actionLabel: "Open Roguelite",
     });
+    expect(preparation?.description).toContain("two Wardstone Expeditions");
   });
 
   it("does not manufacture prep work after a clean victory", () => {

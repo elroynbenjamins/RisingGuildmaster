@@ -7,6 +7,15 @@ export interface EquipmentWearResult { hero: Hero; damagedSlot: EquipmentSlot | 
 export function getDurabilityLabel(durability: number): "PRISTINE" | "WORN" | "DAMAGED" | "BROKEN" { return durability <= 0 ? "BROKEN" : durability < 40 ? "DAMAGED" : durability < 75 ? "WORN" : "PRISTINE"; }
 export function getRepairCost(key: string): number { const item = resolveEquipmentDefinition(key); if (!item) return 0; const missing = 100 - item.durability; return missing <= 0 ? 0 : Math.max(5, Math.ceil(item.value * missing / 100 * .5)); }
 
+export function applyFallEquipmentDamage(hero: Hero, random: RandomSource): EquipmentWearResult {
+  const equipped = Object.entries(hero.equipment).filter((entry): entry is [EquipmentSlot, string] => Boolean(entry[1]));
+  if (!equipped.length || random.next() >= .35) return { hero, damagedSlot: null, durabilityLost: 0 };
+  const [slot, key] = random.pick(equipped);
+  const current = parseEquipmentKey(key).durability;
+  const durabilityLost = Math.min(current, random.int(10, 20));
+  return { hero: { ...hero, equipment: { ...hero.equipment, [slot]: createEquipmentKeyWithDurability(key, current - durabilityLost) } }, damagedSlot: slot, durabilityLost };
+}
+
 export function applyCombatEquipmentWear(hero: Hero, damageRatio: number, random: RandomSource): EquipmentWearResult {
   const equipped = Object.entries(hero.equipment).filter((entry): entry is [EquipmentSlot, string] => Boolean(entry[1]));
   const ratio = Math.max(0, Math.min(1, damageRatio));

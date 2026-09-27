@@ -1,6 +1,7 @@
 import type { EncounterDefinition } from "../../game/quests/questTypes";
+import { LATE_CAMPAIGN_ENCOUNTER_SCALE } from "../../config/campaignBalance";
 const h=[{x:1,y:4},{x:1,y:5},{x:1,y:6},{x:2,y:5}];
-const group=(enemyDefinitionId:string,count:number,level:number,positions:{x:number;y:number}[],difficultyMultiplier?:number)=>({enemyDefinitionId,count,level,spawnPositions:positions,...(difficultyMultiplier?{difficultyMultiplier}:{})});
+const group=(enemyDefinitionId:string,count:number,level:number,positions:{x:number;y:number}[],difficultyMultiplier=1)=>({enemyDefinitionId,count,level,spawnPositions:positions,difficultyMultiplier:difficultyMultiplier*LATE_CAMPAIGN_ENCOUNTER_SCALE});
 export const CHAPTER_8_WESTERN_SEA_ENCOUNTERS: Record<string, EncounterDefinition> = {
  tidewatch_storm_road:{id:"tidewatch_storm_road",battlefieldId:"tidewatch_storm_road",heroSpawnPositions:h,enemies:[group("crownless_mariner",3,14,[{x:10,y:3},{x:10,y:5},{x:10,y:7}]),group("nullwake_arbalist",1,14,[{x:13,y:5}])]},
  tidewatch_refuge_gate:{id:"tidewatch_refuge_gate",battlefieldId:"tidewatch_refuge_gate",heroSpawnPositions:h,enemies:[group("crownless_mariner",3,14,[{x:10,y:3},{x:10,y:5},{x:10,y:7}]),group("blacktide_reaver",1,14,[{x:12,y:5}],1.05)]},

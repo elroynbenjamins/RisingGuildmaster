@@ -45,15 +45,14 @@ function progressionGearTargetLevel(heroLevel: number, slot: EquipmentSlot): num
 function equipProgressionGear(hero: Hero, profile: "lagged_basic" | "optional_progression"): Hero {
   const equipment = { ...hero.equipment };
   for (const slot of SIMULATION_GEAR_SLOTS) {
-    const mainSlot = slot === "weapon" || slot === "armor";
     const targetLevel = profile === "optional_progression"
-      ? Math.max(1, hero.level - (mainSlot ? 1 : 2))
+      ? Math.max(1, hero.level - (slot === "weapon" ? 0 : slot === "armor" ? 1 : 2))
       : progressionGearTargetLevel(hero.level, slot);
     const candidates = Object.values(EQUIPMENT)
       .filter((item) => item.slot === slot)
       .filter((item) => item.levelRequirement <= targetLevel)
       .filter((item) => profile === "optional_progression"
-        ? item.rarity === "common" || item.rarity === "uncommon" || item.rarity === "rare"
+        ? item.rarity === "common" || item.rarity === "uncommon" || item.rarity === "rare" || item.rarity === "epic"
         : item.rarity === "common" || item.rarity === "uncommon")
       .filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(hero.classId))
       .sort((a, b) => b.levelRequirement - a.levelRequirement || b.value - a.value || a.id.localeCompare(b.id));

@@ -16,6 +16,7 @@ import { hasCompletedQuestOnce } from "../game/quests/questCompletionService";
 import { DUNGEON_UNLOCK_HERO_COUNT } from "../game/dungeons/dungeonDraftService";
 import { GUILD_OPERATION_TEAM_SIZE, isGuildOperationsUnlocked } from "../game/operations/guildOperationService";
 import { STARTER_JOURNEY } from "../game/onboarding/starterJourneyService";
+import { getCampaignPreparationRecommendation } from "../game/campaign/campaignPreparationGuide";
 
 export const QUEST_SCREEN_TABS: QuestTab[] = ["Campaign", "Side Quests", "Bosses"];
 const TABS = QUEST_SCREEN_TABS;
@@ -52,6 +53,8 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
   const operationHeroRequirement = GUILD_OPERATION_TEAM_SIZE * 2;
   const operationsUnlocked = isGuildOperationsUnlocked(guild) && guild.heroes.length >= operationHeroRequirement;
   const nextCampaignNode = getAvailableCampaignNodes(guild.world)[0];
+  const preparationRecommendation = getCampaignPreparationRecommendation(guild);
+  const recommendedSideQuestId = preparationRecommendation?.type === "side_quest" ? preparationRecommendation.questId : undefined;
   const currentLocation = guild.world.currentSettlementId
     ? SETTLEMENTS[guild.world.currentSettlementId]?.name ?? formatGameId(guild.world.currentSettlementId)
     : REGIONS[guild.world.currentRegionId]?.name ?? "Unknown Posting";
@@ -99,6 +102,7 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
       const recommendedLevelMin = quest.recommendedLevelMin ?? region?.recommendedLevelMin ?? 1;
       const recommendedLevelMax = quest.recommendedLevelMax ?? region?.recommendedLevelMax ?? recommendedLevelMin;
       const oneClear = quest.questType === "side" && !quest.repeatable;
+      const recommendedPreparation = quest.id === recommendedSideQuestId;
       const railColor = completedBefore ? colors.green : index === 0 ? colors.gold : READINESS_COLORS[readiness] ?? colors.border;
       const settlementLabel = quest.settlementIds?.map((id) => SETTLEMENTS[id]?.name).filter(Boolean).join(" / ") || region?.name || formatGameId(quest.regionId);
       return <View key={quest.id} style={[styles.questCard, { borderColor: railColor }, completedBefore && styles.completedCard]}>
@@ -107,6 +111,7 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
           <View style={styles.labelRow}>
             <Text style={styles.questTypeStamp}>{quest.questType === "side" ? "SIDE QUEST" : quest.questType === "boss" ? "BOSS CONTRACT" : "QUEST"}</Text>
             {index === 0 && !completedBefore ? <StatusChip label="BEST MATCH" tone="gold" /> : null}
+            {recommendedPreparation && !completedBefore ? <StatusChip label="RECOMMENDED PREP" tone="good" /> : null}
             {completedBefore ? <StatusChip label={`✓ COMPLETED${quest.repeatable ? " · REPEATABLE" : ""}`} tone="good" /> : null}
             {oneClear && !completedBefore ? <StatusChip label="ONE CLEAR · REWARDS ONCE" tone="gold" /> : null}
           </View>

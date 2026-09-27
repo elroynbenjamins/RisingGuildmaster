@@ -1,0 +1,22 @@
+name: Final late balance validation
+on:
+  push:
+    branches:
+      - balance/underprepared-casualty-guard
+concurrency:
+  group: final-late-balance-validation
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/chapterXpCurve.test.ts tests/chapter8WesternSea.test.ts tests/lateCampaignScaling.test.ts tests/balanceSimulation.test.ts -t "campaign and roguelite XP curve|Chapter 8 · The Black Tide|late campaign encounter scaling|prepared Standard casualty pressure through Chapters 7–9|underprepared late-chapter bosses"

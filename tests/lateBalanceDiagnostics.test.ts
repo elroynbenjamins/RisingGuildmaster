@@ -3,14 +3,12 @@ import { createSimulationParty, simulateCombatScenario } from "../src/game/simul
 import { calculateHero } from "../src/game/heroes/heroCalculator";
 
 describe("late balance diagnostics", () => {
-  it("prints prepared loadouts and stage pressure", () => {
+  it("prints prepared loadouts and first-encounter pressure", () => {
     for (const level of [13, 15, 17]) {
       const party = createSimulationParty(["warrior","ranger","cleric","mage"], level, 9900 + level, "optional_progression", "subclass_ready");
       console.log("LOADOUT", level, party.map((hero) => ({
         classId: hero.classId,
-        subclassId: hero.subclassId,
         equipment: hero.equipment,
-        skills: hero.learnedSkillIds,
         stats: calculateHero(hero).stats,
       })));
     }
@@ -23,19 +21,15 @@ describe("late balance diagnostics", () => {
       { id: "ch9-serekh", questId: "serekh_chartmaker_boss", heroLevel: 17, seed: 9960 },
     ] as const;
     for (const scenario of scenarios) {
-      for (const encounterLimit of [1, 2, 3]) {
-        const result = simulateCombatScenario({
-          ...scenario,
-          id: `${scenario.id}-limit${encounterLimit}`,
-          partyClasses: ["warrior","ranger","cleric","mage"],
-          difficultyId: "standard",
-          runs: 3,
-          gearProfile: "optional_progression",
-          progressionProfile: "subclass_ready",
-          encounterLimit,
-        });
-        console.log("STAGE", result);
-      }
+      console.log("FIRST", simulateCombatScenario({
+        ...scenario,
+        partyClasses: ["warrior","ranger","cleric","mage"],
+        difficultyId: "standard",
+        runs: 1,
+        gearProfile: "optional_progression",
+        progressionProfile: "subclass_ready",
+        encounterLimit: 1,
+      }));
     }
-  }, 180_000);
+  }, 120_000);
 });

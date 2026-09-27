@@ -4,25 +4,32 @@ import { QUEST_ENCOUNTERS } from "../src/data/encounters/questEncounters";
 
 const party = ["warrior", "ranger", "cleric", "mage"] as const;
 
-describe("global balance diagnostics", () => {
-  it("settles Serekh Iron pre-boss pressure", () => {
+describe("Serekh final settle diagnostics", () => {
+  it("balances underprepared Standard against prepared Hard and Iron", () => {
     const first = QUEST_ENCOUNTERS.chart_hall_guard!;
     const second = QUEST_ENCOUNTERS.collapsing_tidal_engine!;
     const originalFirst = first.enemies.map((g) => g.difficultyMultiplier);
     const originalSecond = second.enemies.map((g) => g.difficultyMultiplier);
 
-    for (const pre of [.80, .75, .70] as const) {
+    for (const pre of [.65, .70] as const) {
       first.enemies.forEach((g) => { g.difficultyMultiplier = pre; });
       second.enemies.forEach((g) => { g.difficultyMultiplier = pre; });
-      for (const difficultyId of ["veteran", "iron_guild"] as const) {
-        console.log("SEREKH_IRON_SETTLE", pre, difficultyId, simulateCombatScenario({
-          id: `serekh-pre${pre}-${difficultyId}`,
+
+      const scenarios = [
+        { id: "prepared-standard", level: 17, difficultyId: "standard" as const, runs: 4, seed: 8950 },
+        { id: "underprepared-standard", level: 16, difficultyId: "standard" as const, runs: 4, seed: 8980 },
+        { id: "prepared-hard", level: 17, difficultyId: "veteran" as const, runs: 4, seed: 8975 },
+        { id: "prepared-iron", level: 17, difficultyId: "iron_guild" as const, runs: 4, seed: 8975 },
+      ];
+      for (const scenario of scenarios) {
+        console.log("SEREKH_SETTLE", pre, scenario.id, simulateCombatScenario({
+          id: `serekh-${pre}-${scenario.id}`,
           questId: "serekh_chartmaker_boss",
-          heroLevel: 17,
+          heroLevel: scenario.level,
           partyClasses: party,
-          difficultyId,
-          runs: 2,
-          seed: 8975,
+          difficultyId: scenario.difficultyId,
+          runs: scenario.runs,
+          seed: scenario.seed,
           gearProfile: "optional_progression",
           progressionProfile: "subclass_ready",
         }));
@@ -31,5 +38,5 @@ describe("global balance diagnostics", () => {
 
     first.enemies.forEach((g, i) => { g.difficultyMultiplier = originalFirst[i]; });
     second.enemies.forEach((g, i) => { g.difficultyMultiplier = originalSecond[i]; });
-  }, 180_000);
+  }, 240_000);
 });

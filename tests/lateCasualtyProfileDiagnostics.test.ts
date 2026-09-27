@@ -2,23 +2,22 @@ import { describe, it } from "vitest";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 
 describe("late casualty profile diagnostics", () => {
-  it("checks final Serekh recovery across preparation profiles", () => {
-    for (const profile of [
-      { suffix: "prepared", heroLevel: 17, gearProfile: "optional_progression" as const },
-      { suffix: "slightly-under", heroLevel: 16, gearProfile: "optional_progression" as const },
-      { suffix: "severely-under", heroLevel: 16, gearProfile: "lagged_basic" as const },
-    ]) {
-      console.log("PROFILE", simulateCombatScenario({
-        id: `ch9-serekh-${profile.suffix}`,
-        questId: "serekh_chartmaker_boss",
-        heroLevel: profile.heroLevel,
-        partyClasses: ["warrior", "ranger", "cleric", "mage"],
-        difficultyId: "standard",
-        runs: 8,
-        seed: 9500,
-        gearProfile: profile.gearProfile,
-        progressionProfile: "subclass_ready",
-      }));
+  it("pinpoints Serekh Hard stage pressure against Standard", () => {
+    for (const difficultyId of ["standard", "veteran", "iron_guild"] as const) {
+      for (const encounterLimit of [1, 2, 3] as const) {
+        console.log("STAGE", simulateCombatScenario({
+          id: `serekh-${difficultyId}-limit${encounterLimit}`,
+          questId: "serekh_chartmaker_boss",
+          heroLevel: 17,
+          partyClasses: ["warrior", "ranger", "cleric", "mage"],
+          difficultyId,
+          runs: 8,
+          seed: 8975,
+          gearProfile: "optional_progression",
+          progressionProfile: "subclass_ready",
+          encounterLimit,
+        }));
+      }
     }
-  }, 180_000);
+  }, 300_000);
 });

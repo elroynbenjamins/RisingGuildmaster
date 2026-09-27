@@ -263,6 +263,29 @@ describe("repeatable balance simulations", () => {
     }
   }, 120_000);
 
+  it("reports late prepared loadouts", () => {
+    for (const level of [13, 15, 17]) {
+      const party = createSimulationParty(["warrior", "ranger", "cleric", "mage"], level, 8990 + level, "optional_progression", "subclass_ready");
+      console.log(`PREPARED LOADOUT LEVEL ${level}`);
+      console.table(party.map((hero) => ({
+        classId: hero.classId,
+        subclassId: hero.subclassId,
+        level: hero.level,
+        weapon: hero.equipment.weapon,
+        armor: hero.equipment.armor,
+        helmet: hero.equipment.helmet,
+        boots: hero.equipment.boots,
+        accessory1: hero.equipment.accessory1,
+        accessory2: hero.equipment.accessory2,
+        maxHP: calculateHero(hero).stats.maxHP,
+        physicalAttack: calculateHero(hero).stats.physicalAttack,
+        magicAttack: calculateHero(hero).stats.magicAttack,
+        physicalDefense: calculateHero(hero).stats.physicalDefense,
+        magicDefense: calculateHero(hero).stats.magicDefense,
+      })));
+    }
+  });
+
   it("reports prepared Standard casualty pressure through Chapters 7–9", () => {
     const scenarios = [
       { id: "prepared-ch7-siege", questId: "siege_of_skyvault", heroLevel: 13, seed: 8900 },

@@ -42,7 +42,7 @@ describe("campaign and roguelite XP curve", () => {
       const representativeSideQuestId = chapter.sideQuestIds?.[0];
       if (representativeSideQuestId) hero = grantHeroXp(hero, getQuestXpForHero(hero, QUESTS[representativeSideQuestId]!, 4));
 
-      const nextMinimum = CAMPAIGN_CHAPTERS[chapterNumber + 1]!.recommendedLevelMin;
+      const nextMinimum = CAMPAIGN_CHAPTERS[chapterNumber + 1]!.recommendedLevelMin ?? 1;
       let dungeonRuns = 0;
       while (chapterNumber >= 2 && hero.level < nextMinimum && dungeonRuns < 2) {
         hero = grantHeroXp(hero, getDungeonCatchupXpTarget(hero.level));

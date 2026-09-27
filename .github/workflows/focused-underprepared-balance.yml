@@ -4,7 +4,7 @@ on:
     branches:
       - balance/underprepared-casualty-guard
 concurrency:
-  group: focused-underprepared-balance-v3
+  group: focused-underprepared-balance-v4
   cancel-in-progress: true
 jobs:
   balance:
@@ -19,4 +19,4 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateTransitionDiagnostics.test.ts
+      - run: pnpm vitest run tests/lateCampaignScaling.test.ts tests/balanceSimulation.test.ts -t "late campaign encounter scaling|prepared Standard casualty pressure through Chapters 7–9|underprepared late-chapter bosses"

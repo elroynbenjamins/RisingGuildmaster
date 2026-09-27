@@ -239,6 +239,38 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter6-laurel-law-basic-l10")!.averageSurvivingHeroes).toBeLessThan(4);
   }, 240_000);
 
+  it("samples Chapter 7–9 lethality with prepared and lacking parties", () => {
+    const scenarios = [
+      { id: "ch7-siege-prepared", questId: "siege_of_skyvault", heroLevel: 13, seed: 9100, gearProfile: "optional_progression" as const },
+      { id: "ch7-varkesh-prepared", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 9110, gearProfile: "optional_progression" as const },
+      { id: "ch7-varkesh-lacking", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 9120, gearProfile: "lagged_basic" as const },
+      { id: "ch8-siege-prepared", questId: "siege_of_tidewatch", heroLevel: 15, seed: 9200, gearProfile: "optional_progression" as const },
+      { id: "ch8-nhal-prepared", questId: "admiral_nhal_veyr_boss", heroLevel: 15, seed: 9210, gearProfile: "optional_progression" as const },
+      { id: "ch8-nhal-lacking", questId: "admiral_nhal_veyr_boss", heroLevel: 14, seed: 9220, gearProfile: "lagged_basic" as const },
+      { id: "ch9-citadel-prepared", questId: "citadel_unwritten_law", heroLevel: 17, seed: 9300, gearProfile: "optional_progression" as const },
+      { id: "ch9-serekh-prepared", questId: "serekh_chartmaker_boss", heroLevel: 17, seed: 9310, gearProfile: "optional_progression" as const },
+      { id: "ch9-serekh-lacking", questId: "serekh_chartmaker_boss", heroLevel: 16, seed: 9320, gearProfile: "lagged_basic" as const },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 2,
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    const byId = new Map(results.map((result) => [result.scenarioId, result]));
+    for (const id of ["ch7-varkesh-prepared", "ch8-nhal-prepared", "ch9-serekh-prepared"] as const) {
+      expect(byId.get(id)!.winRate).toBeGreaterThan(0);
+    }
+    for (const [prepared, lacking] of [
+      ["ch7-varkesh-prepared", "ch7-varkesh-lacking"],
+      ["ch8-nhal-prepared", "ch8-nhal-lacking"],
+      ["ch9-serekh-prepared", "ch9-serekh-lacking"],
+    ] as const) expect(byId.get(prepared)!.averageSurvivingHeroes).toBeGreaterThanOrEqual(byId.get(lacking)!.averageSurvivingHeroes);
+  }, 180_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

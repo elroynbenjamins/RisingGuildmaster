@@ -5,6 +5,7 @@ import { GameIcon } from "../../components/icons/GameIcon";
 import { ActionButton, BackButton, Panel, Portrait, SectionTitle, SegmentedTabs, colors } from "../../components/ui";
 import { RAIDS } from "../../data/raids/raids";
 import { QUESTS } from "../../data/quests/quests";
+import { EQUIPMENT } from "../../data/equipment/equipment";
 import { getQuestAdventureStaminaCost } from "../../game/heroes/adventureStaminaService";
 import { buildRecommendedRaidParty, getRaidCompositionWarnings, getRaidLockReason, getRaidReadiness, getRaidRecord } from "../../game/raids/raidService";
 import { useGuild } from "../../state/GuildContext";
@@ -27,6 +28,7 @@ export function RaidScreen({ onBack, inspectRaid }: { onBack(): void; inspectRai
   const vanguard=suggestedHeroes.slice(0,4);
   const support=suggestedHeroes.slice(4,8);
   const suggestedWarnings=getRaidCompositionWarnings(suggestedIds,guild.heroes);
+  const firstClearEquipment = raid.firstVictoryReward.equipmentId ? EQUIPMENT[raid.firstVictoryReward.equipmentId] : undefined;
 
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack}/>
@@ -82,7 +84,7 @@ export function RaidScreen({ onBack, inspectRaid }: { onBack(): void; inspectRai
       <Panel style={styles.rewardCard}><GameIcon id="xp" size={30}/><Text style={styles.rewardValue}>{quest.xpRewardPerHero}</Text><Text style={styles.rewardLabel}>XP / SURVIVOR</Text></Panel>
       <Panel style={styles.rewardCard}><GameIcon id="victory" size={30}/><Text style={styles.rewardValue}>{record.bestSurvivors}/8</Text><Text style={styles.rewardLabel}>BEST SURVIVORS</Text></Panel>
     </View>
-    <Panel style={styles.trophyPanel}><GameIcon id={record.firstVictoryDay?"victory":"loot"} size={44}/><View style={styles.flex}><Text style={record.firstVictoryDay?styles.cleared:styles.firstClear}>{record.firstVictoryDay?`FIRST CLEAR · DAY ${record.firstVictoryDay}`:"FIRST CLEAR REWARD"}</Text><Text style={styles.trophyName}>{raid.firstVictoryReward.trophyName}</Text><Text style={styles.record}>{record.firstVictoryDay?"Trophy earned":`+${raid.firstVictoryReward.gold} bonus gold · trophy permanently recorded`}</Text><Text style={styles.record}>{record.victories} victories / {record.attempts} attempts</Text></View></Panel>
+    <Panel style={styles.trophyPanel}><GameIcon id={record.firstVictoryDay?"victory":"loot"} size={44}/><View style={styles.flex}><Text style={record.firstVictoryDay?styles.cleared:styles.firstClear}>{record.firstVictoryDay?`FIRST CLEAR · DAY ${record.firstVictoryDay}`:"FIRST CLEAR REWARD"}</Text><Text style={styles.trophyName}>{raid.firstVictoryReward.trophyName}</Text><Text style={styles.record}>{record.firstVictoryDay?`Trophy earned${firstClearEquipment ? ` · ${firstClearEquipment.name} claimed` : ""}`:`+${raid.firstVictoryReward.gold} bonus gold · trophy permanently recorded${firstClearEquipment ? ` · guaranteed ${firstClearEquipment.name}` : ""}`}</Text><Text style={styles.record}>{record.victories} victories / {record.attempts} attempts</Text></View></Panel>
 
     </>}<View style={styles.action}><ActionButton disabled={Boolean(lock)} label={lock??"Inspect Raid & Assemble 8 Heroes"} onPress={()=>inspectRaid(raid.questId)}/></View>
   </ScrollView>;

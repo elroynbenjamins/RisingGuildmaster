@@ -50,7 +50,7 @@ function preparationAction(summary: PostBattleSummary, guild: GuildState): PostB
   const routeText = recommendation.type === "dungeon"
     ? recommendation.suggestedRuns === 1
       ? "Recover first, then complete one Wardstone Expedition before the next story push."
-      : "Recover first, then complete two Wardstone Expeditions and reassess before the next story push."
+      : "Recover first, then complete two Wardstone Expeditions with one recovery day between them and reassess before the next story push."
     : `Recover first, then take ${recommendation.title} before the next story push.`;
 
   return {

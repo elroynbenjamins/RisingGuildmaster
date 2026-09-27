@@ -4,7 +4,7 @@ on:
     branches:
       - balance/late-casualty-final
 concurrency:
-  group: focused-late-casualty-stage-v1
+  group: focused-late-casualty-profile-v4
   cancel-in-progress: true
 jobs:
   validate:

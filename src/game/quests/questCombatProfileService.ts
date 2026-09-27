@@ -25,5 +25,6 @@ export function applyQuestDifficultyCombatSetup(quest: QuestDefinition, setup?: 
     heroHealingPowerModifier: setup?.heroHealingPowerModifier ?? 0,
     heroMovementRangeModifier: setup?.heroMovementRangeModifier ?? 0,
     enemyMovementRangeModifier: setup?.enemyMovementRangeModifier ?? 0,
+    enemyLevelModifier: setup?.enemyLevelModifier ?? 0,
   };
 }

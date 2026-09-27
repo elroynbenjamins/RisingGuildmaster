@@ -1,6 +1,6 @@
 import { QUEST_ENCOUNTERS } from "../../data/encounters/questEncounters";
 import { getEnemyDefinition } from "../../data/enemies";
-import { ENEMY_BASE_STATS, ENEMY_LEVEL_STAT_GROWTH } from "../../config/combatConfig";
+import { ENEMY_BASE_STATS, getEnemyLevelStatMultipliers } from "../../config/combatConfig";
 import type { RandomSource } from "../../utils/random";
 import { calculateEnemyStats } from "../enemies/enemyCalculator";
 import { createEnemyInstance } from "../enemies/enemyFactory";
@@ -17,7 +17,7 @@ export function createQuestEncounter(encounterId: string, random: RandomSource, 
   const difficulty = getDifficulty(difficultyId);
   return encounter.enemies.flatMap((entry) => Array.from({ length: entry.count }, (_, index) => {
     const enemyLevel = Math.max(1, entry.level + enemyLevelModifier);
-    const scaling = { levelMultiplier: 1 + (enemyLevel - 1) * ENEMY_LEVEL_STAT_GROWTH, difficultyMultiplier: entry.difficultyMultiplier ?? 1, hpMultiplier: difficulty.enemyHpMultiplier, damageMultiplier: difficulty.enemyDamageMultiplier, defenseMultiplier: difficulty.enemyDefenseMultiplier, speedMultiplier: difficulty.enemySpeedMultiplier };
+    const scaling = { ...getEnemyLevelStatMultipliers(enemyLevel), difficultyMultiplier: entry.difficultyMultiplier ?? 1, hpMultiplier: difficulty.enemyHpMultiplier, damageMultiplier: difficulty.enemyDamageMultiplier, defenseMultiplier: difficulty.enemyDefenseMultiplier, speedMultiplier: difficulty.enemySpeedMultiplier };
     const instance = createEnemyInstance(entry.enemyDefinitionId, ENEMY_BASE_STATS, random, { level: enemyLevel, scaling });
     const definition = getEnemyDefinition(entry.enemyDefinitionId); const stats = calculateEnemyStats(ENEMY_BASE_STATS, definition, scaling);
     const movementRange = Math.min(5, Math.max(2, 3 + Math.floor(stats.speed / 30)));

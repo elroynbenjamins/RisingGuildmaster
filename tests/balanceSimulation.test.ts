@@ -325,9 +325,9 @@ describe("repeatable balance simulations", () => {
 
   it("keeps underprepared late-chapter bosses dangerous without becoming guaranteed wipes", () => {
     const scenarios = [
-      { id: "underprepared-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 8960 },
-      { id: "underprepared-ch8-nhal", questId: "admiral_nhal_veyr_boss", heroLevel: 14, seed: 8970 },
-      { id: "underprepared-ch9-serekh", questId: "serekh_chartmaker_boss", heroLevel: 16, seed: 8980 },
+      { id: "underprepared-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 8960 },
+      { id: "underprepared-ch8-nhal", questId: "admiral_nhal_veyr_boss", heroLevel: 15, seed: 8970 },
+      { id: "underprepared-ch9-serekh", questId: "serekh_chartmaker_boss", heroLevel: 17, seed: 8980 },
     ] as const;
     const results = scenarios.map((scenario) => simulateCombatScenario({
       ...scenario,

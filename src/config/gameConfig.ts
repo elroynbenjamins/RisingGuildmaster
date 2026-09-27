@@ -15,6 +15,7 @@ export const GAME_CONFIG = {
   maxAdventureStamina: 100,
   adventureStaminaRecoveryPerDay: 35,
   dailyHeroHealthRecoveryRatio: 0.10,
+  fallenHeroXpRate: 0.85,
   standardQuestStaminaCost: 50,
   // Passive income keeps the guild alive, but quests must fund treatment,
   // maintenance, crafting, and expansion.

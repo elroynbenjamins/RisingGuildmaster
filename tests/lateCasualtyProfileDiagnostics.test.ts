@@ -2,30 +2,25 @@ import { describe, it } from "vitest";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 
 describe("late casualty profile diagnostics", () => {
-  it("compares paired prepared and underprepared boss profiles on identical seeds", () => {
-    const bosses = [
-      { id: "ch7-varkesh", questId: "varkesh_gilded_rupture_boss", preparedLevel: 13, seed: 9300 },
-      { id: "ch8-nhal", questId: "admiral_nhal_veyr_boss", preparedLevel: 15, seed: 9400 },
-      { id: "ch9-serekh", questId: "serekh_chartmaker_boss", preparedLevel: 17, seed: 9500 },
-    ] as const;
-    for (const boss of bosses) {
-      for (const profile of [
-        { suffix: "prepared", heroLevel: boss.preparedLevel, gearProfile: "optional_progression" as const },
-        { suffix: "slightly-under", heroLevel: boss.preparedLevel - 1, gearProfile: "optional_progression" as const },
-        { suffix: "severely-under", heroLevel: boss.preparedLevel - 1, gearProfile: "lagged_basic" as const },
-      ]) {
-        console.log("PROFILE", simulateCombatScenario({
-          id: `${boss.id}-${profile.suffix}`,
-          questId: boss.questId,
+  it("pinpoints the remaining paired Serekh stage failures", () => {
+    for (const profile of [
+      { suffix: "prepared", heroLevel: 17, gearProfile: "optional_progression" as const },
+      { suffix: "slightly-under", heroLevel: 16, gearProfile: "optional_progression" as const },
+    ]) {
+      for (const encounterLimit of [1, 2, 3] as const) {
+        console.log("STAGE", simulateCombatScenario({
+          id: `ch9-serekh-${profile.suffix}-limit${encounterLimit}`,
+          questId: "serekh_chartmaker_boss",
           heroLevel: profile.heroLevel,
           partyClasses: ["warrior", "ranger", "cleric", "mage"],
           difficultyId: "standard",
           runs: 8,
-          seed: boss.seed,
+          seed: 9500,
           gearProfile: profile.gearProfile,
           progressionProfile: "subclass_ready",
+          encounterLimit,
         }));
       }
     }
-  }, 300_000);
+  }, 240_000);
 });

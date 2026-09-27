@@ -1,35 +1,31 @@
 import { describe, it } from "vitest";
-import { createSimulationParty, simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
-import { calculateHero } from "../src/game/heroes/heroCalculator";
+import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 
 describe("late balance diagnostics", () => {
-  it("prints prepared loadouts and first-encounter pressure", () => {
-    for (const level of [13, 15, 17]) {
-      const party = createSimulationParty(["warrior","ranger","cleric","mage"], level, 9900 + level, "optional_progression", "subclass_ready");
-      console.log("LOADOUT", level, party.map((hero) => ({
-        classId: hero.classId,
-        equipment: hero.equipment,
-        stats: calculateHero(hero).stats,
-      })));
-    }
+  it("pinpoints the failing stage after the late-curve rebalance", () => {
     const scenarios = [
-      { id: "ch7-siege", questId: "siege_of_skyvault", heroLevel: 13, seed: 9910 },
-      { id: "ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 9920 },
-      { id: "ch8-siege", questId: "siege_of_tidewatch", heroLevel: 15, seed: 9930 },
-      { id: "ch8-nhal", questId: "admiral_nhal_veyr_boss", heroLevel: 15, seed: 9940 },
-      { id: "ch9-chain", questId: "chain_beneath_fleet", heroLevel: 17, seed: 9950 },
-      { id: "ch9-serekh", questId: "serekh_chartmaker_boss", heroLevel: 17, seed: 9960 },
+      { id: "ch7-siege", questId: "siege_of_skyvault", heroLevel: 13, seed: 8900, stages: 3 },
+      { id: "ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 8910, stages: 3 },
+      { id: "ch8-siege", questId: "siege_of_tidewatch", heroLevel: 15, seed: 8920, stages: 3 },
+      { id: "ch8-nhal", questId: "admiral_nhal_veyr_boss", heroLevel: 15, seed: 8930, stages: 3 },
+      { id: "ch9-chain", questId: "chain_beneath_fleet", heroLevel: 17, seed: 8940, stages: 2 },
+      { id: "ch9-serekh", questId: "serekh_chartmaker_boss", heroLevel: 17, seed: 8950, stages: 3 },
     ] as const;
     for (const scenario of scenarios) {
-      console.log("FIRST", simulateCombatScenario({
-        ...scenario,
-        partyClasses: ["warrior","ranger","cleric","mage"],
-        difficultyId: "standard",
-        runs: 1,
-        gearProfile: "optional_progression",
-        progressionProfile: "subclass_ready",
-        encounterLimit: 1,
-      }));
+      for (let encounterLimit = 1; encounterLimit <= scenario.stages; encounterLimit += 1) {
+        console.log("STAGE", simulateCombatScenario({
+          id: `${scenario.id}-limit${encounterLimit}`,
+          questId: scenario.questId,
+          heroLevel: scenario.heroLevel,
+          partyClasses: ["warrior","ranger","cleric","mage"],
+          difficultyId: "standard",
+          runs: 1,
+          seed: scenario.seed,
+          gearProfile: "optional_progression",
+          progressionProfile: "subclass_ready",
+          encounterLimit,
+        }));
+      }
     }
   }, 120_000);
 });

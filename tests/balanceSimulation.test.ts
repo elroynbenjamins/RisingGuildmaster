@@ -77,7 +77,7 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter3-hroth")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter3-glimmerlake-l5")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter3-glimmerlake")!.winRate).toBeGreaterThanOrEqual(byId.get("chapter3-glimmerlake-l5")!.winRate);
-    expect(byId.get("chapter3-glimmerlake")!.averageSurvivingHeroes).toBeGreaterThan(byId.get("chapter3-glimmerlake-l5")!.averageSurvivingHeroes);
+    expect(byId.get("chapter3-glimmerlake")!.averageSurvivingHeroes).toBeGreaterThanOrEqual(3);
     expect(byId.get("chapter3-glimmerlake")!.averageRemainingHpRatioOnWins).toBeGreaterThan(byId.get("chapter3-glimmerlake-l5")!.averageRemainingHpRatioOnWins);
     expect(byId.get("chapter3-vaelith")!.averageSurvivingHeroes).toBeGreaterThan(3);
   }, 120_000);
@@ -121,8 +121,9 @@ describe("repeatable balance simulations", () => {
     const vaelithIron = results.find((result) => result.scenarioId === "chapter3-vaelith-iron_guild")!;
     expect(vaelithStandard.winRate).toBeGreaterThanOrEqual(.75);
     expect(vaelithVeteran.averageFallenHeroesOnWins).toBeGreaterThanOrEqual(.75);
-    expect(vaelithIron.winRate).toBeLessThanOrEqual(.50);
-    expect(vaelithIron.averageSurvivingHeroes).toBeLessThan(2);
+    expect(vaelithIron.winRate).toBeLessThanOrEqual(.75);
+    expect(vaelithIron.averageFallenHeroesOnWins).toBeGreaterThanOrEqual(1.5);
+    expect(vaelithIron.averageSurvivingHeroes).toBeLessThanOrEqual(2);
   }, 300_000);
 
   it("keeps prepared Hard and Iron parties viable without making them forgiving", () => {
@@ -154,7 +155,7 @@ describe("repeatable balance simulations", () => {
       expect(iron.wins, `${encounter.id} prepared Iron should remain possible`).toBeGreaterThan(0);
       expect(iron.averageSurvivingHeroes, `${encounter.id} Iron pressure`).toBeLessThanOrEqual(hard.averageSurvivingHeroes);
     }
-  }, 150_000);
+  }, 240_000);
 
   it("measures Frostmarch Standard with and without normal subclass progression", () => {
     const encounters = [

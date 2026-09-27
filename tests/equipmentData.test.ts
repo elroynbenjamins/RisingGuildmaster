@@ -10,7 +10,7 @@ import type { ClassId, EquipmentSlot } from "../src/game/heroes/types";
 describe("expanded equipment data", () => {
   it("provides the expanded item roster across every slot and progression tier", () => {
     const items = Object.values(EQUIPMENT);
-    expect(items).toHaveLength(156);
+    expect(items).toHaveLength(171);
     for (const slot of ["weapon", "armor", "helmet", "boots", "accessory1", "accessory2"] satisfies EquipmentSlot[]) {
       expect(items.some((item) => item.slot === slot)).toBe(true);
     }

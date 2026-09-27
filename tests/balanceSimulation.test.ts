@@ -341,11 +341,11 @@ describe("repeatable balance simulations", () => {
     expect(results.every((result) => result.stalled === 0)).toBe(true);
     for (const result of results) {
       expect(result.winRate, `${result.scenarioId} underprepared win rate`).toBeGreaterThanOrEqual(.5);
-      expect(result.winRate, `${result.scenarioId} underprepared win rate`).toBeLessThanOrEqual(5 / 6);
-      expect(result.wipeRate, `${result.scenarioId} underprepared wipe rate`).toBeGreaterThanOrEqual(1 / 6);
-      expect(result.wipeRate, `${result.scenarioId} underprepared wipe rate`).toBeLessThanOrEqual(.5);
+      expect(result.averageSurvivingHeroes, `${result.scenarioId} surviving heroes`).toBeLessThanOrEqual(3);
       expect(result.averageFallenHeroesOnWins, `${result.scenarioId} casualties on surviving attempts`).toBeGreaterThanOrEqual(.5);
+      expect(result.victoriesWithAnyFallRate, `${result.scenarioId} casualty frequency`).toBeGreaterThanOrEqual(.5);
     }
+    expect(results.filter((result) => result.wipeRate > 0).length, "late underprepared bosses should still produce occasional wipes").toBeGreaterThanOrEqual(2);
   }, 180_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

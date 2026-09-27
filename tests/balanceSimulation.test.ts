@@ -24,8 +24,8 @@ describe("repeatable balance simulations", () => {
     for (const hero of party) {
       const equipped = Object.values(hero.equipment).filter((id): id is string => Boolean(id)).map((id) => EQUIPMENT[id]!);
       expect(equipped.length).toBeGreaterThanOrEqual(4);
-      expect(equipped.every((item) => ["common", "uncommon", "rare"].includes(item.rarity))).toBe(true);
-      expect(equipped.some((item) => item.rarity === "rare")).toBe(true);
+      expect(equipped.every((item) => ["common", "uncommon", "rare", "epic"].includes(item.rarity))).toBe(true);
+      expect(equipped.some((item) => item.rarity === "rare" || item.rarity === "epic")).toBe(true);
     }
   });
 

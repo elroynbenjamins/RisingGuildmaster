@@ -39,5 +39,27 @@ describe("playable dungeon run integration", () => {
     expect(result.guild.activeDungeonRun?.combatRandomState).toBeNull();
   });
 
+  it("awards fallen expedition heroes reduced catch-up XP instead of zero XP", () => {
+    const base = expeditionGuild();
+    let guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base));
+    guild = resolveDungeonUtilityNode(guild, sequenceRandom([.99])).guild;
+    guild = { ...guild, activeDungeonRun: chooseDungeonNode(guild.activeDungeonRun!, "depths_elite") };
+
+    const before = new Map(guild.heroes.map((hero) => [hero.id, hero.xp]));
+    const fallenId = guild.activeDungeonRun!.partyHeroIds[0]!;
+    const instances = guild.activeDungeonRun!.heroInstances.map((instance) =>
+      instance.heroId === fallenId ? { ...instance, currentHP: 0, isAlive: false } : instance,
+    );
+    const result = resolveDungeonCombat(guild, "victory", instances, sequenceRandom([0, 0]));
+    const roomXp = result.guild.activeDungeonRun!.xpEarnedPerHero;
+    const fallen = result.guild.heroes.find((hero) => hero.id === fallenId)!;
+    const survivorId = guild.activeDungeonRun!.partyHeroIds[1]!;
+    const survivor = result.guild.heroes.find((hero) => hero.id === survivorId)!;
+
+    expect(fallen.xp - (before.get(fallenId) ?? 0)).toBe(Math.round(roomXp * .85));
+    expect(survivor.xp - (before.get(survivorId) ?? 0)).toBe(roomXp);
+    expect(fallen.isAvailable).toBe(false);
+  });
+
   it("persists defeat instead of treating entry into a boss room as victory", () => { const base = expeditionGuild(); let guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base)); const run = guild.activeDungeonRun!; guild = { ...guild, activeDungeonRun: { ...run, currentNodeId: "depths_boss" } }; const result = resolveDungeonCombat(guild, "defeat", run.heroInstances.map((instance) => ({ ...instance, currentHP: 0, isAlive: false })), sequenceRandom([0])); expect(result.guild.activeDungeonRun?.status).toBe("defeat"); expect(result.guild.activeDungeonRun?.resolvedNodeIds).not.toContain("depths_boss"); });
 });

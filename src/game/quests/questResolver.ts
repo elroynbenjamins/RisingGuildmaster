@@ -23,6 +23,7 @@ import { getEnemyDefinition } from "../../data/enemies";
 import { applyCombatEquipmentWear, applyFallEquipmentDamage } from "../equipment/equipmentDurabilityService";
 import { getGuildRank, getQuestReputationReward } from "../renown/guildLegacyService";
 import { getRegionThreatEffects } from "../world/regionalThreatService";
+import { GAME_CONFIG } from "../../config/gameConfig";
 import { CAMPAIGN_NODES } from "../../data/campaign/chapter1";
 
 export function getLevelAppropriateQuestLootIds(itemIds: readonly string[], heroes: readonly Hero[], ownedInventoryIds: readonly string[] = []): string[] {
@@ -159,7 +160,7 @@ function persistHeroOutcome(hero: Hero, instance: HeroCombatInstance, xp: number
   const fallDamaged = defeated ? applyFallEquipmentDamage(afterBattle, random).hero : afterBattle;
   const damageRatio = defeated ? 1 : Math.max(0, (hero.currentHP - instance.currentHP) / Math.max(1, instance.maxHP));
   const worn = applyCombatEquipmentWear(fallDamaged, damageRatio, random).hero;
-  return grantCampaignHeroXp(worn, defeated ? Math.round(xp * .5) : xp, guild.world);
+  return grantCampaignHeroXp(worn, defeated ? Math.round(xp * GAME_CONFIG.fallenHeroXpRate) : xp, guild.world);
 }
 
 export function resolveQuestVictory(activeQuest: ActiveQuest, party: Party, guild: GuildState, instances: readonly HeroCombatInstance[], random: RandomSource): { activeQuest: ActiveQuest; guild: GuildState } {
@@ -171,7 +172,7 @@ export function resolveQuestVictory(activeQuest: ActiveQuest, party: Party, guil
     if (!party.heroIds.includes(hero.id) || !byId.has(hero.id)) return hero;
     const instance = byId.get(hero.id)!; const xp = getQuestXpForHero(hero, quest, partyHeroes.length);
     const persisted = persistHeroOutcome(hero, instance, xp, random, guild); const newInjury = persisted.conditions.find((condition) => isInjuryCondition(condition.conditionId) && !hero.conditions.some((old) => old.conditionId === condition.conditionId)); const newlyInjured = Boolean(newInjury);
-    return recordQuestHistory(persisted, { day: guild.currentDay, questId: quest.id, questName: quest.name, victory: true, xpEarned: instance.isAlive && instance.currentHP > 0 ? xp : Math.round(xp * .5), fellInBattle: !instance.isAlive || instance.currentHP <= 0, newlyInjured, injuryConditionId: newInjury?.conditionId, previousLevel: hero.level });
+    return recordQuestHistory(persisted, { day: guild.currentDay, questId: quest.id, questName: quest.name, victory: true, xpEarned: instance.isAlive && instance.currentHP > 0 ? xp : Math.round(xp * GAME_CONFIG.fallenHeroXpRate), fellInBattle: !instance.isAlive || instance.currentHP <= 0, newlyInjured, injuryConditionId: newInjury?.conditionId, previousLevel: hero.level });
   });
   const lootTable = QUEST_LOOT_TABLES[quest.lootTableId];
   const lootCandidates = lootTable ? getLevelAppropriateQuestLootIds(lootTable.itemIds, partyHeroes, guild.inventory) : [];

@@ -17,6 +17,7 @@ import { getDifficulty } from "../../data/difficulty/difficulties";
 import { calculateDungeonRunScore } from "./dungeonIntelService";
 import { createRogueliteDungeonRecord } from "./rogueliteRotationTypes";
 import { chooseDungeonBoon, offerDungeonBoonChoices, sumDungeonBoonValue } from "./dungeonBoonService";
+import { GAME_CONFIG } from "../../config/gameConfig";
 
 export type DungeonMerchantChoice = "buy_supplies" | "leave";
 export interface DungeonNodeResolution { guild: GuildState; check: AbilityCheckResult | null; text: string; goldDelta: number; recipeId: string | null }
@@ -89,7 +90,7 @@ export function getDungeonEnemyLevelModifier(authoredMaxLevel: number, partyAver
 }
 function syncHeroes(guild: GuildState, instances: readonly HeroCombatInstance[], xp = 0, recommendedLevelMax?: number): GuildState {
   const byId = new Map(instances.map((instance) => [instance.heroId, instance]));
-  return { ...guild, heroes: guild.heroes.map((hero) => { const instance = byId.get(hero.id); if (!instance) return hero; const synced = { ...hero, currentHP: Math.round(instance.currentHP), isAvailable: instance.isAlive }; const earnedXp = recommendedLevelMax === undefined ? xp : getRogueliteXpForHero(xp, hero.level, recommendedLevelMax); return instance.isAlive ? grantHeroXp(synced, earnedXp) : synced; }) };
+  return { ...guild, heroes: guild.heroes.map((hero) => { const instance = byId.get(hero.id); if (!instance) return hero; const synced = { ...hero, currentHP: Math.round(instance.currentHP), isAvailable: instance.isAlive }; const earnedXp = recommendedLevelMax === undefined ? xp : getRogueliteXpForHero(xp, hero.level, recommendedLevelMax); const awardedXp = instance.isAlive ? earnedXp : Math.round(earnedXp * GAME_CONFIG.fallenHeroXpRate); return grantHeroXp(synced, awardedXp); }) };
 }
 
 export function beginDungeonExpedition(guild: GuildState, dungeonId: string, partyHeroIds: string[], modifierIds: string[] = [], random?: RandomSource): GuildState {

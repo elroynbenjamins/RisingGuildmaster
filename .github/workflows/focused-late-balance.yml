@@ -17,4 +17,4 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/enemyLevelScaling.test.ts tests/balanceSimulation.test.ts -t "enemy level stat scaling|prepared Standard casualty pressure through Chapters 7–9|keeps underprepared late-chapter boss parties"
+      - run: pnpm vitest run tests/lateBalanceDiagnostics.test.ts

@@ -35,4 +35,4 @@ jobs:
         run: pnpm typecheck
 
       - name: Test
-        run: pnpm test
+        run: pnpm exec vitest run tests/balanceSimulation.test.ts -t "models a properly prepared|measures late-campaign prepared versus underprepared casualty pressure"

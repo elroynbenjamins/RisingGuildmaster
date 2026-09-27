@@ -40,7 +40,7 @@ describe("equipment tactical combat bonuses", () => {
 
     expect(gearedUnit.stats.magicDamage).toBeGreaterThan(baseUnit.stats.magicDamage);
     expect(gearedUnit.stats.healingPower - baseUnit.stats.healingPower).toBeCloseTo(.12);
-    expect(gearedUnit.stats.initiativeBonus - baseUnit.stats.initiativeBonus).toBe(2);
+    expect(gearedUnit.stats.initiativeBonus - baseUnit.stats.initiativeBonus).toBe(3);
     expect(gearedInstance.movementRange - baseInstance.movementRange).toBe(1);
   });
 });

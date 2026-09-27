@@ -29,6 +29,17 @@ describe("repeatable balance simulations", () => {
     }
   });
 
+  it("keeps realistic prepared gear behind same-level boss rewards", () => {
+    const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 15, 4435, "prepared_realistic", "subclass_ready");
+    for (const hero of party) {
+      const weaponId = hero.equipment.weapon;
+      expect(weaponId).toBeTruthy();
+      const weapon = EQUIPMENT[weaponId!]!;
+      expect(weapon.levelRequirement).toBeLessThanOrEqual(14);
+      expect(["rare", "epic"]).toContain(weapon.rarity);
+    }
+  });
+
   it("adds representative Level-5 subclasses to the normal progression simulation profile", () => {
     const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 4450, "lagged_basic", "subclass_ready");
     expect(party.map((hero) => hero.subclassId)).toEqual(["guardian", "sharpshooter", "pyromancer", "life_priest"]);
@@ -277,7 +288,7 @@ describe("repeatable balance simulations", () => {
       partyClasses: ["warrior", "ranger", "cleric", "mage"],
       difficultyId: "standard",
       runs: 6,
-      gearProfile: "optional_progression",
+      gearProfile: "prepared_realistic",
       progressionProfile: "subclass_ready",
     }));
     const lacking = [

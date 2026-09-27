@@ -29,6 +29,18 @@ describe("repeatable balance simulations", () => {
     }
   });
 
+  it("models a properly prepared party with chapter-appropriate epic gear without boss-reward level creep", () => {
+    const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 13, 4440, "prepared", "subclass_ready");
+    const equipped = party.flatMap((hero) => Object.values(hero.equipment)
+      .filter((id): id is string => Boolean(id))
+      .map((id) => ({ hero, item: EQUIPMENT[id]! })));
+    expect(equipped.some(({ item }) => item.rarity === "epic")).toBe(true);
+    for (const { hero, item } of equipped) {
+      const mainSlot = item.slot === "weapon" || item.slot === "armor";
+      expect(item.levelRequirement).toBeLessThanOrEqual(Math.max(1, hero.level - (mainSlot ? 1 : 2)));
+    }
+  });
+
   it("adds representative Level-5 subclasses to the normal progression simulation profile", () => {
     const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 4450, "lagged_basic", "subclass_ready");
     expect(party.map((hero) => hero.subclassId)).toEqual(["guardian", "sharpshooter", "pyromancer", "life_priest"]);
@@ -237,6 +249,36 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter5-causeway")!.winRate).toBeGreaterThan(0);
     expect(byId.get("chapter6-laurel-law-prepared")!.winRate).toBeGreaterThan(0);
     expect(byId.get("chapter6-laurel-law-basic-l10")!.averageSurvivingHeroes).toBeLessThan(4);
+  }, 240_000);
+
+  it("measures late-campaign prepared versus underprepared casualty pressure", () => {
+    const scenarios = [
+      { id: "ch7-varkesh-prepared", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 9110, gearProfile: "prepared" as const },
+      { id: "ch7-varkesh-underprepared", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 9120, gearProfile: "lagged_basic" as const },
+      { id: "ch8-nhal-prepared", questId: "admiral_nhal_veyr_boss", heroLevel: 15, seed: 9210, gearProfile: "prepared" as const },
+      { id: "ch8-nhal-underprepared", questId: "admiral_nhal_veyr_boss", heroLevel: 14, seed: 9220, gearProfile: "lagged_basic" as const },
+      { id: "ch9-serekh-prepared", questId: "serekh_chartmaker_boss", heroLevel: 17, seed: 9310, gearProfile: "prepared" as const },
+      { id: "ch9-serekh-underprepared", questId: "serekh_chartmaker_boss", heroLevel: 16, seed: 9320, gearProfile: "lagged_basic" as const },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 6,
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    expect(results.every((result) => result.wipeRate === result.losses / 6)).toBe(true);
+    expect(results.every((result) => result.casualtyWinRate >= 0 && result.casualtyWinRate <= 1)).toBe(true);
+    const byId = new Map(results.map((result) => [result.scenarioId, result]));
+    for (const [preparedId, underpreparedId] of [
+      ["ch7-varkesh-prepared", "ch7-varkesh-underprepared"],
+      ["ch8-nhal-prepared", "ch8-nhal-underprepared"],
+      ["ch9-serekh-prepared", "ch9-serekh-underprepared"],
+    ] as const) {
+      expect(byId.get(preparedId)!.winRate).toBeGreaterThanOrEqual(byId.get(underpreparedId)!.winRate);
+    }
   }, 240_000);
 
   it("reports prepared Standard survivor baselines for the midgame pressure checks", () => {

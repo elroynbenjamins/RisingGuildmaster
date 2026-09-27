@@ -239,6 +239,23 @@ describe("repeatable balance simulations", () => {
     expect(byId.get("chapter6-laurel-law-basic-l10")!.averageSurvivingHeroes).toBeLessThan(4);
   }, 240_000);
 
+  it("reports prepared Standard survivor baselines for the midgame pressure checks", () => {
+    const scenarios = [
+      { id: "prepared-road-of-glass", questId: "road_of_glass", heroLevel: 8, seed: 8800 },
+      { id: "prepared-laurel-law", questId: "laurel_law", heroLevel: 10, seed: 8810 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 12,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+  }, 120_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

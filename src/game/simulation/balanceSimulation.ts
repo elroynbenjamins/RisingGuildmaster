@@ -28,7 +28,7 @@ import { FIRST_SUBCLASS_LEVEL, SUBCLASSES } from "../../data/subclasses/subclass
 import { getHeroSkillIds } from "../progression/subclasses/subclassService";
 import type { EquipmentSlot } from "../heroes/types";
 
-export type SimulationGearProfile = "starter" | "lagged_basic" | "optional_progression";
+export type SimulationGearProfile = "starter" | "lagged_basic" | "optional_progression" | "prepared_realistic";
 export type SimulationProgressionProfile = "base" | "subclass_ready";
 export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile }
 export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; wipeRate: number; averageRounds: number; averageSurvivingHeroes: number; averageFallenHeroesOnWins: number; victoriesWithAnyFallRate: number; victoriesWithTwoPlusFallsRate: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
@@ -42,18 +42,20 @@ function progressionGearTargetLevel(heroLevel: number, slot: EquipmentSlot): num
   return Math.max(1, heroLevel - lag);
 }
 
-function equipProgressionGear(hero: Hero, profile: "lagged_basic" | "optional_progression"): Hero {
+function equipProgressionGear(hero: Hero, profile: Exclude<SimulationGearProfile, "starter">): Hero {
   const equipment = { ...hero.equipment };
   for (const slot of SIMULATION_GEAR_SLOTS) {
-    const targetLevel = profile === "optional_progression"
-      ? Math.max(1, hero.level - (slot === "weapon" ? 0 : slot === "armor" ? 1 : 2))
-      : progressionGearTargetLevel(hero.level, slot);
+    const targetLevel = profile === "lagged_basic"
+      ? progressionGearTargetLevel(hero.level, slot)
+      : profile === "prepared_realistic"
+        ? Math.max(1, hero.level - (slot === "weapon" || slot === "armor" ? 1 : 2))
+        : Math.max(1, hero.level - (slot === "weapon" ? 0 : slot === "armor" ? 1 : 2));
     const candidates = Object.values(EQUIPMENT)
       .filter((item) => item.slot === slot)
       .filter((item) => item.levelRequirement <= targetLevel)
-      .filter((item) => profile === "optional_progression"
-        ? item.rarity === "common" || item.rarity === "uncommon" || item.rarity === "rare" || item.rarity === "epic"
-        : item.rarity === "common" || item.rarity === "uncommon")
+      .filter((item) => profile === "lagged_basic"
+        ? item.rarity === "common" || item.rarity === "uncommon"
+        : item.rarity === "common" || item.rarity === "uncommon" || item.rarity === "rare" || item.rarity === "epic")
       .filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(hero.classId))
       .sort((a, b) => b.levelRequirement - a.levelRequirement || b.value - a.value || a.id.localeCompare(b.id));
     if (candidates[0]) equipment[slot] = candidates[0].id;
@@ -73,7 +75,7 @@ function levelHero(hero: Hero, level: number, index: number, gearProfile: Simula
     ? Object.values(SUBCLASSES).find((definition) => definition.baseClassId === skilled.classId)
     : undefined;
   const progressed = subclass ? { ...skilled, subclassId: subclass.id } : skilled;
-  const prepared = gearProfile === "lagged_basic" || gearProfile === "optional_progression" ? equipProgressionGear(progressed, gearProfile) : progressed;
+  const prepared = gearProfile === "starter" ? progressed : equipProgressionGear(progressed, gearProfile);
   return { ...prepared, currentHP: calculateHero(prepared).stats.maxHP };
 }
 

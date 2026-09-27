@@ -20,6 +20,7 @@ import { chooseDungeonBoon, offerDungeonBoonChoices, sumDungeonBoonValue } from 
 import { GAME_CONFIG } from "../../config/gameConfig";
 
 export type DungeonMerchantChoice = "buy_supplies" | "leave";
+export const DUNGEON_VICTORY_RECOVERY_DAYS = 1;
 export interface DungeonNodeResolution { guild: GuildState; check: AbilityCheckResult | null; text: string; goldDelta: number; recipeId: string | null }
 
 function activeRun(guild: GuildState) { const run = guild.activeDungeonRun; if (!run || run.status !== "active") throw new Error("No active dungeon run"); return run; }
@@ -194,7 +195,7 @@ export function selectDungeonBoon(guild: GuildState, boonId: string): GuildState
 
 export function closeDungeonExpedition(guild: GuildState, abandon = false): GuildState {
   if (!guild.activeDungeonRun) throw new Error("No dungeon run to close");
-  const run = guild.activeDungeonRun; const heroIds = new Set(run.partyHeroIds); const won = run.status === "victory" && !abandon; let next: GuildState = { ...guild, heroes: guild.heroes.map((hero) => heroIds.has(hero.id) && hero.currentHP > 0 ? { ...hero, isAvailable: true } : hero), rogueliteRotation: won ? { ...guild.rogueliteRotation, offeredDungeonIds: [], selectedDungeonId: null, cooldownUntilDay: guild.currentDay + 7 } : { ...guild.rogueliteRotation, selectedDungeonId: null }, activeDungeonRun: null };
+  const run = guild.activeDungeonRun; const heroIds = new Set(run.partyHeroIds); const won = run.status === "victory" && !abandon; let next: GuildState = { ...guild, heroes: guild.heroes.map((hero) => heroIds.has(hero.id) && hero.currentHP > 0 ? { ...hero, isAvailable: true } : hero), rogueliteRotation: won ? { ...guild.rogueliteRotation, offeredDungeonIds: [], selectedDungeonId: null, cooldownUntilDay: guild.currentDay + DUNGEON_VICTORY_RECOVERY_DAYS } : { ...guild.rogueliteRotation, selectedDungeonId: null }, activeDungeonRun: null };
   if (next.activeRogueliteRun) next = finishRogueliteRun(next);
   return next;
 }

@@ -48,7 +48,12 @@ export interface EnemyBaseStats {
 export interface EnemyCalculatedStats extends EnemyBaseStats {}
 
 export interface EnemyStatScaling {
+  /** Legacy/shared level multiplier retained for explicit callers. */
   levelMultiplier?: number;
+  hpLevelMultiplier?: number;
+  damageLevelMultiplier?: number;
+  defenseLevelMultiplier?: number;
+  speedLevelMultiplier?: number;
   difficultyMultiplier?: number;
   hpMultiplier?: number;
   damageMultiplier?: number;

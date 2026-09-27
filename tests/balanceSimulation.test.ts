@@ -221,7 +221,7 @@ describe("repeatable balance simulations", () => {
       partyClasses: ["warrior", "ranger", "cleric", "mage"],
       difficultyId: "standard",
       runs: 6,
-      gearProfile: scenario.gearProfile ?? "lagged_basic",
+      gearProfile: "gearProfile" in scenario ? scenario.gearProfile : "lagged_basic",
       progressionProfile: "subclass_ready",
     }));
     console.table(results);

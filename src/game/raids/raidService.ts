@@ -34,7 +34,9 @@ export function getRaidLockReason(raid: RaidDefinition, guild: GuildState): stri
 export function recordRaidOutcome(guild: GuildState, raidId: string, victory: boolean, survivors: number): GuildState {
   const raid = getRaidDefinition(raidId); const current = getRaidRecord(guild, raidId);
   const firstVictory=victory&&current.victories===0; const bonus=firstVictory?raid.firstVictoryReward.gold:0;
+  const firstClearEquipmentId = firstVictory ? raid.firstVictoryReward.equipmentId : undefined;
+  const inventory = firstClearEquipmentId && !guild.inventory.includes(firstClearEquipmentId) ? [...guild.inventory, firstClearEquipmentId] : guild.inventory;
   const record: RaidRecord = { attempts: current.attempts + 1, victories: current.victories + (victory ? 1 : 0), lastAttemptDay: guild.currentDay, nextAvailableDay: victory ? guild.currentDay + raid.weeklyLockoutDays : guild.currentDay + 1, bestSurvivors: Math.max(current.bestSurvivors, survivors),firstVictoryDay:firstVictory?guild.currentDay:current.firstVictoryDay,bonusGoldClaimed:current.bonusGoldClaimed+bonus };
-  return { ...guild,gold:guild.gold+bonus, raidProgress: { records: { ...(guild.raidProgress?.records ?? {}), [raidId]: record } } };
+  return { ...guild,gold:guild.gold+bonus,inventory, raidProgress: { records: { ...(guild.raidProgress?.records ?? {}), [raidId]: record } } };
 }
 export function findRaidByQuestId(questId: string): RaidDefinition | undefined { return Object.values(RAIDS).find((raid) => raid.questId === questId); }

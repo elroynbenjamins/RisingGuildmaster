@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { createGuild } from "../src/game/guild/guildService";
 import { getCampaignPreparationRecommendation } from "../src/game/campaign/campaignPreparationGuide";
+import { getDungeonCatchupXpTarget } from "../src/game/dungeons/dungeonRunService";
+import { xpRequiredForNextLevel } from "../src/game/progression/xpSystem";
 import { testHero } from "./testHero";
 
 function heroes(count: number, level: number, weapon: string | null) {
@@ -76,6 +78,35 @@ describe("campaign preparation guidance", () => {
     expect(getCampaignPreparationRecommendation(guild)).toMatchObject({
       type: "dungeon",
       reason: "level",
+      suggestedRuns: 2,
+      title: "2 Wardstone Expeditions",
+    });
+  });
+
+  it("recommends one Wardstone run when the core party is within one catch-up target of the next level", () => {
+    const guild = chapterEightGuild();
+    const level = 14;
+    const remainingTarget = getDungeonCatchupXpTarget(level);
+    guild.heroes = heroes(6, level, "concordance-glaive").map((hero) => ({
+      ...hero,
+      xp: xpRequiredForNextLevel(level) - remainingTarget,
+    }));
+    guild.world = {
+      ...guild.world,
+      completedCampaignNodeIds: [...guild.world.completedCampaignNodeIds, "siege_of_tidewatch", "board_the_nameless"],
+      completedQuestIds: [
+        ...guild.world.completedQuestIds,
+        "siege_of_tidewatch",
+        "board_the_nameless",
+        "the_lighthouse_that_walked",
+        "letters_from_a_sunken_ship",
+      ],
+    };
+    expect(getCampaignPreparationRecommendation(guild)).toMatchObject({
+      type: "dungeon",
+      reason: "level",
+      suggestedRuns: 1,
+      title: "Wardstone Expedition",
     });
   });
 });

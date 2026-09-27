@@ -33,6 +33,33 @@ describe("post-equipment late campaign baseline", () => {
     expect(results.every((result) => result.stalled === 0)).toBe(true);
   }, 180_000);
 
+  it("reports isolated later-stage pressure", () => {
+    const stages = [
+      { id: "ch7-siege-stage2", questId: "siege_of_skyvault", heroLevel: 13, encounterStartIndex: 1, seed: 9100 },
+      { id: "ch7-siege-stage3", questId: "siege_of_skyvault", heroLevel: 13, encounterStartIndex: 2, seed: 9110 },
+      { id: "ch7-varkesh-stage2", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, encounterStartIndex: 1, seed: 9120 },
+      { id: "ch7-varkesh-stage3", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, encounterStartIndex: 2, seed: 9130 },
+      { id: "ch8-siege-stage2", questId: "siege_of_tidewatch", heroLevel: 15, encounterStartIndex: 1, seed: 9140 },
+      { id: "ch8-siege-stage3", questId: "siege_of_tidewatch", heroLevel: 15, encounterStartIndex: 2, seed: 9150 },
+      { id: "ch8-nhal-stage2", questId: "admiral_nhal_veyr_boss", heroLevel: 15, encounterStartIndex: 1, seed: 9160 },
+      { id: "ch8-nhal-stage3", questId: "admiral_nhal_veyr_boss", heroLevel: 15, encounterStartIndex: 2, seed: 9170 },
+      { id: "ch9-chain-stage2", questId: "chain_beneath_fleet", heroLevel: 17, encounterStartIndex: 1, seed: 9180 },
+      { id: "ch9-serekh-stage2", questId: "serekh_chartmaker_boss", heroLevel: 17, encounterStartIndex: 1, seed: 9190 },
+      { id: "ch9-serekh-stage3", questId: "serekh_chartmaker_boss", heroLevel: 17, encounterStartIndex: 2, seed: 9200 },
+    ] as const;
+    const results = stages.map((stage) => simulateCombatScenario({
+      ...stage,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 3,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+      encounterLimit: 1,
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+  }, 180_000);
+
   it("reports underprepared boss pressure", () => {
     const scenarios = [
       { id: "underprepared-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 8960 },

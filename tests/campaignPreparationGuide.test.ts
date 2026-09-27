@@ -38,6 +38,12 @@ function chapterEightGuild() {
 describe("campaign preparation guidance", () => {
   it("recommends the best available chapter side quest when weapons lag", () => {
     const guild = chapterEightGuild();
+    guild.heroes = guild.heroes.map((hero) => ({
+      ...hero,
+      classId: "mage" as const,
+      level: 15,
+      equipment: { ...hero.equipment, weapon: "skyvault-crozier" },
+    }));
     const recommendation = getCampaignPreparationRecommendation(guild);
     expect(recommendation).toMatchObject({
       type: "side_quest",

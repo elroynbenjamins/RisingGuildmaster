@@ -7,7 +7,7 @@ export interface RaidDefinition {
   id: string; name: string; description: string; recommendedLevel: number; unlockChapter: number;
   questId: string; battlefieldId: string; bossEnemyDefinitionId: string; requiredHeroCount: 8; squads: 2;
   heroSpawnPositions: GridPosition[]; phases: RaidPhaseDefinition[]; weeklyLockoutDays: number;
-  firstVictoryReward: { gold: number; trophyId: string; trophyName: string };
+  firstVictoryReward: { gold: number; trophyId: string; trophyName: string; equipmentId?: string };
 }
 export interface RaidPartyValidation { valid: boolean; errors: string[]; squads: RaidSquad[] }
 export interface RaidReadiness { readyHeroes: number; averageLevel: number; averageStamina: number; recommendedLevel: number; status: "ready" | "risky" | "unready"; warnings: string[] }

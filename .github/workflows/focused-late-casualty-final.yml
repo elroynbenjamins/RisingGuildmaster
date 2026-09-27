@@ -4,7 +4,7 @@ on:
     branches:
       - balance/late-casualty-final
 concurrency:
-  group: focused-late-casualty-final
+  group: focused-late-casualty-profile
   cancel-in-progress: true
 jobs:
   validate:
@@ -19,4 +19,4 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/chapter7IronHills.test.ts tests/chapter8WesternSea.test.ts tests/lateCampaignScaling.test.ts tests/balanceSimulation.test.ts -t "Chapter 7|Chapter 8|late campaign encounter scaling|prepared Standard casualty pressure through Chapters 7–9|underprepared late-chapter bosses"
+      - run: pnpm vitest run tests/lateCasualtyProfileDiagnostics.test.ts

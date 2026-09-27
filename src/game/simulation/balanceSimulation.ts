@@ -30,7 +30,7 @@ import type { EquipmentSlot } from "../heroes/types";
 
 export type SimulationGearProfile = "starter" | "lagged_basic" | "optional_progression";
 export type SimulationProgressionProfile = "base" | "subclass_ready";
-export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile }
+export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterStartIndex?: number; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile }
 export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; wipeRate: number; averageRounds: number; averageSurvivingHeroes: number; averageFallenHeroesOnWins: number; victoriesWithAnyFallRate: number; victoriesWithTwoPlusFallsRate: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
 export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
 export interface EconomySimulationResult { scenarioId: string; startingGold: number; endingGold: number; netGold: number; questIncome: number; tavernIncome: number; salaryPaid: number; fieldExpenses: number; arrears: number; breakEvenQuestsPerWeek: number; goldAfterFacilityReserve: number }
@@ -135,8 +135,12 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
     const random = createSeededRandom(scenario.seed + run * 7919);
     const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "starter", scenario.progressionProfile ?? "base");
     let carried = undefined; let final: CombatState | undefined;
-    const encounterCount = Math.min(QUESTS[scenario.questId]!.encounterIds.length, scenario.encounterLimit ?? Number.POSITIVE_INFINITY);
-    for (let encounterIndex = 0; encounterIndex < encounterCount; encounterIndex++) {
+    const encounterStartIndex = scenario.encounterStartIndex ?? 0;
+    const encounterEndExclusive = Math.min(
+      QUESTS[scenario.questId]!.encounterIds.length,
+      encounterStartIndex + (scenario.encounterLimit ?? Number.POSITIVE_INFINITY),
+    );
+    for (let encounterIndex = encounterStartIndex; encounterIndex < encounterEndExclusive; encounterIndex++) {
       final = autoplayEncounter(createCombatState(scenario.questId, encounterIndex, heroes, random, carried, undefined, [], scenario.difficultyId), random);
       if (final.status !== "victory") break;
       const advanced = advanceToNextEncounter({ questDefinitionId: scenario.questId, partyId: "sim", currentEncounterIndex: encounterIndex, status: "active", goldEarned: 0, xpEarnedPerHero: 0, collectedLootIds: [], collectedMaterials: {} }, final.heroes.map((item) => item.instance));

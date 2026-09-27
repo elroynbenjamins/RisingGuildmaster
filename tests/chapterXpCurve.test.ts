@@ -3,7 +3,7 @@ import { CAMPAIGN_CHAPTERS, CAMPAIGN_NODES } from "../src/data/campaign/chapter1
 import { QUESTS } from "../src/data/quests/quests";
 import { getDungeonCatchupXpTarget, getRogueliteXpForHero } from "../src/game/dungeons/dungeonRunService";
 import { grantHeroXp } from "../src/game/progression/levelSystem";
-import { getQuestXpForHero } from "../src/game/quests/questResolver";
+import { getQuestEnemyXpPool, getQuestXpForHero } from "../src/game/quests/questResolver";
 import { testHero } from "./testHero";
 
 describe("campaign and roguelite XP curve", () => {
@@ -15,7 +15,19 @@ describe("campaign and roguelite XP curve", () => {
       for (const questId of [...campaignQuestIds, ...(chapter.sideQuestIds ?? [])]) hero = grantHeroXp(hero, getQuestXpForHero(hero, QUESTS[questId]!, 4));
       endLevels.push(hero.level);
     }
-    expect(endLevels).toEqual([4, 5, 7, 8, 10, 12, 15, 17, 19]);
+    expect(endLevels).toEqual([4, 5, 7, 9, 10, 12, 15, 17, 19]);
+  });
+
+  it("applies the pacing lift only to campaign-node quests", () => {
+    const hero = { ...testHero(), level: 1, xp: 0 };
+    const mainline = QUESTS.road_of_broken_carts!;
+    const sideQuest = QUESTS.blackbridge_ledger!;
+    const raid = QUESTS.raid_chartmaker_ascendant!;
+    const baseXp = (quest: typeof mainline) => Math.floor(getQuestEnemyXpPool(quest) / 4) + quest.xpRewardPerHero;
+
+    expect(getQuestXpForHero(hero, mainline, 4)).toBe(Math.round(baseXp(mainline) * 1.25 * 1.10));
+    expect(getQuestXpForHero(hero, sideQuest, 4)).toBe(Math.round(baseXp(sideQuest) * 1.25));
+    expect(getQuestXpForHero(hero, raid, 4)).toBe(Math.round(baseXp(raid) * 1.25));
   });
 
   it("keeps a normal one-side-per-chapter core ready with at most two catch-up expeditions", () => {

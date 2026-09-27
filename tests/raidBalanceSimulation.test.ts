@@ -27,4 +27,20 @@ describe("raid balance simulations", () => {
     // Chartmaker is the post-Chapter-9 raid: the gearless autoplay baseline may fail entirely after the global difficulty increase.
     expect(results[2]!.winRate).toBeLessThanOrEqual(.25);
   }, 120_000);
+
+  it("measures Chartmaker with a normal Lv 18 progressed raid roster", () => {
+    const result = simulateCombatScenario({
+      id: "raid-chartmaker-prepared-standard",
+      questId: "raid_chartmaker_ascendant",
+      heroLevel: 18,
+      partyClasses: party,
+      difficultyId: "standard",
+      runs: 8,
+      seed: 15_500,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+    });
+    console.table([result]);
+    expect(result.stalled).toBe(0);
+  }, 120_000);
 });

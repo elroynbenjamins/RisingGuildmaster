@@ -20,4 +20,3 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm vitest run tests/lateCasualtyProfileDiagnostics.test.ts
-Chapter 7|Chapter 8|Chapter 9|late campaign encounter scaling|prepared Standard casualty pressure through Chapters 7–9|separates prepared, underprepared and severely underprepared late boss outcomes|keeps prepared Hard and Iron parties viable"

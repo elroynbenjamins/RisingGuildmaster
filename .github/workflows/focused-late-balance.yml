@@ -1,4 +1,8 @@
 name: Focused late balance
+concurrency:
+  group: focused-late-balance
+  cancel-in-progress: true
+
 on:
   push:
     branches:

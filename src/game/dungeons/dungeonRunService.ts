@@ -1,4 +1,5 @@
 import { DUNGEONS, DUNGEON_NODES, DUNGEON_RUN_MODIFIERS } from "../../data/dungeons/dungeons";
+import { ROGUELITE_ENCOUNTERS } from "../../data/dungeons/rogueliteEncounters";
 import { EQUIPMENT } from "../../data/equipment/equipment";
 import type { RandomSource } from "../../utils/random";
 import type { HeroCombatInstance, QuestCombatSetup } from "../combat/combatTypes";
@@ -77,10 +78,13 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
 function recoverInstances(instances: readonly HeroCombatInstance[], hpRatio: number, manaRatio: number, staminaRatio: number): HeroCombatInstance[] {
   return instances.map((instance) => instance.isAlive ? { ...instance, currentHP: Math.min(instance.maxHP, instance.currentHP + Math.round(instance.maxHP * hpRatio)), currentMana: Math.min(instance.maxMana, instance.currentMana + Math.round(instance.maxMana * manaRatio)), currentStamina: Math.min(instance.maxStamina, instance.currentStamina + Math.round(instance.maxStamina * staminaRatio)) } : instance);
 }
-export function getRogueliteXpForHero(baseXp: number, heroLevel: number, recommendedLevelMax: number): number {
-  const levelsAbove = Math.max(0, heroLevel - recommendedLevelMax);
-  const multiplier = levelsAbove === 0 ? 1 : levelsAbove === 1 ? .50 : levelsAbove === 2 ? .25 : levelsAbove === 3 ? .10 : 0;
-  return Math.max(0, Math.round(baseXp * multiplier));
+export function getRogueliteXpForHero(baseXp: number, _heroLevel: number, _recommendedLevelMax: number): number {
+  // Expedition combat now scales upward to the drafted party, so late-game heroes
+  // earn the authored catch-up XP instead of being penalized for revisiting a theme.
+  return Math.max(0, Math.round(baseXp));
+}
+export function getDungeonEnemyLevelModifier(authoredMaxLevel: number, partyAverageLevel: number): number {
+  return Math.max(0, Math.round(partyAverageLevel) - Math.max(1, Math.round(authoredMaxLevel)));
 }
 function syncHeroes(guild: GuildState, instances: readonly HeroCombatInstance[], xp = 0, recommendedLevelMax?: number): GuildState {
   const byId = new Map(instances.map((instance) => [instance.heroId, instance]));
@@ -127,7 +131,12 @@ export function getDungeonCombatSetup(guild: GuildState): QuestCombatSetup {
   const oathEnemyInitiative = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.enemyInitiativeModifier ?? 0), 0);
   const oathEnemyMovement = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.enemyMovementRangeModifier ?? 0), 0);
   const heroHealingPowerModifier = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.healingPowerModifier ?? 0), 0) + (theme.heroHealingPowerModifier ?? 0) + sumDungeonBoonValue(run, "heroHealingPowerModifier");
-  return { encounterIds: [encounterId], label: node.title, heroInitiativeModifier: (theme.heroInitiativeModifier ?? 0) + sumDungeonBoonValue(run, "heroInitiativeModifier"), enemyInitiativeModifier: (theme.enemyInitiativeModifier ?? 0) + oathEnemyInitiative + sumDungeonBoonValue(run, "enemyInitiativeModifier"), heroArmorClassModifier: sumDungeonBoonValue(run, "heroArmorClassModifier"), heroOpeningAttackRollModifier: sumDungeonBoonValue(run, "heroOpeningAttackRollModifier"), enemyOpeningAttackRollModifier: sumDungeonBoonValue(run, "enemyOpeningAttackRollModifier"), enemyPhysicalDamageModifier, enemyDamageModifier, heroHealingPowerModifier, heroMovementRangeModifier: (theme.heroMovementRangeModifier ?? 0) + sumDungeonBoonValue(run, "heroMovementRangeModifier"), enemyMovementRangeModifier: (theme.enemyMovementRangeModifier ?? 0) + oathEnemyMovement };
+  const party = guild.heroes.filter((hero) => run.partyHeroIds.includes(hero.id));
+  const partyAverageLevel = party.length ? party.reduce((sum, hero) => sum + hero.level, 0) / party.length : dungeon.recommendedLevelMin;
+  const encounter = ROGUELITE_ENCOUNTERS[encounterId];
+  const authoredMaxLevel = Math.max(1, ...(encounter?.enemies.map((group) => group.level) ?? [dungeon.recommendedLevelMin]));
+  const enemyLevelModifier = getDungeonEnemyLevelModifier(authoredMaxLevel, partyAverageLevel);
+  return { encounterIds: [encounterId], label: node.title, enemyLevelModifier, heroInitiativeModifier: (theme.heroInitiativeModifier ?? 0) + sumDungeonBoonValue(run, "heroInitiativeModifier"), enemyInitiativeModifier: (theme.enemyInitiativeModifier ?? 0) + oathEnemyInitiative + sumDungeonBoonValue(run, "enemyInitiativeModifier"), heroArmorClassModifier: sumDungeonBoonValue(run, "heroArmorClassModifier"), heroOpeningAttackRollModifier: sumDungeonBoonValue(run, "heroOpeningAttackRollModifier"), enemyOpeningAttackRollModifier: sumDungeonBoonValue(run, "enemyOpeningAttackRollModifier"), enemyPhysicalDamageModifier, enemyDamageModifier, heroHealingPowerModifier, heroMovementRangeModifier: (theme.heroMovementRangeModifier ?? 0) + sumDungeonBoonValue(run, "heroMovementRangeModifier"), enemyMovementRangeModifier: (theme.enemyMovementRangeModifier ?? 0) + oathEnemyMovement };
 }
 
 export function resolveDungeonUtilityNode(guild: GuildState, random: RandomSource, merchantChoice?: DungeonMerchantChoice): DungeonNodeResolution {

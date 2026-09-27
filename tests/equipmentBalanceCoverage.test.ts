@@ -62,6 +62,16 @@ describe("equipment balance coverage", () => {
     }
   });
 
+  it("keeps every class geared for the Lv 18-19 postgame", () => {
+    for (const classId of CLASSES) {
+      const usable = Object.values(EQUIPMENT).filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(classId));
+      for (const slot of ["weapon", "armor", "helmet", "boots", "accessory1", "accessory2"] as const) {
+        const postgame = usable.filter((item) => item.slot === slot && item.levelRequirement >= 18 && item.levelRequirement <= 19);
+        expect(postgame.length, `${classId} postgame ${slot}`).toBeGreaterThanOrEqual(1);
+      }
+    }
+  });
+
   it("has valid outputs for every crafting recipe", () => {
     for (const recipe of Object.values(CRAFTING_RECIPES)) expect(EQUIPMENT[recipe.outputEquipmentId], recipe.id).toBeDefined();
   });

@@ -23,6 +23,7 @@ import { getEnemyDefinition } from "../../data/enemies";
 import { applyCombatEquipmentWear, applyFallEquipmentDamage } from "../equipment/equipmentDurabilityService";
 import { getGuildRank, getQuestReputationReward } from "../renown/guildLegacyService";
 import { getRegionThreatEffects } from "../world/regionalThreatService";
+import { CAMPAIGN_NODES } from "../../data/campaign/chapter1";
 
 export function getLevelAppropriateQuestLootIds(itemIds: readonly string[], heroes: readonly Hero[], ownedInventoryIds: readonly string[] = []): string[] {
   if (!itemIds.length) return [];
@@ -123,6 +124,8 @@ export function rollHuntFragment(progress: HuntRewardProgress, firstVictoryCount
   };
 }
 
+const MAINLINE_CAMPAIGN_QUEST_IDS = new Set(Object.values(CAMPAIGN_NODES).map((node) => node.questId).filter((id): id is string => Boolean(id)));
+
 export function getQuestEnemyXpPool(quest: ReturnType<typeof getQuestDefinition>): number {
   return quest.encounterIds.reduce((total, encounterId) => total + (QUEST_ENCOUNTERS[encounterId]?.enemies.reduce((sum, group) => sum + getEnemyDefinition(group.enemyDefinitionId).xpReward * group.count, 0) ?? 0), 0);
 }
@@ -133,7 +136,10 @@ export function getQuestXpForHero(hero: Hero, quest: ReturnType<typeof getQuestD
   // is not represented by the number of enemies killed.
   const developmentBase = sharedEnemyXp + Math.max(0, quest.xpRewardPerHero);
   // Preserve the former midpoint progression pace after retiring the hidden hero progression stat.
-  const heroXp = Math.round(developmentBase * 1.25);
+  // Mainline campaign quests receive a small pacing lift so one optional story plus
+  // at most two catch-up expeditions can keep a normal core on the next chapter's level floor.
+  const campaignMainlineMultiplier = MAINLINE_CAMPAIGN_QUEST_IDS.has(quest.id) ? 1.10 : 1;
+  const heroXp = Math.round(developmentBase * 1.25 * campaignMainlineMultiplier);
   if (!quest.repeatable || quest.recommendedLevelMax === undefined || hero.level <= quest.recommendedLevelMax) return heroXp;
   const levelsAbove = hero.level - quest.recommendedLevelMax;
   return Math.max(1, Math.round(heroXp * Math.max(.1, 1 - levelsAbove * .25)));

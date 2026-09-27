@@ -254,6 +254,13 @@ describe("repeatable balance simulations", () => {
     }));
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
+    for (const result of results) {
+      expect(result.winRate, `${result.scenarioId} prepared Standard win rate`).toBeGreaterThanOrEqual(.75);
+      expect(result.averageSurvivingHeroes, `${result.scenarioId} prepared Standard survivors`).toBeGreaterThanOrEqual(2.6);
+      expect(result.averageSurvivingHeroes, `${result.scenarioId} prepared Standard survivors`).toBeLessThanOrEqual(3.4);
+      expect(result.averageFallenHeroesOnWins, `${result.scenarioId} casualty pressure`).toBeGreaterThanOrEqual(.5);
+      expect(result.averageFallenHeroesOnWins, `${result.scenarioId} casualty pressure`).toBeLessThanOrEqual(1.5);
+    }
   }, 120_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

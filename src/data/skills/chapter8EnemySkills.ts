@@ -14,7 +14,7 @@ export const CHAPTER_8_ENEMY_SKILLS: Record<string, CombatSkillDefinition> = {
  leviathan_maul:{id:"leviathan_maul",name:"Leviathan Maul",type:"basic_attack",damageType:"physical",damageMultiplier:1.35,targetType:"single_enemy",cooldownTurns:0,range:2},
  abyssal_hide:{id:"abyssal_hide",name:"Abyssal Hide",type:"passive",selfModifiers:[perm("armorClass","flat",2),perm("maxHP","percentage",.15)]},
  admirals_sabre:{id:"admirals_sabre",name:"Admiral's Sabre",type:"basic_attack",damageType:"physical",damageMultiplier:1.4,targetType:"single_enemy",cooldownTurns:0,range:1},
- black_tide_broadside:{id:"black_tide_broadside",name:"Black Tide Broadside",type:"active",damageType:"magic",damageMultiplier:1.05,targetType:"all_enemies",cooldownTurns:3,range:7,targetModifiers:[{stat:"physicalDefense",operation:"percentage",value:-.15,durationTurns:2}]},
+ black_tide_broadside:{id:"black_tide_broadside",name:"Black Tide Broadside",type:"active",damageType:"magic",damageMultiplier:.8,targetType:"all_enemies",cooldownTurns:4,range:7,targetModifiers:[{stat:"physicalDefense",operation:"percentage",value:-.10,durationTurns:2}]},
  no_harbor_aura:{id:"no_harbor_aura",name:"No Harbor",type:"aura",aura:{target:"same_faction_allies",factionId:"crownless",excludeSelf:true,modifiers:[perm("damage","percentage",.15),perm("speed","percentage",.1)]}},
  last_flag_phase:{id:"last_flag_phase",name:"The Last Flag",type:"passive",conditionalModifiers:[{conditions:{selfHpRatioMax:.6},modifiers:[perm("physicalDamage","percentage",.2),perm("armorClass","flat",1)]},{conditions:{selfHpRatioMax:.3},modifiers:[perm("physicalDamage","percentage",.2),perm("magicDamage","percentage",.2),perm("speed","percentage",.15)]}]},
 };

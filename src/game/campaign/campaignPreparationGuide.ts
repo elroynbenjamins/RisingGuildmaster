@@ -45,7 +45,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
     const weaponId = hero.equipment.weapon;
     if (!weaponId) return true;
     const weapon = resolveEquipmentDefinition(weaponId);
-    return !weapon || hero.level - weapon.levelRequirement >= 2;
+    return !weapon || hero.level - weapon.levelRequirement >= 3;
   }).length;
   const weaponLag = laggingWeaponHeroes >= 2;
 
@@ -67,7 +67,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
     const detail = reason === "level"
       ? `Your top four average Level ${fieldLevel.toFixed(1)}; the next story mission recommends Level ${recommendedMin}. This one-clear side quest gives XP and a guaranteed equipment reward${weaponRecipe ? ", plus a weapon recipe" : ""}.`
       : reason === "weapon"
-        ? `${laggingWeaponHeroes} of your core heroes have weapons at least two levels behind. This one-clear side quest gives a guaranteed equipment reward${weaponRecipe ? " and a permanent weapon recipe" : ""}.`
+        ? `${laggingWeaponHeroes} of your core heroes have weapons at least three levels behind. This one-clear side quest gives a guaranteed equipment reward${weaponRecipe ? " and a permanent weapon recipe" : ""}.`
         : `You are ready for the boss, but this one-clear local story is a good final preparation route for XP and guaranteed gear${weaponRecipe ? ", with a permanent weapon recipe" : ""}.`;
     return { type: "side_quest", questId: quest.id, title: quest.name, detail, reason };
   }
@@ -76,7 +76,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
   if ((underLevel || weaponLag) && dungeonUnlocked) {
     const detail = underLevel
       ? `Your top four average Level ${fieldLevel.toFixed(1)}; the next story mission recommends Level ${recommendedMin}. A Wardstone expedition is the best remaining catch-up route for XP and equipment.`
-      : `${laggingWeaponHeroes} of your core heroes have weapons at least two levels behind. A Wardstone expedition is the best remaining catch-up route for equipment and extra XP.`;
+      : `${laggingWeaponHeroes} of your core heroes have weapons at least three levels behind. A Wardstone expedition is the best remaining catch-up route for equipment and extra XP.`;
     return { type: "dungeon", title: "Wardstone Expedition", detail, reason: underLevel ? "level" : "weapon" };
   }
 

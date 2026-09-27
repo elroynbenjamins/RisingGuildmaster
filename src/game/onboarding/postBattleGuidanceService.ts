@@ -29,6 +29,8 @@ interface PostBattleSummary {
 export function getPostBattleManagementActions(summary: PostBattleSummary, guild: GuildState): PostBattleManagementAction[] {
   const actions: PostBattleManagementAction[] = [];
   const partyIds = new Set(summary.heroOutcomes.map((hero) => hero.heroId));
+  const fallenCount = summary.heroOutcomes.filter((outcome) => outcome.fellInBattle).length;
+  const partyWiped = summary.heroOutcomes.length > 0 && fallenCount === summary.heroOutcomes.length;
   const needsRecovery = summary.heroOutcomes.some((outcome) => {
     const hero = guild.heroes.find((entry) => entry.id === outcome.heroId);
     return Boolean(hero && (hero.currentHP <= 0 || hero.currentHP < outcome.maxHP || hero.conditions.length > 0));
@@ -37,7 +39,14 @@ export function getPostBattleManagementActions(summary: PostBattleSummary, guild
   const itemId = summary.lootIds.find((id) => guild.inventory.includes(id)) ?? summary.lootIds[0];
   const needsReadiness = guild.heroes.some((hero) => partyIds.has(hero.id) && hero.adventureStamina < GAME_CONFIG.maxAdventureStamina);
 
-  if (needsRecovery) actions.push({ id: "recovery", title: "Restore the Party", description: "HP loss, injuries, and fallen heroes persist after battle. The Temple uses gold for treatment; revival costs 5 gems, or today’s free revive when Remove Ads is owned.", actionLabel: "Open Temple", isNew: guild.world.worldFlags[SEEN_FLAGS.recovery] !== true });
+  if (needsRecovery) {
+    const recoveryDescription = partyWiped
+      ? "The party was wiped. Revive them in the Temple first: use 5 gems, a rewarded revive, or today’s free revive when Remove Ads is owned. Then consider one Side Quest or Roguelite Expedition before retrying; Expeditions scale to the party and provide catch-up XP plus level-appropriate gear."
+      : fallenCount >= 2
+        ? "The party took heavy casualties. Restore fallen heroes in the Temple with 5 gems, a rewarded revive, or today’s Remove Ads free revive. If the next mission is still risky, a Side Quest or Roguelite Expedition can add XP and improve their gear."
+        : "HP loss, injuries, and fallen heroes persist after battle. The Temple uses gold for treatment; revival costs 5 gems, or today’s free revive when Remove Ads is owned.";
+    actions.push({ id: "recovery", title: partyWiped ? "Recover, Then Regroup" : "Restore the Party", description: recoveryDescription, actionLabel: "Open Temple", isNew: guild.world.worldFlags[SEEN_FLAGS.recovery] !== true });
+  }
   if (skillHero) actions.push({ id: "skills", title: "Spend a Skill Point", description: `${skillHero.name} can make a permanent class-skill choice. Inspect the full tree and its prerequisites before committing.`, actionLabel: `Develop ${skillHero.name}`, heroId: skillHero.heroId, isNew: guild.world.worldFlags[SEEN_FLAGS.skills] !== true });
   if (itemId) actions.push({ id: "equipment", title: "Equip Recovered Gear", description: "Quest equipment is stored in Inventory. Inspect it to compare eligible heroes and replace their currently equipped item.", actionLabel: "Inspect New Gear", itemId, isNew: guild.world.worldFlags[SEEN_FLAGS.equipment] !== true });
   if (needsReadiness) actions.push({ id: "readiness", title: "Recover Readiness", description: `This quest already advanced the calendar by one day. Additional days restore ${GAME_CONFIG.adventureStaminaRecoveryPerDay} readiness, but also progress payroll, candidate expiry, projects, and regional threats.`, actionLabel: "Review Calendar", isNew: guild.world.worldFlags[SEEN_FLAGS.readiness] !== true });

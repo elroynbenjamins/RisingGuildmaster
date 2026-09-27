@@ -135,6 +135,7 @@ describe("post-battle management guidance", () => {
       actionLabel: "Open Roguelite",
     });
     expect(preparation?.description).toContain("two Wardstone Expeditions");
+    expect(preparation?.description).toContain("one recovery day between them");
   });
 
   it("does not manufacture prep work after a clean victory", () => {

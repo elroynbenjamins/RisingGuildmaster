@@ -1,6 +1,7 @@
 import type { EncounterDefinition } from "../../game/quests/questTypes";
+import { LATE_CAMPAIGN_ENCOUNTER_SCALE } from "../../config/campaignBalance";
 const h=[{x:1,y:4},{x:1,y:5},{x:1,y:6},{x:2,y:5}];
-const g=(enemyDefinitionId:string,count:number,level:number,spawnPositions:{x:number;y:number}[],difficultyMultiplier?:number)=>({enemyDefinitionId,count,level,spawnPositions,...(difficultyMultiplier?{difficultyMultiplier}:{})});
+const g=(enemyDefinitionId:string,count:number,level:number,spawnPositions:{x:number;y:number}[],difficultyMultiplier=1)=>({enemyDefinitionId,count,level,spawnPositions,difficultyMultiplier:difficultyMultiplier*LATE_CAMPAIGN_ENCOUNTER_SCALE});
 export const CHAPTER_9_DROWNED_SEVENTH_ENCOUNTERS: Record<string, EncounterDefinition> = {
  seventh_tidal_gate:{id:"seventh_tidal_gate",battlefieldId:"seventh_tidal_gate",heroSpawnPositions:h,enemies:[g("drowned_legionary",3,16,[{x:10,y:3},{x:10,y:5},{x:10,y:7}]),g("abyssal_lanternbearer",1,16,[{x:13,y:5}])]},
  seventh_bell_shaft:{id:"seventh_bell_shaft",battlefieldId:"seventh_bell_shaft",heroSpawnPositions:h,enemies:[g("tideglass_stalker",2,16,[{x:10,y:3},{x:10,y:7}]),g("nameleech_swarm",2,16,[{x:13,y:3},{x:13,y:7}])]},

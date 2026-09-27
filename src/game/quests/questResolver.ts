@@ -157,10 +157,10 @@ function persistHeroOutcome(hero: Hero, instance: HeroCombatInstance, xp: number
   if (defeated) conditions = applyOutcomeInjury(conditions, hero.id, "major");
   else if (instance.currentHP / instance.maxHP <= .20 && random.next() < injuryChance) conditions = applyOutcomeInjury(conditions, hero.id, "minor");
   const afterBattle = { ...hero, currentHP: defeated ? 0 : instance.currentHP, conditions, isAvailable: !defeated };
-  const fallDamaged = defeated ? applyFallEquipmentDamage(afterBattle, random).hero : afterBattle;
-  const damageRatio = defeated ? 1 : Math.max(0, (hero.currentHP - instance.currentHP) / Math.max(1, instance.maxHP));
-  const worn = applyCombatEquipmentWear(fallDamaged, damageRatio, random).hero;
-  return grantCampaignHeroXp(worn, defeated ? Math.round(xp * GAME_CONFIG.fallenHeroXpRate) : xp, guild.world);
+  const persistedEquipment = defeated
+    ? applyFallEquipmentDamage(afterBattle, random).hero
+    : applyCombatEquipmentWear(afterBattle, Math.max(0, (hero.currentHP - instance.currentHP) / Math.max(1, instance.maxHP)), random).hero;
+  return grantCampaignHeroXp(persistedEquipment, defeated ? Math.round(xp * GAME_CONFIG.fallenHeroXpRate) : xp, guild.world);
 }
 
 export function resolveQuestVictory(activeQuest: ActiveQuest, party: Party, guild: GuildState, instances: readonly HeroCombatInstance[], random: RandomSource): { activeQuest: ActiveQuest; guild: GuildState } {

@@ -282,6 +282,14 @@ describe("repeatable balance simulations", () => {
     }));
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
+    for (const result of results) {
+      const boss = /varkesh|nhal|serekh/.test(result.scenarioId);
+      expect(result.winRate, `${result.scenarioId} prepared Standard win rate`).toBeGreaterThanOrEqual(.67);
+      expect(result.averageSurvivingHeroes, `${result.scenarioId} prepared Standard survivors`).toBeGreaterThanOrEqual(boss ? 2.2 : 2.5);
+      expect(result.averageSurvivingHeroes, `${result.scenarioId} prepared Standard survivors`).toBeLessThanOrEqual(boss ? 3.3 : 3.5);
+      expect(result.averageFallenHeroesOnWins, `${result.scenarioId} casualty pressure`).toBeGreaterThanOrEqual(.5);
+      expect(result.averageFallenHeroesOnWins, `${result.scenarioId} casualty pressure`).toBeLessThanOrEqual(boss ? 1.8 : 1.5);
+    }
   }, 180_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {

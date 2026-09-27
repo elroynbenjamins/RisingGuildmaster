@@ -29,6 +29,17 @@ describe("repeatable balance simulations", () => {
     }
   });
 
+  it("keeps realistic prepared gear behind same-level boss rewards", () => {
+    const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 15, 4435, "prepared_realistic", "subclass_ready");
+    for (const hero of party) {
+      const weaponId = hero.equipment.weapon;
+      expect(weaponId).toBeTruthy();
+      const weapon = EQUIPMENT[weaponId!]!;
+      expect(weapon.levelRequirement).toBeLessThanOrEqual(14);
+      expect(["rare", "epic"]).toContain(weapon.rarity);
+    }
+  });
+
   it("adds representative Level-5 subclasses to the normal progression simulation profile", () => {
     const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 4450, "lagged_basic", "subclass_ready");
     expect(party.map((hero) => hero.subclassId)).toEqual(["guardian", "sharpshooter", "pyromancer", "life_priest"]);
@@ -263,7 +274,7 @@ describe("repeatable balance simulations", () => {
     }
   }, 120_000);
 
-  it("reports prepared Standard casualty pressure through Chapters 7–9", () => {
+  it("reports realistic prepared and lacking casualty pressure through Chapters 7–9", () => {
     const scenarios = [
       { id: "prepared-ch7-siege", questId: "siege_of_skyvault", heroLevel: 13, seed: 8900 },
       { id: "prepared-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 8910 },
@@ -277,12 +288,41 @@ describe("repeatable balance simulations", () => {
       partyClasses: ["warrior", "ranger", "cleric", "mage"],
       difficultyId: "standard",
       runs: 6,
-      gearProfile: "optional_progression",
+      gearProfile: "prepared_realistic",
       progressionProfile: "subclass_ready",
     }));
-    console.table(results);
-    expect(results.every((result) => result.stalled === 0)).toBe(true);
-  }, 180_000);
+    const lacking = [
+      { id: "lacking-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 8960 },
+      { id: "lacking-ch8-nhal", questId: "admiral_nhal_veyr_boss", heroLevel: 14, seed: 8970 },
+      { id: "lacking-ch9-serekh", questId: "serekh_chartmaker_boss", heroLevel: 16, seed: 8980 },
+    ] as const;
+    const lackingResults = lacking.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 4,
+      gearProfile: "lagged_basic",
+      progressionProfile: "subclass_ready",
+    }));
+    const stageProbes = [
+      { id: "stage-ch7-varkesh-1", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 8990, encounterLimit: 1 },
+      { id: "stage-ch7-varkesh-2", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, seed: 9000, encounterLimit: 2 },
+      { id: "stage-ch8-nhal-1", questId: "admiral_nhal_veyr_boss", heroLevel: 15, seed: 9010, encounterLimit: 1 },
+      { id: "stage-ch8-nhal-2", questId: "admiral_nhal_veyr_boss", heroLevel: 15, seed: 9020, encounterLimit: 2 },
+      { id: "stage-ch9-serekh-1", questId: "serekh_chartmaker_boss", heroLevel: 17, seed: 9030, encounterLimit: 1 },
+      { id: "stage-ch9-serekh-2", questId: "serekh_chartmaker_boss", heroLevel: 17, seed: 9040, encounterLimit: 2 },
+    ] as const;
+    const stageResults = stageProbes.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 4,
+      gearProfile: "prepared_realistic",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table([...results, ...lackingResults, ...stageResults]);
+    expect([...results, ...lackingResults, ...stageResults].every((result) => result.stalled === 0)).toBe(true);
+  }, 300_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [

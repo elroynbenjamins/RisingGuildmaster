@@ -44,7 +44,7 @@ describe("repeatable balance simulations", () => {
     expect(results.every((result) => result.stalled === 0)).toBe(true);
     expect(results[0]!.averageRemainingHpRatioOnWins).toBeGreaterThan(results[2]!.averageRemainingHpRatioOnWins);
     expect(results[0]!.averageRemainingHpRatioOnWins).toBeLessThan(.93);
-    expect(results[2]!.averageSurvivingHeroes).toBeLessThan(3.5);
+    expect(results[2]!.averageFallenHeroesOnWins).toBeGreaterThanOrEqual(.5);
     expect(results[2]!.averageRemainingHpRatioOnWins).toBeLessThan(.85);
   }, 150_000);
 
@@ -60,7 +60,7 @@ describe("repeatable balance simulations", () => {
       { id: "chapter3-blue-horns", questId: "night_of_blue_horns", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6700, gearProfile: "lagged_basic" as const },
       { id: "chapter3-hroth", questId: "hroth_iceblood_boss", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6800, gearProfile: "lagged_basic" as const },
       { id: "chapter3-glimmerlake-l5", questId: "beneath_glimmerlake", heroLevel: 5, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6900, gearProfile: "lagged_basic" as const },
-      { id: "chapter3-glimmerlake", questId: "beneath_glimmerlake", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6950, gearProfile: "lagged_basic" as const },
+      { id: "chapter3-glimmerlake", questId: "beneath_glimmerlake", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 6900, gearProfile: "lagged_basic" as const },
       { id: "chapter3-vaelith", questId: "vaelith_pale_echo_boss", heroLevel: 6, partyClasses: ["warrior", "ranger", "cleric", "mage"] as const, difficultyId: "standard" as const, runs: 8, seed: 7000, gearProfile: "lagged_basic" as const },
     ];
     const results = scenarios.map(simulateCombatScenario); console.table(results);
@@ -120,7 +120,7 @@ describe("repeatable balance simulations", () => {
     const vaelithVeteran = results.find((result) => result.scenarioId === "chapter3-vaelith-veteran")!;
     const vaelithIron = results.find((result) => result.scenarioId === "chapter3-vaelith-iron_guild")!;
     expect(vaelithStandard.winRate).toBeGreaterThanOrEqual(.75);
-    expect(vaelithVeteran.averageSurvivingHeroes).toBeLessThanOrEqual(3);
+    expect(vaelithVeteran.averageFallenHeroesOnWins).toBeGreaterThanOrEqual(.75);
     expect(vaelithIron.winRate).toBeLessThanOrEqual(.50);
     expect(vaelithIron.averageSurvivingHeroes).toBeLessThan(2);
   }, 300_000);

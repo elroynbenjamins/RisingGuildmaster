@@ -1,5 +1,6 @@
-import type { EncounterDefinition } from "../../game/quests/questTypes";const h=[{x:1,y:4},{x:1,y:5},{x:1,y:6},{x:2,y:5}];
-export const CHAPTER_7_IRON_HILLS_ENCOUNTERS:Record<string,EncounterDefinition>={
+import type { EncounterDefinition } from "../../game/quests/questTypes";
+import { LATE_CAMPAIGN_ENCOUNTER_SCALE } from "../../config/campaignBalance";const h=[{x:1,y:4},{x:1,y:5},{x:1,y:6},{x:2,y:5}];
+const RAW_CHAPTER_7_IRON_HILLS_ENCOUNTERS:Record<string,EncounterDefinition>={
  skyroad_lower_span:{id:"skyroad_lower_span",battlefieldId:"skyroad_lower_span",heroSpawnPositions:h,enemies:[{enemyDefinitionId:"crownmarked_saboteur",count:3,level:12,spawnPositions:[{x:10,y:2},{x:10,y:5},{x:10,y:8}]},{enemyDefinitionId:"stormcrow_mimic",count:1,level:12,spawnPositions:[{x:13,y:5}]}]},
  skyroad_anchor_bridge:{id:"skyroad_anchor_bridge",battlefieldId:"skyroad_anchor_bridge",heroSpawnPositions:h,enemies:[{enemyDefinitionId:"crownmarked_saboteur",count:2,level:12,spawnPositions:[{x:11,y:3},{x:11,y:7}]},{enemyDefinitionId:"brass_honor_guard",count:2,level:12,spawnPositions:[{x:12,y:3},{x:12,y:7}]}]},
  empty_embassy_court:{id:"empty_embassy_court",battlefieldId:"empty_embassy_court",heroSpawnPositions:h,enemies:[{enemyDefinitionId:"brass_honor_guard",count:3,level:12,spawnPositions:[{x:10,y:3},{x:10,y:5},{x:10,y:7}]},{enemyDefinitionId:"crown_beacon",count:1,level:12,spawnPositions:[{x:13,y:5}]}]},
@@ -17,3 +18,16 @@ export const CHAPTER_7_IRON_HILLS_ENCOUNTERS:Record<string,EncounterDefinition>=
  varkesh_honor_guard:{id:"varkesh_honor_guard",battlefieldId:"skyvault_upper_aerie",heroSpawnPositions:h,enemies:[{enemyDefinitionId:"brass_honor_guard",count:2,level:13,spawnPositions:[{x:10,y:3},{x:10,y:7}]},{enemyDefinitionId:"brasswing_drake",count:2,level:13,spawnPositions:[{x:12,y:2},{x:12,y:8}]}]},
  varkesh_final_concord:{id:"varkesh_final_concord",battlefieldId:"varkesh_final_concord",objective:{type:"eliminate_targets",enemyDefinitionIds:["varkesh_gilded_rupture"],label:"Defeat Varkesh, the Gilded Rupture."},heroSpawnPositions:h,enemies:[{enemyDefinitionId:"varkesh_gilded_rupture",count:1,level:13,difficultyMultiplier:1.25,spawnPositions:[{x:12,y:5}]},{enemyDefinitionId:"crown_beacon",count:2,level:13,spawnPositions:[{x:11,y:2},{x:11,y:8}]}]},
 };
+
+export const CHAPTER_7_IRON_HILLS_ENCOUNTERS: Record<string, EncounterDefinition> = Object.fromEntries(
+  Object.entries(RAW_CHAPTER_7_IRON_HILLS_ENCOUNTERS).map(([id, encounter]) => [
+    id,
+    {
+      ...encounter,
+      enemies: encounter.enemies.map((enemy) => ({
+        ...enemy,
+        difficultyMultiplier: (enemy.difficultyMultiplier ?? 1) * LATE_CAMPAIGN_ENCOUNTER_SCALE,
+      })),
+    },
+  ]),
+);

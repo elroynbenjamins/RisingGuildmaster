@@ -8,7 +8,8 @@ import { createHeroCombatInstance, createHeroCombatUnit } from "../src/game/comb
 import { createCombatBoard } from "../src/game/combat/grid/boardFactory";
 import { getTile } from "../src/game/combat/grid/gridTypes";
 import { resolveQuestExplorationStage } from "../src/game/quests/questExplorationService";
-import { rollHuntFragment } from "../src/game/quests/questResolver";
+import { getQuestEquipmentDropChance, rollHuntFragment } from "../src/game/quests/questResolver";
+import { QUESTS } from "../src/data/quests/quests";
 import { sequenceRandom } from "./combatTestUtils";
 import { testHero } from "./testHero";
 
@@ -53,6 +54,12 @@ describe("monster hunt progression", () => {
       expect(recipe.materials[fragmentId]).toBe(3);
       expect(EQUIPMENT[recipe.outputEquipmentId]).toBeDefined();
     }
+  });
+
+  it("uses hunts as a generous equipment catch-up route", () => {
+    expect(getQuestEquipmentDropChance(QUESTS.white_maw_of_frostmarch!)).toBe(.80);
+    expect(getQuestEquipmentDropChance(QUESTS.teeth_below_guildhaven!)).toBe(.80);
+    expect(getQuestEquipmentDropChance(QUESTS.coils_of_the_sunken_grove!)).toBe(.80);
   });
 
   it("makes deep snow and cracked ice cost two movement points", () => {

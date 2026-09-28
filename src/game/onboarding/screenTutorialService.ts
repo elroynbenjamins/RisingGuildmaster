@@ -1,13 +1,9 @@
 import type { GuildState } from "../guild/types";
 
-export type GuidedScreenId = "guild_management" | "quests" | "world" | "heroes" | "inventory" | "temple" | "crafting";
+export type GuidedScreenId = "guild_management" | "temple" | "crafting";
 
 export const GUIDED_SCREEN_FLAGS: Record<GuidedScreenId, string> = {
   guild_management: "guided_screen_guild_management_seen",
-  quests: "guided_screen_quests_seen",
-  world: "guided_screen_world_seen",
-  heroes: "guided_screen_heroes_seen",
-  inventory: "guided_screen_inventory_seen",
   temple: "guided_screen_temple_seen",
   crafting: "guided_screen_crafting_seen",
 };

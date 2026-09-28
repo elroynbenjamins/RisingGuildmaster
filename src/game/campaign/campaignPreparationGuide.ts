@@ -10,12 +10,14 @@ import type { GuildState } from "../guild/types";
 import { isQuestAvailableForGuild } from "../quests/questAvailability";
 import { getAvailableCampaignNodes } from "./campaignService";
 import { estimateTrainingCatchupPlan, getTrainingProgressionLimit, trainingCapacity } from "../training/trainingService";
+import type { TrainingProgramId } from "../training/trainingTypes";
 
 export interface CampaignTrainingAlternative {
   heroId: string;
   heroName: string;
   currentLevel: number;
   targetLevel: number;
+  programId: TrainingProgramId;
   programName: string;
   sessions: number;
   estimatedDays: number;
@@ -125,6 +127,7 @@ function getTrainingAlternative(
     heroName: candidate.name,
     currentLevel: candidate.level,
     targetLevel: plan.targetLevel,
+    programId: plan.programId,
     programName: plan.programName,
     sessions: plan.sessions,
     estimatedDays: plan.totalDays,

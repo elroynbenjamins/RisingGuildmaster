@@ -9,6 +9,7 @@ import { sequenceRandom } from "./combatTestUtils";
 import { ENEMIES } from "../src/data/enemies";
 import { createCombatState } from "../src/game/combat/combatEngine";
 import { EQUIPMENT } from "../src/data/equipment/equipment";
+import { RECRUITMENT_FIELD_GEAR_IDS } from "../src/data/equipment/equipmentBalanceExpansion";
 
 function expeditionGuild() { const guild = createGuild(); const heroes = Array.from({ length: 8 }, (_, index) => generateHero(createSeededRandom(11 + index))).map((hero, index) => ({ ...hero, id: `dungeon-hero-${index}`, level: 6 })); return { ...guild, heroes, discoveredEnemyIds: Object.keys(ENEMIES), world: { ...guild.world, completedCampaignNodeIds: ["broken_wardstone"] }, rogueliteRotation: { ...guild.rogueliteRotation, offeredDungeonIds: ["wardstone_depths", "thornwood_trials", "temple_of_coils"] } }; }
 const partyIds = (guild: ReturnType<typeof expeditionGuild>) => guild.heroes.slice(0, 4).map((hero) => hero.id);
@@ -169,6 +170,46 @@ describe("playable dungeon run integration", () => {
     expect(awarded.slot).toBe("weapon");
     expect(awarded.levelRequirement).toBe(16);
     expect(awarded.rarity).toBe("rare");
+  });
+
+  it("does not award recruit-issued fieldcoats from expedition caches", () => {
+    const classes = ["warrior", "ranger", "mage", "cleric"] as const;
+    const weapons = ["delvers-longsword", "delvers-longbow", "delvers-crozier", "delvers-crozier"] as const;
+    const base = createGuild();
+    const partyHeroes = classes.map((classId, index) => {
+      const hero = generateHero(createSeededRandom(2_300 + index), { classId });
+      return {
+        ...hero,
+        id: `armor-catchup-hero-${index}`,
+        level: 15,
+        equipment: { ...hero.equipment, weapon: weapons[index]!, armor: "cinderroad-fieldcoat" },
+      };
+    });
+    const reserves = [
+      { ...generateHero(createSeededRandom(2_390), { classId: "warrior" }), id: "armor-catchup-reserve-1" },
+      { ...generateHero(createSeededRandom(2_391), { classId: "berserker" }), id: "armor-catchup-reserve-2" },
+    ];
+    let guild: ReturnType<typeof createGuild> = {
+      ...base,
+      heroes: [...partyHeroes, ...reserves],
+      discoveredEnemyIds: Object.keys(ENEMIES),
+      world: { ...base.world, completedCampaignNodeIds: ["broken_wardstone"] },
+      rogueliteRotation: { ...base.rogueliteRotation, offeredDungeonIds: ["wardstone_depths", "thornwood_trials", "temple_of_coils"] },
+    };
+    guild = beginDungeonExpedition(guild, "wardstone_depths", partyHeroes.map((hero) => hero.id));
+    const run = guild.activeDungeonRun!;
+    guild = {
+      ...guild,
+      activeDungeonRun: { ...run, currentNodeId: "depths_boss" },
+      activeRogueliteRun: { ...guild.activeRogueliteRun!, bossRecipeAwarded: true },
+    };
+
+    const result = resolveDungeonCombat(guild, "victory", guild.activeDungeonRun!.heroInstances, sequenceRandom([.99, 0]));
+    const awardedIds = result.guild.activeDungeonRun?.gearIdsAwarded ?? [];
+    const awarded = EQUIPMENT[awardedIds[awardedIds.length - 1]!]!;
+
+    expect(awarded.slot).toBe("armor");
+    expect(RECRUITMENT_FIELD_GEAR_IDS.has(awarded.id)).toBe(false);
   });
 
   it("persists defeat instead of treating entry into a boss room as victory", () => { const base = expeditionGuild(); let guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base)); const run = guild.activeDungeonRun!; guild = { ...guild, activeDungeonRun: { ...run, currentNodeId: "depths_boss" } }; const result = resolveDungeonCombat(guild, "defeat", run.heroInstances.map((instance) => ({ ...instance, currentHP: 0, isAlive: false })), sequenceRandom([0])); expect(result.guild.activeDungeonRun?.status).toBe("defeat"); expect(result.guild.activeDungeonRun?.resolvedNodeIds).not.toContain("depths_boss"); });

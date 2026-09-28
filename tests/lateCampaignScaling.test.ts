@@ -7,6 +7,6 @@ describe("late campaign encounter scaling", () => {
     expect(LATE_CAMPAIGN_ENCOUNTER_SCALE).toBe(1);
     expect(QUEST_ENCOUNTERS.varkesh_final_concord?.enemies.find((entry) => entry.enemyDefinitionId === "varkesh_gilded_rupture")?.difficultyMultiplier).toBeCloseTo(1.20, 2);
     expect(QUEST_ENCOUNTERS.admirals_quarterdeck?.enemies.find((entry) => entry.enemyDefinitionId === "admiral_nhal_veyr")?.difficultyMultiplier).toBeCloseTo(1.00, 2);
-    expect(QUEST_ENCOUNTERS.serekh_abyss_platform?.enemies.find((entry) => entry.enemyDefinitionId === "serekh_chartmaker")?.difficultyMultiplier).toBeCloseTo(.90, 2);
+    expect(QUEST_ENCOUNTERS.serekh_abyss_platform?.enemies.find((entry) => entry.enemyDefinitionId === "serekh_chartmaker")?.difficultyMultiplier).toBeCloseTo(.75, 2);
   });
 });

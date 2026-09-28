@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { colors } from "../ui";
 import { MAIN_TABS, type MainTab } from "../../ui/navigation";
 import type { QuestTab } from "../../ui/questList";
@@ -8,6 +8,7 @@ import type { GameIconId } from "../../data/ui/gameIcons";
 import { useTheme } from "../../theme/theme";
 import { NotificationBadge } from "./NotificationBadge";
 import { useActionNotifications } from "../../state/useActionNotifications";
+import { GuidePressable } from "../tutorial/GuidedTutorialContext";
 
 const ICONS: Record<MainTab, GameIconId> = { Guild: "guild", Quests: "quests", World: "world", Heroes: "heroes", Inventory: "inventory" };
 
@@ -17,13 +18,13 @@ export function BottomNavigation({ active, onSelect }: { active: MainTab; onSele
   return <View style={[styles.bar, { backgroundColor: c.panel, borderColor: c.border }]}>{MAIN_TABS.map((tab) => {
     const selected = active === tab;
     const notice = notices.tabs[tab];
-    return <Pressable key={tab} accessibilityRole="tab" accessibilityLabel={notice ? `${tab}. ${notice.label}` : tab} accessibilityState={{ selected }} aria-selected={selected} onPress={() => onSelect(tab, tab === "Quests" ? notice?.preferredQuestTab : undefined)} style={({ pressed }: { pressed: boolean }) => [styles.tab, { borderColor: selected ? c.gold : c.border, backgroundColor: selected ? c.panel2 : "transparent" }, pressed && styles.pressed]}>
+    return <GuidePressable guideId={`nav.${tab}`} key={tab} accessibilityRole="tab" accessibilityLabel={notice ? `${tab}. ${notice.label}` : tab} accessibilityState={{ selected }} aria-selected={selected} onPress={() => onSelect(tab, tab === "Quests" ? notice?.preferredQuestTab : undefined)} style={({ pressed }: { pressed: boolean }) => [styles.tab, { borderColor: selected ? c.gold : c.border, backgroundColor: selected ? c.panel2 : "transparent" }, pressed && styles.pressed]}>
       {selected ? <View style={[styles.selectedPlate, { backgroundColor: c.gold }]} /> : null}
       {notice ? <View style={styles.notice}><NotificationBadge count={notice.count} tone={notice.tone} label={`${tab}: ${notice.label}`} /></View> : null}
       <GameIcon id={ICONS[tab]} size={29} framed={false} />
       <Text style={[styles.label, { color: selected ? c.gold : c.muted }]}>{tab}</Text>
 
-    </Pressable>;
+    </GuidePressable>;
   })}</View>;
 }
 

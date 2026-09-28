@@ -8,7 +8,7 @@ import type { QuestDefinition } from "../quests/questTypes";
 import { getEligiblePersonalQuestHeroes } from "../quests/questAvailability";
 import { getQuestAdventureStaminaCost } from "../heroes/adventureStaminaService";
 import { getQuestSkillCoverage } from "./partyReadinessService";
-import { getHeroFieldReadinessPenalty } from "./heroFieldReadinessService";
+import { getHeroFieldReadinessPenalty, hasPendingHeroCombatProgression } from "./heroFieldReadinessService";
 
 export type PartyCombatRole = "frontline" | "support" | "ranged";
 
@@ -37,7 +37,9 @@ function heroScore(hero: Hero, quest: QuestDefinition, selected: readonly Hero[]
   const stats = calculateHero(hero).stats;
   const hpRatio = stats.maxHP ? hero.currentHP / stats.maxHP : 0;
   const recommended = quest.recommendedLevelMin ?? 1;
-  let score = Math.min(hero.level, recommended + 2) * 8 + hpRatio * 20 + hero.adventureStamina * .15 - getHeroFieldReadinessPenalty(hero);
+  const gearPenalty = getHeroFieldReadinessPenalty(hero);
+  const progressionPenalty = gearPenalty === 0 && hasPendingHeroCombatProgression(hero) ? 10 : 0;
+  let score = Math.min(hero.level, recommended + 2) * 8 + hpRatio * 20 + hero.adventureStamina * .15 - gearPenalty - progressionPenalty;
   const existingRoles = new Set(selected.flatMap(getHeroPartyRoles));
   for (const role of getHeroPartyRoles(hero)) if (!existingRoles.has(role)) score += 18;
   for (const skillId of questSkillIds(quest)) {

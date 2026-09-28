@@ -25,6 +25,7 @@ describe("playable dungeon run integration", () => {
     const beforeXp = new Map(base.heroes.map((hero) => [hero.id, hero.xp]));
     let guild = beginDungeonExpedition(base, "wardstone_depths", ids);
     const run = guild.activeDungeonRun!;
+    expect(run.catchupReferenceLevel).toBe(13);
     guild = { ...guild, activeDungeonRun: { ...run, currentNodeId: "depths_guard" } };
 
     const result = resolveDungeonCombat(guild, "victory", guild.activeDungeonRun!.heroInstances, sequenceRandom([0]));

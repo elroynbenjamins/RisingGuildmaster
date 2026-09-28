@@ -5,6 +5,7 @@ import { getDungeonCatchupXpTarget } from "../src/game/dungeons/dungeonRunServic
 import { xpRequiredForNextLevel } from "../src/game/progression/xpSystem";
 import { advanceGuildTime } from "../src/game/economy/guildCalendarService";
 import { startHeroTraining } from "../src/game/training/trainingService";
+import { reviveHero } from "../src/game/temple/templeService";
 import { testHero } from "./testHero";
 import type { Hero } from "../src/game/heroes/types";
 
@@ -296,6 +297,41 @@ describe("campaign preparation guidance", () => {
     expect(recommendation?.detail).toContain("2 Heroic Curriculum sessions");
     expect(recommendation?.detail).toContain("8 days");
     expect(recommendation?.detail).toContain("720 gold");
+  });
+
+  it("pauses replacement catch-up while the hero is fallen and resumes it after revival", () => {
+    let guild = chapterSevenBossGuild(6);
+    guild.gems = 5;
+    guild.heroes = guild.heroes.map((hero, index) => index === 0 ? {
+      ...hero,
+      level: 12,
+      xp: 0,
+      currentHP: 0,
+      isAvailable: false,
+    } : hero);
+    guild.recentPartyHeroIds = guild.heroes.slice(0, 4).map((hero) => hero.id);
+    const replacementId = guild.heroes[0]!.id;
+
+    const whileFallen = getCampaignPreparationRecommendation(guild);
+    expect(whileFallen?.trainingAlternative).toBeUndefined();
+
+    guild = reviveHero(guild, replacementId, new Date("2026-09-28T12:00:00Z"));
+    expect(guild.gems).toBe(0);
+    expect(guild.heroes.find((hero) => hero.id === replacementId)).toMatchObject({
+      level: 12,
+      isAvailable: true,
+    });
+
+    const afterRevive = getCampaignPreparationRecommendation(guild);
+    expect(afterRevive).toMatchObject({
+      type: "dungeon",
+      reason: "level",
+      trainingAlternative: {
+        heroId: replacementId,
+        currentLevel: 12,
+        targetLevel: 13,
+      },
+    });
   });
 
   it("updates and clears Chapter 9 Training Hall catch-up advice as the replacement recovers", () => {

@@ -1,0 +1,29 @@
+name: Late recruit readiness lifecycle
+
+on:
+  push:
+    branches:
+      - test/late-recruit-readiness-lifecycle
+    paths:
+      - .github/workflows/late-recruit-readiness-lifecycle.yml
+      - tests/lateRecruitReadinessLifecycle.test.ts
+      - src/game/recruitment/**
+      - src/game/party/**
+      - src/data/equipment/**
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm vitest run tests/lateRecruitReadinessLifecycle.test.ts tests/partyRecommendationGearReadiness.test.ts tests/questDeployment.test.ts tests/recruitment.test.ts

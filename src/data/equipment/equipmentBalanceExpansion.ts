@@ -50,6 +50,16 @@ export const EQUIPMENT_BALANCE_EXPANSION: Record<string, EquipmentDefinition> = 
   "cinderscript-recurve": item("cinderscript-recurve", "Cinderscript Recurve", "weapon", "uncommon", 7, 545, [mod("cinderscript-recurve", "attackRoll", "flat", 1), mod("cinderscript-recurve", "magicDamage", "percentage", .09), mod("cinderscript-recurve", "criticalChance", "flat", .02)], ["spellbow"]),
   "hearthwall-shield": item("hearthwall-shield", "Hearthwall Shield", "weapon", "uncommon", 7, 560, [mod("hearthwall-shield", "armorClass", "flat", 1), mod("hearthwall-shield", "maxHP", "percentage", .08), mod("hearthwall-shield", "physicalDefense", "percentage", .07)], ["bulwark"]),
 
+  // Level-11 expedition catch-up weapons. These keep Chapter 7 Wardstone recovery
+  // useful without allowing generic caches to award the Level-11/12 epic story weapons.
+  "wayfarers-longsword": item("wayfarers-longsword", "Wayfarer's Longsword", "weapon", "rare", 11, 1720, [mod("wayfarers-longsword", "attackRoll", "flat", 2), mod("wayfarers-longsword", "physicalDamage", "percentage", .15)], ["warrior", "paladin", "berserker"]),
+  "wayfarers-longbow": item("wayfarers-longbow", "Wayfarer's Longbow", "weapon", "rare", 11, 1700, [mod("wayfarers-longbow", "attackRoll", "flat", 2), mod("wayfarers-longbow", "physicalDamage", "percentage", .15), mod("wayfarers-longbow", "criticalChance", "flat", .03)], ["ranger"]),
+  "wayfarers-crozier": item("wayfarers-crozier", "Wayfarer's Crozier", "weapon", "rare", 11, 1740, [mod("wayfarers-crozier", "attackRoll", "flat", 2), mod("wayfarers-crozier", "magicDamage", "percentage", .15), mod("wayfarers-crozier", "healingPower", "percentage", .07)], ["mage", "cleric", "summoner"]),
+  "wayfarers-quarterstaff": item("wayfarers-quarterstaff", "Wayfarer's Quarterstaff", "weapon", "rare", 11, 1690, [mod("wayfarers-quarterstaff", "attackRoll", "flat", 2), mod("wayfarers-quarterstaff", "physicalDamage", "percentage", .15), mod("wayfarers-quarterstaff", "speed", "percentage", .06)], ["monk"]),
+  "wayfarers-rapier": item("wayfarers-rapier", "Wayfarer's Rapier", "weapon", "rare", 11, 1710, [mod("wayfarers-rapier", "attackRoll", "flat", 2), mod("wayfarers-rapier", "physicalDamage", "percentage", .10), mod("wayfarers-rapier", "magicDamage", "percentage", .10), mod("wayfarers-rapier", "criticalChance", "flat", .03)], ["bard"]),
+  "wayfarers-recurve": item("wayfarers-recurve", "Wayfarer's Recurve", "weapon", "rare", 11, 1730, [mod("wayfarers-recurve", "attackRoll", "flat", 2), mod("wayfarers-recurve", "magicDamage", "percentage", .15), mod("wayfarers-recurve", "criticalChance", "flat", .03)], ["spellbow"]),
+  "wayfarers-aegis": item("wayfarers-aegis", "Wayfarer's Aegis", "weapon", "rare", 11, 1760, [mod("wayfarers-aegis", "armorClass", "flat", 2), mod("wayfarers-aegis", "maxHP", "percentage", .11), mod("wayfarers-aegis", "magicDefense", "percentage", .09)], ["bulwark"]),
+
   // Level-14 expedition catch-up weapons. These are rare, effect-free field upgrades:
   // strong enough to repair a badly lagging primary slot, but intentionally below the
   // Level-15 epic Black Tide campaign weapons and their signature effects.

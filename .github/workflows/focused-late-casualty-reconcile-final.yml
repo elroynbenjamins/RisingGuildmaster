@@ -4,7 +4,7 @@ on:
     branches:
       - balance/late-casualty-reconcile-final
 concurrency:
-  group: focused-late-casualty-reconcile-final
+  group: focused-late-casualty-sweep-v2
   cancel-in-progress: true
 jobs:
   validate:

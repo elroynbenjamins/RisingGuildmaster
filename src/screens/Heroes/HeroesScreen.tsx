@@ -14,8 +14,6 @@ import { useGuild } from "../../state/GuildContext";
 import { filterAndSortHeroes, type HeroFilter, type HeroSort } from "../../ui/heroList";
 import { heroHasSkillChoice } from "../../ui/actionNotifications";
 import { useTheme } from "../../theme/theme";
-import { GuidedTip } from "../../components/onboarding/GuidedTip";
-import { markGuidedScreenTipSeen, shouldShowGuidedScreenTip } from "../../game/onboarding/screenTutorialService";
 
 const FILTERS: HeroFilter[] = ["All", "Available", "Injured", "Fallen"];
 const SORTS: HeroSort[] = ["Level", "Name", "Class"];
@@ -26,8 +24,7 @@ function averageTopFour(heroes: readonly Hero[]): number {
 }
 
 export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void; recruit(): void }) {
-  const { guild, updateGuild } = useGuild();
-  const showGuide = shouldShowGuidedScreenTip(guild, "heroes");
+  const { guild } = useGuild();
   const { colors: themeColors } = useTheme();
   const [filter, setFilter] = useState<HeroFilter>("All");
   const [sort, setSort] = useState<HeroSort>("Level");
@@ -69,7 +66,6 @@ export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void
       </Pressable>
     </View>
 
-    {showGuide && <GuidedTip step="SCREEN GUIDE · HEROES" title="Tap the hero who needs attention" message="HP, readiness, gear and skill points matter before deployment. Gold attention means there is something worth checking." onDismiss={() => updateGuild((current) => markGuidedScreenTipSeen(current, "heroes"))} />}
 
     {showSummary && <View style={styles.overview}>
       <View style={[styles.overviewItem, { backgroundColor: "transparent", borderColor: themeColors.green }]}><Text style={[styles.overviewValue, { color: themeColors.green }]}>{availableCount}</Text><Text style={[styles.overviewLabel, { color: themeColors.muted }]}>FIELD READY</Text></View>

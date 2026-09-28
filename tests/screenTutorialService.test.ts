@@ -27,7 +27,7 @@ describe("screen-by-screen tutorial guidance", () => {
 
   it("shows each main screen tip once for guided players", () => {
     let guild = guidedGuild();
-    for (const id of ["guild_management", "quests", "world", "heroes", "inventory"] as const) {
+    for (const id of ["guild_management", "quests", "world", "heroes", "inventory", "temple", "crafting"] as const) {
       expect(shouldShowGuidedScreenTip(guild, id)).toBe(true);
       guild = markGuidedScreenTipSeen(guild, id);
       expect(shouldShowGuidedScreenTip(guild, id)).toBe(false);

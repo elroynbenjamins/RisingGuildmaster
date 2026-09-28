@@ -55,7 +55,7 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
       .map((key) => resolveEquipmentDefinition(key)?.id ?? key),
   );
   const levelAppropriate = Object.values(EQUIPMENT).filter((item) =>
-    !RECRUITMENT_FIELD_GEAR_IDS.has(item.id as never)
+    !RECRUITMENT_FIELD_GEAR_IDS.has(item.id)
     && item.levelRequirement >= minLevel
     && item.levelRequirement <= maxLevel
     && (!item.classRestrictions.length || party.some((hero) => item.classRestrictions.includes(hero.classId)))

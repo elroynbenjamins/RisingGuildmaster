@@ -1,0 +1,19 @@
+name: Simulation gear source audit
+on:
+  push:
+    branches:
+      - balance/simulation-gear-source-audit
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/simulationGearSourceDiagnostics.test.ts

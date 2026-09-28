@@ -98,6 +98,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
 
   const recommendedMin = nextQuest.recommendedLevelMin ?? chapter.recommendedLevelMin ?? 1;
   const underLevel = fieldLevel + .01 < recommendedMin;
+  const meaningfulLevelGap = fieldLevel + .50 < recommendedMin;
   const laggingWeaponHeroes = heroes.filter((hero) => {
     const weaponId = hero.equipment.weapon;
     if (!weaponId) return true;
@@ -134,7 +135,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
       || (a.difficulty ?? 0) - (b.difficulty ?? 0));
 
   const reason: "level" | "weapon" | "armor" | "secondary" | "boss" | null =
-    underLevel ? "level" : weaponLag ? "weapon" : armorLag ? "armor" : secondaryGearGap ? "secondary" : nextQuest.questType === "boss" && sideQuests.length ? "boss" : null;
+    meaningfulLevelGap ? "level" : weaponLag ? "weapon" : armorLag ? "armor" : secondaryGearGap ? "secondary" : underLevel ? "level" : nextQuest.questType === "boss" && sideQuests.length ? "boss" : null;
 
   if (reason && sideQuests.length) {
     const quest = sideQuests[0]!;

@@ -11,8 +11,8 @@ import { isQuestAvailableForGuild } from "../quests/questAvailability";
 import { getAvailableCampaignNodes } from "./campaignService";
 
 export type CampaignPreparationRecommendation =
-  | { type: "side_quest"; questId: string; title: string; detail: string; reason: "level" | "weapon" | "armor" | "boss" }
-  | { type: "dungeon"; title: string; detail: string; reason: "level" | "weapon" | "armor"; suggestedRuns: 1 | 2 }
+  | { type: "side_quest"; questId: string; title: string; detail: string; reason: "level" | "weapon" | "armor" | "secondary" | "boss" }
+  | { type: "dungeon"; title: string; detail: string; reason: "level" | "weapon" | "armor" | "secondary"; suggestedRuns: 1 | 2 }
   | null;
 
 function hasWeaponRecipe(questId: string): boolean {
@@ -44,6 +44,21 @@ function hasUsableArmorRecipe(questId: string, heroClassIds: ReadonlySet<string>
     return Boolean(
       equipment
       && equipment.slot === "armor"
+      && (!equipment.classRestrictions.length || equipment.classRestrictions.some((classId) => heroClassIds.has(classId))),
+    );
+  });
+}
+
+const SECONDARY_GEAR_SLOTS = ["helmet", "boots", "accessory1", "accessory2"] as const;
+
+function hasUsableSecondaryRecipe(questId: string, heroClassIds: ReadonlySet<string>): boolean {
+  const quest = QUESTS[questId];
+  return (quest?.recipeUnlockIdsOnVictory ?? []).some((recipeId) => {
+    const equipmentId = CRAFTING_RECIPES[recipeId]?.outputEquipmentId;
+    const equipment = equipmentId ? EQUIPMENT[equipmentId] : undefined;
+    return Boolean(
+      equipment
+      && SECONDARY_GEAR_SLOTS.includes(equipment.slot as (typeof SECONDARY_GEAR_SLOTS)[number])
       && (!equipment.classRestrictions.length || equipment.classRestrictions.some((classId) => heroClassIds.has(classId))),
     );
   });
@@ -83,6 +98,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
 
   const recommendedMin = nextQuest.recommendedLevelMin ?? chapter.recommendedLevelMin ?? 1;
   const underLevel = fieldLevel + .01 < recommendedMin;
+  const meaningfulLevelGap = fieldLevel + .50 < recommendedMin;
   const laggingWeaponHeroes = heroes.filter((hero) => {
     const weaponId = hero.equipment.weapon;
     if (!weaponId) return true;
@@ -97,6 +113,10 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
     return !armor || hero.level - armor.levelRequirement >= 3;
   }).length;
   const armorLag = laggingArmorHeroes >= 2;
+  const secondaryGapHeroes = recommendedMin >= 12
+    ? heroes.filter((hero) => SECONDARY_GEAR_SLOTS.filter((slot) => !hero.equipment[slot]).length >= 3).length
+    : 0;
+  const secondaryGearGap = secondaryGapHeroes >= 1;
 
   const sideQuests = (chapter.sideQuestIds ?? [])
     .map((id) => QUESTS[id])
@@ -107,40 +127,47 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
       ? Number(hasUsableWeaponRecipe(b.id, coreClassIds)) - Number(hasUsableWeaponRecipe(a.id, coreClassIds))
       : armorLag
         ? Number(hasUsableArmorRecipe(b.id, coreClassIds)) - Number(hasUsableArmorRecipe(a.id, coreClassIds))
-        : Number(hasUsableWeaponRecipe(b.id, coreClassIds)) - Number(hasUsableWeaponRecipe(a.id, coreClassIds)))
+        : secondaryGearGap
+          ? Number(hasUsableSecondaryRecipe(b.id, coreClassIds)) - Number(hasUsableSecondaryRecipe(a.id, coreClassIds))
+          : Number(hasUsableWeaponRecipe(b.id, coreClassIds)) - Number(hasUsableWeaponRecipe(a.id, coreClassIds)))
       || Number(hasWeaponRecipe(b.id)) - Number(hasWeaponRecipe(a.id))
       || Math.abs((a.recommendedLevelMin ?? recommendedMin) - fieldLevel) - Math.abs((b.recommendedLevelMin ?? recommendedMin) - fieldLevel)
       || (a.difficulty ?? 0) - (b.difficulty ?? 0));
 
-  const reason: "level" | "weapon" | "armor" | "boss" | null =
-    underLevel ? "level" : weaponLag ? "weapon" : armorLag ? "armor" : nextQuest.questType === "boss" && sideQuests.length ? "boss" : null;
+  const reason: "level" | "weapon" | "armor" | "secondary" | "boss" | null =
+    meaningfulLevelGap ? "level" : weaponLag ? "weapon" : armorLag ? "armor" : secondaryGearGap ? "secondary" : underLevel ? "level" : nextQuest.questType === "boss" && sideQuests.length ? "boss" : null;
 
   if (reason && sideQuests.length) {
     const quest = sideQuests[0]!;
     const weaponRecipe = hasUsableWeaponRecipe(quest.id, coreClassIds);
     const armorRecipe = hasUsableArmorRecipe(quest.id, coreClassIds);
+    const secondaryRecipe = hasUsableSecondaryRecipe(quest.id, coreClassIds);
     const detail = reason === "level"
-      ? `Your top four average Level ${fieldLevel.toFixed(1)}; the next story mission recommends Level ${recommendedMin}. This one-clear side quest gives XP and a guaranteed equipment reward${weaponRecipe ? ", plus a weapon recipe" : armorRecipe ? ", plus an armor recipe" : ""}.`
+      ? `Your top four average Level ${fieldLevel.toFixed(1)}; the next story mission recommends Level ${recommendedMin}. This one-clear side quest gives XP and a guaranteed equipment reward${weaponRecipe ? ", plus a weapon recipe" : armorRecipe ? ", plus an armor recipe" : secondaryRecipe ? ", plus a secondary-slot recipe" : ""}.`
       : reason === "weapon"
         ? `${laggingWeaponHeroes} of your core heroes have weapons at least three levels behind. This one-clear side quest gives a guaranteed equipment reward${weaponRecipe ? " and a permanent weapon recipe" : ""}.`
         : reason === "armor"
           ? `${laggingArmorHeroes} of your core heroes have armor at least three levels behind. This one-clear side quest gives a guaranteed equipment reward${armorRecipe ? " and a permanent armor recipe" : ""}.`
-          : `You are ready for the boss, but this one-clear local story is a good final preparation route for XP and guaranteed gear${weaponRecipe ? ", with a permanent weapon recipe" : armorRecipe ? ", with a permanent armor recipe" : ""}.`;
+          : reason === "secondary"
+            ? `${secondaryGapHeroes} of your core heroes ${secondaryGapHeroes === 1 ? "is" : "are"} missing three or more helmet, boots, or accessory slots. This one-clear side quest gives XP and a guaranteed equipment reward${secondaryRecipe ? ", plus a permanent secondary-slot recipe" : ""}.`
+            : `You are ready for the boss, but this one-clear local story is a good final preparation route for XP and guaranteed gear${weaponRecipe ? ", with a permanent weapon recipe" : armorRecipe ? ", with a permanent armor recipe" : secondaryRecipe ? ", with a permanent secondary-slot recipe" : ""}.`;
     return { type: "side_quest", questId: quest.id, title: quest.name, detail, reason };
   }
 
   const dungeonUnlocked = guild.world.completedCampaignNodeIds.includes("broken_wardstone") && guild.heroes.length >= DUNGEON_UNLOCK_HERO_COUNT;
-  if ((underLevel || weaponLag || armorLag) && dungeonUnlocked) {
-    const runs: 1 | 2 = (weaponLag || armorLag) ? 2 : suggestedDungeonRuns(heroes, recommendedMin);
+  if ((underLevel || weaponLag || armorLag || secondaryGearGap) && dungeonUnlocked) {
+    const runs: 1 | 2 = (weaponLag || armorLag || secondaryGearGap) ? 2 : suggestedDungeonRuns(heroes, recommendedMin);
     const runText = runs === 1
       ? "Start with one Wardstone Expedition."
       : "Plan on two Wardstone Expeditions, then reassess before the next story push.";
-    const dungeonReason: "level" | "weapon" | "armor" = underLevel ? "level" : weaponLag ? "weapon" : "armor";
+    const dungeonReason: "level" | "weapon" | "armor" | "secondary" = meaningfulLevelGap ? "level" : weaponLag ? "weapon" : armorLag ? "armor" : secondaryGearGap ? "secondary" : "level";
     const detail = dungeonReason === "level"
       ? `Your top four average Level ${fieldLevel.toFixed(1)}; the next story mission recommends Level ${recommendedMin}. ${runText} Each clear gives catch-up XP plus an equipment cache.`
       : dungeonReason === "weapon"
         ? `${laggingWeaponHeroes} of your core heroes have weapons at least three levels behind. ${runText} Each clear gives an equipment cache plus extra XP.`
-        : `${laggingArmorHeroes} of your core heroes have armor at least three levels behind. ${runText} Each clear gives an equipment cache plus extra XP.`;
+        : dungeonReason === "armor"
+          ? `${laggingArmorHeroes} of your core heroes have armor at least three levels behind. ${runText} Each clear gives an equipment cache plus extra XP.`
+          : `${secondaryGapHeroes} of your core heroes ${secondaryGapHeroes === 1 ? "is" : "are"} missing three or more secondary gear slots. ${runText} Each clear gives an equipment cache plus extra XP.`;
     return { type: "dungeon", title: runs === 1 ? "Wardstone Expedition" : "2 Wardstone Expeditions", detail, reason: dungeonReason, suggestedRuns: runs };
   }
 

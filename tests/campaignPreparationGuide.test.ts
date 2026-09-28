@@ -344,15 +344,15 @@ describe("campaign preparation guidance", () => {
       reason: "level",
       trainingAlternative: {
         heroId: traineeId,
-        programId: "heroic_regimen",
+        programId: "class_mastery",
         sessions: 1,
-        estimatedDays: 4,
-        estimatedGoldCost: 360,
+        estimatedDays: 3,
+        estimatedGoldCost: 190,
       },
     });
 
     guild = startHeroTraining(guild, traineeId, secondAdvice!.trainingAlternative!.programId);
-    guild = advanceGuildTime(guild, 4).guild;
+    guild = advanceGuildTime(guild, 3).guild;
     const recovered = guild.heroes.find((hero) => hero.id === traineeId)!;
     expect(recovered.level).toBe(17);
     expect(getCampaignPreparationRecommendation(guild)).toBeNull();

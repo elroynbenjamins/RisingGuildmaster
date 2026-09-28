@@ -1,27 +1,24 @@
-name: Late progression-aware balance
+name: Serekh finale pressure
 on:
   push:
     branches:
       - balance/late-severe-softgate-tuning
 concurrency:
-  group: late-progression-aware-balance
+  group: serekh-finale-pressure
   cancel-in-progress: true
 jobs:
   source-guard:
     runs-on: ubuntu-latest
-    steps: &steps
+    steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
+        with: { version: 10 }
       - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
+        with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
-      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts -t "excludes current boss rewards"
-  varkesh:
+      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts -t "post-boss-only"
+  scale-135:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,8 +27,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts -t "Varkesh realistic"
-  nhal:
+      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts -t "1.35"
+  scale-140:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,8 +37,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts -t "Nhal realistic"
-  serekh:
+      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts -t "1.40"
+  scale-145:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,4 +47,4 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts -t "Serekh realistic"
+      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts -t "1.45"

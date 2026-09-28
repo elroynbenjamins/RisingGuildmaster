@@ -62,6 +62,39 @@ describe("playable dungeon run integration", () => {
     expect(fallen.isAvailable).toBe(false);
   });
 
+  it("prioritizes a Level-11 primary weapon for a badly behind Level-12 party", () => {
+    const classes = ["ranger", "mage", "cleric", "bard"] as const;
+    const currentArmor = ["galewing-mantle", "galewing-mantle", "galewing-mantle", "resonant-fieldcoat"] as const;
+    const base = createGuild();
+    const heroes = classes.map((classId, index) => {
+      const hero = generateHero(createSeededRandom(2_000 + index), { classId });
+      return { ...hero, id: `ch7-catchup-hero-${index}`, level: 12, equipment: { ...hero.equipment, armor: currentArmor[index]! } };
+    });
+    let guild: ReturnType<typeof createGuild> = {
+      ...base,
+      heroes,
+      discoveredEnemyIds: Object.keys(ENEMIES),
+      world: { ...base.world, completedCampaignNodeIds: ["broken_wardstone"] },
+      rogueliteRotation: { ...base.rogueliteRotation, offeredDungeonIds: ["wardstone_depths", "thornwood_trials", "temple_of_coils"] },
+    };
+    guild = beginDungeonExpedition(guild, "wardstone_depths", heroes.map((hero) => hero.id));
+    const run = guild.activeDungeonRun!;
+    guild = {
+      ...guild,
+      activeDungeonRun: { ...run, currentNodeId: "depths_boss" },
+      activeRogueliteRun: { ...guild.activeRogueliteRun!, bossRecipeAwarded: true },
+    };
+
+    const result = resolveDungeonCombat(guild, "victory", guild.activeDungeonRun!.heroInstances, sequenceRandom([.99, 0]));
+    const awardedIds = result.guild.activeDungeonRun?.gearIdsAwarded ?? [];
+    const awarded = EQUIPMENT[awardedIds[awardedIds.length - 1]!]!;
+
+    expect(awarded.id.startsWith("trailblazers-")).toBe(true);
+    expect(awarded.slot).toBe("weapon");
+    expect(awarded.levelRequirement).toBe(11);
+    expect(awarded.rarity).toBe("rare");
+  });
+
   it("prioritizes a primary weapon when a Level-15 party is badly behind", () => {
     const classes = ["ranger", "mage", "cleric", "bard"] as const;
     const base = createGuild();

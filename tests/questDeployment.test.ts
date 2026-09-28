@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { QUESTS } from "../src/data/quests/quests";
 import { buildRecommendedQuestParty, getDeploymentRole, getQuestDeploymentSummary } from "../src/game/party/questDeploymentService";
 import { testHero } from "./testHero";
+import { calculateHero } from "../src/game/heroes/heroCalculator";
 
 const quest = QUESTS.guildhaven_cellar_slimes!;
 const potions = { ...emptyPotionInventory(), minor_healing_potion: 1, mana_tonic: 0, stamina_draught: 1 } as const;
@@ -71,6 +72,36 @@ describe("quest deployment presentation", () => {
       tone: "danger",
     }));
     expect(summary.warnings.find((entry) => entry.id === "lagging_gear")?.text).toContain("higher casualty risk");
+  });
+
+  it("warns when a late hero still has class progression choices available", () => {
+    const unfinishedBase = hero("unfinished", "warrior", 13);
+    const unfinished = {
+      ...unfinishedBase,
+      learnedSkillIds: [],
+      subclassId: null,
+      masteryId: null,
+      equipment: {
+        weapon: "wayfarers-longsword",
+        armor: "wayfarer-fieldcoat",
+        helmet: "leather-cap",
+        boots: "trail-boots",
+        accessory1: "copper-luck-ring",
+        accessory2: "wayfarer-clasp",
+      },
+    };
+    const readyHero = { ...unfinished, currentHP: calculateHero(unfinished).stats.maxHP };
+    const summary = getQuestDeploymentSummary(
+      { ...quest, recommendedLevelMin: 13, minimumPartyAverageLevel: undefined },
+      [readyHero],
+      [],
+      potions,
+    );
+    expect(summary.status).toBe("watch");
+    expect(summary.warnings).toContainEqual(expect.objectContaining({
+      id: "unspent_progression",
+      tone: "warning",
+    }));
   });
 
   it("warns when a high-level hero has almost no secondary gear", () => {

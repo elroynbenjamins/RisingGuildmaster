@@ -158,6 +158,14 @@ export const EQUIPMENT_ICON_ART: Readonly<Record<string, ImageSourcePropType>> =
   "worn-sword": require("../../../assets-runtime/images/equipment/complete/worn-sword.webp"),
   "yew-shortbow": require("../../../assets-runtime/images/equipment/complete/yew-shortbow.webp"),
 
+  // Temporary shared silhouettes for the Chapter 5 catch-up bridge; dedicated art can replace these mappings later.
+  "cinderroad-fieldcoat": require("../../../assets-runtime/images/equipment/complete/vigilant-trail-coat.webp"),
+  "cinderroad-crozier": require("../../../assets-runtime/images/equipment/complete/wardstone-scepter.webp"),
+  "cinderstep-quarterstaff": require("../../../assets-runtime/images/equipment/complete/ironwood-quarterstaff.webp"),
+  "emberverse-rapier": require("../../../assets-runtime/images/equipment/complete/silver-tongue-rapier.webp"),
+  "cinderscript-recurve": require("../../../assets-runtime/images/equipment/complete/stormstring-recurve.webp"),
+  "hearthwall-shield": require("../../../assets-runtime/images/equipment/complete/gateward-shield.webp"),
+
   // Temporary shared silhouettes for the Chapter 6-7 balance gear; dedicated art can replace these mappings later.
   "sixth-chorus-crozier": require("../../../assets-runtime/images/equipment/complete/wardstone-scepter.webp"),
   "oathwind-quarterstaff": require("../../../assets-runtime/images/equipment/complete/seven-bells-quarterstaff.webp"),

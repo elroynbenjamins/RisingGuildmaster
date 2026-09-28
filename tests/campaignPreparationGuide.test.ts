@@ -237,6 +237,7 @@ describe("campaign preparation guidance", () => {
         accessory2: null,
       },
     } : hero);
+    guild.recentPartyHeroIds = guild.heroes.slice(0, 4).map((hero) => hero.id);
     guild.world = {
       ...guild.world,
       completedQuestIds: [

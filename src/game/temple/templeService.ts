@@ -97,6 +97,22 @@ export function canUseFreeDailyRevive(guild: GuildState, date = new Date()): boo
   return Boolean(guild.entitlements.adsRemoved) && guild.lastFreeReviveDate !== calendarDateKey(date);
 }
 
+export function getBulkReviveGemCost(guild: GuildState, date = new Date()): number {
+  const fallenCount = guild.heroes.filter((hero) => hero.currentHP <= 0).length;
+  if (!fallenCount) return 0;
+  const freeRevives = canUseFreeDailyRevive(guild, date) ? 1 : 0;
+  return Math.max(0, fallenCount - freeRevives) * TEMPLE_CONFIG.revivalGemCost;
+}
+
+export function reviveAllFallenHeroes(guild: GuildState, date = new Date()): GuildState {
+  requireLocalHealingService(guild);
+  const fallenIds = guild.heroes.filter((hero) => hero.currentHP <= 0).map((hero) => hero.id);
+  if (!fallenIds.length) throw new Error("No fallen heroes to revive");
+  const totalGemCost = getBulkReviveGemCost(guild, date);
+  if (guild.gems < totalGemCost) throw new Error("Not enough gems");
+  return fallenIds.reduce((current, heroId) => reviveHero(current, heroId, date), guild);
+}
+
 export function reviveHero(guild: GuildState, heroId: string, date = new Date()): GuildState {
   requireLocalHealingService(guild);
   const hero = findHero(guild, heroId);

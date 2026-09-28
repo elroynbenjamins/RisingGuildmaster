@@ -1,5 +1,5 @@
 import { SearchField } from "../../components/inputs/SearchField";
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { EmptyState, Panel, SegmentedTabs, SecondaryButton } from "../../components/ui";
 import { HeroRosterCard } from "../../components/heroes/HeroRosterCard";
@@ -14,6 +14,7 @@ import { useGuild } from "../../state/GuildContext";
 import { filterAndSortHeroes, type HeroFilter, type HeroSort } from "../../ui/heroList";
 import { heroHasSkillChoice } from "../../ui/actionNotifications";
 import { useTheme } from "../../theme/theme";
+import { GuidedTutorialContext } from "../../components/tutorial/GuidedTutorialContext";
 
 const FILTERS: HeroFilter[] = ["All", "Available", "Injured", "Fallen"];
 const SORTS: HeroSort[] = ["Level", "Name", "Class"];
@@ -25,6 +26,7 @@ function averageTopFour(heroes: readonly Hero[]): number {
 
 export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void; recruit(): void }) {
   const { guild } = useGuild();
+  const guide = useContext(GuidedTutorialContext);
   const { colors: themeColors } = useTheme();
   const [filter, setFilter] = useState<HeroFilter>("All");
   const [sort, setSort] = useState<HeroSort>("Level");
@@ -86,7 +88,7 @@ export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void
     </Panel>
     <Text style={[styles.cardHeader, { color: attentionCount ? themeColors.gold : themeColors.muted }]}>{attentionCount ? `${attentionCount} hero${attentionCount===1?"":"es"} need attention · ` : ""}{heroes.length} shown · Tap a hero to manage</Text>
 
-    {heroes.map((hero) => {
+    {heroes.map((hero, index) => {
       const skillPoints = getAvailableClassSkillPoints(hero);
       const loyalty = getHeroLoyalty(guild, hero.id).score;
       return <HeroRosterCard
@@ -97,7 +99,8 @@ export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void
         contract={contractByHeroId.get(hero.id)}
         trainingSession={trainingByHeroId.get(hero.id)}
         currentDay={guild.currentDay}
-        onPress={() => openHero(hero)}
+        guideId={index === 0 ? "heroes.firstHero" : undefined}
+        onPress={() => { if (index === 0) guide?.dispatch({ type: "complete", tour: "heroes" }); openHero(hero); }}
       />;
     })}
 

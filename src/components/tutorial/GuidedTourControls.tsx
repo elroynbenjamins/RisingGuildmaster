@@ -13,11 +13,11 @@ export function GuidedTourControls() {
   const completed = GUIDED_TOUR_IDS.filter(id => progress.tours[id]?.status === 'completed').length;
   const skipped = GUIDED_TOUR_IDS.filter(id => progress.tours[id]?.status === 'skipped').length;
   return <View style={[styles.panel, { backgroundColor: colors.panel, borderColor: colors.border }]}>
-    <Text style={[styles.title, { color: colors.text }]}>Interactive tab guides</Text>
-    <Text style={[styles.body, { color: colors.muted }]}>{completed}/5 completed{skipped ? ` · ${skipped} skipped` : ''} · {progress.enabled ? 'Enabled' : 'Paused'}</Text>
-    <Text style={[styles.body, { color: colors.muted }]}>Guides resume on the main tabs after recruitment. Heroes, loot and travel lessons appear when relevant. Replaying changes only these guides, never your guild or rewards.</Text>
+    <Text style={[styles.title, { color: colors.text }]}>Interactive screen guides</Text>
+    <Text style={[styles.body, { color: colors.muted }]}>{completed}/5 core guides completed{skipped ? ` · ${skipped} skipped` : ''} · {progress.enabled ? 'Enabled' : 'Paused'}</Text>
+    <Text style={[styles.body, { color: colors.muted }]}>Core screen guides begin after your first completed quest. Hero, loot and travel lessons appear only when relevant. Pause disables tutorial guidance; replay restarts only these core guides and never changes guild progress or rewards.</Text>
     <View style={styles.actions}>
-      <Pressable accessibilityRole="button" disabled={!guide} onPress={() => guide?.dispatch({ type: progress.enabled ? 'pause' : 'resume' })} style={[styles.button, { borderColor: colors.border }]}><Text style={{ color: colors.text }}>{progress.enabled ? 'Pause guides' : 'Resume guides'}</Text></Pressable>
+      <Pressable accessibilityRole="button" disabled={!guide} onPress={() => guide?.dispatch({ type: progress.enabled ? 'pause' : 'resume' })} style={[styles.button, { borderColor: colors.border }]}><Text style={{ color: colors.text }}>{progress.enabled ? 'Pause all guides' : 'Resume guides'}</Text></Pressable>
       <Pressable accessibilityRole="button" disabled={!guide} onPress={() => guide?.dispatch({ type: 'replay' })} style={[styles.button, { borderColor: colors.gold }]}><Text style={{ color: colors.gold }}>Replay tab guides</Text></Pressable>
     </View>
   </View>;

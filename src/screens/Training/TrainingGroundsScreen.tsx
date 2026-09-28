@@ -11,6 +11,7 @@ import { useGuild } from "../../state/GuildContext";
 import { getRaceNameColor } from "../../ui/raceColors";
 import { GameIcon } from "../../components/icons/GameIcon";
 import { triggerTactileFeedback } from "../../ui/tactileFeedback";
+import { isTutorialGuidanceEnabled } from "../../game/onboarding/tutorialService";
 
 export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: { onBack(): void; openCalendar(): void; openSideQuests?(): void }) {
   const { showDialog } = useGameDialog();
@@ -30,7 +31,7 @@ export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests }: 
   const catchup = useMemo(() => getTrainingCatchupAdvice(guild), [guild]);
   const tutorialSeen = guild.world.worldFlags.training_hall_v2_tutorial_seen === true;
   const [trainingGuideStep, setTrainingGuideStep] = useState<"hero" | "program" | "begin">("hero");
-  const guideTraining = !tutorialSeen && available.length > 0 && sessions.length < capacity;
+  const guideTraining = isTutorialGuidanceEnabled(guild) && !tutorialSeen && available.length > 0 && sessions.length < capacity;
   const trainingPulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     if (!guideTraining) { trainingPulse.setValue(1); return; }

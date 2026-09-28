@@ -66,8 +66,7 @@ export function reduceGuidedTour(progress: GuidedTourProgress, action: GuideActi
 export function isGuideEligible(tour: GuidedTourId, snapshot: GuideSnapshot): boolean {
   if (snapshot.recruitmentActive || snapshot.heroCount < 2) return false;
   switch (tour) {
-    case 'guild': case 'quests': return true;
-    case 'heroes': return snapshot.hasQuestResult;
+    case 'guild': case 'quests': case 'heroes': return snapshot.hasQuestResult;
     case 'inventory': return snapshot.hasStoredGear && snapshot.hasQuestResult;
     case 'world': return snapshot.travelRelevant;
   }
@@ -87,11 +86,11 @@ export function getGuidedStep(tour: GuidedTourId, snapshot: GuideSnapshot, targe
     if (!targets.has('quests.story')) {
       return targets.has('quests.campaign') ? { tour, target: 'quests.campaign', title: 'Choose Campaign', body: 'Open Campaign to find the next story objective. Side quests and bosses become useful as your guild progresses.', acknowledgement: false } : null;
     }
-    return { tour, target: 'quests.story', title: 'Your next story order', body: 'Campaign is the main story path. Open the highlighted story card when you are ready; party risk is checked before deployment.', acknowledgement: true };
+    return { tour, target: 'quests.story', title: 'Your next story order', body: 'Campaign is the main story path. Open the highlighted story card when you are ready; party risk is checked before deployment.', acknowledgement: false };
   }
   if (tour === 'guild') {
     return targets.has('guild.currentOrder')
-      ? { tour, target: 'guild.currentOrder', title: 'Follow Current Order', body: 'When you are unsure what to do next, this is the guild’s recommended next action. It never deploys or spends resources silently.', acknowledgement: true }
+      ? { tour, target: 'guild.currentOrder', title: 'Follow Current Order', body: 'When you are unsure what to do next, this is the guild’s recommended next action. It never deploys or spends resources silently.', acknowledgement: false }
       : null;
   }
   if (tour === 'heroes') {

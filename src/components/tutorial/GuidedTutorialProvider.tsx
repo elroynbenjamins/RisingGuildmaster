@@ -150,7 +150,7 @@ export function GuidedTutorialProvider({ children, blocked, onVisibilityChange }
           {!step.acknowledgement && <Text style={[styles.hint, { color: colors.gold }]}>Tap the highlighted control to continue.</Text>}
         </ScrollView>
         <View style={styles.actions}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Skip this guide for now" onPress={() => dispatch({ type: 'skip', tour: step.tour })} style={styles.action}><Text style={{ color: colors.muted }}>Not now</Text></Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Skip this lesson" onPress={() => dispatch({ type: 'skip', tour: step.tour })} style={styles.action}><Text style={{ color: colors.muted }}>Skip lesson</Text></Pressable>
           {step.acknowledgement ? <Pressable accessibilityRole="button" onPress={() => dispatch({ type: 'complete', tour: step.tour })} style={[styles.action, { backgroundColor: colors.gold, borderRadius: 8 }]}><Text style={{ color: colors.buttonText, fontWeight: '700' }}>Got it</Text></Pressable> : <Pressable accessibilityRole="button" onPress={() => dispatch({ type: 'pause' })} style={styles.action}><Text style={{ color: colors.muted }}>Pause guides</Text></Pressable>}
         </View>
       </View>

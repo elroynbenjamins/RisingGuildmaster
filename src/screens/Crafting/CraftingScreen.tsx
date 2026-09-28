@@ -30,7 +30,6 @@ const TABS: ArtisanType[] = ["blacksmith", "tailor", "jeweler"];
 export function CraftingScreen({ onBack, openCalendar, targetHeroId, initialSlot, materialFilter, openGatheringForMaterial }: { onBack(): void; openCalendar(): void; targetHeroId?: string; initialSlot?: EquipmentSlot; materialFilter?: MaterialId; openGatheringForMaterial?(materialId:MaterialId):void }) {
   const { showDialog } = useGameDialog();
   const { guild, updateGuild } = useGuild();
-  const showGuide = shouldShowGuidedScreenTip(guild, "crafting");
   const targetHero = targetHeroId ? guild.heroes.find((hero) => hero.id === targetHeroId) : undefined;
   const targetRecipe = targetHeroId && initialSlot ? getBestRecipeForHeroSlot(guild, targetHeroId, initialSlot) : undefined;
   const [tab, setTab] = useState<ArtisanType>(targetRecipe?.artisanType ?? "blacksmith");
@@ -42,6 +41,9 @@ export function CraftingScreen({ onBack, openCalendar, targetHeroId, initialSlot
   const [showWorkshopInfo,setShowWorkshopInfo]=useState(false);
   const [showRecipeFilters,setShowRecipeFilters]=useState(false);
   const artisan = ARTISANS[tab]; const state = guild.artisans[tab]; const nextTier = getNextArtisanBuildingTier(guild, tab);
+  const showGuide = shouldShowGuidedScreenTip(guild, "crafting");
+  const guideTitle = state.recruited ? "Craft upgrades, not clutter" : state.construction ? "Construction advances with time" : "Build first, then craft";
+  const guideMessage = state.recruited ? "Recipes are sorted by useful upgrades first. Missing materials link back to expeditions, and upgrade labels show who benefits." : state.construction ? `This workshop completes on Day ${state.construction.completionDay}. Use End Day or the Calendar to advance construction.` : "Choose a workshop to construct first. Once operational, recipes show their gold, material, level, and hero-upgrade requirements.";
   const act = (action: () => typeof guild, message: string) => { try { const beforeGold=guild.gold; const beforeInventory=guild.inventory.length; const next=action(); updateGuild(next); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); const goldSpent=Math.max(0,beforeGold-next.gold); const itemAdded=next.inventory.length>beforeInventory; showDialog({ title: itemAdded ? "Craft Complete" : "Workshop Order Complete", message: `${message}${goldSpent?`\n\nTreasury: ${beforeGold.toLocaleString()} → ${next.gold.toLocaleString()} gold`:""}`, eyebrow:itemAdded?"ITEM CREATED":"WORKSHOP UPDATED", tone: "success" }); } catch (error) { triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning"); showDialog({ title: "Cannot complete", message: error instanceof Error ? error.message : "Workshop action failed", tone: "danger" }); } };
   const artisanRecipes = Object.values(CRAFTING_RECIPES).filter((recipe) => recipe.artisanType === tab);
   const recipes = artisanRecipes.filter((recipe) => !recipe.unlockSource || (guild.unlockedRecipeIds ?? []).includes(recipe.id));
@@ -79,7 +81,7 @@ export function CraftingScreen({ onBack, openCalendar, targetHeroId, initialSlot
     <BackButton onPress={onBack} />
     <View style={styles.header}><View style={styles.flex}><Text style={styles.title}>Artisan District</Text><Text style={styles.day}>Guild Day {guild.currentDay}</Text></View>{anyConstruction && <SecondaryButton iconId="calendar" label="Calendar" onPress={openCalendar} />}</View>
     <Text style={styles.intro}>{anyConstruction?"A workshop project is active. Use the Calendar to advance construction.":"Choose a workshop, then craft upgrades your roster can use now."}</Text>
-    {showGuide && <GuidedTip step="SCREEN GUIDE · WORKSHOPS" title="Build → gather → craft" message="A workshop must be operational first. Recipes show missing materials and whether the result improves a current hero." onDismiss={() => updateGuild((current) => markGuidedScreenTipSeen(current, "crafting"))} />}
+    {showGuide && <GuidedTip step="SCREEN GUIDE · WORKSHOPS" title={guideTitle} message={guideMessage} onDismiss={() => updateGuild((current) => markGuidedScreenTipSeen(current, "crafting"))} />}
     <SegmentedTabs values={TABS} value={tab} onChange={setTab}/>
     <Panel style={[styles.artisan, !state.recruited && styles.lockedWorkshop]}>
       <View style={styles.buildingHead}><GameIcon id={tab === "blacksmith" ? "blacksmith" : tab === "tailor" ? "tailor" : "jeweler"} size={48} /><View style={styles.flex}><Text style={styles.artisanName}>{artisan.name}</Text><Text style={state.recruited ? styles.operational : styles.locked}>{state.recruited ? `LEVEL ${state.level} · ${tierName?.toUpperCase()} · OPERATIONAL` : construction ? "CONSTRUCTION IN PROGRESS" : "WORKSHOP NOT BUILT"}</Text></View></View>

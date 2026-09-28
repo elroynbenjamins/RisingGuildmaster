@@ -48,7 +48,7 @@ import { EnemyPortrait } from "../components/enemies/EnemyPortrait";
 import { triggerTactileFeedback } from "../ui/tactileFeedback";
 import { describeEncounterObjective, getEncounterObjectiveProgress } from "../game/combat/combatObjectiveService";
 import { interactWithBattlefieldObject } from "../game/combat/battlefieldMechanicService";
-import { getCombatTutorialStep, recordCombatTutorialAction } from "../game/onboarding/tutorialService";
+import { getCombatTutorialStep, isTutorialGuidanceEnabled, recordCombatTutorialAction } from "../game/onboarding/tutorialService";
 
 const ENEMY_TURN_DELAY_MS: Record<"normal"|"fast"|"very_fast", number> = { normal: 700, fast: 400, very_fast: 120 };
 
@@ -113,7 +113,7 @@ export function CombatScreen({ questId, heroes, combatSetup, initialHeroInstance
     return () => animation.stop();
   }, [combatTutorialPulse, combatTutorialStep, state.combatStarted, state.status]);
   useEffect(() => { if (state.status === "victory" && combatTutorialStep === "end_turn") updateGuild((currentGuild)=>recordCombatTutorialAction(currentGuild,"ended_turn")); }, [state.status, combatTutorialStep, updateGuild]);
-  const guideFirstReward = questId === "guildhaven_cellar_slimes" && guild.tutorial.completed && guild.tutorial.freeRefreshUsed && state.status === "victory";
+  const guideFirstReward = isTutorialGuidanceEnabled(guild) && questId === "guildhaven_cellar_slimes" && guild.tutorial.completed && guild.tutorial.freeRefreshUsed && state.status === "victory";
   useEffect(() => {
     if (!guideFirstReward) { firstRewardPulse.setValue(1); return; }
     const animation = Animated.loop(Animated.sequence([

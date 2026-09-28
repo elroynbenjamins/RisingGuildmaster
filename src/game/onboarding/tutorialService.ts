@@ -32,7 +32,12 @@ export function recordTutorialRefresh(guild: GuildState): GuildState {
   if (!guild.tutorial.active || guild.tutorial.step !== "refresh_board") return guild;
   return { ...guild, tutorial: { ...guild.tutorial, step: "recruit_second", freeRefreshUsed: true } };
 }
+export function isTutorialGuidanceEnabled(guild: GuildState): boolean {
+  return guild.tutorial.guided ? guild.tutorial.guided.enabled : true;
+}
+
 export function getCombatTutorialStep(guild: GuildState): CombatTutorialStep {
+  if (!isTutorialGuidanceEnabled(guild)) return "complete";
   return guild.tutorial.contextualSeen?.combat_basics === true ? "complete" : (guild.tutorial.combatStep ?? "move");
 }
 export function recordCombatTutorialAction(guild: GuildState, action: CombatTutorialAction): GuildState {

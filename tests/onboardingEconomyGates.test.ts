@@ -6,7 +6,7 @@ import { advanceGuildTime } from "../src/game/economy/guildCalendarService";
 import { createGuild } from "../src/game/guild/guildService";
 import { recoverAdventureStamina, spendPartyAdventureStamina } from "../src/game/heroes/adventureStaminaService";
 import { creditVerifiedGems, exchangeGemsForGold } from "../src/game/monetization/gemService";
-import { beginTutorial, completeTutorial, getCombatTutorialStep, getTutorialResumeDestination, recordCombatTutorialAction, recordTutorialCandidateTab, recordTutorialRecruit, recordTutorialRefresh } from "../src/game/onboarding/tutorialService";
+import { beginTutorial, completeTutorial, getCombatTutorialStep, getTutorialResumeDestination, isTutorialGuidanceEnabled, recordCombatTutorialAction, recordTutorialCandidateTab, recordTutorialRecruit, recordTutorialRefresh, skipTutorial } from "../src/game/onboarding/tutorialService";
 import { isQuestBoardCategoryUnlocked } from "../src/game/quests/questAvailability";
 import { generateHero } from "../src/game/heroes/heroGenerator";
 import { createSeededRandom } from "../src/utils/random";
@@ -40,6 +40,15 @@ describe("new-game onboarding and progression gates", () => {
     guild = recordCombatTutorialAction(guild, "ended_turn");
     expect(getCombatTutorialStep(guild)).toBe("complete");
     expect(guild.tutorial.contextualSeen.combat_basics).toBe(true);
+  });
+
+  it("pauses contextual guidance when the guided tutorial is skipped", () => {
+    const skipped = skipTutorial(createGuild());
+    expect(isTutorialGuidanceEnabled(skipped)).toBe(false);
+    expect(getCombatTutorialStep(skipped)).toBe("complete");
+    const resumed = { ...skipped, tutorial: { ...skipped.tutorial, guided: { ...skipped.tutorial.guided!, enabled: true } } };
+    expect(isTutorialGuidanceEnabled(resumed)).toBe(true);
+    expect(getCombatTutorialStep(resumed)).toBe("move");
   });
 
   it("guides two recruits without comparison through one mandatory free refresh", () => {

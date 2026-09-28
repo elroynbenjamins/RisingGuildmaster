@@ -26,7 +26,7 @@ import { QUESTS } from "../../data/quests/quests";
 import { isQuestAvailableForGuild, isQuestBoardCategoryUnlocked } from "../../game/quests/questAvailability";
 import { triggerTactileFeedback } from "../../ui/tactileFeedback";
 import { useGameToast } from "../../components/feedback/GameToast";
-import { hasSeenContextualTutorial, markContextualTutorialSeen } from "../../game/onboarding/tutorialService";
+import { hasSeenContextualTutorial, isTutorialGuidanceEnabled, markContextualTutorialSeen } from "../../game/onboarding/tutorialService";
 import { GuidedTutorialContext } from "../../components/tutorial/GuidedTutorialContext";
 
 interface WorldMapProps {
@@ -70,7 +70,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
   const nextCampaignNode = getAvailableCampaignNodes(guild.world)[0];
   const campaignRequirement = nextCampaignNode ? getCampaignNodeLocationRequirement(nextCampaignNode.id) : null;
   const campaignAtLocation = isAtCampaignLocation(guild.world, campaignRequirement);
-  const guideCampaignTravel = Boolean(nextCampaignNode && campaignRequirement && !campaignAtLocation && !hasSeenContextualTutorial(guild, "campaign_travel"));
+  const guideCampaignTravel = Boolean(isTutorialGuidanceEnabled(guild) && nextCampaignNode && campaignRequirement && !campaignAtLocation && !hasSeenContextualTutorial(guild, "campaign_travel"));
   const campaignTravelPulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     if (!guideCampaignTravel) { campaignTravelPulse.setValue(1); return; }

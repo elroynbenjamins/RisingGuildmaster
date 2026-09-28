@@ -20,6 +20,7 @@ import { NotificationDot } from "../../components/navigation/NotificationDot";
 import { useActionNotifications } from "../../state/useActionNotifications";
 import { acknowledgeTimeAdvanceGuidance, CALENDAR_BASICS_GUIDANCE_FLAG, getTimeAdvanceGuidance, payrollWarningLine } from "../../game/onboarding/timeAndPayrollGuidanceService";
 import { GuidedTip } from "../../components/onboarding/GuidedTip";
+import { isTutorialGuidanceEnabled } from "../../game/onboarding/tutorialService";
 import { GuidedTutorialContext } from "../../components/tutorial/GuidedTutorialContext";
 import { GuidedScrollView } from "../../components/tutorial/GuidedScrollView";
 
@@ -81,8 +82,11 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
   const warTablePrimerSeen = guild.world.worldFlags.war_table_v2_tutorial_seen === true;
   const guidedOpening = guild.tutorial.completed && guild.tutorial.freeRefreshUsed && guild.world.completedQuestIds.includes("guildhaven_cellar_slimes");
   const calendarPrimerSeen = guild.world.worldFlags[CALENDAR_BASICS_GUIDANCE_FLAG] === true;
-  const guideWarTable = guidedOpening && !warTablePrimerSeen;
-  const guideEndDay = guidedOpening && warTablePrimerSeen && !calendarPrimerSeen;
+  const guidanceEnabled = isTutorialGuidanceEnabled(guild);
+  const questGuideStatus = guild.tutorial.guided?.tours.quests?.status;
+  const questGuideResolved = !guild.tutorial.guided || questGuideStatus === "completed" || questGuideStatus === "skipped";
+  const guideWarTable = guidanceEnabled && guidedOpening && !warTablePrimerSeen;
+  const guideEndDay = guidanceEnabled && guidedOpening && warTablePrimerSeen && questGuideResolved && !calendarPrimerSeen;
   const onboardingPulse = useRef(new Animated.Value(1)).current;
   const acknowledgeWarTablePrimer = () => updateGuild((current) => current.world.worldFlags.war_table_v2_tutorial_seen === true ? current : ({ ...current, world: { ...current.world, worldFlags: { ...current.world.worldFlags, war_table_v2_tutorial_seen: true } } }));
   const acknowledgeEndDayPrimer = () => updateGuild((current) => acknowledgeTimeAdvanceGuidance(current, { showCalendarPrimer: true, showPayrollPrimer: false }));
@@ -148,7 +152,6 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
       </Panel>
     </Pressable>
 
-    {guideWarTable && <GuidedTip step="GUIDED STEP · WAR TABLE" title="Follow Current Order" message="Unsure what to do next? CURRENT ORDER is your next useful action. The button below is highlighted." onDismiss={acknowledgeWarTablePrimer} />}
     <SectionTitle>CURRENT ORDER</SectionTitle>
     <Panel style={[styles.priority, priority.tone === "urgent" && styles.priorityUrgent]}>
       <View style={styles.priorityIcon}><GameIcon id={priority.iconId} size={58} /></View>

@@ -3,6 +3,8 @@ import { createGuild } from "../src/game/guild/guildService";
 import { getCampaignPreparationRecommendation } from "../src/game/campaign/campaignPreparationGuide";
 import { getDungeonCatchupXpTarget } from "../src/game/dungeons/dungeonRunService";
 import { xpRequiredForNextLevel } from "../src/game/progression/xpSystem";
+import { advanceGuildTime } from "../src/game/economy/guildCalendarService";
+import { startHeroTraining } from "../src/game/training/trainingService";
 import { testHero } from "./testHero";
 import type { Hero } from "../src/game/heroes/types";
 
@@ -294,6 +296,66 @@ describe("campaign preparation guidance", () => {
     expect(recommendation?.detail).toContain("2 Heroic Curriculum sessions");
     expect(recommendation?.detail).toContain("8 days");
     expect(recommendation?.detail).toContain("720 gold");
+  });
+
+  it("updates and clears Chapter 9 Training Hall catch-up advice as the replacement recovers", () => {
+    let guild = chapterNineBossGuild(6);
+    guild.trainingGround.level = 3;
+    guild.heroes = guild.heroes.map((hero, index) => index === 0 ? {
+      ...hero,
+      level: 16,
+      xp: 0,
+    } : hero);
+    guild.recentPartyHeroIds = guild.heroes.slice(0, 4).map((hero) => hero.id);
+    guild.world = {
+      ...guild.world,
+      completedQuestIds: [
+        ...guild.world.completedQuestIds,
+        "choir_in_the_diving_bell",
+        "tavern_at_the_bottom_of_the_sea",
+      ],
+    };
+
+    const traineeId = guild.heroes[0]!.id;
+    const firstAdvice = getCampaignPreparationRecommendation(guild);
+    expect(firstAdvice).toMatchObject({
+      type: "dungeon",
+      reason: "level",
+      trainingAlternative: {
+        heroId: traineeId,
+        programId: "heroic_regimen",
+        sessions: 2,
+        estimatedDays: 8,
+        estimatedGoldCost: 720,
+      },
+    });
+
+    guild = startHeroTraining(guild, traineeId, firstAdvice!.trainingAlternative!.programId);
+    expect(getCampaignPreparationRecommendation(guild)?.trainingAlternative).toBeUndefined();
+
+    guild = advanceGuildTime(guild, 4).guild;
+    const traineeAfterOne = guild.heroes.find((hero) => hero.id === traineeId)!;
+    expect(traineeAfterOne.level).toBe(16);
+    expect(traineeAfterOne.xp).toBeGreaterThan(0);
+
+    const secondAdvice = getCampaignPreparationRecommendation(guild);
+    expect(secondAdvice).toMatchObject({
+      type: "dungeon",
+      reason: "level",
+      trainingAlternative: {
+        heroId: traineeId,
+        programId: "class_mastery",
+        sessions: 1,
+        estimatedDays: 3,
+        estimatedGoldCost: 190,
+      },
+    });
+
+    guild = startHeroTraining(guild, traineeId, secondAdvice!.trainingAlternative!.programId);
+    guild = advanceGuildTime(guild, 3).guild;
+    const recovered = guild.heroes.find((hero) => hero.id === traineeId)!;
+    expect(recovered.level).toBe(17);
+    expect(getCampaignPreparationRecommendation(guild)).toBeNull();
   });
 
   it("falls back to two Roguelite runs for a Chapter 9 sparse replacement after local side stories", () => {

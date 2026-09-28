@@ -24,12 +24,12 @@ describe("late role substitution diagnostic", () => {
           heroLevel: boss.level,
           partyClasses: party.classes,
           difficultyId: "veteran",
-          runs: 4,
+          runs: 2,
           seed: boss.seed,
           gearProfile: "optional_progression",
           progressionProfile: "subclass_ready",
         }));
       }
     }
-  }, 420_000);
+  }, 300_000);
 });

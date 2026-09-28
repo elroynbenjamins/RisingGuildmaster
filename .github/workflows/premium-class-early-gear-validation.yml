@@ -20,4 +20,4 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
-      - run: pnpm vitest run tests/equipmentBalanceCoverage.test.ts tests/craftingEquipment.test.ts tests/weaponIcons.test.ts tests/questRosterEquipmentPass.test.ts tests/chapter2Campaign.test.ts tests/chapter3Frostmarch.test.ts
+      - run: pnpm vitest run tests/premiumClassEarlyGearDiagnostics.test.ts

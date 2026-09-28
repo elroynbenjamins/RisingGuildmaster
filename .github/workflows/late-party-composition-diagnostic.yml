@@ -1,0 +1,29 @@
+name: Late party composition diagnostic
+
+on:
+  push:
+    branches:
+      - balance/late-party-composition-coverage
+    paths:
+      - .github/workflows/late-party-composition-diagnostic.yml
+      - tests/latePartyCompositionDiagnostic.test.ts
+      - src/game/simulation/balanceSimulation.ts
+      - src/data/encounters/**
+      - src/data/quests/**
+      - src/data/equipment/**
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/latePartyCompositionDiagnostic.test.ts

@@ -6,7 +6,7 @@ import type { PotionInventory } from "../alchemy/potionTypes";
 import { getQuestAdventureStaminaCost } from "../heroes/adventureStaminaService";
 import { getQuestMissionIntel, type QuestMissionIntel } from "../quests/questMissionIntelService";
 import type { QuestDefinition } from "../quests/questTypes";
-import { getHeroFieldReadinessPenalty } from "./heroFieldReadinessService";
+import { getHeroFieldReadinessPenalty, hasPendingHeroCombatProgression } from "./heroFieldReadinessService";
 
 export type DeploymentRole = "frontline" | "support" | "ranged";
 export type DeploymentStatus = "empty" | "blocked" | "high_risk" | "watch" | "ready";
@@ -138,6 +138,7 @@ export function getQuestDeploymentSummary(
   };
   const intel = getQuestMissionIntel(quest, discoveredEnemyIds);
   const warnings: DeploymentWarning[] = [];
+  const pendingProgressionHeroes = heroes.filter(hasPendingHeroCombatProgression).length;
 
   const sizeBlocked = heroes.length < quest.minPartySize || heroes.length > quest.maxPartySize;
   if (heroes.length && averageLevel < recommendedLevel) warnings.push({ id: "level", tone: "danger", text: `Party average Lv ${averageLevel.toFixed(1)} is below the recommended Lv ${recommendedLevel}.` });
@@ -158,6 +159,11 @@ export function getQuestDeploymentSummary(
     id: "lagging_gear",
     tone: laggingPrimaryHeroes >= 2 ? "danger" : "warning",
     text: `${laggingPrimaryHeroes} selected hero${laggingPrimaryHeroes === 1 ? " has" : "es have"} a weapon or armor piece at least three levels behind. Upgrade primary gear or expect higher casualty risk.`,
+  });
+  if (pendingProgressionHeroes) warnings.push({
+    id: "unspent_progression",
+    tone: "warning",
+    text: `${pendingProgressionHeroes} selected hero${pendingProgressionHeroes === 1 ? " has" : "es have"} class skill or class-path choices still available. Finish their build before a difficult mission.`,
   });
   if (sparseLoadoutHeroes) warnings.push({
     id: "sparse_loadout",
@@ -180,7 +186,9 @@ export function getQuestDeploymentSummary(
 
 function heroScore(hero: Hero): number {
   const maximum = Math.max(1, calculateHero(hero).stats.maxHP);
-  return hero.level * 100 + hero.currentHP / maximum * 25 + hero.adventureStamina / GAME_CONFIG.maxAdventureStamina * 15 - getHeroFieldReadinessPenalty(hero) * 8;
+  const gearPenalty = getHeroFieldReadinessPenalty(hero);
+  const progressionPenalty = gearPenalty === 0 && hasPendingHeroCombatProgression(hero) ? 14 : 0;
+  return hero.level * 100 + hero.currentHP / maximum * 25 + hero.adventureStamina / GAME_CONFIG.maxAdventureStamina * 15 - (gearPenalty + progressionPenalty) * 8;
 }
 
 /**

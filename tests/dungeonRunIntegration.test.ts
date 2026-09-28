@@ -93,7 +93,7 @@ describe("playable dungeon run integration", () => {
     const awardedIds = result.guild.activeDungeonRun?.gearIdsAwarded ?? [];
     const awarded = EQUIPMENT[awardedIds[awardedIds.length - 1]!]!;
 
-    expect(awarded.id.startsWith("trailblazers-")).toBe(true);
+    expect(awarded.id.startsWith("wayfarers-")).toBe(true);
     expect(awarded.slot).toBe("weapon");
     expect(awarded.levelRequirement).toBe(11);
     expect(awarded.rarity).toBe("rare");

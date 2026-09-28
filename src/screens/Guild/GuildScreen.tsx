@@ -153,7 +153,7 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
         <Text style={[styles.priorityKicker, priority.tone === "urgent" && styles.priorityKickerUrgent]}>{priority.tone === "urgent" ? "IMMEDIATE ACTION" : priority.tone === "progress" ? "CAMPAIGN ORDER" : "GUILD OPPORTUNITY"}</Text>
         <Text style={styles.priorityTitle}>{priority.title}</Text>
         <Text style={styles.priorityText}>{priority.description}</Text>
-        <Animated.View style={{ opacity: guideWarTable ? onboardingPulse : 1 }}><ActionButton label={priority.actionLabel} onPress={() => { if (!warTablePrimerSeen) acknowledgeWarTablePrimer(); navigate(priority.destination); }} /></Animated.View>
+        <Animated.View style={{ opacity: guideWarTable ? onboardingPulse : 1 }}><ActionButton guideId="guild.currentOrder" label={priority.actionLabel} onPress={() => { if (!warTablePrimerSeen) acknowledgeWarTablePrimer(); navigate(priority.destination); }} /></Animated.View>
       </View>
     </Panel>
 

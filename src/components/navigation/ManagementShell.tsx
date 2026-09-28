@@ -9,6 +9,7 @@ import { GlobalResourceHeader } from "./GlobalResourceHeader";
 import { GuildActivityStrip } from "./GuildActivityStrip";
 import { useTheme } from "../../theme/theme";
 import { GuidedTutorialContext } from "../tutorial/GuidedTutorialContext";
+import { GuidedTutorialContext } from "../tutorial/GuidedTutorialContext";
 
 export function ManagementShell({ guild, active, onSelect, onOpenGems, onOpenActivity, children }: React.PropsWithChildren<{
   guild: GuildState;
@@ -18,6 +19,8 @@ export function ManagementShell({ guild, active, onSelect, onOpenGems, onOpenAct
   onOpenActivity(destination: GuildActivityDestination): void;
 }>) {
   const { colors } = useTheme();
+  const enterMainTab = useContext(GuidedTutorialContext)?.enterMainTab;
+  useLayoutEffect(() => enterMainTab?.(active), [active, enterMainTab]);
   const guide = useContext(GuidedTutorialContext);
   useEffect(() => guide?.enterMainTab(active), [guide, active]);
   return <View style={[styles.root, { backgroundColor: colors.background }]}>

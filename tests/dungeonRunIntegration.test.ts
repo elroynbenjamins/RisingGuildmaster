@@ -66,18 +66,22 @@ describe("playable dungeon run integration", () => {
     const classes = ["ranger", "mage", "cleric", "bard"] as const;
     const currentArmor = ["galewing-mantle", "galewing-mantle", "galewing-mantle", "resonant-fieldcoat"] as const;
     const base = createGuild();
-    const heroes = classes.map((classId, index) => {
+    const partyHeroes = classes.map((classId, index) => {
       const hero = generateHero(createSeededRandom(2_000 + index), { classId });
       return { ...hero, id: `ch7-catchup-hero-${index}`, level: 12, equipment: { ...hero.equipment, armor: currentArmor[index]! } };
     });
+    const reserves = [
+      { ...generateHero(createSeededRandom(2_090), { classId: "warrior" }), id: "ch7-catchup-reserve-1" },
+      { ...generateHero(createSeededRandom(2_091), { classId: "berserker" }), id: "ch7-catchup-reserve-2" },
+    ];
     let guild: ReturnType<typeof createGuild> = {
       ...base,
-      heroes,
+      heroes: [...partyHeroes, ...reserves],
       discoveredEnemyIds: Object.keys(ENEMIES),
       world: { ...base.world, completedCampaignNodeIds: ["broken_wardstone"] },
       rogueliteRotation: { ...base.rogueliteRotation, offeredDungeonIds: ["wardstone_depths", "thornwood_trials", "temple_of_coils"] },
     };
-    guild = beginDungeonExpedition(guild, "wardstone_depths", heroes.map((hero) => hero.id));
+    guild = beginDungeonExpedition(guild, "wardstone_depths", partyHeroes.map((hero) => hero.id));
     const run = guild.activeDungeonRun!;
     guild = {
       ...guild,
@@ -98,18 +102,22 @@ describe("playable dungeon run integration", () => {
   it("prioritizes a primary weapon when a Level-15 party is badly behind", () => {
     const classes = ["ranger", "mage", "cleric", "bard"] as const;
     const base = createGuild();
-    const heroes = classes.map((classId, index) => {
+    const partyHeroes = classes.map((classId, index) => {
       const hero = generateHero(createSeededRandom(2_100 + index), { classId });
       return { ...hero, id: `catchup-hero-${index}`, level: 15, equipment: { ...hero.equipment, armor: "deadletter-coat" } };
     });
+    const reserves = [
+      { ...generateHero(createSeededRandom(2_190), { classId: "warrior" }), id: "catchup-reserve-1" },
+      { ...generateHero(createSeededRandom(2_191), { classId: "berserker" }), id: "catchup-reserve-2" },
+    ];
     let guild: ReturnType<typeof createGuild> = {
       ...base,
-      heroes,
+      heroes: [...partyHeroes, ...reserves],
       discoveredEnemyIds: Object.keys(ENEMIES),
       world: { ...base.world, completedCampaignNodeIds: ["broken_wardstone"] },
       rogueliteRotation: { ...base.rogueliteRotation, offeredDungeonIds: ["wardstone_depths", "thornwood_trials", "temple_of_coils"] },
     };
-    guild = beginDungeonExpedition(guild, "wardstone_depths", heroes.map((hero) => hero.id));
+    guild = beginDungeonExpedition(guild, "wardstone_depths", partyHeroes.map((hero) => hero.id));
     const run = guild.activeDungeonRun!;
     guild = {
       ...guild,

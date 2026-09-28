@@ -21,11 +21,11 @@ function guidedGuild() {
 describe("screen-by-screen tutorial guidance", () => {
   it("does not show screen tips before guided recruitment is completed", () => {
     const guild = createGuild();
-    expect(shouldShowGuidedScreenTip(guild, "quests")).toBe(false);
-    expect(shouldShowGuidedScreenTip(guild, "heroes")).toBe(false);
+    expect(shouldShowGuidedScreenTip(guild, "guild_management")).toBe(false);
+    expect(shouldShowGuidedScreenTip(guild, "temple")).toBe(false);
   });
 
-  it("shows each main screen tip once for guided players", () => {
+  it("shows each uncovered sub-screen tip once for guided players", () => {
     let guild = guidedGuild();
     for (const id of ["guild_management", "temple", "crafting"] as const) {
       expect(shouldShowGuidedScreenTip(guild, id)).toBe(true);
@@ -38,6 +38,6 @@ describe("screen-by-screen tutorial guidance", () => {
   it("does not opt skipped tutorials into the follow-up screen tour", () => {
     const guild = createGuild();
     guild.tutorial = { ...guild.tutorial, active: false, completed: true, step: "complete", freeRefreshUsed: false };
-    expect(shouldShowGuidedScreenTip(guild, "world")).toBe(false);
+    expect(shouldShowGuidedScreenTip(guild, "crafting")).toBe(false);
   });
 });

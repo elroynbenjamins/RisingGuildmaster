@@ -124,7 +124,7 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
     });
   };
 
-  return <ScrollView style={{ backgroundColor: themeColors.background }} contentContainerStyle={styles.content}>
+  return <GuidedScrollView style={{ backgroundColor: themeColors.background }} contentContainerStyle={styles.content}>
     <LocationArtwork location="guild" />
     <View style={styles.banner}>
 

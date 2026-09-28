@@ -115,7 +115,7 @@ describe("equipment balance coverage", () => {
     }
   });
 
-  it("keeps expedition weapon bridges below the Chapter 7 and 8 epic tiers", () => {
+  it("keeps expedition weapon bridges below the Chapter 7–9 epic tiers", () => {
     for (const [prefix, level] of [["wayfarers-", 11], ["delvers-", 14], ["deepward-", 16]] as const) {
       const catchup = Object.values(EQUIPMENT).filter((item) => item.id.startsWith(prefix) && item.slot === "weapon");
       expect(catchup, prefix).toHaveLength(7);

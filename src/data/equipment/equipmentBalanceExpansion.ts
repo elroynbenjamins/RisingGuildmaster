@@ -87,8 +87,8 @@ export const EQUIPMENT_BALANCE_EXPANSION: Record<string, EquipmentDefinition> = 
   "deepward-recurve": item("deepward-recurve", "Deepward Recurve", "weapon", "rare", 16, 3150, [mod("deepward-recurve", "attackRoll", "flat", 2), mod("deepward-recurve", "magicDamage", "percentage", .19), mod("deepward-recurve", "criticalChance", "flat", .03)], ["spellbow"]),
   "deepward-aegis": item("deepward-aegis", "Deepward Aegis", "weapon", "rare", 16, 3180, [mod("deepward-aegis", "armorClass", "flat", 2), mod("deepward-aegis", "maxHP", "percentage", .14), mod("deepward-aegis", "magicDefense", "percentage", .11)], ["bulwark"]),
 
-  // Generic late field armor for replacement heroes and expedition catch-up.
-  // Effect-free and universal so it cannot replace authored class/story armor.
+  // Generic late field armor issued to replacement recruits.
+  // Effect-free and universal; generic expedition/simulation sources exclude these IDs.
   "wayfarer-fieldcoat": item("wayfarer-fieldcoat", "Wayfarer Fieldcoat", "armor", "rare", 11, 1680, [mod("wayfarer-fieldcoat", "armorClass", "flat", 1), mod("wayfarer-fieldcoat", "maxHP", "percentage", .09), mod("wayfarer-fieldcoat", "physicalDefense", "percentage", .06), mod("wayfarer-fieldcoat", "magicDefense", "percentage", .06)]),
   "delver-fieldcoat": item("delver-fieldcoat", "Delver Fieldcoat", "armor", "rare", 14, 2180, [mod("delver-fieldcoat", "armorClass", "flat", 1), mod("delver-fieldcoat", "maxHP", "percentage", .11), mod("delver-fieldcoat", "physicalDefense", "percentage", .08), mod("delver-fieldcoat", "magicDefense", "percentage", .08)]),
   "deepward-fieldcoat": item("deepward-fieldcoat", "Deepward Fieldcoat", "armor", "rare", 16, 2960, [mod("deepward-fieldcoat", "armorClass", "flat", 1), mod("deepward-fieldcoat", "maxHP", "percentage", .13), mod("deepward-fieldcoat", "physicalDefense", "percentage", .10), mod("deepward-fieldcoat", "magicDefense", "percentage", .10)]),

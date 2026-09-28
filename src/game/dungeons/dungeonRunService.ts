@@ -18,6 +18,7 @@ import { calculateDungeonRunScore } from "./dungeonIntelService";
 import { createRogueliteDungeonRecord } from "./rogueliteRotationTypes";
 import { chooseDungeonBoon, offerDungeonBoonChoices, sumDungeonBoonValue } from "./dungeonBoonService";
 import { GAME_CONFIG } from "../../config/gameConfig";
+import { resolveEquipmentDefinition } from "../equipment/equipmentResolver";
 
 export type DungeonMerchantChoice = "buy_supplies" | "leave";
 export interface DungeonNodeResolution { guild: GuildState; check: AbilityCheckResult | null; text: string; goldDelta: number; recipeId: string | null }
@@ -48,7 +49,10 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
   const minLevel = Math.max(1, averageLevel - 2);
   const maxLevel = Math.max(minLevel, averageLevel - 1);
   const allowRare = random.next() < .15;
-  const owned = new Set([...guild.inventory, ...party.flatMap((hero) => Object.values(hero.equipment).filter((id): id is string => Boolean(id)))]);
+  const owned = new Set(
+    [...guild.inventory, ...party.flatMap((hero) => Object.values(hero.equipment).filter((id): id is string => Boolean(id)))]
+      .map((key) => resolveEquipmentDefinition(key)?.id ?? key),
+  );
   const levelAppropriate = Object.values(EQUIPMENT).filter((item) =>
     item.levelRequirement >= minLevel
     && item.levelRequirement <= maxLevel
@@ -63,7 +67,7 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
     && party.some((hero) => {
       if (item.classRestrictions.length && !item.classRestrictions.includes(hero.classId)) return false;
       const equippedId = hero.equipment[item.slot];
-      const equipped = equippedId ? EQUIPMENT[equippedId] : undefined;
+      const equipped = equippedId ? resolveEquipmentDefinition(equippedId) : undefined;
       const equippedLevel = equipped?.levelRequirement ?? 0;
       return hero.level - equippedLevel >= 3 && item.levelRequirement > equippedLevel;
     })

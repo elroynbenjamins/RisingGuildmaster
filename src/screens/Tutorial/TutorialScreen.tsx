@@ -10,7 +10,7 @@ export function TutorialScreen({ onBegin, onSkip }: { onBegin(): void; onSkip():
     <View style={styles.flow}><StatusChip label="1 · RECRUIT" tone="gold"/><StatusChip label="2 · FIRST QUEST" tone="blue"/><StatusChip label="3 · COMBAT" tone="danger"/><StatusChip label="4 · TRAVEL" tone="good"/></View>
     <Text style={styles.note}>New systems get one short tip when you first reach them. The full rules stay optional in Settings → Guildmaster Handbook.</Text>
     <ActionButton label="BEGIN GUIDED GUILD" onPress={onBegin} />
-    <SecondaryButton label="Skip Guided Recruitment" onPress={onSkip} />
+    <SecondaryButton label="Skip Guided Tutorial" onPress={onSkip} />
   </Panel></View>;
 }
 const styles = StyleSheet.create({ screen: { flex: 1, backgroundColor: colors.background, justifyContent: "center", padding: 22 }, panel: { borderColor: colors.gold, gap: 14 }, step: { color: colors.gold, fontSize: 10, fontWeight: "900", letterSpacing: 1.8 }, title: { color: colors.text, fontSize: 28, fontWeight: "900" }, body: { color: colors.text, lineHeight: 21 }, flow:{flexDirection:"row",flexWrap:"wrap",gap:5}, note: { color: colors.muted, lineHeight: 18, fontStyle: "italic" } });

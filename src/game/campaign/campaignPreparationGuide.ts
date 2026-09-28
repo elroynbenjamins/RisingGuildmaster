@@ -67,7 +67,16 @@ function hasUsableSecondaryRecipe(questId: string, heroClassIds: ReadonlySet<str
 function coreFieldHeroes(guild: GuildState) {
   const active = guild.heroes.filter((hero) => hero.isAvailable && hero.currentHP > 0);
   const pool = active.length >= 4 ? active : guild.heroes;
-  return [...pool].sort((a, b) => b.level - a.level).slice(0, 4);
+  const sorted = [...pool].sort((a, b) => b.level - a.level);
+  const byId = new Map(sorted.map((hero) => [hero.id, hero]));
+  const recent = guild.recentPartyHeroIds.map((id) => byId.get(id)).filter((hero): hero is GuildState["heroes"][number] => Boolean(hero));
+  if (!recent.length) return sorted.slice(0, 4);
+  const chosen = [...recent.slice(0, 4)];
+  for (const hero of sorted) {
+    if (chosen.length >= 4) break;
+    if (!chosen.some((entry) => entry.id === hero.id)) chosen.push(hero);
+  }
+  return chosen;
 }
 
 function xpNeededToReachLevel(hero: GuildState["heroes"][number], targetLevel: number): number {

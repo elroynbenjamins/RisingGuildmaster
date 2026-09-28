@@ -23,6 +23,7 @@ import { advanceGuildTime, totalSalaryArrears } from "../economy/guildCalendarSe
 import { createHeroContract } from "../recruitment/contractService";
 import { calculateWeeklySalary } from "../recruitment/recruitmentCostCalculator";
 import { EQUIPMENT } from "../../data/equipment/equipment";
+import { RECRUITMENT_FIELD_GEAR_IDS } from "../../data/equipment/equipmentBalanceExpansion";
 import { calculateHero } from "../heroes/heroCalculator";
 import { FIRST_SUBCLASS_LEVEL, SUBCLASSES } from "../../data/subclasses/subclasses";
 import { getHeroSkillIds } from "../progression/subclasses/subclassService";
@@ -50,6 +51,7 @@ function equipProgressionGear(hero: Hero, profile: "lagged_basic" | "optional_pr
       : progressionGearTargetLevel(hero.level, slot);
     const candidates = Object.values(EQUIPMENT)
       .filter((item) => item.slot === slot)
+      .filter((item) => !RECRUITMENT_FIELD_GEAR_IDS.has(item.id))
       .filter((item) => item.levelRequirement <= targetLevel)
       .filter((item) => profile === "optional_progression"
         ? item.rarity === "common" || item.rarity === "uncommon" || item.rarity === "rare" || item.rarity === "epic"

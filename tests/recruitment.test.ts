@@ -15,10 +15,42 @@ import { RACE_HOMELANDS } from "../src/data/recruitment/raceHomelands";
 import type { GuildmasterSkillId } from "../src/game/guildmaster/guildmasterTypes";
 import { getRecruitmentLevelProfile, getRecruitmentLevelRange } from "../src/game/recruitment/recruitmentLevelService";
 import { advanceGuildTime } from "../src/game/economy/guildCalendarService";
+import { EQUIPMENT } from "../src/data/equipment/equipment";
+import { calculateHero } from "../src/game/heroes/heroCalculator";
+import type { ClassId } from "../src/game/heroes/types";
 
 describe("recruitment generation", () => {
   it("uses normalized race and class probabilities", () => { expect(Object.values(RECRUITMENT_RACE_WEIGHTS).reduce((a,b)=>a+b,0)).toBeCloseTo(1); expect(Object.values(RECRUITMENT_CLASS_WEIGHTS).reduce((a,b)=>a+b,0)).toBeCloseTo(1); });
   it.each(["prospect","standard","veteran","elite"] as const)("generates level-one %s candidates inside archetype ranges", (archetype) => { const candidate = generateRecruitmentCandidate(createSeededRandom(42), 5, 0, archetype); const balance = RECRUITMENT_ARCHETYPES[archetype]; expect(candidate.archetype).toBe(archetype); expect(candidate.heroPreview.age).toBeGreaterThanOrEqual(balance.ageMin); expect(candidate.heroPreview.age).toBeLessThanOrEqual(balance.ageMax); expect(candidate.heroPreview.level).toBe(1); expect(candidate.heroPreview.xp).toBe(0); expect(candidate.expiresAtDay).toBe(12); });
+  it("equips higher-level recruits with modest field gear instead of Level-1 starters", () => {
+    const classes: ClassId[] = ["warrior","ranger","mage","cleric","paladin","berserker","monk","bard","spellbow","bulwark","summoner"];
+    for (const level of [12, 14, 16]) {
+      for (const [index, classId] of classes.entries()) {
+        const candidate = generateRecruitmentCandidate(
+          createSeededRandom(30_000 + level * 100 + index),
+          5,
+          80,
+          "standard",
+          "human",
+          classId,
+          undefined,
+          undefined,
+          { standard: { min: level, max: level } },
+        );
+        for (const slot of ["weapon", "armor"] as const) {
+          const item = EQUIPMENT[candidate.heroPreview.equipment[slot]!]!;
+          expect(item, `${level} ${classId} ${slot}`).toBeDefined();
+          expect(item.levelRequirement, `${level} ${classId} ${slot} lag`).toBeGreaterThanOrEqual(level - 1);
+          expect(item.levelRequirement).toBeLessThanOrEqual(level);
+          expect(["common","uncommon","rare"]).toContain(item.rarity);
+          expect(item.specialEffectIds).toHaveLength(0);
+          expect(item.classRestrictions.length === 0 || item.classRestrictions.includes(classId)).toBe(true);
+        }
+        expect(candidate.heroPreview.currentHP).toBe(calculateHero(candidate.heroPreview).stats.maxHP);
+      }
+    }
+  });
+
   it("generates three deterministic, diverse candidates", () => { const first = generateRecruitmentPool(createSeededRandom(77), 1); const second = generateRecruitmentPool(createSeededRandom(77), 1); expect(first).toEqual(second); expect(first).toHaveLength(3); expect(new Set(first.map((item)=>item.candidateId)).size).toBe(3); });
   it("raises elite candidate chance with reputation", () => { expect(getArchetypeWeights(60).elite).toBeCloseTo(.08); expect(getArchetypeWeights(999).elite).toBeCloseTo(.10); expect(Object.values(getArchetypeWeights(60)).reduce((a,b)=>a+b,0)).toBeCloseTo(1); });
   it("actually generates higher-level board candidates once the guild has progressed", () => {

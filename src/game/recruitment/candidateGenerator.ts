@@ -9,6 +9,27 @@ export type RecruitmentLevelRanges = Partial<Record<RecruitmentArchetype,{min:nu
 import { TRAITS } from "../../data/traits/traits";
 import { getBackgroundModifier } from "../../data/backgrounds/backgrounds";
 import { generateWeightedTraits } from "../traits/traitGenerationService";
+import { EQUIPMENT } from "../../data/equipment/equipment";
+import { calculateHero } from "../heroes/heroCalculator";
+import type { EquipmentSlot, Hero } from "../heroes/types";
+
+const RECRUITMENT_PRIMARY_SLOTS: readonly EquipmentSlot[] = ["weapon", "armor"];
+function equipRecruitmentFieldGear(hero: Hero): Hero {
+  if (hero.level <= 1) return hero;
+  const equipment = { ...hero.equipment };
+  for (const slot of RECRUITMENT_PRIMARY_SLOTS) {
+    const candidates = Object.values(EQUIPMENT)
+      .filter((item) => item.slot === slot)
+      .filter((item) => item.levelRequirement <= hero.level)
+      .filter((item) => item.rarity !== "epic" && item.rarity !== "legendary")
+      .filter((item) => item.specialEffectIds.length === 0)
+      .filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(hero.classId))
+      .sort((a, b) => b.levelRequirement - a.levelRequirement || b.value - a.value || a.id.localeCompare(b.id));
+    if (candidates[0]) equipment[slot] = candidates[0].id;
+  }
+  const equipped = { ...hero, equipment };
+  return { ...equipped, currentHP: calculateHero(equipped).stats.maxHP };
+}
 
 function weightedPick<T extends string | number>(random: RandomSource, weights: Record<T, number>): T { const entries = Object.entries(weights) as [T, number][]; const total = entries.reduce((sum, [, weight]) => sum + weight, 0); let roll = random.next() * total; for (const [id, weight] of entries) { roll -= weight; if (roll < 0) return id; } return entries[entries.length - 1]![0]; }
 export function getArchetypeWeights(reputation: number): Record<RecruitmentArchetype, number> { const elite = Math.min(.10, .05 + Math.floor(Math.max(0, reputation) / 20) * .01); const remainingScale = (1 - elite) / .95; return { prospect: .35 * remainingScale, standard: .40 * remainingScale, veteran: .20 * remainingScale, elite }; }
@@ -26,7 +47,7 @@ export function generateRecruitmentCandidate(random: RandomSource, currentDay: n
   const classWeights = Object.fromEntries(Object.entries(RECRUITMENT_CLASS_WEIGHTS).filter(([id]) => !allowedClassIds || allowedClassIds.includes(id as ClassId))) as Record<ClassId, number>;
   const archetype = forcedArchetype ?? weightedPick(random, getArchetypeWeights(reputation)); const balance = RECRUITMENT_ARCHETYPES[archetype]; const raceId = forcedRaceId ?? weightedPick(random, raceWeights) as RaceId; const classId = forcedClassId ?? weightedPick(random, classWeights) as ClassId;
   const traitCount = random.int(balance.traitCountMin, balance.traitCountMax); const levelRange=levelRanges?.[archetype]??{min:1,max:1}; const level=random.int(Math.max(1,levelRange.min),Math.max(levelRange.min,levelRange.max));
-  let hero = generateHero(random, { raceId, classId, age: random.int(balance.ageMin, balance.ageMax), level, traitCount: 0 }); hero = { ...hero, traitIds: generateWeightedTraits(random, traitCount) };
+  let hero = generateHero(random, { raceId, classId, age: random.int(balance.ageMin, balance.ageMax), level, traitCount: 0 }); hero = equipRecruitmentFieldGear({ ...hero, traitIds: generateWeightedTraits(random, traitCount) });
   const attributeTotal = Object.values(hero.baseAttributes).reduce((sum, value) => sum + value, 0); const recruitmentFee = calculateRecruitmentFee(hero.level, attributeTotal, balance.recruitmentFeeModifier, 0, getBackgroundModifier(hero.backgroundId, "recruitmentFee")); const weeklySalary = calculateWeeklySalary(hero, balance.salaryModifier); const contractLengthWeeks = Number(weightedPick(random, CONTRACT_LENGTH_WEIGHTS)) as ContractLengthWeeks; const candidateId = `candidate-${hero.id}`;
   const financialRadius = balance.estimateRadius / 100 + .05; const feeEstimate = financialEstimate(recruitmentFee, financialRadius); const salaryEstimate = financialEstimate(weeklySalary, financialRadius);
   hero = { ...hero, recruitmentCost: recruitmentFee, salary: weeklySalary };

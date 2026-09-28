@@ -34,6 +34,26 @@ describe("quest deployment presentation", () => {
     expect(summary.warnings.some((entry) => entry.id === "level")).toBe(true);
   });
 
+  it("marks a deployment high risk when multiple heroes have badly lagging primary gear", () => {
+    const party = [
+      hero("lag-a", "warrior", 15),
+      hero("lag-b", "warrior", 15),
+      hero("lag-c", "warrior", 15),
+      hero("lag-d", "warrior", 15),
+    ].map((entry) => ({
+      ...entry,
+      equipment: { ...entry.equipment, weapon: "worn-sword", armor: "padded-armor" },
+    }));
+    const summary = getQuestDeploymentSummary({ ...quest, recommendedLevelMin: 15 }, party, [], potions);
+    expect(summary.equipment.laggingPrimaryHeroes).toBe(4);
+    expect(summary.status).toBe("high_risk");
+    expect(summary.warnings).toContainEqual(expect.objectContaining({
+      id: "lagging_gear",
+      tone: "danger",
+    }));
+    expect(summary.warnings.find((entry) => entry.id === "lagging_gear")?.text).toContain("higher casualty risk");
+  });
+
   it("builds a balanced ordinary quest party before filling spare slots", () => {
     const roster = [
       hero("fighter", "warrior", 3),

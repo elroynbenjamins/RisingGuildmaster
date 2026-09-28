@@ -50,6 +50,8 @@ describe("training presentation", () => {
     const advice = getTrainingCatchupAdvice(guild);
     expect(advice).not.toBeNull();
     expect(advice!.averageLevel).toBeLessThan(advice!.targetLevel);
+    expect(advice!.message).toMatch(/Roguelite Expeditions/i);
+    expect(advice!.message).toMatch(/Training Hall/i);
     expect(advice!.message).toMatch(/Side Quests/i);
   });
 });

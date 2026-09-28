@@ -11,6 +11,7 @@ import { sequenceRandom } from "./combatTestUtils";
 import { testHero } from "./testHero";
 import { EQUIPMENT } from "../src/data/equipment/equipment";
 import { parseEquipmentKey } from "../src/game/equipment/equipmentResolver";
+import { QUEST_LOOT_TABLES } from "../src/data/loot/questLootTables";
 const instance = (values: Partial<HeroCombatInstance> = {}): HeroCombatInstance => ({ heroId: "hero-test", currentHP: 100, maxHP: 100, currentMana: 10, maxMana: 100, currentStamina: 10, maxStamina: 100, activeConditions: [], activeCooldowns: {}, isAlive: true, position: { x: 1, y: 2 }, movementRange: 3, ...values });
 
 describe("quest loop", () => {
@@ -33,5 +34,48 @@ describe("quest loop", () => {
     expect(fallback.length).toBeGreaterThan(0);
     expect(fallback.every((id) => EQUIPMENT[id] && EQUIPMENT[id]!.levelRequirement >= 2 && EQUIPMENT[id]!.levelRequirement <= 4)).toBe(true);
   });
+  it("prioritizes Chapter 5 bridge weapons when premium-class weapons are badly lagging", () => {
+    const cases = [
+      { classId: "monk" as const, starter: "novice-quarterstaff", expected: "cinderstep-quarterstaff" },
+      { classId: "bard" as const, starter: "practice-rapier", expected: "emberverse-rapier" },
+      { classId: "spellbow" as const, starter: "runewood-shortbow", expected: "cinderscript-recurve" },
+      { classId: "bulwark" as const, starter: "watch-shield", expected: "hearthwall-shield" },
+      { classId: "summoner" as const, starter: "binding-rod", expected: "cinderroad-crozier" },
+    ];
+    for (const entry of cases) {
+      const hero = {
+        ...testHero(),
+        id: `bridge-${entry.classId}`,
+        classId: entry.classId,
+        level: 8,
+        equipment: { ...testHero().equipment, weapon: entry.starter, armor: "cinderroad-fieldcoat" },
+      };
+      const candidates = getLevelAppropriateQuestLootIds(QUEST_LOOT_TABLES.ashlands_campaign_loot!.itemIds, [hero]);
+      expect(candidates, `${entry.classId} weapon candidates`).toContain(entry.expected);
+    }
+  });
+
+  it("prioritizes the Chapter 5 fieldcoat when primary armor is badly lagging", () => {
+    const cases = [
+      { classId: "ranger" as const, weapon: "memoryglass-blade", armor: "hunter-leathers" },
+      { classId: "monk" as const, weapon: "cinderstep-quarterstaff", armor: "disciple-wraps" },
+      { classId: "bard" as const, weapon: "emberverse-rapier", armor: "minstrel-coat" },
+      { classId: "spellbow" as const, weapon: "cinderscript-recurve", armor: "spellthread-coat" },
+      { classId: "bulwark" as const, weapon: "hearthwall-shield", armor: "recruit-bulwark-mail" },
+      { classId: "summoner" as const, weapon: "cinderroad-crozier", armor: "conjurers-robe" },
+    ];
+    for (const entry of cases) {
+      const hero = {
+        ...testHero(),
+        id: `bridge-armor-${entry.classId}`,
+        classId: entry.classId,
+        level: 8,
+        equipment: { ...testHero().equipment, weapon: entry.weapon, armor: entry.armor },
+      };
+      const candidates = getLevelAppropriateQuestLootIds(QUEST_LOOT_TABLES.ashlands_campaign_loot!.itemIds, [hero]);
+      expect(candidates, `${entry.classId} armor candidates`).toContain("cinderroad-fieldcoat");
+    }
+  });
+
   it("applies one repairable fall penalty without stacking normal combat wear", () => { const hero = { ...testHero(), equipment: { ...testHero().equipment, weapon: "worn-sword" } }; const guild = { ...createGuild(), heroes: [hero] }; const party = { id: "p", heroIds: [hero.id, "support"] }; const result = resolveQuestDefeat(startQuest(QUESTS.goblin_patrol!, party), party, guild, [instance({ currentHP: 0, isAlive: false })], sequenceRandom([0, 0, 0, 0, 0, 0])); const weapon=result.guild.heroes[0]?.equipment.weapon; expect(weapon).toBeTruthy(); expect(parseEquipmentKey(weapon!).durability).toBe(90); });
 });

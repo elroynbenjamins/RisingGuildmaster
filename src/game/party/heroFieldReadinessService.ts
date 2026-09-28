@@ -1,5 +1,6 @@
 import type { Hero } from "../heroes/types";
 import { resolveEquipmentDefinition } from "../equipment/equipmentResolver";
+import { getAvailableClassSkillPoints } from "../progression/skills/skillProgressionService";
 
 const PRIMARY_SLOTS = ["weapon", "armor"] as const;
 const SECONDARY_SLOTS = ["helmet", "boots", "accessory1", "accessory2"] as const;
@@ -21,4 +22,12 @@ export function getHeroFieldReadinessPenalty(hero: Hero): number {
     if (secondaryEquipped <= 1) penalty += 14;
   }
   return penalty;
+}
+
+
+export function hasPendingHeroCombatProgression(hero: Hero): boolean {
+  if (hero.level < 5) return false;
+  return getAvailableClassSkillPoints(hero) > 0
+    || !hero.subclassId
+    || (hero.level >= 10 && !hero.masteryId);
 }

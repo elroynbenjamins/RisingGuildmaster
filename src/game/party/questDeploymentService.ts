@@ -6,6 +6,7 @@ import type { PotionInventory } from "../alchemy/potionTypes";
 import { getQuestAdventureStaminaCost } from "../heroes/adventureStaminaService";
 import { getQuestMissionIntel, type QuestMissionIntel } from "../quests/questMissionIntelService";
 import type { QuestDefinition } from "../quests/questTypes";
+import { getHeroFieldReadinessPenalty } from "./heroFieldReadinessService";
 
 export type DeploymentRole = "frontline" | "support" | "ranged";
 export type DeploymentStatus = "empty" | "blocked" | "high_risk" | "watch" | "ready";
@@ -179,7 +180,7 @@ export function getQuestDeploymentSummary(
 
 function heroScore(hero: Hero): number {
   const maximum = Math.max(1, calculateHero(hero).stats.maxHP);
-  return hero.level * 100 + hero.currentHP / maximum * 25 + hero.adventureStamina / GAME_CONFIG.maxAdventureStamina * 15;
+  return hero.level * 100 + hero.currentHP / maximum * 25 + hero.adventureStamina / GAME_CONFIG.maxAdventureStamina * 15 - getHeroFieldReadinessPenalty(hero) * 8;
 }
 
 /**

@@ -19,7 +19,6 @@ import { STARTER_JOURNEY } from "../game/onboarding/starterJourneyService";
 import { getCampaignPreparationRecommendation } from "../game/campaign/campaignPreparationGuide";
 import { GuidedScrollView } from "../components/tutorial/GuidedScrollView";
 import { GuidedTutorialContext } from "../components/tutorial/GuidedTutorialContext";
-import { useGuideTarget } from "../components/tutorial/GuidedTutorialContext";
 
 export const QUEST_SCREEN_TABS: QuestTab[] = ["Campaign", "Side Quests", "Bosses"];
 const TABS = QUEST_SCREEN_TABS;

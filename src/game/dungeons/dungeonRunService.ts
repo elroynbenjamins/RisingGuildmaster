@@ -6,6 +6,7 @@ import type { HeroCombatInstance, QuestCombatSetup } from "../combat/combatTypes
 import type { CombatState } from "../combat/combatEngine";
 import { createHeroCombatInstance } from "../combat/heroCombatFactory";
 import type { GuildState } from "../guild/types";
+import type { Hero } from "../heroes/types";
 import { grantHeroXp } from "../progression/levelSystem";
 import { xpRequiredForNextLevel } from "../progression/xpSystem";
 import { finishRogueliteRun, resolveRogueliteRecipeDrop, startRogueliteRun } from "../roguelite/recipeRewardService";
@@ -41,14 +42,12 @@ function getDungeonCombatXp(guild: GuildState, run: NonNullable<GuildState["acti
   const fullRunTarget = getDungeonCatchupXpTarget(referenceLevel);
   return Math.max(1, Math.round(fullRunTarget * dungeonNodeXpShare(nodeId, nodeType)));
 }
-function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>, random: RandomSource): GuildState {
-  const party = guild.heroes.filter((hero) => run.partyHeroIds.includes(hero.id));
-  if (!party.length) return guild;
+export function getExpeditionCacheTopItemIds(party: readonly Hero[], ownedInventoryIds: readonly string[] = [], allowRare = false): string[] {
+  if (!party.length) return [];
   const averageLevel = Math.max(1, Math.floor(party.reduce((sum, hero) => sum + hero.level, 0) / party.length));
   const minLevel = Math.max(1, averageLevel - 2);
   const maxLevel = Math.max(minLevel, averageLevel - 1);
-  const allowRare = random.next() < .15;
-  const owned = new Set([...guild.inventory, ...party.flatMap((hero) => Object.values(hero.equipment).filter((id): id is string => Boolean(id)))]);
+  const owned = new Set([...ownedInventoryIds, ...party.flatMap((hero) => Object.values(hero.equipment).filter((id): id is string => Boolean(id)))]);
   const levelAppropriate = Object.values(EQUIPMENT).filter((item) =>
     item.levelRequirement >= minLevel
     && item.levelRequirement <= maxLevel
@@ -58,7 +57,32 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
   const eligible = preferred.length ? preferred : levelAppropriate.filter((item) => item.rarity === "rare");
   const newItems = eligible.filter((item) => !owned.has(item.id));
   const candidates = newItems.length ? newItems : eligible;
-  if (!candidates.length) return guild;
+  if (!candidates.length) return [];
+
+  const primaryUrgency = (item: (typeof candidates)[number]): number => {
+    if (item.slot !== "weapon" && item.slot !== "armor") return 0;
+    let urgency = 0;
+    for (const hero of party) {
+      if (item.classRestrictions.length && !item.classRestrictions.includes(hero.classId)) continue;
+      const equippedId = hero.equipment[item.slot];
+      const equipped = equippedId ? EQUIPMENT[equippedId] : undefined;
+      if (!equipped) {
+        urgency = Math.max(urgency, item.slot === "weapon" ? 10 : 8);
+        continue;
+      }
+      if (item.levelRequirement <= equipped.levelRequirement) continue;
+      const lag = Math.max(0, hero.level - equipped.levelRequirement);
+      if (lag < 3) continue;
+      urgency = Math.max(urgency, lag + (item.slot === "weapon" ? 4 : 2));
+    }
+    return urgency;
+  };
+
+  const maxPrimaryUrgency = Math.max(0, ...candidates.map(primaryUrgency));
+  const priorityPool = maxPrimaryUrgency > 0
+    ? candidates.filter((item) => primaryUrgency(item) === maxPrimaryUrgency)
+    : candidates;
+
   const score = (item: (typeof candidates)[number]) => {
     let value = item.rarity === "rare" ? 3 : item.rarity === "uncommon" ? 2 : 1;
     for (const hero of party) {
@@ -71,10 +95,17 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
     }
     return value;
   };
-  const ranked = [...candidates].sort((a,b) => score(b) - score(a) || b.levelRequirement - a.levelRequirement || a.id.localeCompare(b.id));
+  const ranked = [...priorityPool].sort((a,b) => score(b) - score(a) || b.levelRequirement - a.levelRequirement || a.id.localeCompare(b.id));
   const bestScore = score(ranked[0]!);
-  const top = ranked.filter((item) => score(item) >= bestScore - 1).slice(0, 4);
-  const awarded = random.pick(top);
+  return ranked.filter((item) => score(item) >= bestScore - 1).slice(0, 4).map((item) => item.id);
+}
+
+function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>, random: RandomSource): GuildState {
+  const party = guild.heroes.filter((hero) => run.partyHeroIds.includes(hero.id));
+  if (!party.length) return guild;
+  const topIds = getExpeditionCacheTopItemIds(party, guild.inventory, random.next() < .15);
+  if (!topIds.length) return guild;
+  const awarded = EQUIPMENT[random.pick(topIds)]!;
   return { ...guild, inventory: [...guild.inventory, awarded.id], activeDungeonRun: { ...run, gearIdsAwarded: [...(run.gearIdsAwarded ?? []), awarded.id], lastResolutionText: `${run.lastResolutionText ?? "Expedition cleared."} Expedition Cache: ${awarded.name}.` } };
 }
 function recoverInstances(instances: readonly HeroCombatInstance[], hpRatio: number, manaRatio: number, staminaRatio: number): HeroCombatInstance[] {

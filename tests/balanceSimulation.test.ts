@@ -4,6 +4,23 @@ import { EQUIPMENT } from "../src/data/equipment/equipment";
 import { calculateHero } from "../src/game/heroes/heroCalculator";
 
 describe("repeatable balance simulations", () => {
+  it("autoplays reach-zone encounters without stalling", () => {
+    const result = simulateCombatScenario({
+      id: "reach-zone-feathers-regression",
+      questId: "feathers_over_the_abyss",
+      heroLevel: 12,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 4,
+      seed: 14_900,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+      encounterLimit: 1,
+    });
+    expect(result.stalled).toBe(0);
+    expect(result.wins + result.losses).toBe(4);
+  }, 120_000);
+
   it("builds requested classes at full leveled HP with deliberately lagged basic gear", () => {
     const party = createSimulationParty(["warrior", "ranger", "mage", "cleric"], 6, 4400, "lagged_basic");
     expect(party.map((hero) => hero.classId)).toEqual(["warrior", "ranger", "mage", "cleric"]);

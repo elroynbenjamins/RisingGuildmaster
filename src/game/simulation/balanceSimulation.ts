@@ -23,6 +23,9 @@ import { advanceGuildTime, totalSalaryArrears } from "../economy/guildCalendarSe
 import { createHeroContract } from "../recruitment/contractService";
 import { calculateWeeklySalary } from "../recruitment/recruitmentCostCalculator";
 import { EQUIPMENT } from "../../data/equipment/equipment";
+import { CRAFTING_RECIPES } from "../../data/crafting/recipes";
+import { QUEST_LOOT_TABLES } from "../../data/loot/questLootTables";
+import { CAMPAIGN_NODES } from "../../data/campaign/chapter1";
 import { calculateHero } from "../heroes/heroCalculator";
 import { FIRST_SUBCLASS_LEVEL, SUBCLASSES } from "../../data/subclasses/subclasses";
 import { getHeroSkillIds } from "../progression/subclasses/subclassService";
@@ -37,12 +40,81 @@ export interface EconomySimulationResult { scenarioId: string; startingGold: num
 
 const SIMULATION_GEAR_SLOTS: readonly EquipmentSlot[] = ["weapon", "armor", "helmet", "boots", "accessory1", "accessory2"];
 
+const QUEST_NODE_BY_QUEST_ID = new Map(
+  Object.values(CAMPAIGN_NODES)
+    .filter((node) => Boolean(node.questId))
+    .map((node) => [node.questId!, node] as const),
+);
+
+const QUEST_GATED_RECIPE_IDS = new Set(
+  Object.values(QUESTS).flatMap((quest) => quest.recipeUnlockIdsOnVictory ?? []),
+);
+
+const UNGATED_RECIPE_EQUIPMENT_IDS = new Set(
+  Object.values(CRAFTING_RECIPES)
+    .filter((recipe) => !QUEST_GATED_RECIPE_IDS.has(recipe.id))
+    .map((recipe) => recipe.outputEquipmentId)
+    .filter((id): id is string => Boolean(id)),
+);
+
+const EQUIPMENT_SOURCE_QUEST_IDS = (() => {
+  const sources = new Map<string, Set<string>>();
+  const add = (equipmentId: string, questId: string) => {
+    const ids = sources.get(equipmentId) ?? new Set<string>();
+    ids.add(questId);
+    sources.set(equipmentId, ids);
+  };
+  for (const quest of Object.values(QUESTS)) {
+    for (const recipeId of quest.recipeUnlockIdsOnVictory ?? []) {
+      const equipmentId = CRAFTING_RECIPES[recipeId]?.outputEquipmentId;
+      if (equipmentId) add(equipmentId, quest.id);
+    }
+    for (const equipmentId of QUEST_LOOT_TABLES[quest.lootTableId]?.itemIds ?? []) add(equipmentId, quest.id);
+  }
+  return sources;
+})();
+
+function completedCampaignNodesBeforeQuest(questId: string): Set<string> {
+  const completed = new Set<string>();
+  const visit = (nodeId: string) => {
+    if (completed.has(nodeId)) return;
+    completed.add(nodeId);
+    for (const prerequisite of CAMPAIGN_NODES[nodeId]?.prerequisiteNodeIds ?? []) visit(prerequisite);
+  };
+  const currentNode = QUEST_NODE_BY_QUEST_ID.get(questId);
+  const roots = currentNode?.prerequisiteNodeIds ?? QUESTS[questId]?.prerequisiteCampaignNodeIds ?? [];
+  for (const nodeId of roots) visit(nodeId);
+  return completed;
+}
+
+function isSourceQuestAvailableBefore(sourceQuestId: string, currentQuestId: string, completedNodes: ReadonlySet<string>): boolean {
+  if (sourceQuestId === currentQuestId) return false;
+  const sourceNode = QUEST_NODE_BY_QUEST_ID.get(sourceQuestId);
+  if (sourceNode) return completedNodes.has(sourceNode.id);
+  const sourceQuest = QUESTS[sourceQuestId];
+  const currentQuest = QUESTS[currentQuestId];
+  if (!sourceQuest || !currentQuest) return true;
+  const sourceChapter = sourceQuest.campaignChapter ?? 0;
+  const currentChapter = currentQuest.campaignChapter ?? Number.POSITIVE_INFINITY;
+  if (sourceChapter > currentChapter) return false;
+  if (sourceChapter < currentChapter) return true;
+  return (sourceQuest.prerequisiteCampaignNodeIds ?? []).every((nodeId) => completedNodes.has(nodeId));
+}
+
+function equipmentAvailableBeforeQuest(equipmentId: string, questId?: string): boolean {
+  if (!questId || UNGATED_RECIPE_EQUIPMENT_IDS.has(equipmentId)) return true;
+  const sourceQuestIds = EQUIPMENT_SOURCE_QUEST_IDS.get(equipmentId);
+  if (!sourceQuestIds?.size) return true;
+  const completedNodes = completedCampaignNodesBeforeQuest(questId);
+  return [...sourceQuestIds].some((sourceQuestId) => isSourceQuestAvailableBefore(sourceQuestId, questId, completedNodes));
+}
+
 function progressionGearTargetLevel(heroLevel: number, slot: EquipmentSlot): number {
   const lag = slot === "weapon" || slot === "armor" ? 2 : 3;
   return Math.max(1, heroLevel - lag);
 }
 
-function equipProgressionGear(hero: Hero, profile: "lagged_basic" | "optional_progression"): Hero {
+function equipProgressionGear(hero: Hero, profile: "lagged_basic" | "optional_progression", questId?: string): Hero {
   const equipment = { ...hero.equipment };
   for (const slot of SIMULATION_GEAR_SLOTS) {
     const targetLevel = profile === "optional_progression"
@@ -51,6 +123,7 @@ function equipProgressionGear(hero: Hero, profile: "lagged_basic" | "optional_pr
     const candidates = Object.values(EQUIPMENT)
       .filter((item) => item.slot === slot)
       .filter((item) => item.levelRequirement <= targetLevel)
+      .filter((item) => equipmentAvailableBeforeQuest(item.id, questId))
       .filter((item) => profile === "optional_progression"
         ? item.rarity === "common" || item.rarity === "uncommon" || item.rarity === "rare" || item.rarity === "epic"
         : item.rarity === "common" || item.rarity === "uncommon")
@@ -62,7 +135,7 @@ function equipProgressionGear(hero: Hero, profile: "lagged_basic" | "optional_pr
   return { ...equipped, currentHP: calculateHero(equipped).stats.maxHP };
 }
 
-function levelHero(hero: Hero, level: number, index: number, gearProfile: SimulationGearProfile, progressionProfile: SimulationProgressionProfile): Hero {
+function levelHero(hero: Hero, level: number, index: number, gearProfile: SimulationGearProfile, progressionProfile: SimulationProgressionProfile, questId?: string): Hero {
   let xp = 0;
   for (let current = 1; current < level; current++) xp += xpRequiredForNextLevel(current);
   const leveled = grantHeroXp(hero, xp, level);
@@ -73,17 +146,18 @@ function levelHero(hero: Hero, level: number, index: number, gearProfile: Simula
     ? Object.values(SUBCLASSES).find((definition) => definition.baseClassId === skilled.classId)
     : undefined;
   const progressed = subclass ? { ...skilled, subclassId: subclass.id } : skilled;
-  const prepared = gearProfile === "lagged_basic" || gearProfile === "optional_progression" ? equipProgressionGear(progressed, gearProfile) : progressed;
+  const prepared = gearProfile === "lagged_basic" || gearProfile === "optional_progression" ? equipProgressionGear(progressed, gearProfile, questId) : progressed;
   return { ...prepared, currentHP: calculateHero(prepared).stats.maxHP };
 }
 
-export function createSimulationParty(classes: readonly ClassId[], level: number, seed: number, gearProfile: SimulationGearProfile = "starter", progressionProfile: SimulationProgressionProfile = "base"): Hero[] {
+export function createSimulationParty(classes: readonly ClassId[], level: number, seed: number, gearProfile: SimulationGearProfile = "starter", progressionProfile: SimulationProgressionProfile = "base", questId?: string): Hero[] {
   return classes.map((classId, index) => levelHero(
     { ...generateHero(createSeededRandom(seed + index * 97), { classId }), id: `sim-${seed}-${index}` },
     level,
     index,
     gearProfile,
     progressionProfile,
+    questId,
   ));
 }
 
@@ -133,7 +207,7 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
   let wins = 0, losses = 0, stalled = 0, rounds = 0, survivors = 0, fallenOnWins = 0, winsWithAnyFall = 0, winsWithTwoPlusFalls = 0, hpRatios = 0;
   for (let run = 0; run < scenario.runs; run++) {
     const random = createSeededRandom(scenario.seed + run * 7919);
-    const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "starter", scenario.progressionProfile ?? "base");
+    const heroes = createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "starter", scenario.progressionProfile ?? "base", scenario.questId);
     let carried = undefined; let final: CombatState | undefined;
     const encounterCount = Math.min(QUESTS[scenario.questId]!.encounterIds.length, scenario.encounterLimit ?? Number.POSITIVE_INFINITY);
     for (let encounterIndex = 0; encounterIndex < encounterCount; encounterIndex++) {

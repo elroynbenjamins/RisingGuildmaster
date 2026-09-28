@@ -67,7 +67,8 @@ function levelHero(hero: Hero, level: number, index: number, gearProfile: Simula
   for (let current = 1; current < level; current++) xp += xpRequiredForNextLevel(current);
   const leveled = grantHeroXp(hero, xp, level);
   const tree = CLASS_SKILL_TREES[leveled.classId];
-  const normalizedSkillPathIndex = ((skillPathIndex % tree.recommendedPaths.length) + tree.recommendedPaths.length) % tree.recommendedPaths.length;\n  const learnedSkillIds = tree.recommendedPaths[normalizedSkillPathIndex]!.skillIds.filter((skillId) => (tree.nodes.find((node) => node.skillId === skillId)?.requiredLevel ?? Infinity) <= level);
+  const normalizedSkillPathIndex = ((skillPathIndex % tree.recommendedPaths.length) + tree.recommendedPaths.length) % tree.recommendedPaths.length;
+  const learnedSkillIds = tree.recommendedPaths[normalizedSkillPathIndex]!.skillIds.filter((skillId) => (tree.nodes.find((node) => node.skillId === skillId)?.requiredLevel ?? Infinity) <= level);
   const skilled = { ...leveled, learnedSkillIds };
   const subclass = progressionProfile === "subclass_ready" && level >= FIRST_SUBCLASS_LEVEL
     ? Object.values(SUBCLASSES).find((definition) => definition.baseClassId === skilled.classId)
@@ -84,6 +85,7 @@ export function createSimulationParty(classes: readonly ClassId[], level: number
     index,
     gearProfile,
     progressionProfile,
+    skillPathIndices?.[index] ?? index,
   ));
 }
 
@@ -140,6 +142,7 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
           index,
           scenario.gearProfile ?? "starter",
           scenario.progressionProfile ?? "base",
+          scenario.skillPathIndices?.[index] ?? index,
         ))
       : createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "starter", scenario.progressionProfile ?? "base", scenario.skillPathIndices);
     let carried = undefined; let final: CombatState | undefined;

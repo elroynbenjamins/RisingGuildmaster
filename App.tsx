@@ -29,6 +29,7 @@ import { TrainingGroundsScreen } from "./src/screens/Training/TrainingGroundsScr
 import { beginDungeonCombatCheckpoint, checkpointDungeonCombat, getDungeonCombatSetup, resolveDungeonCombat } from "./src/game/dungeons/dungeonRunService";
 import { MainMenuScreen } from "./src/screens/MainMenu/MainMenuScreen";
 import { TutorialScreen } from "./src/screens/Tutorial/TutorialScreen";
+import { GuidedTutorialProvider } from "./src/components/tutorial/GuidedTutorialProvider";
 import { beginTutorial, getTutorialResumeDestination, markContextualTutorialSeen, skipTutorial } from "./src/game/onboarding/tutorialService";
 import { markFourthHeroReady } from "./src/game/onboarding/starterJourneyService";
 import { commitQuestPartyToCombat, type QuestPreCombatCondition } from "./src/game/quests/questCombatCommitService";
@@ -349,7 +350,7 @@ function Game() {
   else screen = <InventoryScreen openItem={(item) => setRoute({ name: "item", itemId: item.inventoryKey })} openCrafting={() => setRoute({ name: "crafting" })} openGathering={() => setRoute({ name: "gathering" })} openCraftingForMaterial={(materialId)=>setRoute({name:"crafting",materialFilter:materialId})} openGatheringForMaterial={(materialId)=>setRoute({name:"gathering",targetMaterialId:materialId})} openPotions={() => setRoute({ name: "alchemy" })} />;
   return <ManagementShell onOpenActivity={(destination) => setRoute(destination === "training" ? {name: "training"} : destination === "gathering" ? {name: "gathering"} : destination === "recruitment" ? {name: "recruitment"} : destination === "crafting" ? {name:"crafting"} : {name: "dungeon"})} onOpenGems={() => setRoute({ name: "gemsSupport" })} guild={guild} active={tab} onSelect={main}>{screen}</ManagementShell>;
 }
-function ThemedFrame(){const theme=useTheme();useEffect(()=>{void initializeAdMobPrivacy().catch(()=>{ /* Ads retry when the player requests one. */ });},[]);return <SafeAreaView style={[styles.safe,{backgroundColor:theme.colors.background}]} edges={["top","right","bottom","left"]}><StatusBar barStyle={theme.statusBar} backgroundColor={theme.colors.background}/><GameToastProvider><GameDialogProvider><Game/></GameDialogProvider></GameToastProvider></SafeAreaView>}
+function ThemedFrame(){const theme=useTheme();useEffect(()=>{void initializeAdMobPrivacy().catch(()=>{ /* Ads retry when the player requests one. */ });},[]);return <SafeAreaView style={[styles.safe,{backgroundColor:theme.colors.background}]} edges={["top","right","bottom","left"]}><StatusBar barStyle={theme.statusBar} backgroundColor={theme.colors.background}/><GameToastProvider><GameDialogProvider><GuidedTutorialProvider blocked={false} onVisibilityChange={()=>{}}><Game/></GuidedTutorialProvider></GameDialogProvider></GameToastProvider></SafeAreaView>}
 function SavedTheme(){const{guild}=useGuild();return <ThemeProvider themeId={guild.uiPreferences.themeId??"guild_dark"}><ThemedFrame/></ThemeProvider>}
 export default function App() { return <SafeAreaProvider><GuildProvider><SavedTheme/></GuildProvider></SafeAreaProvider>; }
 const styles = StyleSheet.create({ safe: { flex: 1, backgroundColor: colors.background }, loading: { flex: 1, alignItems: "center", justifyContent: "center" }, loadingTitle: { color: colors.gold, fontSize: 25, fontWeight: "900", letterSpacing: 3 }, loadingText: { color: colors.muted, marginTop: 10 } });

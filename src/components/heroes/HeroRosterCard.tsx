@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { CLASSES } from "../../data/classes/classes";
 import { RACES } from "../../data/races/races";
 import { GAME_CONFIG } from "../../config/gameConfig";
@@ -14,6 +14,7 @@ import { HeroPortrait } from "./HeroPortrait";
 import { MiniMeter, StatusChip } from "../ui";
 import { NotificationDot } from "../navigation/NotificationDot";
 import { getHeroContractPresentation, getHeroDutyStatus, HERO_CLASS_ACCENTS } from "../../ui/heroPresentation";
+import { GuidePressable } from "../tutorial/GuidedTutorialContext";
 
 export function HeroRosterCard({
   hero,
@@ -23,6 +24,7 @@ export function HeroRosterCard({
   trainingSession,
   currentDay,
   onPress,
+  guideId,
 }: {
   hero: Hero;
   loyaltyScore: number;
@@ -31,6 +33,7 @@ export function HeroRosterCard({
   trainingSession?: TrainingSession;
   currentDay: number;
   onPress(): void;
+  guideId?: string;
 }) {
   const { colors: c } = useTheme();
   const calculated = calculateHero(hero);
@@ -42,7 +45,8 @@ export function HeroRosterCard({
   const lowHp = hero.currentHP <= hpMax * .3;
   const lowReadiness = hero.adventureStamina < 40;
 
-  return <Pressable
+  return <GuidePressable
+    guideId={guideId}
     accessibilityRole="button"
     accessibilityLabel={`Inspect ${hero.name}, level ${hero.level} ${CLASSES[hero.classId].name}, ${status.label}`}
     onPress={onPress}
@@ -86,7 +90,7 @@ export function HeroRosterCard({
       </View>
       <Text style={[styles.inspect, { color: c.text }]}>Inspect ›</Text>
     </View>
-  </Pressable>;
+  </GuidePressable>;
 }
 
 const styles = StyleSheet.create({

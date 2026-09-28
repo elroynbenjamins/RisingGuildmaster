@@ -1,6 +1,6 @@
 import { SearchField } from "../../components/inputs/SearchField";
-import React, { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useContext, useMemo, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { EmptyState, Panel, SegmentedTabs, SecondaryButton } from "../../components/ui";
 import { HeroRosterCard } from "../../components/heroes/HeroRosterCard";
 import { GameIcon } from "../../components/icons/GameIcon";
@@ -14,6 +14,8 @@ import { useGuild } from "../../state/GuildContext";
 import { filterAndSortHeroes, type HeroFilter, type HeroSort } from "../../ui/heroList";
 import { heroHasSkillChoice } from "../../ui/actionNotifications";
 import { useTheme } from "../../theme/theme";
+import { GuidedTutorialContext } from "../../components/tutorial/GuidedTutorialContext";
+import { GuidedScrollView } from "../../components/tutorial/GuidedScrollView";
 
 const FILTERS: HeroFilter[] = ["All", "Available", "Injured", "Fallen"];
 const SORTS: HeroSort[] = ["Level", "Name", "Class"];
@@ -25,6 +27,7 @@ function averageTopFour(heroes: readonly Hero[]): number {
 
 export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void; recruit(): void }) {
   const { guild } = useGuild();
+  const guide = useContext(GuidedTutorialContext);
   const { colors: themeColors } = useTheme();
   const [filter, setFilter] = useState<HeroFilter>("All");
   const [sort, setSort] = useState<HeroSort>("Level");
@@ -54,7 +57,7 @@ export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void
   }).length;
   const capacityReached = guild.heroes.length >= RECRUITMENT_CONFIG.heroCapacity;
 
-  return <ScrollView keyboardShouldPersistTaps="handled" style={{ backgroundColor: themeColors.background }} contentContainerStyle={styles.content}>
+  return <GuidedScrollView keyboardShouldPersistTaps="handled" style={{ backgroundColor: themeColors.background }} contentContainerStyle={styles.content}>
     <View style={styles.rosterBanner}>
       <View style={styles.titleRow}><GameIcon id="heroes" size={34}/><Text style={[styles.title, { color: themeColors.text }]}>Adventurers</Text></View>
       <View style={styles.compactRow}>
@@ -65,6 +68,7 @@ export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void
         <Text style={{ color: themeColors.muted }}>{availableCount} ready · {attentionCount} need attention</Text><Text style={{ color: themeColors.muted }}>{showSummary ? '−' : '+'}</Text>
       </Pressable>
     </View>
+
 
     {showSummary && <View style={styles.overview}>
       <View style={[styles.overviewItem, { backgroundColor: "transparent", borderColor: themeColors.green }]}><Text style={[styles.overviewValue, { color: themeColors.green }]}>{availableCount}</Text><Text style={[styles.overviewLabel, { color: themeColors.muted }]}>FIELD READY</Text></View>
@@ -85,7 +89,7 @@ export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void
     </Panel>
     <Text style={[styles.cardHeader, { color: attentionCount ? themeColors.gold : themeColors.muted }]}>{attentionCount ? `${attentionCount} hero${attentionCount===1?"":"es"} need attention · ` : ""}{heroes.length} shown · Tap a hero to manage</Text>
 
-    {heroes.map((hero) => {
+    {heroes.map((hero, index) => {
       const skillPoints = getAvailableClassSkillPoints(hero);
       const loyalty = getHeroLoyalty(guild, hero.id).score;
       return <HeroRosterCard
@@ -96,12 +100,13 @@ export function HeroesScreen({ openHero, recruit }: { openHero(hero: Hero): void
         contract={contractByHeroId.get(hero.id)}
         trainingSession={trainingByHeroId.get(hero.id)}
         currentDay={guild.currentDay}
-        onPress={() => openHero(hero)}
+        guideId={index === 0 ? "heroes.firstHero" : undefined}
+        onPress={() => { if (index === 0) guide?.dispatch({ type: "complete", tour: "heroes" }); openHero(hero); }}
       />;
     })}
 
     {!heroes.length && <EmptyState title={filter === "Fallen" && !query ? "No fallen heroes" : guild.heroes.length ? "No matching heroes" : "Your roster is empty"} message={query ? "Try another hero name, race, or class." : filter === "Fallen" ? "Every guild member is still standing." : guild.heroes.length ? "Change the current roster filter." : "Recruit candidates to begin building your guild."} actionLabel={!guild.heroes.length ? "Open Recruitment" : "Clear filters"} onAction={!guild.heroes.length ? recruit : () => { setQuery(""); setFilter("All"); }} />}
-  </ScrollView>;
+  </GuidedScrollView>;
 }
 
 const styles = StyleSheet.create({

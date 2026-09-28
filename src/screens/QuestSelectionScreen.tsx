@@ -17,6 +17,8 @@ import { DUNGEON_UNLOCK_HERO_COUNT } from "../game/dungeons/dungeonDraftService"
 import { GUILD_OPERATION_TEAM_SIZE, isGuildOperationsUnlocked } from "../game/operations/guildOperationService";
 import { STARTER_JOURNEY } from "../game/onboarding/starterJourneyService";
 import { getCampaignPreparationRecommendation } from "../game/campaign/campaignPreparationGuide";
+import { GuidedTip } from "../components/onboarding/GuidedTip";
+import { markGuidedScreenTipSeen, shouldShowGuidedScreenTip } from "../game/onboarding/screenTutorialService";
 
 export const QUEST_SCREEN_TABS: QuestTab[] = ["Campaign", "Side Quests", "Bosses"];
 const TABS = QUEST_SCREEN_TABS;
@@ -37,7 +39,8 @@ function RewardToken({ icon, label }: { icon: "gold" | "xp" | "loot"; label: str
 }
 
 export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDungeons, openOperations, openRaids, initialTab = "Campaign" }: { onBack?: () => void; selectQuest(id: string): void; openCampaign?(): void; openDungeons?(): void; openOperations?(): void; openRaids?(): void; initialTab?: QuestTab }) {
-  const { guild } = useGuild();
+  const { guild, updateGuild } = useGuild();
+  const showGuide = shouldShowGuidedScreenTip(guild, "quests");
   const [showQuestDetails, setShowQuestDetails] = useState(!guild.uiPreferences.compactQuestCards);
   const [tab, setTab] = useState<QuestTab>(initialTab === "Contracts" ? "Campaign" : initialTab);
   const [showActivities, setShowActivities] = useState(false);
@@ -79,6 +82,8 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
       <View style={styles.boardTitleRow}><View style={styles.boardIdentity}><GameIcon id="quests" size={30} framed={false}/><Text style={styles.title}>Quest Board</Text></View><View style={styles.locationPlate}><Text style={styles.locationLabel}>POSTING</Text><Text numberOfLines={1} style={styles.locationValue}>{currentLocation}</Text></View></View>
       <View style={styles.fieldStrip}><Text style={styles.fieldLabel}>FIELD TEAM</Text><Text style={styles.fieldValue}>TOP 4 AVG · LV {fieldLevel.toFixed(1)}</Text><Text style={styles.fieldRoster}>{fieldHeroes.length}/4 HEROES</Text></View>
     </View>
+
+    {showGuide && <GuidedTip step="SCREEN GUIDE · QUESTS" title="Follow the story order first" message="Campaign advances the story. Side Quests are optional one-clear preparation. Tap Prepare to inspect party risk before committing." onDismiss={() => updateGuild((current) => markGuidedScreenTipSeen(current, "quests"))} />}
 
     {(openDungeons || openOperations || openRaids) && <View style={styles.activitiesToggle}><Pressable accessibilityRole="button" accessibilityLabel="Special activities" accessibilityState={{ expanded: showActivities }} aria-expanded={showActivities} onPress={() => setShowActivities(value => !value)} style={{ minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 }}><View style={{ flex: 1 }}><Text style={{ color: colors.text, fontSize: 14 }}>Special activities</Text><Text style={{ color: colors.muted, fontSize: 11 }}>Dungeons · Operations · Raids</Text></View><Text style={{ color: colors.muted }}>{showActivities ? "−" : "+"}</Text></Pressable></View>}
     {showActivities && <View style={styles.specialActivities}>

@@ -259,6 +259,43 @@ describe("campaign preparation guidance", () => {
     expect(recommendation?.detail).toMatch(/Training Hall/i);
   });
 
+  it("shows the late Training Hall time and gold estimate for an under-level Chapter 9 recruit", () => {
+    const guild = chapterNineBossGuild(6);
+    guild.trainingGround.level = 3;
+    guild.heroes = guild.heroes.map((hero, index) => index === 0 ? {
+      ...hero,
+      level: 16,
+      xp: 0,
+    } : hero);
+    guild.recentPartyHeroIds = guild.heroes.slice(0, 4).map((hero) => hero.id);
+    guild.world = {
+      ...guild.world,
+      completedQuestIds: [
+        ...guild.world.completedQuestIds,
+        "choir_in_the_diving_bell",
+        "tavern_at_the_bottom_of_the_sea",
+      ],
+    };
+    const recommendation = getCampaignPreparationRecommendation(guild);
+    expect(recommendation).toMatchObject({
+      type: "dungeon",
+      reason: "level",
+      trainingAlternative: {
+        heroId: guild.heroes[0]!.id,
+        currentLevel: 16,
+        targetLevel: 17,
+        programId: "heroic_regimen",
+        programName: "Heroic Curriculum",
+        sessions: 2,
+        estimatedDays: 8,
+        estimatedGoldCost: 720,
+      },
+    });
+    expect(recommendation?.detail).toContain("2 Heroic Curriculum sessions");
+    expect(recommendation?.detail).toContain("8 days");
+    expect(recommendation?.detail).toContain("720 gold");
+  });
+
   it("falls back to two Roguelite runs for a Chapter 9 sparse replacement after local side stories", () => {
     const guild = chapterNineBossGuild(6);
     guild.heroes = guild.heroes.map((hero, index) => index === 0 ? {

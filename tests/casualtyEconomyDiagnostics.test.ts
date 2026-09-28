@@ -5,6 +5,8 @@ import { calculateHero } from "../src/game/heroes/heroCalculator";
 import { createEquipmentKeyWithDurability } from "../src/game/equipment/equipmentResolver";
 import { getRepairCost } from "../src/game/equipment/equipmentDurabilityService";
 import { createSimulationParty, simulateCombatScenario, type SimulationGearProfile } from "../src/game/simulation/balanceSimulation";
+import { calculateWeeklySalary } from "../src/game/recruitment/recruitmentCostCalculator";
+import { GAME_CONFIG } from "../src/config/gameConfig";
 
 const classes = ["warrior", "ranger", "cleric", "mage"] as const;
 
@@ -87,5 +89,27 @@ describe("casualty economy diagnostics", () => {
     });
 
     console.table(rows);
+
+    const weeklyRows = rows.map((row, index) => {
+      const scenario = scenarios[index]!;
+      const heroCount = scenario.level >= 13 ? 8 : 6;
+      const rosterClasses = Array.from({ length: heroCount }, (_, heroIndex) => classes[heroIndex % classes.length]!);
+      const roster = createSimulationParty(rosterClasses, scenario.level, scenario.seed + 500, scenario.gearProfile, "subclass_ready");
+      const weeklyPayroll = roster.reduce((sum, hero) => sum + calculateWeeklySalary(hero), 0);
+      const questsPerWeek = scenario.level >= 13 ? 4 : 3;
+      const weeklyQuestNet = questsPerWeek * (row.expectedQuestGoldPerAttempt - row.expectedRecoveryGoldPerAttempt);
+      const weeklyTavernIncome = GAME_CONFIG.dailyTavernIncome * 7;
+      return {
+        chapterMission: row.chapterMission,
+        heroCount,
+        questsPerWeek,
+        weeklyPayroll,
+        weeklyTavernIncome,
+        weeklyQuestNet: Math.round(weeklyQuestNet),
+        weeklyBalanceAfterRecoveryAndPayroll: Math.round(weeklyQuestNet + weeklyTavernIncome - weeklyPayroll),
+      };
+    });
+    console.log("CASUALTY_WEEKLY_ECONOMY");
+    console.table(weeklyRows);
   }, 240_000);
 });

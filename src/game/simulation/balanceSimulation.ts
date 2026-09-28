@@ -30,7 +30,7 @@ import type { EquipmentSlot } from "../heroes/types";
 
 export type SimulationGearProfile = "starter" | "lagged_basic" | "optional_progression";
 export type SimulationProgressionProfile = "base" | "subclass_ready";
-export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; partyLevels?: readonly number[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile }
+export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; partyLevels?: readonly number[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile; skillPathIndices?: readonly number[] }
 export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; wipeRate: number; averageRounds: number; averageSurvivingHeroes: number; averageFallenHeroesOnWins: number; victoriesWithAnyFallRate: number; victoriesWithTwoPlusFallsRate: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
 export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
 export interface EconomySimulationResult { scenarioId: string; startingGold: number; endingGold: number; netGold: number; questIncome: number; tavernIncome: number; salaryPaid: number; fieldExpenses: number; arrears: number; breakEvenQuestsPerWeek: number; goldAfterFacilityReserve: number }
@@ -62,12 +62,13 @@ function equipProgressionGear(hero: Hero, profile: "lagged_basic" | "optional_pr
   return { ...equipped, currentHP: calculateHero(equipped).stats.maxHP };
 }
 
-function levelHero(hero: Hero, level: number, index: number, gearProfile: SimulationGearProfile, progressionProfile: SimulationProgressionProfile): Hero {
+function levelHero(hero: Hero, level: number, index: number, gearProfile: SimulationGearProfile, progressionProfile: SimulationProgressionProfile, skillPathIndex: number = index): Hero {
   let xp = 0;
   for (let current = 1; current < level; current++) xp += xpRequiredForNextLevel(current);
   const leveled = grantHeroXp(hero, xp, level);
   const tree = CLASS_SKILL_TREES[leveled.classId];
-  const learnedSkillIds = tree.recommendedPaths[index % tree.recommendedPaths.length]!.skillIds.filter((skillId) => (tree.nodes.find((node) => node.skillId === skillId)?.requiredLevel ?? Infinity) <= level);
+  const normalizedSkillPathIndex = ((skillPathIndex % tree.recommendedPaths.length) + tree.recommendedPaths.length) % tree.recommendedPaths.length;
+  const learnedSkillIds = tree.recommendedPaths[normalizedSkillPathIndex]!.skillIds.filter((skillId) => (tree.nodes.find((node) => node.skillId === skillId)?.requiredLevel ?? Infinity) <= level);
   const skilled = { ...leveled, learnedSkillIds };
   const subclass = progressionProfile === "subclass_ready" && level >= FIRST_SUBCLASS_LEVEL
     ? Object.values(SUBCLASSES).find((definition) => definition.baseClassId === skilled.classId)
@@ -77,13 +78,14 @@ function levelHero(hero: Hero, level: number, index: number, gearProfile: Simula
   return { ...prepared, currentHP: calculateHero(prepared).stats.maxHP };
 }
 
-export function createSimulationParty(classes: readonly ClassId[], level: number, seed: number, gearProfile: SimulationGearProfile = "starter", progressionProfile: SimulationProgressionProfile = "base"): Hero[] {
+export function createSimulationParty(classes: readonly ClassId[], level: number, seed: number, gearProfile: SimulationGearProfile = "starter", progressionProfile: SimulationProgressionProfile = "base", skillPathIndices?: readonly number[]): Hero[] {
   return classes.map((classId, index) => levelHero(
     { ...generateHero(createSeededRandom(seed + index * 97), { classId }), id: `sim-${seed}-${index}` },
     level,
     index,
     gearProfile,
     progressionProfile,
+    skillPathIndices?.[index] ?? index,
   ));
 }
 
@@ -140,8 +142,9 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
           index,
           scenario.gearProfile ?? "starter",
           scenario.progressionProfile ?? "base",
+          scenario.skillPathIndices?.[index] ?? index,
         ))
-      : createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "starter", scenario.progressionProfile ?? "base");
+      : createSimulationParty(scenario.partyClasses, scenario.heroLevel, scenario.seed + run * 31, scenario.gearProfile ?? "starter", scenario.progressionProfile ?? "base", scenario.skillPathIndices);
     let carried = undefined; let final: CombatState | undefined;
     const encounterCount = Math.min(QUESTS[scenario.questId]!.encounterIds.length, scenario.encounterLimit ?? Number.POSITIVE_INFINITY);
     for (let encounterIndex = 0; encounterIndex < encounterCount; encounterIndex++) {

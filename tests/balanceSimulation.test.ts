@@ -408,6 +408,33 @@ describe("repeatable balance simulations", () => {
     expect(preparedAverageFallen, "alternate prepared parties should retain aggregate casualty pressure").toBeGreaterThanOrEqual(.5);
   }, 180_000);
 
+  it("keeps one-level-behind replacements viable across late party roles", () => {
+    const scenarios = [
+      { id: "replacement-role-frontline", partyLevels: [12, 13, 13, 13] as const, seed: 19_100 },
+      { id: "replacement-role-damage", partyLevels: [13, 12, 13, 13] as const, seed: 19_603 },
+      { id: "replacement-role-support", partyLevels: [13, 13, 12, 13] as const, seed: 20_106 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      id: scenario.id,
+      questId: "varkesh_gilded_rupture_boss",
+      heroLevel: 13,
+      partyLevels: scenario.partyLevels,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      skillPathIndices: [0, 1, 0, 1],
+      difficultyId: "standard",
+      runs: 4,
+      seed: scenario.seed,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    for (const result of results) {
+      expect(result.winRate, `${result.scenarioId} replacement viability`).toBeGreaterThanOrEqual(.5);
+      expect(result.victoriesWithAnyFallRate, `${result.scenarioId} casualty pressure`).toBeGreaterThanOrEqual(.5);
+    }
+  }, 120_000);
+
   it("keeps a two-level-behind frontline replacement risky but viable through late bosses", () => {
     const scenarios = [
       { id: "replacement-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", level: 13, partyLevels: [11, 13, 13, 13] as const, seed: 13_700 },

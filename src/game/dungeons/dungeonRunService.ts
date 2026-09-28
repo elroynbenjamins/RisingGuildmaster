@@ -39,6 +39,7 @@ export function getDungeonCatchupXpTarget(heroLevel: number): number { return Ma
 const ROGUELITE_REPLACEMENT_CATCHUP_MULTIPLIER = 3.1;
 
 function getDungeonPartyReferenceLevel(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>): number {
+  if (run.catchupReferenceLevel !== undefined) return Math.max(1, Math.round(run.catchupReferenceLevel));
   const party = guild.heroes.filter((hero) => run.partyHeroIds.includes(hero.id));
   const averageLevel = party.length ? party.reduce((sum, hero) => sum + hero.level, 0) / party.length : 1;
   return Math.max(1, Math.round(averageLevel));
@@ -129,7 +130,10 @@ export function beginDungeonExpedition(guild: GuildState, dungeonId: string, par
   if (party.length !== 4 || party.length !== new Set(partyHeroIds).size) throw new Error("A roguelite dungeon party requires exactly four unique drafted heroes");
   if (party.some((hero) => !hero.isAvailable || hero.currentHP <= 0)) throw new Error("Every dungeon hero must be available and alive");
   const partyAverageLevel = party.reduce((sum, hero) => sum + hero.level, 0) / party.length;
-  const run = startDungeonRun(dungeonId, modifierIds, partyHeroIds, party.map(createHeroCombatInstance), random, guild.discoveredEnemyIds, partyAverageLevel);
+  const run = {
+    ...startDungeonRun(dungeonId, modifierIds, partyHeroIds, party.map(createHeroCombatInstance), random, guild.discoveredEnemyIds, partyAverageLevel),
+    catchupReferenceLevel: Math.max(1, Math.round(partyAverageLevel)),
+  };
   const withRoguelite = startRogueliteRun(guild, run.id);
   const record = guild.rogueliteRotation.records[dungeonId] ?? createRogueliteDungeonRecord();
   return { ...withRoguelite, recentPartyHeroIds: partyHeroIds, rogueliteRotation: { ...guild.rogueliteRotation, selectedDungeonId: dungeonId, records: { ...guild.rogueliteRotation.records, [dungeonId]: { ...record, attempts: record.attempts + 1 } } }, activeDungeonRun: run };

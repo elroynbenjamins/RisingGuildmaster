@@ -1,24 +1,30 @@
 import { describe, it } from "vitest";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 
-describe("severe late underprepared diagnostics", () => {
-  it("measures one-level-behind parties with lagged basic gear", () => {
+describe("late preparation gradient diagnostics", () => {
+  it("compares prepared, mildly underprepared, and severely underprepared parties on identical seeds", () => {
     for (const boss of [
-      { id: "varkesh", questId: "varkesh_gilded_rupture_boss", level: 12, seed: 9600 },
-      { id: "nhal", questId: "admiral_nhal_veyr_boss", level: 14, seed: 9700 },
-      { id: "serekh", questId: "serekh_chartmaker_boss", level: 16, seed: 9800 },
+      { id: "varkesh", questId: "varkesh_gilded_rupture_boss", preparedLevel: 13, seed: 9600 },
+      { id: "nhal", questId: "admiral_nhal_veyr_boss", preparedLevel: 15, seed: 9700 },
+      { id: "serekh", questId: "serekh_chartmaker_boss", preparedLevel: 17, seed: 9800 },
     ] as const) {
-      console.log("SEVERE", simulateCombatScenario({
-        id: `severe-${boss.id}`,
-        questId: boss.questId,
-        heroLevel: boss.level,
-        partyClasses: ["warrior", "ranger", "cleric", "mage"],
-        difficultyId: "standard",
-        runs: 8,
-        seed: boss.seed,
-        gearProfile: "lagged_basic",
-        progressionProfile: "subclass_ready",
-      }));
+      for (const profile of [
+        { suffix: "prepared", level: boss.preparedLevel, gearProfile: "optional_progression" as const },
+        { suffix: "mild", level: boss.preparedLevel - 1, gearProfile: "optional_progression" as const },
+        { suffix: "severe", level: boss.preparedLevel - 1, gearProfile: "lagged_basic" as const },
+      ]) {
+        console.log("GRADIENT", simulateCombatScenario({
+          id: `${boss.id}-${profile.suffix}`,
+          questId: boss.questId,
+          heroLevel: profile.level,
+          partyClasses: ["warrior", "ranger", "cleric", "mage"],
+          difficultyId: "standard",
+          runs: 8,
+          seed: boss.seed,
+          gearProfile: profile.gearProfile,
+          progressionProfile: "subclass_ready",
+        }));
+      }
     }
-  }, 240_000);
+  }, 300_000);
 });

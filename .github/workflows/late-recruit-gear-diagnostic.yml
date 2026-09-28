@@ -8,6 +8,8 @@ on:
       - .github/workflows/late-recruit-gear-diagnostic.yml
       - tests/lateRecruitGearDiagnostic.test.ts
       - tests/recruitment.test.ts
+      - tests/equipmentBalanceCoverage.test.ts
+      - tests/weaponIcons.test.ts
       - src/game/recruitment/candidateGenerator.ts
       - src/data/equipment/**
 

@@ -40,6 +40,27 @@ describe("equipment balance coverage", () => {
     }
   });
 
+  it("keeps every premium class on reachable Level-4 primary bridge gear", () => {
+    const premiumClasses: ClassId[] = ["monk", "bard", "spellbow", "bulwark", "summoner"];
+    const earlyLootIds = new Set([
+      ...QUEST_LOOT_TABLES.mosswatch_quest_loot!.itemIds,
+      ...QUEST_LOOT_TABLES.caravan_escort_loot!.itemIds,
+      ...QUEST_LOOT_TABLES.brambleford_defense_loot!.itemIds,
+    ]);
+    const defaultLevelOneOutputs = new Set(Object.values(CRAFTING_RECIPES)
+      .filter((recipe) => !recipe.unlockSource && recipe.artisanLevel <= 1)
+      .map((recipe) => recipe.outputEquipmentId));
+    const reachable = (itemId: string) => earlyLootIds.has(itemId) || defaultLevelOneOutputs.has(itemId);
+
+    for (const classId of premiumClasses) {
+      const usable = Object.values(EQUIPMENT).filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(classId));
+      const weapons = usable.filter((item) => item.slot === "weapon" && item.levelRequirement === 4 && reachable(item.id));
+      const armor = usable.filter((item) => item.slot === "armor" && item.levelRequirement === 4 && reachable(item.id));
+      expect(weapons.length, `${classId} reachable Level-4 weapon`).toBeGreaterThanOrEqual(1);
+      expect(armor.length, `${classId} reachable Level-4 armor`).toBeGreaterThanOrEqual(1);
+    }
+  });
+
   it("keeps every class on reachable primary bridge gear through Chapter 5", () => {
     const accessibleQuestIds = new Set<string>();
     for (let chapterNumber = 1; chapterNumber <= 5; chapterNumber += 1) {

@@ -1,0 +1,33 @@
+name: Final late catch-up check
+
+on:
+  push:
+    branches:
+      - balance/ch8-expedition-primary-catchup
+    paths:
+      - .github/workflows/final-late-catchup-check.yml
+      - src/data/equipment/equipmentBalanceExpansion.ts
+      - src/data/equipment/equipmentIconArt.ts
+      - src/game/dungeons/dungeonRunService.ts
+      - src/game/campaign/campaignPreparationGuide.ts
+      - tests/dungeonRunIntegration.test.ts
+      - tests/equipmentBalanceCoverage.test.ts
+      - tests/campaignPreparationGuide.test.ts
+      - tests/weaponIcons.test.ts
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm vitest run tests/dungeonRunIntegration.test.ts tests/equipmentBalanceCoverage.test.ts tests/campaignPreparationGuide.test.ts tests/weaponIcons.test.ts

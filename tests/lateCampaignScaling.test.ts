@@ -10,5 +10,6 @@ describe("late campaign encounter scaling", () => {
     expect(QUEST_ENCOUNTERS.serekh_abyss_platform?.enemies.find((entry) => entry.enemyDefinitionId === "serekh_chartmaker")?.difficultyMultiplier).toBeCloseTo(1.00, 2);
     expect(QUEST_ENCOUNTERS.skyvault_upper_aerie?.enemies.find((entry) => entry.enemyDefinitionId === "brasswing_drake")?.difficultyMultiplier).toBeCloseTo(1.20, 2);
     expect(QUEST_ENCOUNTERS.collapsing_tidal_engine?.enemies.find((entry) => entry.enemyDefinitionId === "tideglass_stalker")?.difficultyMultiplier).toBeCloseTo(.90, 2);
+    expect(QUEST_ENCOUNTERS.chart_hall_guard?.enemies.every((entry) => Math.abs((entry.difficultyMultiplier ?? 1) - 1) < .001)).toBe(true);
   });
 });

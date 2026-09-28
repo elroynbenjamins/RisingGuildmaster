@@ -69,7 +69,7 @@ describe("playable dungeon run integration", () => {
       const hero = generateHero(createSeededRandom(2_100 + index), { classId });
       return { ...hero, id: `catchup-hero-${index}`, level: 15, equipment: { ...hero.equipment, armor: "deadletter-coat" } };
     });
-    let guild = {
+    let guild: ReturnType<typeof createGuild> = {
       ...base,
       heroes,
       discoveredEnemyIds: Object.keys(ENEMIES),

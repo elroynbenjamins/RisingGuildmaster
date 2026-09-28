@@ -1,0 +1,22 @@
+name: Current main casualty diagnostic
+on:
+  push:
+    branches:
+      - balance/current-main-casualty-check
+concurrency:
+  group: current-main-casualty-diagnostic
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/currentMainCasualtyDiagnostics.test.ts

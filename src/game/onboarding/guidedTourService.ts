@@ -87,13 +87,13 @@ export function getGuidedStep(tour: GuidedTourId, snapshot: GuideSnapshot, targe
     if (!targets.has('quests.story')) {
       return targets.has('quests.campaign') ? { tour, target: 'quests.campaign', title: 'Choose Campaign', body: 'Open Campaign to find the next story objective. Side quests and bosses become useful as your guild progresses.', acknowledgement: false } : null;
     }
-    return { tour, target: 'quests.story', title: 'Your next story order', body: 'This button opens your current campaign objective. Review its briefing, then choose available heroes. Opening the timeline does not spend resources or deploy anyone.', acknowledgement: false };
+    return { tour, target: 'quests.story', title: 'Your next story order', body: 'Campaign is the main story path. Open the highlighted story card when you are ready; party risk is checked before deployment.', acknowledgement: true };
   }
   const copy: Record<Exclude<GuidedTourId, 'quests'>, { title: string; body: string }> = {
-    guild: { title: 'Your command center', body: 'Follow Current Order for your next recommended task. Recruit adds heroes; Manage opens guild services. Use End Day when you need recovery or time to pass, and review its costs before confirming.' },
-    heroes: { title: 'Get to know your company', body: 'Tap a hero to review health, readiness, equipment and skills. Check availability before deployment. Skill choices are introduced when points are available; you do not need to spend anything now.' },
-    inventory: { title: 'Put your first loot to use', body: 'Tap stored gear to inspect it. Check its level and class requirements, then equip compatible items from a hero’s Equipment screen. Equipped items stay with that hero, rather than appearing as stored gear.' },
-    world: { title: 'Travel toward your objective', body: 'Open the region containing your next objective. Review the destination, travel party, rations and time before confirming. The guide will never confirm travel for you.' },
+    guild: { title: 'Your command center', body: 'CURRENT ORDER is the safest answer to “what next?”. Recruit adds heroes, Manage opens services, and End Day heals while advancing time.' },
+    heroes: { title: 'Get to know your company', body: 'Tap a hero for HP, readiness, gear and skills. Fallen heroes need the Temple; unavailable heroes cannot deploy.' },
+    inventory: { title: 'Put your first loot to use', body: 'Tap loot to compare it. Check level and class requirements, then equip compatible gear from the hero screen.' },
+    world: { title: 'Travel toward your objective', body: 'Travel costs days and rations. Check the destination and travel party before confirming; the guide never travels for you.' },
   };
   return { tour, target: `nav.${destination}`, ...copy[tour], acknowledgement: true };
 }

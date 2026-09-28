@@ -111,9 +111,15 @@ describe('progressive main-tab guides', () => {
   it('waits safely when the story controls are absent', () => {
     expect(getGuidedStep('quests', { ...fresh(), mainTab: 'Quests' }, new Set())).toBe(null);
   });
-  it('finishes informational hints with acknowledgement, not a forced purchase', () => {
-    for (const tour of ['guild', 'heroes', 'inventory', 'world'] as const) {
-      const tab = ({ guild: 'Guild', heroes: 'Heroes', inventory: 'Inventory', world: 'World' } as const)[tour];
+  it('points the Guild lesson at Current Order instead of a generic tab', () => {
+    const step = getGuidedStep('guild', fresh(), new Set(['guild.currentOrder']));
+    expect(step?.target).toBe('guild.currentOrder');
+    expect(step?.acknowledgement).toBe(true);
+    expect(getGuidedStep('guild', fresh(), new Set())).toBe(null);
+  });
+  it('finishes later informational hints with acknowledgement, not a forced action', () => {
+    for (const tour of ['heroes', 'inventory', 'world'] as const) {
+      const tab = ({ heroes: 'Heroes', inventory: 'Inventory', world: 'World' } as const)[tour];
       expect(getGuidedStep(tour, { ...advanced(), mainTab: tab }, new Set())?.acknowledgement).toBe(true);
     }
   });

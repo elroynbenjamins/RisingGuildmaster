@@ -133,7 +133,7 @@ describe("campaign preparation guidance", () => {
       questId: "the_bell_that_hatched",
       reason: "secondary",
     });
-    expect(recommendation?.detail).toContain("missing multiple helmet, boots, or accessory slots");
+    expect(recommendation?.detail).toContain("missing three or more helmet, boots, or accessory slots");
     expect(recommendation?.detail).toContain("secondary-slot recipe");
   });
 
@@ -155,7 +155,7 @@ describe("campaign preparation guidance", () => {
       questId: "the_lighthouse_that_walked",
       reason: "secondary",
     });
-    expect(recommendation?.detail).toContain("missing multiple helmet, boots, or accessory slots");
+    expect(recommendation?.detail).toContain("missing three or more helmet, boots, or accessory slots");
     expect(recommendation?.detail).toContain("secondary-slot recipe");
   });
 

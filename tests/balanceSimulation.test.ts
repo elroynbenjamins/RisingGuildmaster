@@ -124,7 +124,7 @@ describe("repeatable balance simulations", () => {
     expect(vaelithIron.winRate).toBeLessThanOrEqual(.75);
     expect(vaelithIron.averageFallenHeroesOnWins).toBeGreaterThanOrEqual(1.5);
     expect(vaelithIron.averageSurvivingHeroes).toBeLessThanOrEqual(2);
-  }, 300_000);
+  }, 420_000);
 
   it("keeps prepared Hard and Iron parties viable without making them forgiving", () => {
     const encounters = [

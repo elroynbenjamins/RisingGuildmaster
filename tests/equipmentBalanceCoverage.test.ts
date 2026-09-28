@@ -115,14 +115,16 @@ describe("equipment balance coverage", () => {
     }
   });
 
-  it("keeps a Level-14 expedition weapon bridge below the Chapter 8 epic tier", () => {
-    const catchup = Object.values(EQUIPMENT).filter((item) => item.id.startsWith("delvers-"));
-    expect(catchup).toHaveLength(7);
-    expect(catchup.every((item) => item.slot === "weapon" && item.levelRequirement === 14 && item.rarity === "rare")).toBe(true);
-    expect(catchup.every((item) => item.specialEffectIds.length === 0)).toBe(true);
-    for (const item of catchup) expect(EQUIPMENT_ICON_ART[item.id], item.id).toBeDefined();
-    for (const classId of CLASSES) {
-      expect(catchup.some((item) => !item.classRestrictions.length || item.classRestrictions.includes(classId)), `${classId} expedition catch-up weapon`).toBe(true);
+  it("keeps expedition weapon bridges below the Chapter 7 and 8 epic tiers", () => {
+    for (const [prefix, level] of [["trailblazers-", 11], ["delvers-", 14]] as const) {
+      const catchup = Object.values(EQUIPMENT).filter((item) => item.id.startsWith(prefix));
+      expect(catchup, prefix).toHaveLength(7);
+      expect(catchup.every((item) => item.slot === "weapon" && item.levelRequirement === level && item.rarity === "rare")).toBe(true);
+      expect(catchup.every((item) => item.specialEffectIds.length === 0)).toBe(true);
+      for (const item of catchup) expect(EQUIPMENT_ICON_ART[item.id], item.id).toBeDefined();
+      for (const classId of CLASSES) {
+        expect(catchup.some((item) => !item.classRestrictions.length || item.classRestrictions.includes(classId)), `${classId} ${prefix} expedition catch-up weapon`).toBe(true);
+      }
     }
   });
 

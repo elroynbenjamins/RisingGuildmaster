@@ -56,6 +56,7 @@ export interface QuestDeploymentSummary {
     wornItems: number;
     damagedItems: number;
     brokenItems: number;
+    missingPrimaryHeroes: number;
     laggingPrimaryHeroes: number;
   };
   supplies: {
@@ -105,7 +106,7 @@ export function getQuestDeploymentSummary(
   heroes.forEach((hero) => { roleCounts[getDeploymentRole(hero)] += 1; });
   const roleLabels = (Object.keys(roleCounts) as DeploymentRole[]).map((role) => `${ROLE_LABELS[role]} ${roleCounts[role]}`);
 
-  let equippedSlots = 0; let wornItems = 0; let damagedItems = 0; let brokenItems = 0; let laggingPrimaryHeroes = 0;
+  let equippedSlots = 0; let wornItems = 0; let damagedItems = 0; let brokenItems = 0; let missingPrimaryHeroes = 0; let laggingPrimaryHeroes = 0;
   for (const hero of heroes) {
     for (const key of Object.values(hero.equipment)) {
       if (!key) continue;
@@ -115,6 +116,7 @@ export function getQuestDeploymentSummary(
       else if (durability < 40) damagedItems += 1;
       else if (durability < 75) wornItems += 1;
     }
+    if (!hero.equipment.weapon || !hero.equipment.armor) missingPrimaryHeroes += 1;
     const primaryKeys = [hero.equipment.weapon, hero.equipment.armor].filter((key): key is string => Boolean(key));
     if (primaryKeys.some((key) => {
       const item = resolveEquipmentDefinition(key);
@@ -122,7 +124,7 @@ export function getQuestDeploymentSummary(
     })) laggingPrimaryHeroes += 1;
   }
   const totalSlots = heroes.length * 6;
-  const equipment = { equippedSlots, totalSlots, missingSlots: Math.max(0, totalSlots - equippedSlots), wornItems, damagedItems, brokenItems, laggingPrimaryHeroes };
+  const equipment = { equippedSlots, totalSlots, missingSlots: Math.max(0, totalSlots - equippedSlots), wornItems, damagedItems, brokenItems, missingPrimaryHeroes, laggingPrimaryHeroes };
   const supplies = {
     healing: potions.minor_healing_potion,
     mana: potions.mana_tonic,
@@ -142,6 +144,11 @@ export function getQuestDeploymentSummary(
   if (heroes.length >= 3 && roleCounts.support === 0) warnings.push({ id: "support", tone: "warning", text: "No support hero selected. Sustained encounters may be harder to recover from." });
   if (brokenItems) warnings.push({ id: "broken_gear", tone: "danger", text: `${brokenItems} equipped item${brokenItems === 1 ? " is" : "s are"} broken and provide no normal durability value.` });
   else if (damagedItems) warnings.push({ id: "damaged_gear", tone: "warning", text: `${damagedItems} equipped item${damagedItems === 1 ? " is" : "s are"} below 40% durability.` });
+  if (missingPrimaryHeroes) warnings.push({
+    id: "missing_primary_gear",
+    tone: "danger",
+    text: `${missingPrimaryHeroes} selected hero${missingPrimaryHeroes === 1 ? " is" : "es are"} missing a weapon or armor piece. Equip primary gear before deployment or expect severe casualty risk.`,
+  });
   if (laggingPrimaryHeroes) warnings.push({
     id: "lagging_gear",
     tone: laggingPrimaryHeroes >= 2 ? "danger" : "warning",

@@ -17,7 +17,7 @@ import { calculateDungeonRunScore, getDungeonDiscoveryReadiness, getUnlockedReci
 import type { RogueliteDungeonRecord } from "../../game/dungeons/rogueliteRotationTypes";
 import { BOSS_WEAPON_RECIPE_IDS, ELITE_RING_RECIPE_IDS } from "../../data/crafting/rogueliteRecipePools";
 import { DungeonNodeIcon, DungeonStateIcon, DungeonThemeIcon, DungeonUtilityIcon } from "../../components/dungeons/DungeonVisualIcon";
-import { hasSeenContextualTutorial, markContextualTutorialSeen } from "../../game/onboarding/tutorialService";
+import { hasSeenContextualTutorial, isTutorialGuidanceEnabled, markContextualTutorialSeen } from "../../game/onboarding/tutorialService";
 
 function ThemeHeader({ dungeon, record }: { dungeon: DungeonDefinition; record?: RogueliteDungeonRecord }) { return <Panel style={[styles.themeHeader, { borderColor: dungeon.accentColor }]}><DungeonThemeIcon themeId={dungeon.themeId} size={58} /><View style={styles.flex}><Text style={styles.themeName}>{dungeon.name}</Text><Text style={styles.meta}>{dungeon.description}</Text><Text style={[styles.themeRule, { color: dungeon.accentColor }]}>{dungeon.themeRule}</Text>{record && <Text style={styles.record}>BEST {record.bestGrade ?? "—"} · {record.bestScore} pts · {record.victories}/{record.attempts} clears</Text>}</View></Panel>; }
 function ThemeReadiness({ dungeon, discoveredEnemyIds }: { dungeon: DungeonDefinition; discoveredEnemyIds: readonly string[] }) {
@@ -40,7 +40,7 @@ export function DungeonScreen({ guild, random, updateGuild, onBack, startCombat 
   const cooldownReady = guild.currentDay >= guild.rogueliteRotation.cooldownUntilDay;
   const rogueliteUnlocked = chapterUnlocked && cooldownReady && guild.heroes.length >= DUNGEON_UNLOCK_HERO_COUNT;
   const readyThemeExists = guild.rogueliteRotation.offeredDungeonIds.some((id) => Boolean(DUNGEONS[id] && getDungeonDiscoveryReadiness(id, guild.discoveredEnemyIds).ready));
-  const guideRoguelite = !run && rogueliteUnlocked && readyThemeExists && !hasSeenContextualTutorial(guild, "roguelite_expeditions");
+  const guideRoguelite = isTutorialGuidanceEnabled(guild) && !run && rogueliteUnlocked && readyThemeExists && !hasSeenContextualTutorial(guild, "roguelite_expeditions");
   const roguelitePulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     if (!guideRoguelite) { roguelitePulse.setValue(1); return; }

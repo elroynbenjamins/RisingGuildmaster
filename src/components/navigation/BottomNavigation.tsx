@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "../ui";
 import { MAIN_TABS, type MainTab } from "../../ui/navigation";
 import type { QuestTab } from "../../ui/questList";
@@ -9,7 +9,6 @@ import { useTheme } from "../../theme/theme";
 import { NotificationBadge } from "./NotificationBadge";
 import { useActionNotifications } from "../../state/useActionNotifications";
 import { useGuideTarget } from "../tutorial/GuidedTutorialContext";
-import { GuidePressable } from "../tutorial/GuidedTutorialContext";
 
 const ICONS: Record<MainTab, GameIconId> = { Guild: "guild", Quests: "quests", World: "world", Heroes: "heroes", Inventory: "inventory" };
 

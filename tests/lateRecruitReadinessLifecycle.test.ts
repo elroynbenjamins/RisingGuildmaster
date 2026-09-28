@@ -100,7 +100,8 @@ describe("late recruit readiness lifecycle", () => {
       emptyPotionInventory(),
     );
 
-    expect(freshSummary.status).toBe("watch");
+    expect(freshSummary.status).toBe("high_risk");
+    expect(freshSummary.warnings.map((warning) => warning.id)).toContain("level");
     expect(freshSummary.warnings.map((warning) => warning.id)).toEqual(expect.arrayContaining([
       "unspent_progression",
       "sparse_loadout",
@@ -127,6 +128,8 @@ describe("late recruit readiness lifecycle", () => {
       emptyPotionInventory(),
     );
 
+    expect(recoveredSummary.status).toBe("high_risk");
+    expect(recoveredSummary.warnings.map((warning) => warning.id)).toContain("level");
     expect(recoveredSummary.warnings.map((warning) => warning.id)).not.toContain("unspent_progression");
     expect(recoveredSummary.warnings.map((warning) => warning.id)).not.toContain("sparse_loadout");
     expect(suggestPartyForQuest(recoveredGuild, quest)).toContain(readyFresh.id);

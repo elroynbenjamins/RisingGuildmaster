@@ -25,12 +25,11 @@ import { calculateWeeklySalary } from "../recruitment/recruitmentCostCalculator"
 import { EQUIPMENT } from "../../data/equipment/equipment";
 import { calculateHero } from "../heroes/heroCalculator";
 import { FIRST_SUBCLASS_LEVEL, SUBCLASSES } from "../../data/subclasses/subclasses";
-import { MASTERIES, MASTERY_LEVEL } from "../../data/masteries/masteries";
 import { getHeroSkillIds } from "../progression/subclasses/subclassService";
 import type { EquipmentSlot } from "../heroes/types";
 
 export type SimulationGearProfile = "starter" | "lagged_basic" | "optional_progression";
-export type SimulationProgressionProfile = "base" | "subclass_ready" | "mastery_ready" | "mastery_alt_ready";
+export type SimulationProgressionProfile = "base" | "subclass_ready";
 export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile }
 export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; wipeRate: number; averageRounds: number; averageSurvivingHeroes: number; averageFallenHeroesOnWins: number; victoriesWithAnyFallRate: number; victoriesWithTwoPlusFallsRate: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
 export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
@@ -70,19 +69,10 @@ function levelHero(hero: Hero, level: number, index: number, gearProfile: Simula
   const tree = CLASS_SKILL_TREES[leveled.classId];
   const learnedSkillIds = tree.recommendedPaths[index % tree.recommendedPaths.length]!.skillIds.filter((skillId) => (tree.nodes.find((node) => node.skillId === skillId)?.requiredLevel ?? Infinity) <= level);
   const skilled = { ...leveled, learnedSkillIds };
-  const subclass = progressionProfile !== "base" && level >= FIRST_SUBCLASS_LEVEL
+  const subclass = progressionProfile === "subclass_ready" && level >= FIRST_SUBCLASS_LEVEL
     ? Object.values(SUBCLASSES).find((definition) => definition.baseClassId === skilled.classId)
     : undefined;
-  const subclassed = subclass ? { ...skilled, subclassId: subclass.id } : skilled;
-  const masteryChoices = level >= MASTERY_LEVEL
-    ? Object.values(MASTERIES).filter((definition) => definition.baseClassId === skilled.classId)
-    : [];
-  const mastery = progressionProfile === "mastery_ready"
-    ? masteryChoices[0]
-    : progressionProfile === "mastery_alt_ready"
-      ? masteryChoices[1]
-      : undefined;
-  const progressed = mastery ? { ...subclassed, masteryId: mastery.id } : subclassed;
+  const progressed = subclass ? { ...skilled, subclassId: subclass.id } : skilled;
   const prepared = gearProfile === "lagged_basic" || gearProfile === "optional_progression" ? equipProgressionGear(progressed, gearProfile) : progressed;
   return { ...prepared, currentHP: calculateHero(prepared).stats.maxHP };
 }

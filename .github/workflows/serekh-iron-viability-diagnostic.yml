@@ -1,0 +1,29 @@
+name: Serekh Iron viability diagnostic
+
+on:
+  push:
+    branches:
+      - balance/serekh-preparation-separation
+    paths:
+      - tests/serekhIronViabilityDiagnostic.test.ts
+      - .github/workflows/serekh-iron-viability-diagnostic.yml
+      - src/data/encounters/chapter9DrownedSeventhEncounters.ts
+      - src/data/quests/chapter9DrownedSeventhQuests.ts
+      - src/data/enemies/chapter9DrownedSeventh.ts
+      - src/game/simulation/balanceSimulation.ts
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/serekhIronViabilityDiagnostic.test.ts

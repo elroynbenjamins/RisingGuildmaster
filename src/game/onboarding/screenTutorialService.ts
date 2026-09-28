@@ -9,7 +9,7 @@ export const GUIDED_SCREEN_FLAGS: Record<GuidedScreenId, string> = {
 };
 
 export function isGuidedOnboardingPlayer(guild: GuildState): boolean {
-  return guild.tutorial.completed && guild.tutorial.freeRefreshUsed;
+  return guild.tutorial.completed && guild.tutorial.freeRefreshUsed && guild.tutorial.guided?.enabled === true;
 }
 
 export function shouldShowGuidedScreenTip(guild: GuildState, id: GuidedScreenId): boolean {

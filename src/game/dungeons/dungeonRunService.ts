@@ -81,7 +81,7 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
     for (const hero of party) {
       if (item.classRestrictions.length && !item.classRestrictions.includes(hero.classId)) continue;
       const equippedId = hero.equipment[item.slot];
-      const equipped = equippedId ? EQUIPMENT[equippedId] : undefined;
+      const equipped = equippedId ? resolveEquipmentDefinition(equippedId) : undefined;
       if (!equipped) value += 5;
       else if (equipped.levelRequirement < item.levelRequirement) value += 4;
       else if (equipped.levelRequirement === item.levelRequirement && equipped.rarity === "common" && item.rarity !== "common") value += 2;

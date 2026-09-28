@@ -4,6 +4,12 @@ import type { Modifier } from "../../game/modifiers/types";
 const mod = (id: string, target: Modifier["target"], operation: Modifier["operation"], value: number): Modifier => ({ source: "equipment", sourceId: id, target, operation, value });
 const item = (id: string, name: string, slot: EquipmentDefinition["slot"], rarity: EquipmentDefinition["rarity"], level: number, value: number, modifiers: Modifier[], classes: EquipmentDefinition["classRestrictions"] = [], effects: string[] = []): EquipmentDefinition => ({ id, name, slot, rarity, level, value, modifiers, specialEffectIds: effects, classRestrictions: classes, levelRequirement: level });
 
+export const RECRUITMENT_FIELD_GEAR_IDS: ReadonlySet<string> = new Set([
+  "wayfarer-fieldcoat",
+  "delver-fieldcoat",
+  "deepward-fieldcoat",
+]);
+
 /** Low- and mid-tier tactical gear added after the Monk/Bard equipment coverage audit. */
 export const EQUIPMENT_BALANCE_EXPANSION: Record<string, EquipmentDefinition> = {
   "novice-quarterstaff": item("novice-quarterstaff", "Novice Quarterstaff", "weapon", "common", 1, 32, [mod("novice-quarterstaff", "physicalDamage", "percentage", .03)], ["monk"]),
@@ -80,6 +86,12 @@ export const EQUIPMENT_BALANCE_EXPANSION: Record<string, EquipmentDefinition> = 
   "deepward-rapier": item("deepward-rapier", "Deepward Rapier", "weapon", "rare", 16, 3130, [mod("deepward-rapier", "attackRoll", "flat", 2), mod("deepward-rapier", "physicalDamage", "percentage", .13), mod("deepward-rapier", "magicDamage", "percentage", .13), mod("deepward-rapier", "criticalChance", "flat", .03)], ["bard"]),
   "deepward-recurve": item("deepward-recurve", "Deepward Recurve", "weapon", "rare", 16, 3150, [mod("deepward-recurve", "attackRoll", "flat", 2), mod("deepward-recurve", "magicDamage", "percentage", .19), mod("deepward-recurve", "criticalChance", "flat", .03)], ["spellbow"]),
   "deepward-aegis": item("deepward-aegis", "Deepward Aegis", "weapon", "rare", 16, 3180, [mod("deepward-aegis", "armorClass", "flat", 2), mod("deepward-aegis", "maxHP", "percentage", .14), mod("deepward-aegis", "magicDefense", "percentage", .11)], ["bulwark"]),
+
+  // Generic late field armor for replacement heroes and expedition catch-up.
+  // Effect-free and universal so it cannot replace authored class/story armor.
+  "wayfarer-fieldcoat": item("wayfarer-fieldcoat", "Wayfarer Fieldcoat", "armor", "rare", 11, 1680, [mod("wayfarer-fieldcoat", "armorClass", "flat", 1), mod("wayfarer-fieldcoat", "maxHP", "percentage", .09), mod("wayfarer-fieldcoat", "physicalDefense", "percentage", .06), mod("wayfarer-fieldcoat", "magicDefense", "percentage", .06)]),
+  "delver-fieldcoat": item("delver-fieldcoat", "Delver Fieldcoat", "armor", "rare", 14, 2180, [mod("delver-fieldcoat", "armorClass", "flat", 1), mod("delver-fieldcoat", "maxHP", "percentage", .11), mod("delver-fieldcoat", "physicalDefense", "percentage", .08), mod("delver-fieldcoat", "magicDefense", "percentage", .08)]),
+  "deepward-fieldcoat": item("deepward-fieldcoat", "Deepward Fieldcoat", "armor", "rare", 16, 2960, [mod("deepward-fieldcoat", "armorClass", "flat", 1), mod("deepward-fieldcoat", "maxHP", "percentage", .13), mod("deepward-fieldcoat", "physicalDefense", "percentage", .10), mod("deepward-fieldcoat", "magicDefense", "percentage", .10)]),
 
   "stormglass-boots": item("stormglass-boots", "Stormglass Boots", "boots", "rare", 6, 330, [mod("stormglass-boots", "movementRange", "flat", 1), mod("stormglass-boots", "speed", "percentage", .06), mod("stormglass-boots", "magicDefense", "percentage", .05)]),
   "oathkeepers-helm": item("oathkeepers-helm", "Oathkeeper's Helm", "helmet", "rare", 6, 345, [mod("oathkeepers-helm", "armorClass", "flat", 1), mod("oathkeepers-helm", "maxHP", "percentage", .06)], ["warrior", "cleric", "paladin", "berserker"]),

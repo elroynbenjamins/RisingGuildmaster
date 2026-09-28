@@ -1,0 +1,28 @@
+name: Late sparse loadout check
+
+on:
+  push:
+    branches:
+      - ux/late-sparse-loadout-warning
+    paths:
+      - .github/workflows/late-sparse-loadout-check.yml
+      - src/game/party/questDeploymentService.ts
+      - src/screens/PartySelectionScreen.tsx
+      - tests/questDeployment.test.ts
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm vitest run tests/questDeployment.test.ts

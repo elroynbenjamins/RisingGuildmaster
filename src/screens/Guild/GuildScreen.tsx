@@ -83,8 +83,10 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
   const guidedOpening = guild.tutorial.completed && guild.tutorial.freeRefreshUsed && guild.world.completedQuestIds.includes("guildhaven_cellar_slimes");
   const calendarPrimerSeen = guild.world.worldFlags[CALENDAR_BASICS_GUIDANCE_FLAG] === true;
   const guidanceEnabled = isTutorialGuidanceEnabled(guild);
+  const questGuideStatus = guild.tutorial.guided?.tours.quests?.status;
+  const questGuideResolved = !guild.tutorial.guided || questGuideStatus === "completed" || questGuideStatus === "skipped";
   const guideWarTable = guidanceEnabled && guidedOpening && !warTablePrimerSeen;
-  const guideEndDay = guidanceEnabled && guidedOpening && warTablePrimerSeen && !calendarPrimerSeen;
+  const guideEndDay = guidanceEnabled && guidedOpening && warTablePrimerSeen && questGuideResolved && !calendarPrimerSeen;
   const onboardingPulse = useRef(new Animated.Value(1)).current;
   const acknowledgeWarTablePrimer = () => updateGuild((current) => current.world.worldFlags.war_table_v2_tutorial_seen === true ? current : ({ ...current, world: { ...current.world, worldFlags: { ...current.world.worldFlags, war_table_v2_tutorial_seen: true } } }));
   const acknowledgeEndDayPrimer = () => updateGuild((current) => acknowledgeTimeAdvanceGuidance(current, { showCalendarPrimer: true, showPayrollPrimer: false }));

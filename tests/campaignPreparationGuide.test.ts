@@ -273,6 +273,7 @@ describe("campaign preparation guidance", () => {
         heroId: guild.heroes[0]!.id,
         currentLevel: 16,
         targetLevel: 17,
+        programId: "heroic_regimen",
         programName: "Heroic Curriculum",
         sessions: 2,
         estimatedDays: 8,

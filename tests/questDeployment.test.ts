@@ -74,7 +74,17 @@ describe("quest deployment presentation", () => {
   });
 
   it("warns when a high-level hero has almost no secondary gear", () => {
-    const geared = hero("geared", "warrior", 13);
+    const gearedBase = hero("geared", "warrior", 13);
+    const geared = {
+      ...gearedBase,
+      equipment: {
+        ...gearedBase.equipment,
+        helmet: "leather-cap",
+        boots: "trail-boots",
+        accessory1: "copper-luck-ring",
+        accessory2: "wayfarer-clasp",
+      },
+    };
     const sparse = {
       ...hero("fresh-recruit", "warrior", 13),
       equipment: {

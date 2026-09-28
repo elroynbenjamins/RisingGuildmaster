@@ -19,6 +19,7 @@ import { useTheme } from "../../theme/theme";
 import { NotificationDot } from "../../components/navigation/NotificationDot";
 import { useActionNotifications } from "../../state/useActionNotifications";
 import { acknowledgeTimeAdvanceGuidance, CALENDAR_BASICS_GUIDANCE_FLAG, getTimeAdvanceGuidance, payrollWarningLine } from "../../game/onboarding/timeAndPayrollGuidanceService";
+import { GuidedTip } from "../../components/onboarding/GuidedTip";
 
 type Destination = "guildmasterSkills" | GuildPriorityDestination | GuildCommandDestination | "heroes" | "management";
 const QUICK_ACTIONS: { label: string; target: Destination; iconId: GameIconId; sublabel: string }[] = [
@@ -81,6 +82,7 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
   const guideEndDay = guidedOpening && warTablePrimerSeen && !calendarPrimerSeen;
   const onboardingPulse = useRef(new Animated.Value(1)).current;
   const acknowledgeWarTablePrimer = () => updateGuild((current) => current.world.worldFlags.war_table_v2_tutorial_seen === true ? current : ({ ...current, world: { ...current.world, worldFlags: { ...current.world.worldFlags, war_table_v2_tutorial_seen: true } } }));
+  const acknowledgeEndDayPrimer = () => updateGuild((current) => acknowledgeTimeAdvanceGuidance(current, { showCalendarPrimer: true, showPayrollPrimer: false }));
   useEffect(() => {
     if (!guideWarTable && !guideEndDay) { onboardingPulse.setValue(1); return; }
     const animation = Animated.loop(Animated.sequence([
@@ -143,6 +145,7 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
       </Panel>
     </Pressable>
 
+    {guideWarTable && <GuidedTip step="GUIDED STEP · WAR TABLE" title="Follow Current Order" message="Unsure what to do next? CURRENT ORDER is your next useful action. The button below is highlighted." onDismiss={acknowledgeWarTablePrimer} />}
     <SectionTitle>CURRENT ORDER</SectionTitle>
     <Panel style={[styles.priority, priority.tone === "urgent" && styles.priorityUrgent]}>
       <View style={styles.priorityIcon}><GameIcon id={priority.iconId} size={58} /></View>
@@ -164,6 +167,7 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
       {action.target === "management" && notices.manage ? <NotificationDot/> : null}
     </Pressable>)}</View>
 
+    {guideEndDay && <GuidedTip step="GUIDED STEP · END DAY" title="Time moves the whole guild" message={`End Day heals living heroes ${Math.round(GAME_CONFIG.dailyHeroHealthRecoveryRatio * 100)}% and advances payroll, contracts and timed work by one day.`} onDismiss={acknowledgeEndDayPrimer} />}
     <SectionTitle>CALENDAR WATCH</SectionTitle>
     <Panel style={styles.calendar}>
       <View style={styles.calendarHeader}><View><Text style={styles.calendarKicker}>NEXT MILESTONE</Text><Text style={styles.calendarTitle}>{nextMilestone ? `Day ${nextMilestone.day} · +${nextMilestone.daysAway} day${nextMilestone.daysAway === 1 ? "" : "s"}` : "No scheduled milestone in 30 days"}</Text></View><Text style={styles.calendarDay}>D{nextDay.targetDay}</Text></View>

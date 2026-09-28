@@ -60,16 +60,6 @@ export const EQUIPMENT_BALANCE_EXPANSION: Record<string, EquipmentDefinition> = 
   "wayfarers-recurve": item("wayfarers-recurve", "Wayfarer's Recurve", "weapon", "rare", 11, 1730, [mod("wayfarers-recurve", "attackRoll", "flat", 2), mod("wayfarers-recurve", "magicDamage", "percentage", .15), mod("wayfarers-recurve", "criticalChance", "flat", .03)], ["spellbow"]),
   "wayfarers-aegis": item("wayfarers-aegis", "Wayfarer's Aegis", "weapon", "rare", 11, 1760, [mod("wayfarers-aegis", "armorClass", "flat", 2), mod("wayfarers-aegis", "maxHP", "percentage", .11), mod("wayfarers-aegis", "magicDefense", "percentage", .09)], ["bulwark"]),
 
-  // Level-11 expedition catch-up weapons. These sit below the Chapter 7 epic
-  // story weapons and let Wardstone repair a badly lagging primary slot without bypassing them.
-  "trailblazers-longsword": item("trailblazers-longsword", "Trailblazer's Longsword", "weapon", "rare", 11, 1680, [mod("trailblazers-longsword", "attackRoll", "flat", 1), mod("trailblazers-longsword", "physicalDamage", "percentage", .14)], ["warrior", "paladin", "berserker"]),
-  "trailblazers-longbow": item("trailblazers-longbow", "Trailblazer's Longbow", "weapon", "rare", 11, 1660, [mod("trailblazers-longbow", "attackRoll", "flat", 1), mod("trailblazers-longbow", "physicalDamage", "percentage", .14), mod("trailblazers-longbow", "criticalChance", "flat", .02)], ["ranger"]),
-  "trailblazers-crozier": item("trailblazers-crozier", "Trailblazer's Crozier", "weapon", "rare", 11, 1690, [mod("trailblazers-crozier", "attackRoll", "flat", 1), mod("trailblazers-crozier", "magicDamage", "percentage", .14), mod("trailblazers-crozier", "healingPower", "percentage", .07)], ["mage", "cleric", "summoner"]),
-  "trailblazers-quarterstaff": item("trailblazers-quarterstaff", "Trailblazer's Quarterstaff", "weapon", "rare", 11, 1650, [mod("trailblazers-quarterstaff", "attackRoll", "flat", 1), mod("trailblazers-quarterstaff", "physicalDamage", "percentage", .14), mod("trailblazers-quarterstaff", "speed", "percentage", .05)], ["monk"]),
-  "trailblazers-rapier": item("trailblazers-rapier", "Trailblazer's Rapier", "weapon", "rare", 11, 1670, [mod("trailblazers-rapier", "attackRoll", "flat", 1), mod("trailblazers-rapier", "physicalDamage", "percentage", .10), mod("trailblazers-rapier", "magicDamage", "percentage", .10), mod("trailblazers-rapier", "criticalChance", "flat", .02)], ["bard"]),
-  "trailblazers-recurve": item("trailblazers-recurve", "Trailblazer's Recurve", "weapon", "rare", 11, 1690, [mod("trailblazers-recurve", "attackRoll", "flat", 1), mod("trailblazers-recurve", "magicDamage", "percentage", .14), mod("trailblazers-recurve", "criticalChance", "flat", .02)], ["spellbow"]),
-  "trailblazers-aegis": item("trailblazers-aegis", "Trailblazer's Aegis", "weapon", "rare", 11, 1710, [mod("trailblazers-aegis", "armorClass", "flat", 2), mod("trailblazers-aegis", "maxHP", "percentage", .10), mod("trailblazers-aegis", "magicDefense", "percentage", .08)], ["bulwark"]),
-
   // Level-14 expedition catch-up weapons. These are rare, effect-free field upgrades:
   // strong enough to repair a badly lagging primary slot, but intentionally below the
   // Level-15 epic Black Tide campaign weapons and their signature effects.

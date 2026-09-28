@@ -35,8 +35,14 @@ export function GuidedTutorialProvider({ children, blocked, onVisibilityChange }
     updateGuild(current => {
       if (!session.current.started || session.current.slot !== slot) return current;
       const next = reduceGuidedTour(normalizeGuidedTourProgress(current.tutorial.guided), action);
-      if (JSON.stringify(next) === JSON.stringify(current.tutorial.guided)) return current;
-      return { ...current, tutorial: { ...current.tutorial, guided: next } };
+      const closesGuildPrimer = "tour" in action && action.tour === "guild" && (action.type === "complete" || action.type === "skip");
+      const primerAlreadyClosed = current.world.worldFlags.war_table_v2_tutorial_seen === true;
+      if (JSON.stringify(next) === JSON.stringify(current.tutorial.guided) && (!closesGuildPrimer || primerAlreadyClosed)) return current;
+      return {
+        ...current,
+        tutorial: { ...current.tutorial, guided: next },
+        world: closesGuildPrimer ? { ...current.world, worldFlags: { ...current.world.worldFlags, war_table_v2_tutorial_seen: true } } : current.world,
+      };
     });
   }, [updateGuild]);
   const register = useCallback((id: string, anchor: GuideAnchor) => {

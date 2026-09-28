@@ -89,6 +89,8 @@ export function getExpeditionCacheTopItemIds(party: readonly Hero[], ownedInvent
     priorityPool = rarityPreferred.length ? rarityPreferred : sourcePool.filter((item) => item.rarity === "rare");
   }
 
+  if (!priorityPool.length) return [];
+
   const score = (item: (typeof sourcePool)[number]) => {
     let value = item.rarity === "rare" ? 3 : item.rarity === "uncommon" ? 2 : 1;
     for (const hero of party) {

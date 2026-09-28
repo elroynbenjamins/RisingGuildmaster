@@ -8,6 +8,7 @@ import type { QuestDefinition } from "../quests/questTypes";
 import { getEligiblePersonalQuestHeroes } from "../quests/questAvailability";
 import { getQuestAdventureStaminaCost } from "../heroes/adventureStaminaService";
 import { getQuestSkillCoverage } from "./partyReadinessService";
+import { resolveEquipmentDefinition } from "../equipment/equipmentResolver";
 
 export type PartyCombatRole = "frontline" | "support" | "ranged";
 
@@ -32,11 +33,27 @@ function questSkillIds(quest: QuestDefinition) {
   }))];
 }
 
+function gearReadinessAdjustment(hero: Hero): number {
+  const primary = [hero.equipment.weapon, hero.equipment.armor];
+  if (primary.some((key) => !key)) return -40;
+  const badlyLaggingPrimary = primary.some((key) => {
+    const item = key ? resolveEquipmentDefinition(key) : undefined;
+    return !item || hero.level - item.levelRequirement >= 3;
+  });
+  if (badlyLaggingPrimary) return -24;
+  if (hero.level >= 10) {
+    const secondaryEquipped = [hero.equipment.helmet, hero.equipment.boots, hero.equipment.accessory1, hero.equipment.accessory2]
+      .filter(Boolean).length;
+    if (secondaryEquipped <= 1) return -16;
+  }
+  return 0;
+}
+
 function heroScore(hero: Hero, quest: QuestDefinition, selected: readonly Hero[]): number {
   const stats = calculateHero(hero).stats;
   const hpRatio = stats.maxHP ? hero.currentHP / stats.maxHP : 0;
   const recommended = quest.recommendedLevelMin ?? 1;
-  let score = Math.min(hero.level, recommended + 2) * 8 + hpRatio * 20 + hero.adventureStamina * .15;
+  let score = Math.min(hero.level, recommended + 2) * 8 + hpRatio * 20 + hero.adventureStamina * .15 + gearReadinessAdjustment(hero);
   const existingRoles = new Set(selected.flatMap(getHeroPartyRoles));
   for (const role of getHeroPartyRoles(hero)) if (!existingRoles.has(role)) score += 18;
   for (const skillId of questSkillIds(quest)) {

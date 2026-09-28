@@ -36,11 +36,16 @@ function dungeonNodeXpShare(nodeId: string, nodeType: string): number {
   return .25;
 }
 export function getDungeonCatchupXpTarget(heroLevel: number): number { return Math.max(1, Math.round(xpRequiredForNextLevel(Math.max(1, heroLevel)) * .20)); }
-function getDungeonCombatXp(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>, nodeId: string, nodeType: string): number {
+const ROGUELITE_REPLACEMENT_CATCHUP_MULTIPLIER = 3.1;
+
+function getDungeonPartyReferenceLevel(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>): number {
   const party = guild.heroes.filter((hero) => run.partyHeroIds.includes(hero.id));
   const averageLevel = party.length ? party.reduce((sum, hero) => sum + hero.level, 0) / party.length : 1;
-  const referenceLevel = Math.max(1, Math.round(averageLevel));
-  const fullRunTarget = getDungeonCatchupXpTarget(referenceLevel);
+  return Math.max(1, Math.round(averageLevel));
+}
+
+function getDungeonCombatXp(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>, nodeId: string, nodeType: string): number {
+  const fullRunTarget = getDungeonCatchupXpTarget(getDungeonPartyReferenceLevel(guild, run));
   return Math.max(1, Math.round(fullRunTarget * dungeonNodeXpShare(nodeId, nodeType)));
 }
 function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["activeDungeonRun"]>, random: RandomSource): GuildState {
@@ -99,17 +104,19 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
 function recoverInstances(instances: readonly HeroCombatInstance[], hpRatio: number, manaRatio: number, staminaRatio: number): HeroCombatInstance[] {
   return instances.map((instance) => instance.isAlive ? { ...instance, currentHP: Math.min(instance.maxHP, instance.currentHP + Math.round(instance.maxHP * hpRatio)), currentMana: Math.min(instance.maxMana, instance.currentMana + Math.round(instance.maxMana * manaRatio)), currentStamina: Math.min(instance.maxStamina, instance.currentStamina + Math.round(instance.maxStamina * staminaRatio)) } : instance);
 }
-export function getRogueliteXpForHero(baseXp: number, _heroLevel: number, _recommendedLevelMax: number): number {
-  // Expedition combat now scales upward to the drafted party, so late-game heroes
-  // earn the authored catch-up XP instead of being penalized for revisiting a theme.
-  return Math.max(0, Math.round(baseXp));
+export function getRogueliteXpForHero(baseXp: number, heroLevel: number, partyReferenceLevel: number): number {
+  // Expeditions scale to the drafted party. Heroes below that reference get
+  // accelerated XP so a replacement can realistically catch up across 1–2
+  // successful rotations without increasing XP for established veterans.
+  const multiplier = heroLevel < partyReferenceLevel ? ROGUELITE_REPLACEMENT_CATCHUP_MULTIPLIER : 1;
+  return Math.max(0, Math.round(baseXp * multiplier));
 }
 export function getDungeonEnemyLevelModifier(authoredMaxLevel: number, partyAverageLevel: number): number {
   return Math.max(0, Math.round(partyAverageLevel) - Math.max(1, Math.round(authoredMaxLevel)));
 }
-function syncHeroes(guild: GuildState, instances: readonly HeroCombatInstance[], xp = 0, recommendedLevelMax?: number): GuildState {
+function syncHeroes(guild: GuildState, instances: readonly HeroCombatInstance[], xp = 0, catchupReferenceLevel?: number): GuildState {
   const byId = new Map(instances.map((instance) => [instance.heroId, instance]));
-  return { ...guild, heroes: guild.heroes.map((hero) => { const instance = byId.get(hero.id); if (!instance) return hero; const synced = { ...hero, currentHP: Math.round(instance.currentHP), isAvailable: instance.isAlive }; const earnedXp = recommendedLevelMax === undefined ? xp : getRogueliteXpForHero(xp, hero.level, recommendedLevelMax); const awardedXp = instance.isAlive ? earnedXp : Math.round(earnedXp * GAME_CONFIG.fallenHeroXpRate); return grantHeroXp(synced, awardedXp); }) };
+  return { ...guild, heroes: guild.heroes.map((hero) => { const instance = byId.get(hero.id); if (!instance) return hero; const synced = { ...hero, currentHP: Math.round(instance.currentHP), isAvailable: instance.isAlive }; const earnedXp = catchupReferenceLevel === undefined ? xp : getRogueliteXpForHero(xp, hero.level, catchupReferenceLevel); const awardedXp = instance.isAlive ? earnedXp : Math.round(earnedXp * GAME_CONFIG.fallenHeroXpRate); return grantHeroXp(synced, awardedXp); }) };
 }
 
 export function beginDungeonExpedition(guild: GuildState, dungeonId: string, partyHeroIds: string[], modifierIds: string[] = [], random?: RandomSource): GuildState {
@@ -189,11 +196,14 @@ export function resolveDungeonCombat(guild: GuildState, status: "victory" | "def
   const run = activeRun(guild); const node = DUNGEON_NODES[run.currentNodeId]; if (!node || !["combat", "elite", "boss"].includes(node.type)) throw new Error("Current dungeon node is not combat");
   if (run.resolvedNodeIds.includes(node.id)) throw new Error("Dungeon node has already been resolved");
   if (status === "defeat") { const defeatedRun = { ...run, heroInstances: instances, combatState: null, combatRandomState: null, status: "defeat" as const, lastResolutionText: "The expedition was defeated in the depths." }; const next = syncHeroes(updateRun(guild, defeatedRun), instances); return { guild: next, check: null, text: defeatedRun.lastResolutionText, goldDelta: 0, recipeId: null }; }
-  const goldDelta = scaledGold(guild, node.goldReward ?? 0); const xp = getDungeonCombatXp(guild, run, node.id, node.type); const text = `${node.title} cleared. ${goldDelta} gold and up to ${xp} XP per surviving hero.`;
+  const goldDelta = scaledGold(guild, node.goldReward ?? 0);
+  const xp = getDungeonCombatXp(guild, run, node.id, node.type);
+  const catchupReferenceLevel = getDungeonPartyReferenceLevel(guild, run);
+  const text = `${node.title} cleared. ${goldDelta} gold and ${xp} base XP per surviving hero; heroes below party Level ${catchupReferenceLevel} earn extra catch-up XP.`;
   let resolvedRun = markDungeonNodeResolved({ ...run, heroInstances: instances, combatState: null, combatRandomState: null }, text);
   resolvedRun = { ...resolvedRun, goldEarned: resolvedRun.goldEarned + goldDelta, xpEarnedPerHero: resolvedRun.xpEarnedPerHero + xp };
   if (node.type !== "boss") resolvedRun = offerDungeonBoonChoices(resolvedRun, random);
-  let next = syncHeroes(updateRun({ ...guild, gold: guild.gold + goldDelta }, resolvedRun), instances, xp, DUNGEONS[run.dungeonId]!.recommendedLevelMax);
+  let next = syncHeroes(updateRun({ ...guild, gold: guild.gold + goldDelta }, resolvedRun), instances, xp, catchupReferenceLevel);
   let recipeId: string | null = null;
   if (node.type === "elite" || node.type === "boss") { const rareLootModifier = run.selectedModifierIds.reduce((sum, id) => sum + (DUNGEON_RUN_MODIFIERS[id]?.rareLootModifier ?? 0), 0) + sumDungeonBoonValue(run, "rareLootModifier"); const party = next.heroes.filter((hero) => run.partyHeroIds.includes(hero.id)); const partyAverageLevel = party.reduce((sum, hero) => sum + hero.level, 0) / Math.max(1, party.length); const encounterId = run.selectedEncounterIds[node.id]; const drop = resolveRogueliteRecipeDrop(next, node.type, random, rareLootModifier, DUNGEONS[run.dungeonId]!.themeId, { encounterId, partyAverageLevel }); next = drop.guild; recipeId = drop.result.droppedRecipeId; if (recipeId && next.activeDungeonRun) next = updateRun(next, { ...next.activeDungeonRun, recipeIdsUnlocked: [...next.activeDungeonRun.recipeIdsUnlocked, recipeId] }); }
   const victoriousRun = next.activeDungeonRun;

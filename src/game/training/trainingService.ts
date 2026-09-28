@@ -13,6 +13,15 @@ import { CAMPAIGN_CHAPTERS } from "../../data/campaign/chapter1";
 export function trainingCapacity(guild: GuildState): number { return TRAINING_GROUND_CONFIG.capacityByLevel[guild.trainingGround.level] ?? 1; }
 
 export interface TrainingProgressionLimit { campaignCap: number; rosterCap: number; levelCap: number }
+export interface TrainingCatchupPlan {
+  programId: TrainingProgramId;
+  programName: string;
+  sessions: number;
+  totalDays: number;
+  totalGoldCost: number;
+  targetLevel: number;
+}
+
 
 export function getCampaignTrainingLevelCap(guild: GuildState): number {
   const completed = new Set(guild.world.completedCampaignNodeIds);
@@ -59,6 +68,36 @@ export function calculateTrainingQuote(hero: Hero, programId: TrainingProgramId,
   const limit = guild ? getTrainingProgressionLimit(guild, hero) : undefined;
   return { goldCost: getTrainingGoldCost(programId, costMultiplier), xpReward: limit ? Math.min(rawXp, maxXpBeforeLevelCap(hero, limit.levelCap)) : rawXp, levelCap: limit?.levelCap, developmentSessionsUsed: hero.focusedTrainingSessions ?? 0 };
 }
+export function estimateTrainingCatchupPlan(guild: GuildState, hero: Hero, requestedTargetLevel: number): TrainingCatchupPlan | null {
+  const progression = getTrainingProgressionLimit(guild, hero);
+  const targetLevel = Math.min(requestedTargetLevel, progression.levelCap);
+  if (targetLevel <= hero.level) return null;
+
+  const plans = Object.values(TRAINING_PROGRAMS)
+    .filter((program) => program.trainingGroundLevel <= guild.trainingGround.level)
+    .map((program) => {
+      let simulated = { ...hero };
+      let sessions = 0;
+      let totalDays = 0;
+      let totalGoldCost = 0;
+      while (simulated.level < targetLevel && sessions < 50) {
+        const quote = calculateTrainingQuote(simulated, program.id, guild);
+        if (quote.xpReward <= 0) break;
+        simulated = grantTrainingXp(simulated, quote.xpReward, targetLevel);
+        sessions += 1;
+        totalDays += program.durationDays;
+        totalGoldCost += quote.goldCost;
+      }
+      return simulated.level >= targetLevel
+        ? { programId: program.id, programName: program.name, sessions, totalDays, totalGoldCost, targetLevel }
+        : null;
+    })
+    .filter((plan): plan is TrainingCatchupPlan => Boolean(plan))
+    .sort((a, b) => a.totalDays - b.totalDays || a.totalGoldCost - b.totalGoldCost || a.sessions - b.sessions);
+
+  return plans[0] ?? null;
+}
+
 export function startHeroTraining(guild: GuildState, heroId: string, programId: TrainingProgramId): GuildState {
   const hero = guild.heroes.find((item) => item.id === heroId); const program = TRAINING_PROGRAMS[programId];
   if (!hero || !program) throw new Error("Training selection is unavailable");

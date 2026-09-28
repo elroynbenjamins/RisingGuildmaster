@@ -115,6 +115,19 @@ describe("campaign preparation guidance", () => {
     expect(recommendation?.detail).toContain("armor recipe");
   });
 
+  it("stops severe secondary-gap guidance after two secondary pieces are restored", () => {
+    const guild = chapterEightGuild();
+    guild.heroes = heroes(4, 14, "concordance-glaive").map((hero, index) => index === 0 ? {
+      ...hero,
+      equipment: {
+        ...hero.equipment,
+        accessory1: null,
+        accessory2: null,
+      },
+    } : hero);
+    expect(getCampaignPreparationRecommendation(guild)).toBeNull();
+  });
+
   it("routes a Chapter 7 replacement toward the Bell side quest before Varkesh", () => {
     const guild = chapterSevenBossGuild();
     guild.heroes = guild.heroes.map((hero, index) => index === 0 ? {

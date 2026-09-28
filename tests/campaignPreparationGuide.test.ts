@@ -224,6 +224,30 @@ describe("campaign preparation guidance", () => {
     expect(recommendation?.detail).toContain("secondary-slot recipe");
   });
 
+  it("offers roguelite or Training Hall XP catch-up after a Chapter 7 replacement fixes gear", () => {
+    const guild = chapterSevenBossGuild();
+    guild.heroes = guild.heroes.map((hero, index) => index === 0 ? {
+      ...hero,
+      level: 12,
+      xp: 0,
+    } : hero);
+    guild.recentPartyHeroIds = guild.heroes.map((hero) => hero.id);
+    const recommendation = getCampaignPreparationRecommendation(guild);
+    expect(recommendation).toMatchObject({
+      type: "dungeon",
+      reason: "level",
+      title: "2 Roguelite Expeditions",
+      trainingAlternative: {
+        heroId: guild.heroes[0]!.id,
+        heroName: guild.heroes[0]!.name,
+        currentLevel: 12,
+        targetLevel: 13,
+      },
+    });
+    expect(recommendation?.detail).toMatch(/Roguelite Expedition/i);
+    expect(recommendation?.detail).toMatch(/Training Hall/i);
+  });
+
   it("falls back to two Wardstone runs for a Chapter 9 sparse replacement after local side stories", () => {
     const guild = chapterNineBossGuild(6);
     guild.heroes = guild.heroes.map((hero, index) => index === 0 ? {
@@ -250,7 +274,7 @@ describe("campaign preparation guidance", () => {
       type: "dungeon",
       reason: "secondary",
       suggestedRuns: 2,
-      title: "2 Wardstone Expeditions",
+      title: "2 Roguelite Expeditions",
     });
   });
 
@@ -278,7 +302,7 @@ describe("campaign preparation guidance", () => {
       type: "dungeon",
       reason: "secondary",
       suggestedRuns: 2,
-      title: "2 Wardstone Expeditions",
+      title: "2 Roguelite Expeditions",
     });
   });
 
@@ -300,7 +324,7 @@ describe("campaign preparation guidance", () => {
       type: "dungeon",
       reason: "level",
       suggestedRuns: 2,
-      title: "2 Wardstone Expeditions",
+      title: "2 Roguelite Expeditions",
     });
   });
 
@@ -323,7 +347,7 @@ describe("campaign preparation guidance", () => {
       type: "dungeon",
       reason: "weapon",
       suggestedRuns: 2,
-      title: "2 Wardstone Expeditions",
+      title: "2 Roguelite Expeditions",
     });
   });
 
@@ -350,7 +374,7 @@ describe("campaign preparation guidance", () => {
       type: "dungeon",
       reason: "level",
       suggestedRuns: 1,
-      title: "Wardstone Expedition",
+      title: "Roguelite Expedition",
     });
   });
 });

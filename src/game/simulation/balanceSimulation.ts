@@ -113,11 +113,21 @@ function tryHeroAction(state: CombatState, random: RandomSource): CombatState | 
   return null;
 }
 
-function moveTowardEnemy(state: CombatState, random: RandomSource): CombatState {
+function moveTowardGoal(state: CombatState, random: RandomSource): CombatState {
   const actor = state.heroes.find((item) => item.hero.id === state.awaitingHeroId)!;
-  const enemies = state.enemies.filter((item) => item.unit.isAlive);
-  const reachable = getReachablePositions(state.board, actor.unit.position, getEffectiveMovementRange(actor.unit), actor.unit.ignoredTerrainMovementCosts);
-  const destination = reachable.sort((a, b) => Math.min(...enemies.map((enemy) => manhattanDistance(a, enemy.unit.position))) - Math.min(...enemies.map((enemy) => manhattanDistance(b, enemy.unit.position))))[0];
+  const reachable = getReachablePositions(state.board, actor.unit.position, getEffectiveMovementRange(actor.unit), actor.unit.ignoredTerrainMovementCosts)
+    .filter((position) => position.x !== actor.unit.position.x || position.y !== actor.unit.position.y);
+
+  const targets = state.objective.type === "reach_zone"
+    ? state.objective.positions
+    : state.enemies.filter((item) => item.unit.isAlive).map((item) => item.unit.position);
+
+  if (!targets.length) return state;
+  if (state.objective.type === "reach_zone" && targets.some((position) => position.x === actor.unit.position.x && position.y === actor.unit.position.y)) return state;
+
+  const distanceToGoal = (position: { x: number; y: number }) =>
+    Math.min(...targets.map((target) => manhattanDistance(position, target)));
+  const destination = reachable.sort((a, b) => distanceToGoal(a) - distanceToGoal(b))[0];
   return destination ? moveCurrentHero(state, destination, random) : state;
 }
 
@@ -126,7 +136,10 @@ function autoplayEncounter(initial: CombatState, random: RandomSource): CombatSt
   while (state.status === "active" && decisions++ < 500) {
     if (!state.awaitingHeroId) break;
     let acted = tryHeroAction(state, random);
-    if (!acted && !state.actions.movementUsed) { state = moveTowardEnemy(state, random); acted = tryHeroAction(state, random); }
+    if (!acted && !state.actions.movementUsed) {
+      state = moveTowardGoal(state, random);
+      if (state.status === "active" && state.awaitingHeroId) acted = tryHeroAction(state, random);
+    }
     state = acted ?? state;
     if (state.status === "active" && state.awaitingHeroId) state = endCurrentHeroTurn(state, random);
   }

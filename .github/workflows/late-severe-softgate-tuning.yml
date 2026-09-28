@@ -1,12 +1,15 @@
-name: Late severe soft gate tuning
+name: Late progression-aware balance
 on:
   push:
     branches:
       - balance/late-severe-softgate-tuning
+concurrency:
+  group: late-progression-aware-balance
+  cancel-in-progress: true
 jobs:
-  tune:
+  source-guard:
     runs-on: ubuntu-latest
-    steps:
+    steps: &steps
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
@@ -16,4 +19,35 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts
+      - run: pnpm typecheck
+      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts -t "excludes current boss rewards"
+  varkesh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts -t "Varkesh realistic"
+  nhal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts -t "Nhal realistic"
+  serekh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/lateSevereSoftGateDiagnostics.test.ts -t "Serekh realistic"

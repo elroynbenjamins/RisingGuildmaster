@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createGuild } from "../src/game/guild/guildService";
 import { calculateHero } from "../src/game/heroes/heroCalculator";
 import { creditVerifiedGems } from "../src/game/monetization/gemService";
-import { fullyTreatHero, getConditionTreatmentCost, getHalfHealingCost, getHealingCost, healHero, healHeroToHalf, reviveHero, treatHeroConditions } from "../src/game/temple/templeService";
+import { fullyTreatHero, getBulkReviveGemCost, getConditionTreatmentCost, getHalfHealingCost, getHealingCost, healHero, healHeroToHalf, reviveAllFallenHeroes, reviveHero, treatHeroConditions } from "../src/game/temple/templeService";
 import { testHero } from "./testHero";
 
 describe("Temple services", () => {
@@ -74,6 +74,36 @@ describe("Temple services", () => {
     const fallen = { ...testHero(), currentHP: 0, isAvailable: false, conditions: [{ conditionId: "broken_arm" as const, remainingDuration: 8 }] };
     const result = reviveHero({ ...createGuild(), heroes: [fallen] }, fallen.id);
     expect(result.heroes[0]?.conditions).toEqual([{ conditionId: "broken_arm", remainingDuration: 8 }]);
+  });
+
+  it("revives multiple fallen heroes atomically at the same per-hero cost", () => {
+    const fallen = Array.from({ length: 3 }, (_, index) => ({ ...testHero(), id: `fallen-${index}`, currentHP: 0, isAvailable: false }));
+    const guild = { ...createGuild(), gems: 15, heroes: fallen };
+    expect(getBulkReviveGemCost(guild)).toBe(15);
+    const result = reviveAllFallenHeroes(guild);
+    expect(result.gems).toBe(0);
+    expect(result.heroes.every((hero) => hero.currentHP > 0 && hero.isAvailable)).toBe(true);
+    expect(result.gemTransactions.filter((transaction) => transaction.type === "revival")).toHaveLength(3);
+  });
+
+  it("uses the Remove Ads free revive once before charging bulk revival gems", () => {
+    const date = new Date("2026-09-28T12:00:00Z");
+    const fallen = Array.from({ length: 3 }, (_, index) => ({ ...testHero(), id: `free-fallen-${index}`, currentHP: 0, isAvailable: false }));
+    const base = createGuild();
+    const guild = { ...base, gems: 10, heroes: fallen, entitlements: { ...base.entitlements, adsRemoved: true } };
+    expect(getBulkReviveGemCost(guild, date)).toBe(10);
+    const result = reviveAllFallenHeroes(guild, date);
+    expect(result.gems).toBe(0);
+    expect(result.lastFreeReviveDate).toBeTruthy();
+    expect(result.heroes.every((hero) => hero.currentHP > 0)).toBe(true);
+    expect(result.gemTransactions.filter((transaction) => transaction.type === "revival")).toHaveLength(2);
+  });
+
+  it("rejects an unaffordable bulk revival without partially reviving the roster", () => {
+    const fallen = Array.from({ length: 3 }, (_, index) => ({ ...testHero(), id: `poor-fallen-${index}`, currentHP: 0, isAvailable: false }));
+    const guild = { ...createGuild(), gems: 10, heroes: fallen };
+    expect(() => reviveAllFallenHeroes(guild)).toThrow("Not enough gems");
+    expect(guild.heroes.every((hero) => hero.currentHP === 0)).toBe(true);
   });
 });
 

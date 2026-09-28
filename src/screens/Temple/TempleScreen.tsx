@@ -20,8 +20,7 @@ type Tab = "Treatment" | "Revival";
 export function TempleScreen({ onBack, openWorld }: { onBack(): void; openWorld(): void }) {
   const { guild, updateGuild } = useGuild();
   const { showToast } = useGameToast();
-  const showGuide = shouldShowGuidedScreenTip(guild, "temple");
-  const [tab, setTab] = useState<Tab>("Treatment");
+  const [tab, setTab] = useState<Tab>(() => guild.heroes.some((hero) => hero.currentHP <= 0) ? "Revival" : "Treatment");
   const [confirmHeroId, setConfirmHeroId] = useState<string | null>(null);
   const [confirmAllRevives, setConfirmAllRevives] = useState(false);
   const [expandedHeroId,setExpandedHeroId]=useState<string | null>(null);
@@ -30,6 +29,10 @@ export function TempleScreen({ onBack, openWorld }: { onBack(): void; openWorld(
   const localHealingAvailable = hasLocalHealingService(guild.world);
   const living = guild.heroes.filter((hero) => hero.currentHP > 0);
   const fallen = guild.heroes.filter((hero) => hero.currentHP <= 0);
+  const treatmentNeeded = living.some((hero) => hero.currentHP < calculateHero(hero).stats.maxHP || hero.conditions.some((entry) => entry.conditionId !== "inspired"));
+  const showGuide = shouldShowGuidedScreenTip(guild, "temple") && (fallen.length > 0 || treatmentNeeded);
+  const guideTitle = fallen.length > 0 ? "Fallen heroes need Revival" : "Recover now or wait";
+  const guideMessage = fallen.length > 0 ? "Revival returns a fallen hero at 25% HP and normally costs 5 gems. Use Treatment afterwards if you need them battle-ready now." : "Treatment spends gold for immediate healing or cures. End Day restores 10% max HP and readiness for free, but advances the calendar.";
   const bulkReviveGemCost = getBulkReviveGemCost(guild);
   const bulkReviveUsesFree = canUseFreeDailyRevive(guild) && fallen.length > 0;
   const act = (action: () => ReturnType<typeof fullyTreatHero>, success: string) => { try { const next=action(); const goldSpent=Math.max(0,guild.gold-next.gold); const gemsSpent=Math.max(0,guild.gems-next.gems); updateGuild(next); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); showToast({title:success.includes("brink")?"Revival Complete":"Temple Service Complete",message:`${success}${goldSpent?` · -${goldSpent} gold`:""}${gemsSpent?` · -${gemsSpent} gems`:""}`,tone:"success"}); } catch (error) { triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning"); showToast({title:"Temple Service Failed",message:error instanceof Error ? error.message : "Temple service failed",tone:"danger"}); } };
@@ -41,7 +44,7 @@ export function TempleScreen({ onBack, openWorld }: { onBack(): void; openWorld(
     <BackButton onPress={onBack} />
     <View style={styles.titleRow}><GameIcon id="temple" size={36}/><View style={styles.heroInfo}><Text style={styles.eyebrow}>{(currentSettlement?.name ?? "Local").toUpperCase()} · HEALING SERVICES</Text><Text style={styles.title}>Temple of Renewal</Text></View></View>
     <Text style={styles.intro}>Restore wounded adventurers or recover fallen heroes.</Text>
-    {showGuide && <GuidedTip step="SCREEN GUIDE · TEMPLE" title="Healing and revival are different" message="Treatment uses guild gold. Revival brings fallen heroes back at 25% HP and normally costs 5 gems; heal them afterwards if needed." onDismiss={() => updateGuild((current) => markGuidedScreenTipSeen(current, "temple"))} />}
+    {showGuide && <GuidedTip step="SCREEN GUIDE · TEMPLE" title={guideTitle} message={guideMessage} onDismiss={() => updateGuild((current) => markGuidedScreenTipSeen(current, "temple"))} />}
     <View style={styles.wallet}><Text style={styles.gold}>◆ {guild.gold.toLocaleString()} gold</Text><Text style={styles.gems}>◇ {guild.gems} gems</Text></View>
     <SegmentedTabs values={["Treatment", "Revival"] as const} value={tab} onChange={setTab} />{tab==="Revival"&&guild.entitlements.adsRemoved&&<Text style={canUseFreeDailyRevive(guild)?styles.freeRevive:styles.conditions}>{canUseFreeDailyRevive(guild)?"REMOVE ADS BENEFIT · 1 FREE REVIVE READY":"REMOVE ADS BENEFIT · Today’s free revive has been used"}</Text>}
     {tab === "Treatment" ? (living.length ? living.map((hero) => {

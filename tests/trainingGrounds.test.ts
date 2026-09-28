@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { advanceGuildTime } from "../src/game/economy/guildCalendarService";
 import { createGuild } from "../src/game/guild/guildService";
 import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
-import { getTrainingGoldCost, calculateTrainingQuote, getTrainingProgressionLimit, grantTrainingXp, startHeroTraining, startTrainingGroundUpgrade, trainingCapacity } from "../src/game/training/trainingService";
+import { getCampaignTrainingLevelCap, getTrainingGoldCost, calculateTrainingQuote, getTrainingProgressionLimit, grantTrainingXp, startHeroTraining, startTrainingGroundUpgrade, trainingCapacity } from "../src/game/training/trainingService";
 import { xpRequiredForNextLevel } from "../src/game/progression/xpSystem";
 import { testHero } from "./testHero";
 
@@ -56,9 +56,34 @@ describe("Training Hall", () => {
   it("limits catch-up training by campaign progress and the strongest four peers", () => {
     const trainee = { ...testHero(), id: "trainee" }; const guild = createGuild();
     guild.heroes = [trainee, ...[8, 8, 7, 7].map((level, index) => ({ ...testHero(), id: `veteran-${index}`, level }))];
-    expect(getTrainingProgressionLimit(guild, trainee)).toMatchObject({ campaignCap: 4, rosterCap: 6, levelCap: 4 });
+    expect(getTrainingProgressionLimit(guild, trainee)).toMatchObject({ campaignCap: 4, rosterCap: 7, levelCap: 4 });
     guild.world.completedCampaignNodeIds.push("broken_wardstone"); guild.world.campaignChapter = 2;
     expect(getTrainingProgressionLimit(guild, trainee).levelCap).toBe(6);
+  });
+
+  it("extends the training catch-up cap through the released late chapters", () => {
+    const guild = createGuild();
+    for (const [chapter, expectedCap] of [[7, 13], [8, 15], [9, 17]] as const) {
+      guild.world.campaignChapter = chapter;
+      expect(getCampaignTrainingLevelCap(guild)).toBe(expectedCap);
+    }
+  });
+
+  it("gives late recruits meaningful scalable XP while keeping them below veteran peers", () => {
+    const trainee = { ...testHero(), id: "late-trainee", level: 11, xp: 0 };
+    const guild = createGuild();
+    guild.world.campaignChapter = 7;
+    guild.trainingGround.level = 3;
+    guild.heroes = [
+      trainee,
+      ...[13, 13, 13].map((level, index) => ({ ...testHero(), id: `late-peer-${index}`, level })),
+    ];
+    const limit = getTrainingProgressionLimit(guild, trainee);
+    const quote = calculateTrainingQuote(trainee, "heroic_regimen", guild);
+    expect(limit).toMatchObject({ campaignCap: 13, rosterCap: 13, levelCap: 13 });
+    expect(quote.levelCap).toBe(13);
+    expect(quote.xpReward).toBeGreaterThan(300);
+    expect(quote.xpReward).toBeGreaterThanOrEqual(Math.floor(xpRequiredForNextLevel(11) * .35));
   });
 
   it("does not bank training XP beyond the permitted level", () => {

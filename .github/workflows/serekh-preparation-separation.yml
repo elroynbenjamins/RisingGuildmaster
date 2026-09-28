@@ -16,4 +16,4 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/serekhPreparationSeparationDiagnostics.test.ts
+      - run: pnpm vitest run tests/chapter9DrownedSeventh.test.ts tests/lateCampaignScaling.test.ts tests/balanceSimulation.test.ts -t "Chapter 9|late campaign encounter scaling|prepared Standard casualty pressure through Chapters 7–9|underprepared late-chapter bosses|Serekh preparation meaningful"

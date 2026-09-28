@@ -20,4 +20,4 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
-      - run: pnpm vitest run tests/chapter7IronHills.test.ts tests/chapter8WesternSea.test.ts tests/chapter9DrownedSeventh.test.ts tests/lateCampaignScaling.test.ts tests/balanceSimulation.test.ts -t "Chapter 7|Chapter 8|Chapter 9|late campaign encounter scaling|prepared Standard casualty pressure through Chapters 7–9|separates prepared, underprepared and severely underprepared late boss outcomes|keeps prepared Hard and Iron parties viable"
+      - run: pnpm vitest run tests/varkeshPreparationDiagnostic.test.ts

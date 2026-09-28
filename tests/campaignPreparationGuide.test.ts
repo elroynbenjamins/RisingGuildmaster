@@ -24,11 +24,11 @@ function heroes(count: number, level: number, weapon: string | null, armor: stri
   }));
 }
 
-function chapterSevenBossGuild() {
+function chapterSevenBossGuild(count = 4) {
   const guild = createGuild();
   return {
     ...guild,
-    heroes: heroes(4, 13, "wayfarers-longsword", "wayfarer-fieldcoat"),
+    heroes: heroes(count, 13, "wayfarers-longsword", "wayfarer-fieldcoat"),
     world: {
       ...guild.world,
       campaignChapter: 7,
@@ -225,13 +225,13 @@ describe("campaign preparation guidance", () => {
   });
 
   it("offers roguelite or Training Hall XP catch-up after a Chapter 7 replacement fixes gear", () => {
-    const guild = chapterSevenBossGuild();
+    const guild = chapterSevenBossGuild(6);
     guild.heroes = guild.heroes.map((hero, index) => index === 0 ? {
       ...hero,
       level: 12,
       xp: 0,
     } : hero);
-    guild.recentPartyHeroIds = guild.heroes.map((hero) => hero.id);
+    guild.recentPartyHeroIds = guild.heroes.slice(0, 4).map((hero) => hero.id);
     const recommendation = getCampaignPreparationRecommendation(guild);
     expect(recommendation).toMatchObject({
       type: "dungeon",

@@ -4,8 +4,9 @@ import { getCampaignPreparationRecommendation } from "../src/game/campaign/campa
 import { getDungeonCatchupXpTarget } from "../src/game/dungeons/dungeonRunService";
 import { xpRequiredForNextLevel } from "../src/game/progression/xpSystem";
 import { testHero } from "./testHero";
+import type { Hero } from "../src/game/heroes/types";
 
-function heroes(count: number, level: number, weapon: string | null, armor: string | null = "tidewatch-mail") {
+function heroes(count: number, level: number, weapon: string | null, armor: string | null = "tidewatch-mail"): Hero[] {
   return Array.from({ length: count }, (_, index) => ({
     ...testHero(),
     id: `prep-hero-${index}`,

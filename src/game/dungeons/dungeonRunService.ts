@@ -56,8 +56,21 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
   );
   const preferred = levelAppropriate.filter((item) => item.rarity === "common" || item.rarity === "uncommon" || (allowRare && item.rarity === "rare"));
   const eligible = preferred.length ? preferred : levelAppropriate.filter((item) => item.rarity === "rare");
+  const primaryCatchup = levelAppropriate.filter((item) =>
+    (item.slot === "weapon" || item.slot === "armor")
+    && item.rarity !== "epic"
+    && item.rarity !== "legendary"
+    && party.some((hero) => {
+      if (item.classRestrictions.length && !item.classRestrictions.includes(hero.classId)) return false;
+      const equippedId = hero.equipment[item.slot];
+      const equipped = equippedId ? EQUIPMENT[equippedId] : undefined;
+      const equippedLevel = equipped?.levelRequirement ?? 0;
+      return hero.level - equippedLevel >= 3 && item.levelRequirement > equippedLevel;
+    })
+  );
+  const newPrimaryCatchup = primaryCatchup.filter((item) => !owned.has(item.id));
   const newItems = eligible.filter((item) => !owned.has(item.id));
-  const candidates = newItems.length ? newItems : eligible;
+  const candidates = newPrimaryCatchup.length ? newPrimaryCatchup : (newItems.length ? newItems : eligible);
   if (!candidates.length) return guild;
   const score = (item: (typeof candidates)[number]) => {
     let value = item.rarity === "rare" ? 3 : item.rarity === "uncommon" ? 2 : 1;

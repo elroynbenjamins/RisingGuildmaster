@@ -19,6 +19,7 @@ import { STARTER_JOURNEY } from "../game/onboarding/starterJourneyService";
 import { getCampaignPreparationRecommendation } from "../game/campaign/campaignPreparationGuide";
 import { GuidedTip } from "../components/onboarding/GuidedTip";
 import { markGuidedScreenTipSeen, shouldShowGuidedScreenTip } from "../game/onboarding/screenTutorialService";
+import { useGuideTarget } from "../components/tutorial/GuidedTutorialContext";
 
 export const QUEST_SCREEN_TABS: QuestTab[] = ["Campaign", "Side Quests", "Bosses"];
 const TABS = QUEST_SCREEN_TABS;
@@ -56,6 +57,7 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
   const operationHeroRequirement = GUILD_OPERATION_TEAM_SIZE * 2;
   const operationsUnlocked = isGuildOperationsUnlocked(guild) && guild.heroes.length >= operationHeroRequirement;
   const nextCampaignNode = getAvailableCampaignNodes(guild.world)[0];
+  const storyGuideTarget = useGuideTarget(nextCampaignNode?.questId ? "quests.story" : "quests.campaign");
   const preparationRecommendation = getCampaignPreparationRecommendation(guild);
   const recommendedSideQuestId = preparationRecommendation?.type === "side_quest" ? preparationRecommendation.questId : undefined;
   const currentLocation = guild.world.currentSettlementId
@@ -95,9 +97,9 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
     <SegmentedTabs values={TABS} value={tab} onChange={setTab} />
     <View style={styles.boardControls}><Text style={[styles.boardCount, quests.length ? {color:colors.gold}:undefined]}>{quests.length ? `${quests.length} POSTING${quests.length===1?"":"S"} HERE · BEST MATCH FIRST` : "NO LOCAL POSTINGS"}</Text><SecondaryButton label={showQuestDetails ? "Compact Cards" : "Show Intel"} onPress={() => setShowQuestDetails((value) => !value)} /></View>
 
-    {tab === "Campaign" && openCampaign && <Panel style={styles.campaign}>
+    {tab === "Campaign" && openCampaign && <View ref={storyGuideTarget} collapsable={false}><Panel style={styles.campaign}>
       <View style={styles.campaignRail} /><View style={styles.campaignBody}><Text style={styles.campaignStamp}>STORY ORDER · CHAPTER {guild.world.campaignChapter}</Text><Text style={styles.campaignName}>{nextCampaignNode?.title ?? "Campaign Timeline"}</Text><Text style={styles.detail}>{nextCampaignNode?.description ?? "Review completed chapters and the next available story objective."}</Text><View style={styles.campaignAction}><ActionButton iconId="quests" label={nextCampaignNode?.questId ? "Prepare Story Mission" : "Open Campaign Timeline"} onPress={openCampaign} /></View></View>
-    </Panel>}
+    </Panel></View>}
 
     {quests.map((quest, index) => {
       const factions = [...new Set(quest.encounterIds.flatMap((id) => QUEST_ENCOUNTERS[id]?.enemies ?? []).map((entry) => getEnemyDefinition(entry.enemyDefinitionId).factionId))];

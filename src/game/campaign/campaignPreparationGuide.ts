@@ -197,7 +197,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
     const runs = suggestedDungeonRuns(heroes, recommendedMin);
     const runText = runs === 1
       ? "Start with one Roguelite Expedition, then reassess."
-      : "Plan on two Roguelite Expeditions, then reassess.";
+      : "Plan on up to two successful Roguelite Expeditions. A victory refreshes expedition themes after 7 days, so reassess after each clear.";
     const trainingText = trainingAlternative
       ? ` Or use the Training Hall for ${trainingAlternative.heroName}: about ${trainingAlternative.sessions} ${trainingAlternative.programName} session${trainingAlternative.sessions === 1 ? "" : "s"}, ${trainingAlternative.estimatedDays} days and ${trainingAlternative.estimatedGoldCost.toLocaleString()} gold to reach Level ${trainingAlternative.targetLevel} safely while the rest of the guild handles other work.`
       : "";

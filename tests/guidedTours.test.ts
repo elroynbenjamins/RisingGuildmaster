@@ -117,10 +117,20 @@ describe('progressive main-tab guides', () => {
     expect(step?.acknowledgement).toBe(true);
     expect(getGuidedStep('guild', fresh(), new Set())).toBe(null);
   });
-  it('finishes later informational hints with acknowledgement, not a forced action', () => {
-    for (const tour of ['heroes', 'inventory', 'world'] as const) {
-      const tab = ({ heroes: 'Heroes', inventory: 'Inventory', world: 'World' } as const)[tour];
-      expect(getGuidedStep(tour, { ...advanced(), mainTab: tab }, new Set())?.acknowledgement).toBe(true);
+  it('uses real actions for Heroes, Inventory and World lessons', () => {
+    const hero = getGuidedStep('heroes', { ...advanced(), mainTab: 'Heroes' }, new Set(['heroes.firstHero']));
+    const inventory = getGuidedStep('inventory', { ...advanced(), mainTab: 'Inventory' }, new Set(['inventory.firstItem']));
+    const world = getGuidedStep('world', { ...advanced(), mainTab: 'World' }, new Set(['world.campaignRoute']));
+    expect(hero?.target).toBe('heroes.firstHero');
+    expect(inventory?.target).toBe('inventory.firstItem');
+    expect(world?.target).toBe('world.campaignRoute');
+    expect(hero?.acknowledgement).toBe(false);
+    expect(inventory?.acknowledgement).toBe(false);
+    expect(world?.acknowledgement).toBe(false);
+  });
+  it('waits safely when a real screen action has not mounted yet', () => {
+    for (const [tour, tab] of [['heroes', 'Heroes'], ['inventory', 'Inventory'], ['world', 'World']] as const) {
+      expect(getGuidedStep(tour, { ...advanced(), mainTab: tab }, new Set())).toBe(null);
     }
   });
   it('stops after all eligible tours are finished', () => {

@@ -131,6 +131,7 @@ export function migrateGuildState(value: unknown): GuildState {
       step: saved.tutorial.step === "compare_candidates" ? "recruit_first" as const : saved.tutorial.step,
       inspectedCandidateId: saved.tutorial.inspectedCandidateId ?? null,
       inspectedCandidateTabs: saved.tutorial.inspectedCandidateTabs ?? [],
+      guided: saved.tutorial.guided,
     }
     : { ...createTutorialState(), active: false, completed: true, step: "complete" as const };
 

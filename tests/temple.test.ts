@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 import { createGuild } from "../src/game/guild/guildService";
 import { calculateHero } from "../src/game/heroes/heroCalculator";
 import { creditVerifiedGems } from "../src/game/monetization/gemService";
-import { fullyTreatHero, getConditionTreatmentCost, getHalfHealingCost, getHealingCost, healHero, healHeroToHalf, reviveHero, treatHeroConditions } from "../src/game/temple/templeService";
+import { canUseFreeDailyRevive, fullyTreatHero, getConditionTreatmentCost, getHalfHealingCost, getHealingCost, healHero, healHeroToHalf, reviveHero, treatHeroConditions } from "../src/game/temple/templeService";
 import { testHero } from "./testHero";
+import { TEMPLE_CONFIG } from "../src/config/templeConfig";
 
 describe("Temple services", () => {
   it.each([[100, 90], [11, 10], [1, 1], [0, 0]])("discounts %i missing HP to %i gold", (missingHp, cost) => {
@@ -68,6 +69,39 @@ describe("Temple services", () => {
   it("rejects revival without enough gems", () => {
     const fallen = { ...testHero(), currentHP: 0, isAvailable: false };
     expect(() => reviveHero({ ...createGuild(), gems: 2, heroes: [fallen] }, fallen.id)).toThrow("Not enough gems");
+  });
+
+  it("resets the Remove Ads free revive on the next calendar day", () => {
+    const first = { ...testHero(), id: "daily-revive-1", currentHP: 0, isAvailable: false };
+    const second = { ...testHero(), id: "daily-revive-2", currentHP: 0, isAvailable: false };
+    const dayOne = new Date("2026-09-28T10:00:00Z");
+    const dayTwo = new Date("2026-09-29T10:00:00Z");
+    const guild = { ...createGuild(), gems: 0, heroes: [first, second], entitlements: { ...createGuild().entitlements, adsRemoved: true } };
+
+    expect(canUseFreeDailyRevive(guild, dayOne)).toBe(true);
+    const revived = reviveHero(guild, first.id, dayOne);
+    expect(revived.gems).toBe(0);
+    expect(canUseFreeDailyRevive(revived, dayOne)).toBe(false);
+    expect(() => reviveHero(revived, second.id, dayOne)).toThrow("Not enough gems");
+    expect(canUseFreeDailyRevive(revived, dayTwo)).toBe(true);
+    expect(reviveHero(revived, second.id, dayTwo).gems).toBe(0);
+  });
+
+  it("lets one verified revive-ad reward fund exactly one standard revival", () => {
+    expect(TEMPLE_CONFIG.rewardedAdGems).toBe(TEMPLE_CONFIG.revivalGemCost);
+    const fallen = { ...testHero(), currentHP: 0, isAvailable: false };
+    const base = { ...createGuild(), gems: 0, heroes: [fallen] };
+    const funded = creditVerifiedGems(base, {
+      transactionId: "revive-ad-test",
+      source: "rewarded_ad",
+      gems: TEMPLE_CONFIG.rewardedAdGems,
+      verified: true,
+      note: "Hero revive rewarded ad",
+    });
+    const revived = reviveHero(funded, fallen.id);
+    expect(revived.gems).toBe(0);
+    expect(revived.heroes[0]).toMatchObject({ isAvailable: true });
+    expect(revived.gemTransactions.map((entry) => entry.amount)).toEqual([TEMPLE_CONFIG.rewardedAdGems, -TEMPLE_CONFIG.revivalGemCost]);
   });
 
   it("preserves a named battle injury on revival instead of adding a duplicate general injury", () => {

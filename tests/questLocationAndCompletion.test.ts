@@ -14,6 +14,20 @@ describe("quest location and prior completion guidance", () => {
     expect(isQuestAtCurrentLocation(quest, { ...guild.world, currentRegionId: "shadowfen", currentSettlementId: "blackwater" })).toBe(true);
   });
 
+  it("keeps Chapters 7–9 as soft preparation gates instead of hard level locks", () => {
+    const lateStoryQuests = Object.values(QUESTS).filter((quest) =>
+      (quest.campaignChapter ?? 0) >= 7
+      && (quest.campaignChapter ?? 0) <= 9
+      && (quest.questType === "campaign" || quest.questType === "boss"),
+    );
+
+    expect(lateStoryQuests.length).toBeGreaterThan(0);
+    for (const quest of lateStoryQuests) {
+      expect(quest.minimumPartyAverageLevel, `${quest.id} should remain attemptable while underprepared`).toBeUndefined();
+      expect(quest.recommendedLevelMin, `${quest.id} still needs visible preparation guidance`).toBeGreaterThan(0);
+    }
+  });
+
   it("recognizes first clears from completed quest state and legacy chronicle records", () => {
     const guild = createGuild();
     expect(hasCompletedQuestOnce(guild, "coils_of_the_sunken_grove")).toBe(false);

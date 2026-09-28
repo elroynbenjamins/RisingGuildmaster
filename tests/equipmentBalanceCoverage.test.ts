@@ -7,6 +7,7 @@ import type { ClassId } from "../src/game/heroes/types";
 import { createSeededRandom } from "../src/utils/random";
 import { createGuild } from "../src/game/guild/guildService";
 import { resolveGuildEventChoice } from "../src/game/world/worldEventResolver";
+import { QUEST_LOOT_TABLES } from "../src/data/loot/questLootTables";
 
 const CLASSES: ClassId[] = ["warrior", "ranger", "mage", "cleric", "paladin", "berserker", "monk", "bard", "spellbow", "bulwark", "summoner"];
 const ATTRIBUTE_TARGETS = new Set(["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]);
@@ -37,13 +38,27 @@ describe("equipment balance coverage", () => {
     }
   });
 
-  it("keeps every class on primary bridge gear through Chapter 5", () => {
+  it("keeps every class on reachable primary bridge gear through Chapter 5", () => {
+    const ashlandsLootIds = new Set([
+      ...QUEST_LOOT_TABLES.ashlands_campaign_loot!.itemIds,
+      ...QUEST_LOOT_TABLES.emberfall_defense_loot!.itemIds,
+      ...QUEST_LOOT_TABLES.keeper_cinders_loot!.itemIds,
+      ...QUEST_LOOT_TABLES.purple_hearth_loot!.itemIds,
+      ...QUEST_LOOT_TABLES.ash_herald_loot!.itemIds,
+      ...QUEST_LOOT_TABLES.glassworks_rescue_loot!.itemIds,
+      ...QUEST_LOOT_TABLES.phoenix_memory_loot!.itemIds,
+    ]);
+    const defaultLevelTwoOutputs = new Set(Object.values(CRAFTING_RECIPES)
+      .filter((recipe) => !recipe.unlockSource && recipe.artisanLevel <= 2)
+      .map((recipe) => recipe.outputEquipmentId));
+    const reachable = (itemId: string) => ashlandsLootIds.has(itemId) || defaultLevelTwoOutputs.has(itemId);
+
     for (const classId of CLASSES) {
       const usable = Object.values(EQUIPMENT).filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(classId));
-      const weapons = usable.filter((item) => item.slot === "weapon" && item.levelRequirement >= 7 && item.levelRequirement <= 9);
-      const armor = usable.filter((item) => item.slot === "armor" && item.levelRequirement >= 7 && item.levelRequirement <= 9);
-      expect(weapons.length, `${classId} Chapter 5 bridge weapon`).toBeGreaterThanOrEqual(1);
-      expect(armor.length, `${classId} Chapter 5 bridge armor`).toBeGreaterThanOrEqual(1);
+      const weapons = usable.filter((item) => item.slot === "weapon" && item.levelRequirement >= 7 && item.levelRequirement <= 9 && reachable(item.id));
+      const armor = usable.filter((item) => item.slot === "armor" && item.levelRequirement >= 7 && item.levelRequirement <= 9 && reachable(item.id));
+      expect(weapons.length, `${classId} reachable Chapter 5 bridge weapon`).toBeGreaterThanOrEqual(1);
+      expect(armor.length, `${classId} reachable Chapter 5 bridge armor`).toBeGreaterThanOrEqual(1);
     }
   });
 

@@ -4,11 +4,11 @@ import type { Modifier } from "../../game/modifiers/types";
 const mod = (id: string, target: Modifier["target"], operation: Modifier["operation"], value: number): Modifier => ({ source: "equipment", sourceId: id, target, operation, value });
 const item = (id: string, name: string, slot: EquipmentDefinition["slot"], rarity: EquipmentDefinition["rarity"], level: number, value: number, modifiers: Modifier[], classes: EquipmentDefinition["classRestrictions"] = [], effects: string[] = []): EquipmentDefinition => ({ id, name, slot, rarity, level, value, modifiers, specialEffectIds: effects, classRestrictions: classes, levelRequirement: level });
 
-export const RECRUITMENT_FIELD_GEAR_IDS = new Set([
+export const RECRUITMENT_FIELD_GEAR_IDS: ReadonlySet<string> = new Set([
   "wayfarer-fieldcoat",
   "delver-fieldcoat",
   "deepward-fieldcoat",
-] as const);
+]);
 
 /** Low- and mid-tier tactical gear added after the Monk/Bard equipment coverage audit. */
 export const EQUIPMENT_BALANCE_EXPANSION: Record<string, EquipmentDefinition> = {

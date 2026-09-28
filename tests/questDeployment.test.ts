@@ -77,8 +77,10 @@ describe("quest deployment presentation", () => {
     const gearedBase = hero("geared", "warrior", 13);
     const geared = {
       ...gearedBase,
+      currentHP: 9999,
       equipment: {
-        ...gearedBase.equipment,
+        weapon: "wayfarers-longsword",
+        armor: "wayfarer-fieldcoat",
         helmet: "leather-cap",
         boots: "trail-boots",
         accessory1: "copper-luck-ring",
@@ -87,6 +89,7 @@ describe("quest deployment presentation", () => {
     };
     const sparse = {
       ...hero("fresh-recruit", "warrior", 13),
+      currentHP: 9999,
       equipment: {
         weapon: "wayfarers-longsword",
         armor: "wayfarer-fieldcoat",

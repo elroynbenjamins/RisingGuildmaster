@@ -51,7 +51,7 @@ function equipProgressionGear(hero: Hero, profile: "lagged_basic" | "optional_pr
       : progressionGearTargetLevel(hero.level, slot);
     const candidates = Object.values(EQUIPMENT)
       .filter((item) => item.slot === slot)
-      .filter((item) => !RECRUITMENT_FIELD_GEAR_IDS.has(item.id as never))
+      .filter((item) => !RECRUITMENT_FIELD_GEAR_IDS.has(item.id))
       .filter((item) => item.levelRequirement <= targetLevel)
       .filter((item) => profile === "optional_progression"
         ? item.rarity === "common" || item.rarity === "uncommon" || item.rarity === "rare" || item.rarity === "epic"

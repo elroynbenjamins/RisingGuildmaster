@@ -113,7 +113,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
   }).length;
   const armorLag = laggingArmorHeroes >= 2;
   const secondaryGapHeroes = recommendedMin >= 12
-    ? heroes.filter((hero) => SECONDARY_GEAR_SLOTS.filter((slot) => !hero.equipment[slot]).length >= 2).length
+    ? heroes.filter((hero) => SECONDARY_GEAR_SLOTS.filter((slot) => !hero.equipment[slot]).length >= 3).length
     : 0;
   const secondaryGearGap = secondaryGapHeroes >= 1;
 
@@ -148,7 +148,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
         : reason === "armor"
           ? `${laggingArmorHeroes} of your core heroes have armor at least three levels behind. This one-clear side quest gives a guaranteed equipment reward${armorRecipe ? " and a permanent armor recipe" : ""}.`
           : reason === "secondary"
-            ? `${secondaryGapHeroes} of your core heroes ${secondaryGapHeroes === 1 ? "is" : "are"} missing multiple helmet, boots, or accessory slots. This one-clear side quest gives XP and a guaranteed equipment reward${secondaryRecipe ? ", plus a permanent secondary-slot recipe" : ""}.`
+            ? `${secondaryGapHeroes} of your core heroes ${secondaryGapHeroes === 1 ? "is" : "are"} missing three or more helmet, boots, or accessory slots. This one-clear side quest gives XP and a guaranteed equipment reward${secondaryRecipe ? ", plus a permanent secondary-slot recipe" : ""}.`
             : `You are ready for the boss, but this one-clear local story is a good final preparation route for XP and guaranteed gear${weaponRecipe ? ", with a permanent weapon recipe" : armorRecipe ? ", with a permanent armor recipe" : secondaryRecipe ? ", with a permanent secondary-slot recipe" : ""}.`;
     return { type: "side_quest", questId: quest.id, title: quest.name, detail, reason };
   }
@@ -166,7 +166,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
         ? `${laggingWeaponHeroes} of your core heroes have weapons at least three levels behind. ${runText} Each clear gives an equipment cache plus extra XP.`
         : dungeonReason === "armor"
           ? `${laggingArmorHeroes} of your core heroes have armor at least three levels behind. ${runText} Each clear gives an equipment cache plus extra XP.`
-          : `${secondaryGapHeroes} of your core heroes ${secondaryGapHeroes === 1 ? "is" : "are"} missing multiple secondary gear slots. ${runText} Each clear gives an equipment cache plus extra XP.`;
+          : `${secondaryGapHeroes} of your core heroes ${secondaryGapHeroes === 1 ? "is" : "are"} missing three or more secondary gear slots. ${runText} Each clear gives an equipment cache plus extra XP.`;
     return { type: "dungeon", title: runs === 1 ? "Wardstone Expedition" : "2 Wardstone Expeditions", detail, reason: dungeonReason, suggestedRuns: runs };
   }
 

@@ -58,6 +58,7 @@ export interface QuestDeploymentSummary {
     brokenItems: number;
     missingPrimaryHeroes: number;
     laggingPrimaryHeroes: number;
+    sparseLoadoutHeroes: number;
   };
   supplies: {
     healing: number;
@@ -106,7 +107,7 @@ export function getQuestDeploymentSummary(
   heroes.forEach((hero) => { roleCounts[getDeploymentRole(hero)] += 1; });
   const roleLabels = (Object.keys(roleCounts) as DeploymentRole[]).map((role) => `${ROLE_LABELS[role]} ${roleCounts[role]}`);
 
-  let equippedSlots = 0; let wornItems = 0; let damagedItems = 0; let brokenItems = 0; let missingPrimaryHeroes = 0; let laggingPrimaryHeroes = 0;
+  let equippedSlots = 0; let wornItems = 0; let damagedItems = 0; let brokenItems = 0; let missingPrimaryHeroes = 0; let laggingPrimaryHeroes = 0; let sparseLoadoutHeroes = 0;
   for (const hero of heroes) {
     for (const key of Object.values(hero.equipment)) {
       if (!key) continue;
@@ -122,9 +123,12 @@ export function getQuestDeploymentSummary(
       const item = resolveEquipmentDefinition(key);
       return Boolean(item && hero.level - item.levelRequirement >= 3);
     })) laggingPrimaryHeroes += 1;
+    const secondaryEquipped = [hero.equipment.helmet, hero.equipment.boots, hero.equipment.accessory1, hero.equipment.accessory2]
+      .filter(Boolean).length;
+    if (hero.level >= 10 && secondaryEquipped <= 1) sparseLoadoutHeroes += 1;
   }
   const totalSlots = heroes.length * 6;
-  const equipment = { equippedSlots, totalSlots, missingSlots: Math.max(0, totalSlots - equippedSlots), wornItems, damagedItems, brokenItems, missingPrimaryHeroes, laggingPrimaryHeroes };
+  const equipment = { equippedSlots, totalSlots, missingSlots: Math.max(0, totalSlots - equippedSlots), wornItems, damagedItems, brokenItems, missingPrimaryHeroes, laggingPrimaryHeroes, sparseLoadoutHeroes };
   const supplies = {
     healing: potions.minor_healing_potion,
     mana: potions.mana_tonic,
@@ -153,6 +157,11 @@ export function getQuestDeploymentSummary(
     id: "lagging_gear",
     tone: laggingPrimaryHeroes >= 2 ? "danger" : "warning",
     text: `${laggingPrimaryHeroes} selected hero${laggingPrimaryHeroes === 1 ? " has" : "es have"} a weapon or armor piece at least three levels behind. Upgrade primary gear or expect higher casualty risk.`,
+  });
+  if (sparseLoadoutHeroes) warnings.push({
+    id: "sparse_loadout",
+    tone: "warning",
+    text: `${sparseLoadoutHeroes} high-level selected hero${sparseLoadoutHeroes === 1 ? " has" : "es have"} three or more empty secondary gear slots. Add helmets, boots, or accessories before a difficult mission.`,
   });
   if (heroes.length && supplies.healing <= 0) warnings.push({ id: "healing", tone: "warning", text: "No healing potions are stocked for emergency combat recovery." });
   if (heroes.length && intel.coverage === "none") warnings.push({ id: "intel", tone: "info", text: "No exact enemy types are documented in the Monster Manual for this mission." });

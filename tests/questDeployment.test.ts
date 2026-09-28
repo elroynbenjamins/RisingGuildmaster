@@ -73,6 +73,46 @@ describe("quest deployment presentation", () => {
     expect(summary.warnings.find((entry) => entry.id === "lagging_gear")?.text).toContain("higher casualty risk");
   });
 
+  it("warns when a high-level hero has almost no secondary gear", () => {
+    const gearedBase = hero("geared", "warrior", 13);
+    const geared = {
+      ...gearedBase,
+      currentHP: 9999,
+      equipment: {
+        weapon: "wayfarers-longsword",
+        armor: "wayfarer-fieldcoat",
+        helmet: "leather-cap",
+        boots: "trail-boots",
+        accessory1: "copper-luck-ring",
+        accessory2: "wayfarer-clasp",
+      },
+    };
+    const sparse = {
+      ...hero("fresh-recruit", "warrior", 13),
+      currentHP: 9999,
+      equipment: {
+        weapon: "wayfarers-longsword",
+        armor: "wayfarer-fieldcoat",
+        helmet: null,
+        boots: null,
+        accessory1: null,
+        accessory2: null,
+      },
+    };
+    const summary = getQuestDeploymentSummary(
+      { ...quest, recommendedLevelMin: 13, minimumPartyAverageLevel: undefined },
+      [sparse, geared],
+      [],
+      potions,
+    );
+    expect(summary.equipment.sparseLoadoutHeroes).toBe(1);
+    expect(summary.status).toBe("watch");
+    expect(summary.warnings).toContainEqual(expect.objectContaining({
+      id: "sparse_loadout",
+      tone: "warning",
+    }));
+  });
+
   it("builds a balanced ordinary quest party before filling spare slots", () => {
     const roster = [
       hero("fighter", "warrior", 3),

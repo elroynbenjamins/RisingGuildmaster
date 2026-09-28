@@ -135,5 +135,41 @@ describe("playable dungeon run integration", () => {
     expect(awarded.rarity).toBe("rare");
   });
 
+  it("prioritizes a Level-16 primary weapon for a badly behind Level-17 party", () => {
+    const classes = ["ranger", "mage", "cleric", "bard"] as const;
+    const base = createGuild();
+    const partyHeroes = classes.map((classId, index) => {
+      const hero = generateHero(createSeededRandom(2_200 + index), { classId });
+      return { ...hero, id: `ch9-catchup-hero-${index}`, level: 17, equipment: { ...hero.equipment, armor: "last-call-mantle" } };
+    });
+    const reserves = [
+      { ...generateHero(createSeededRandom(2_290), { classId: "warrior" }), id: "ch9-catchup-reserve-1" },
+      { ...generateHero(createSeededRandom(2_291), { classId: "berserker" }), id: "ch9-catchup-reserve-2" },
+    ];
+    let guild: ReturnType<typeof createGuild> = {
+      ...base,
+      heroes: [...partyHeroes, ...reserves],
+      discoveredEnemyIds: Object.keys(ENEMIES),
+      world: { ...base.world, completedCampaignNodeIds: ["broken_wardstone"] },
+      rogueliteRotation: { ...base.rogueliteRotation, offeredDungeonIds: ["wardstone_depths", "thornwood_trials", "temple_of_coils"] },
+    };
+    guild = beginDungeonExpedition(guild, "wardstone_depths", partyHeroes.map((hero) => hero.id));
+    const run = guild.activeDungeonRun!;
+    guild = {
+      ...guild,
+      activeDungeonRun: { ...run, currentNodeId: "depths_boss" },
+      activeRogueliteRun: { ...guild.activeRogueliteRun!, bossRecipeAwarded: true },
+    };
+
+    const result = resolveDungeonCombat(guild, "victory", guild.activeDungeonRun!.heroInstances, sequenceRandom([.99, 0]));
+    const awardedIds = result.guild.activeDungeonRun?.gearIdsAwarded ?? [];
+    const awarded = EQUIPMENT[awardedIds[awardedIds.length - 1]!]!;
+
+    expect(awarded.id.startsWith("deepward-")).toBe(true);
+    expect(awarded.slot).toBe("weapon");
+    expect(awarded.levelRequirement).toBe(16);
+    expect(awarded.rarity).toBe("rare");
+  });
+
   it("persists defeat instead of treating entry into a boss room as victory", () => { const base = expeditionGuild(); let guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base)); const run = guild.activeDungeonRun!; guild = { ...guild, activeDungeonRun: { ...run, currentNodeId: "depths_boss" } }; const result = resolveDungeonCombat(guild, "defeat", run.heroInstances.map((instance) => ({ ...instance, currentHP: 0, isAlive: false })), sequenceRandom([0])); expect(result.guild.activeDungeonRun?.status).toBe("defeat"); expect(result.guild.activeDungeonRun?.resolvedNodeIds).not.toContain("depths_boss"); });
 });

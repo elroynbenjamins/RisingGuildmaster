@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { compactResourceAmount } from "../../ui/compactResourceAmount";
 import { LocationArtwork } from "../../components/art/LocationArtwork";
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -20,6 +20,8 @@ import { NotificationDot } from "../../components/navigation/NotificationDot";
 import { useActionNotifications } from "../../state/useActionNotifications";
 import { acknowledgeTimeAdvanceGuidance, CALENDAR_BASICS_GUIDANCE_FLAG, getTimeAdvanceGuidance, payrollWarningLine } from "../../game/onboarding/timeAndPayrollGuidanceService";
 import { GuidedTip } from "../../components/onboarding/GuidedTip";
+import { GuidedTutorialContext } from "../../components/tutorial/GuidedTutorialContext";
+import { GuidedScrollView } from "../../components/tutorial/GuidedScrollView";
 
 type Destination = "guildmasterSkills" | GuildPriorityDestination | GuildCommandDestination | "heroes" | "management";
 const QUICK_ACTIONS: { label: string; target: Destination; iconId: GameIconId; sublabel: string }[] = [
@@ -60,6 +62,7 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
   const { showDialog } = useGameDialog();
   const { colors: themeColors } = useTheme();
   const { guild, updateGuild } = useGuild();
+  const guide = useContext(GuidedTutorialContext);
   const recent = guild.recentPartyHeroIds.map((id) => guild.heroes.find((hero) => hero.id === id)).filter((hero): hero is NonNullable<typeof hero> => Boolean(hero));
   const notices = useActionNotifications();
   const xpRequired = guildmasterXpToNextLevel(guild.guildmaster.level);
@@ -153,7 +156,7 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
         <Text style={[styles.priorityKicker, priority.tone === "urgent" && styles.priorityKickerUrgent]}>{priority.tone === "urgent" ? "IMMEDIATE ACTION" : priority.tone === "progress" ? "CAMPAIGN ORDER" : "GUILD OPPORTUNITY"}</Text>
         <Text style={styles.priorityTitle}>{priority.title}</Text>
         <Text style={styles.priorityText}>{priority.description}</Text>
-        <Animated.View style={{ opacity: guideWarTable ? onboardingPulse : 1 }}><ActionButton guideId="guild.currentOrder" label={priority.actionLabel} onPress={() => { if (!warTablePrimerSeen) acknowledgeWarTablePrimer(); navigate(priority.destination); }} /></Animated.View>
+        <Animated.View style={{ opacity: guideWarTable ? onboardingPulse : 1 }}><ActionButton guideId="guild.currentOrder" label={priority.actionLabel} onPress={() => { guide?.dispatch({ type: "complete", tour: "guild" }); if (!warTablePrimerSeen) acknowledgeWarTablePrimer(); navigate(priority.destination); }} /></Animated.View>
       </View>
     </Panel>
 
@@ -179,7 +182,7 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
 
     <SectionTitle>RECENT PARTY</SectionTitle>
     {recent.length ? <Panel style={styles.party}>{recent.map((hero) => <Pressable key={hero.id} onPress={() => navigate("heroes")} style={({ pressed }) => [styles.member, pressed && styles.memberPressed]}><Portrait hero={hero} size={55} /><Text numberOfLines={1} style={[styles.memberName, { color: getRaceNameColor(hero.raceId) }]}>{hero.name}</Text><Text style={styles.memberLevel}>LV {hero.level}</Text></Pressable>)}</Panel> : <EmptyState title="No recent party" message="Assemble a party from a quest and your latest adventurers will appear here." actionLabel="View heroes" onAction={() => navigate("heroes")} />}
-  </ScrollView>;
+  </GuidedScrollView>;
 }
 
 const styles = StyleSheet.create({

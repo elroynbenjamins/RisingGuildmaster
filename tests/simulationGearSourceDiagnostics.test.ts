@@ -7,7 +7,7 @@ import { QUESTS } from "../src/data/quests/quests";
 import { createSimulationParty } from "../src/game/simulation/balanceSimulation";
 import type { ClassId, EquipmentSlot } from "../src/game/heroes/types";
 
-const PARTY = ["warrior","ranger","cleric","mage"] as const;
+const PARTY = ["warrior","ranger","mage","cleric","paladin","berserker","monk","bard","spellbow","bulwark","summoner"] as const;
 const SLOTS: readonly EquipmentSlot[] = ["weapon","armor","helmet","boots","accessory1","accessory2"];
 
 function questIdsThrough(chapterNumber:number): Set<string> {

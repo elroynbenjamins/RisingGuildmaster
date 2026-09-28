@@ -11,7 +11,7 @@ import { IDLE_MISSION_UNLOCK_HERO_COUNT, claimGatheringMission, getIdleMissionLe
 import { useGuild } from "../../state/GuildContext";
 import { getRaceNameColor } from "../../ui/raceColors";
 import { createSeededRandom, randomSeed } from "../../utils/random";
-import { hasSeenContextualTutorial, markContextualTutorialSeen } from "../../game/onboarding/tutorialService";
+import { hasSeenContextualTutorial, isTutorialGuidanceEnabled, markContextualTutorialSeen } from "../../game/onboarding/tutorialService";
 
 export function GatheringScreen({ onBack, openCalendar, targetMaterialId }: { onBack(): void; openCalendar(): void; targetMaterialId?: MaterialId }) {
   const { showDialog } = useGameDialog();
@@ -21,7 +21,7 @@ export function GatheringScreen({ onBack, openCalendar, targetMaterialId }: { on
   const claim = (id: string) => { try { const mission = guild.gatheringMissions.find((item) => item.id === id); const progressLines = mission?.heroIds.map((heroId) => { const hero = guild.heroes.find((item) => item.id === heroId); return hero ? `${hero.name}: +${getIdleMissionLevelProgressXp(hero.level)} progress XP` : null; }).filter(Boolean).join("\n") ?? ""; const claimed = claimGatheringMission(guild, id); updateGuild(claimed.guild); const materials = Object.entries(claimed.result.materials).map(([materialId, amount]) => `${MATERIALS[materialId as keyof typeof MATERIALS].name} ×${amount}`).join(", ") || "No materials"; showDialog({ title: claimed.result.success ? "Expedition Rewards Secured" : "Expedition Returned Empty", message: `${claimed.result.quality.toUpperCase()} YIELD · ${materials}\n${claimed.result.equipmentIds.length ? `Equipment: ${claimed.result.equipmentIds.join(", ")}\n` : ""}Hero XP: +${claimed.result.xpPerHero} each\n${progressLines}\n\nCHECK · D20 ${claimed.result.diceRoll} + ${claimed.result.modifier} = ${claimed.result.total} vs DC ${claimed.result.difficultyClass}`, tone: claimed.result.success ? "success" : "danger" }); } catch (error) { showDialog({ title: "Cannot claim", message: error instanceof Error ? error.message : "Claim failed", tone: "danger" }); } };
   const active = guild.gatheringMissions.filter((mission) => mission.status === "active");
   const unlocked = guild.heroes.length >= IDLE_MISSION_UNLOCK_HERO_COUNT;
-  const guideIdleMission = unlocked && !hasSeenContextualTutorial(guild, "idle_missions");
+  const guideIdleMission = isTutorialGuidanceEnabled(guild) && unlocked && !hasSeenContextualTutorial(guild, "idle_missions");
   const idleMissionPulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     if (!guideIdleMission) { idleMissionPulse.setValue(1); return; }

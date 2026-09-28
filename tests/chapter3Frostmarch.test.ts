@@ -29,7 +29,7 @@ describe("Chapter 3 Frostmarch campaign", () => {
   });
   it("starts Frostmarch with Level-5 equipment choices across multiple roles", () => {
     const ids = QUEST_LOOT_TABLES.frostmarch_campaign_loot!.itemIds;
-    expect(ids).toEqual(expect.arrayContaining(["wardplate", "spellweaver-hood", "wardmarch-boots", "sapphire-ward-ring"]));
+    expect(ids).toEqual(expect.arrayContaining(["moonwood-longbow", "wardplate", "spellweaver-hood", "wardmarch-boots", "sapphire-ward-ring"]));
     expect(ids.every((id) => EQUIPMENT[id]?.levelRequirement === 5)).toBe(true);
   });
 

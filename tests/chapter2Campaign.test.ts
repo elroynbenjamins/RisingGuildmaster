@@ -5,6 +5,8 @@ import { CHAPTER_2 } from "../src/data/campaign/chapter2";
 import { QUEST_ENCOUNTERS } from "../src/data/encounters/questEncounters";
 import { ENEMIES } from "../src/data/enemies";
 import { QUESTS } from "../src/data/quests/quests";
+import { CRAFTING_RECIPES } from "../src/data/crafting/recipes";
+import { EQUIPMENT } from "../src/data/equipment/equipment";
 import { resolveNewBossPhases } from "../src/game/bosses/bossPhaseService";
 import { completeCampaignNode, getAvailableCampaignNodes } from "../src/game/campaign/campaignService";
 import { resolveCampaignChoice } from "../src/game/campaign/campaignChoiceResolver";
@@ -78,6 +80,15 @@ describe("Chapter 2: The Hollow Forge", () => {
     award("last_lift_of_flintwatch");
     award("descent_to_hollow_forge");
     expect(hero.level).toBeGreaterThanOrEqual(5);
+  });
+
+  it("offers Cleric a Level-4 armor catch-up route before the Hollow Warden", () => {
+    expect(QUESTS.last_lift_of_flintwatch?.recipeUnlockIdsOnVictory).toContain("forge_sapphire_lamellar");
+    const recipe = CRAFTING_RECIPES.forge_sapphire_lamellar!;
+    const armor = EQUIPMENT[recipe.outputEquipmentId]!;
+    expect(recipe.artisanLevel).toBe(2);
+    expect(armor).toMatchObject({ slot: "armor", levelRequirement: 4 });
+    expect(armor.classRestrictions).toContain("cleric");
   });
 
   it("gives the final boss three escalating data-driven phases", () => {

@@ -74,6 +74,35 @@ function chapterEightGuild() {
   };
 }
 
+function chapterNineBossGuild(count = 4) {
+  const guild = createGuild();
+  return {
+    ...guild,
+    heroes: heroes(count, 17, "deepward-longsword", "deepward-fieldcoat"),
+    world: {
+      ...guild.world,
+      campaignChapter: 9,
+      completedCampaignNodeIds: [
+        ...guild.world.completedCampaignNodeIds,
+        "broken_wardstone",
+        "the_seventh_bell",
+        "map_that_bled_salt",
+        "descent_below_bells",
+        "streets_drown_twice",
+        "name_of_the_seventh",
+        "citadel_unwritten_law",
+        "chain_beneath_fleet",
+      ],
+      completedQuestIds: [
+        "descent_below_bells",
+        "streets_drown_twice",
+        "citadel_unwritten_law",
+        "chain_beneath_fleet",
+      ],
+    },
+  };
+}
+
 describe("campaign preparation guidance", () => {
   it("recommends the best available chapter side quest when weapons lag", () => {
     const guild = chapterEightGuild();
@@ -171,6 +200,57 @@ describe("campaign preparation guidance", () => {
     });
     expect(recommendation?.detail).toContain("missing three or more helmet, boots, or accessory slots");
     expect(recommendation?.detail).toContain("secondary-slot recipe");
+  });
+
+  it("routes a Chapter 9 replacement toward the Choir side quest before Serekh", () => {
+    const guild = chapterNineBossGuild();
+    guild.heroes = guild.heroes.map((hero, index) => index === 0 ? {
+      ...hero,
+      level: 16,
+      equipment: {
+        ...hero.equipment,
+        helmet: null,
+        boots: null,
+        accessory1: null,
+        accessory2: null,
+      },
+    } : hero);
+    const recommendation = getCampaignPreparationRecommendation(guild);
+    expect(recommendation).toMatchObject({
+      type: "side_quest",
+      questId: "choir_in_the_diving_bell",
+      reason: "secondary",
+    });
+    expect(recommendation?.detail).toContain("secondary-slot recipe");
+  });
+
+  it("falls back to two Wardstone runs for a Chapter 9 sparse replacement after local side stories", () => {
+    const guild = chapterNineBossGuild(6);
+    guild.heroes = guild.heroes.map((hero, index) => index === 0 ? {
+      ...hero,
+      level: 16,
+      equipment: {
+        ...hero.equipment,
+        helmet: null,
+        boots: null,
+        accessory1: null,
+        accessory2: null,
+      },
+    } : hero);
+    guild.world = {
+      ...guild.world,
+      completedQuestIds: [
+        ...guild.world.completedQuestIds,
+        "choir_in_the_diving_bell",
+        "tavern_at_the_bottom_of_the_sea",
+      ],
+    };
+    expect(getCampaignPreparationRecommendation(guild)).toMatchObject({
+      type: "dungeon",
+      reason: "secondary",
+      suggestedRuns: 2,
+      title: "2 Wardstone Expeditions",
+    });
   });
 
   it("uses two expeditions when a late replacement still lacks secondary gear after local side stories", () => {

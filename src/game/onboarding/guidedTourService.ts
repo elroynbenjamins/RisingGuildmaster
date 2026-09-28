@@ -89,8 +89,12 @@ export function getGuidedStep(tour: GuidedTourId, snapshot: GuideSnapshot, targe
     }
     return { tour, target: 'quests.story', title: 'Your next story order', body: 'Campaign is the main story path. Open the highlighted story card when you are ready; party risk is checked before deployment.', acknowledgement: true };
   }
-  const copy: Record<Exclude<GuidedTourId, 'quests'>, { title: string; body: string }> = {
-    guild: { title: 'Your command center', body: 'CURRENT ORDER is the safest answer to “what next?”. Recruit adds heroes, Manage opens services, and End Day heals while advancing time.' },
+  if (tour === 'guild') {
+    return targets.has('guild.currentOrder')
+      ? { tour, target: 'guild.currentOrder', title: 'Follow Current Order', body: 'When you are unsure what to do next, this is the guild’s recommended next action. It never deploys or spends resources silently.', acknowledgement: true }
+      : null;
+  }
+  const copy: Record<Exclude<GuidedTourId, 'quests' | 'guild'>, { title: string; body: string }> = {
     heroes: { title: 'Get to know your company', body: 'Tap a hero for HP, readiness, gear and skills. Fallen heroes need the Temple; unavailable heroes cannot deploy.' },
     inventory: { title: 'Put your first loot to use', body: 'Tap loot to compare it. Check level and class requirements, then equip compatible gear from the hero screen.' },
     world: { title: 'Travel toward your objective', body: 'Travel costs days and rations. Check the destination and travel party before confirming; the guide never travels for you.' },

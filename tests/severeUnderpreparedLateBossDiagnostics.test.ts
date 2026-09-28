@@ -1,31 +1,43 @@
 import { describe, it } from "vitest";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 
-describe("late boss preparation separation diagnostics", () => {
-  it("compares prepared, underprepared and severely underprepared profiles", () => {
-    const bosses = [
-      { id: "ch7-varkesh", questId: "varkesh_gilded_rupture_boss", preparedLevel: 13, seed: 10960 },
-      { id: "ch8-nhal", questId: "admiral_nhal_veyr_boss", preparedLevel: 15, seed: 11970 },
-      { id: "ch9-serekh", questId: "serekh_chartmaker_boss", preparedLevel: 17, seed: 12980 },
-    ] as const;
-    for (const boss of bosses) {
-      for (const profile of [
-        { suffix: "prepared", heroLevel: boss.preparedLevel, gearProfile: "optional_progression" as const },
-        { suffix: "underprepared", heroLevel: boss.preparedLevel - 1, gearProfile: "optional_progression" as const },
-        { suffix: "severe", heroLevel: boss.preparedLevel - 1, gearProfile: "lagged_basic" as const },
-      ]) {
-        console.log("PROFILE", simulateCombatScenario({
-          id: `${boss.id}-${profile.suffix}`,
-          questId: boss.questId,
+describe("late boss tuning diagnostics", () => {
+  it("isolates Nhal stage pressure and rechecks Serekh preparation bands", () => {
+    for (const profile of [
+      { suffix: "prepared", heroLevel: 15, gearProfile: "optional_progression" as const },
+      { suffix: "underprepared", heroLevel: 14, gearProfile: "optional_progression" as const },
+    ]) {
+      for (const encounterLimit of [1, 2, 3] as const) {
+        console.log("NHAL", simulateCombatScenario({
+          id: `ch8-nhal-${profile.suffix}-limit${encounterLimit}`,
+          questId: "admiral_nhal_veyr_boss",
           heroLevel: profile.heroLevel,
           partyClasses: ["warrior", "ranger", "cleric", "mage"],
           difficultyId: "standard",
-          runs: 12,
-          seed: boss.seed,
+          runs: 8,
+          seed: 11970,
           gearProfile: profile.gearProfile,
           progressionProfile: "subclass_ready",
+          encounterLimit,
         }));
       }
     }
-  }, 360_000);
+    for (const profile of [
+      { suffix: "prepared", heroLevel: 17, gearProfile: "optional_progression" as const },
+      { suffix: "underprepared", heroLevel: 16, gearProfile: "optional_progression" as const },
+      { suffix: "severe", heroLevel: 16, gearProfile: "lagged_basic" as const },
+    ]) {
+      console.log("SEREKH", simulateCombatScenario({
+        id: `ch9-serekh-${profile.suffix}`,
+        questId: "serekh_chartmaker_boss",
+        heroLevel: profile.heroLevel,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId: "standard",
+        runs: 8,
+        seed: 12980,
+        gearProfile: profile.gearProfile,
+        progressionProfile: "subclass_ready",
+      }));
+    }
+  }, 300_000);
 });

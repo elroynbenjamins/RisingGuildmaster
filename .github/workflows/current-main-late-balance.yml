@@ -4,7 +4,7 @@ on:
     branches:
       - balance/current-main-late-validation
 concurrency:
-  group: current-main-serekh-iron-comps
+  group: current-main-late-final
   cancel-in-progress: true
 jobs:
   validate:
@@ -19,4 +19,5 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/currentMainLateBalanceDiagnostics.test.ts
+      - run: pnpm typecheck
+      - run: pnpm vitest run tests/chapter9DrownedSeventh.test.ts tests/lateCampaignScaling.test.ts tests/balanceSimulation.test.ts -t "Chapter 9|late campaign encounter scaling|prepared Standard casualty pressure through Chapters 7–9|keeps underprepared late-chapter bosses dangerous without becoming guaranteed wipes|keeps late boss preparation meaningfully better across shared seeds|keeps prepared Hard and Iron parties viable without making them forgiving"

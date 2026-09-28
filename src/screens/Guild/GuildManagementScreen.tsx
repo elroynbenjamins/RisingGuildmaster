@@ -6,6 +6,9 @@ import { NotificationDot } from "../../components/navigation/NotificationDot";
 import { GameIcon } from "../../components/icons/GameIcon";
 import type { GameIconId } from "../../data/ui/gameIcons";
 import { useActionNotifications } from "../../state/useActionNotifications";
+import { useGuild } from "../../state/GuildContext";
+import { GuidedTip } from "../../components/onboarding/GuidedTip";
+import { markGuidedScreenTipSeen, shouldShowGuidedScreenTip } from "../../game/onboarding/screenTutorialService";
 type EntryId = "gems" | "guildmaster" | "roster" | "temple" | "operations" | "legacy" | "achievements" | "content" | "finances" | "manual" | "heroCodex" | "skillCodex" | "loreJournal" | "settings";
 type Entry = { id: EntryId; name: string; detail: string };
 const ENTRY_ICONS: Record<EntryId,GameIconId> = { gems:"gold", guildmaster:"management", roster:"heroes", temple:"temple", operations:"management", legacy:"victory", achievements:"victory", content:"hero_codex", finances:"calendar", manual:"monster_manual", heroCodex:"hero_codex", skillCodex:"skill_codex", loreJournal:"journal", settings:"management" };
@@ -41,6 +44,8 @@ interface GuildManagementScreenProps {
 
 export function GuildManagementScreen(props: GuildManagementScreenProps) {
   const notices = useActionNotifications();
+  const { guild, updateGuild } = useGuild();
+  const showGuide = shouldShowGuidedScreenTip(guild, "guild_management");
   const [section, setSection] = useState<"Command" | "Services" | "Archives">("Command");
   const group = GROUPS[section === "Command" ? 0 : section === "Services" ? 1 : 2]!;
   const actions: Record<EntryId, () => void> = {
@@ -53,6 +58,7 @@ export function GuildManagementScreen(props: GuildManagementScreenProps) {
     <BackButton onPress={props.onBack} />
     <Text style={styles.title}>Guild Management</Text>
     <Text style={styles.intro}>Command the guild, maintain its services, and consult its growing archives.</Text>
+    {showGuide && <GuidedTip step="SCREEN GUIDE · MANAGEMENT" title="Three groups, one place" message="Command handles roster and time. Services handles recovery. Archives is reference. Start with Calendar & Finances." onDismiss={() => updateGuild((current) => markGuidedScreenTipSeen(current, "guild_management"))} />}
     <SegmentedTabs values={["Command", "Services", "Archives"] as const} value={section} onChange={setSection}/>
     <View style={styles.group}>
       <Text style={styles.section}>{group.title}</Text>

@@ -342,6 +342,52 @@ describe("repeatable balance simulations", () => {
     expect(averageFallen, "average late prepared casualty pressure").toBeGreaterThanOrEqual(.75);
   }, 180_000);
 
+  it("keeps alternate late parties viable while preserving preparation pressure", () => {
+    const defensiveVarkesh = simulateCombatScenario({
+      id: "alt-ch7-varkesh-base-defensive",
+      questId: "varkesh_gilded_rupture_boss",
+      heroLevel: 13,
+      partyClasses: ["warrior", "paladin", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 6,
+      seed: 12_700,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+    });
+    const aggressiveScenarios = [
+      { id: "alt-ch8-nhal-prepared-aggressive", questId: "admiral_nhal_veyr_boss", heroLevel: 15, seed: 13_800, gearProfile: "optional_progression" as const },
+      { id: "alt-ch8-nhal-lagged-aggressive", questId: "admiral_nhal_veyr_boss", heroLevel: 14, seed: 13_800, gearProfile: "lagged_basic" as const },
+      { id: "alt-ch9-serekh-prepared-aggressive", questId: "serekh_chartmaker_boss", heroLevel: 17, seed: 13_900, gearProfile: "optional_progression" as const },
+      { id: "alt-ch9-serekh-lagged-aggressive", questId: "serekh_chartmaker_boss", heroLevel: 16, seed: 13_900, gearProfile: "lagged_basic" as const },
+    ] as const;
+    const aggressive = aggressiveScenarios.map((scenario) => simulateCombatScenario({
+      ...scenario,
+      partyClasses: ["warrior", "berserker", "cleric", "ranger"],
+      difficultyId: "standard",
+      runs: 6,
+      progressionProfile: "subclass_ready",
+    }));
+    const [nhalPrepared, nhalLagged, serekhPrepared, serekhLagged] = aggressive;
+    console.table([defensiveVarkesh, ...aggressive]);
+
+    expect(defensiveVarkesh.stalled).toBe(0);
+    expect(defensiveVarkesh.winRate, "prepared defensive Varkesh party viability").toBeGreaterThanOrEqual(.5);
+    expect(defensiveVarkesh.averageFallenHeroesOnWins, "defensive Varkesh casualty pressure").toBeGreaterThanOrEqual(1);
+
+    for (const result of [nhalPrepared, serekhPrepared]) {
+      expect(result.stalled).toBe(0);
+      expect(result.winRate, `${result.scenarioId} prepared viability`).toBeGreaterThanOrEqual(.75);
+    }
+    expect(nhalLagged.winRate).toBeLessThan(nhalPrepared.winRate);
+    expect(serekhLagged.winRate).toBeLessThan(serekhPrepared.winRate);
+    expect(nhalLagged.wipeRate, "lagged aggressive Nhal wipe pressure").toBeGreaterThanOrEqual(.5);
+    expect(serekhLagged.wipeRate, "lagged aggressive Serekh wipe pressure").toBeGreaterThanOrEqual(.5);
+
+    const preparedAverageFallen = [defensiveVarkesh, nhalPrepared, serekhPrepared]
+      .reduce((sum, result) => sum + result.averageFallenHeroesOnWins, 0) / 3;
+    expect(preparedAverageFallen, "alternate prepared parties should retain aggregate casualty pressure").toBeGreaterThanOrEqual(.5);
+  }, 180_000);
+
   it("keeps underprepared late-chapter bosses dangerous without becoming guaranteed wipes", () => {
     const scenarios = [
       { id: "underprepared-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 8960 },

@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/late-recruit-gear-diagnostic.yml
       - tests/lateRecruitGearDiagnostic.test.ts
+      - tests/recruitment.test.ts
       - src/game/recruitment/candidateGenerator.ts
       - src/data/equipment/**
 
@@ -25,4 +26,4 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
-      - run: pnpm vitest run tests/lateRecruitGearDiagnostic.test.ts
+      - run: pnpm vitest run tests/lateRecruitGearDiagnostic.test.ts tests/recruitment.test.ts tests/weaponIcons.test.ts tests/equipmentBalanceCoverage.test.ts

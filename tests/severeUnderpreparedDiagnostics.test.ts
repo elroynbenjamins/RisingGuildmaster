@@ -1,30 +1,34 @@
 import { describe, it } from "vitest";
-import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
+import { calculateHero } from "../src/game/heroes/heroCalculator";
+import { createSimulationParty, simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 
-describe("late preparation gradient diagnostics", () => {
-  it("compares prepared, mildly underprepared, and severely underprepared parties on identical seeds", () => {
-    for (const boss of [
-      { id: "varkesh", questId: "varkesh_gilded_rupture_boss", preparedLevel: 13, seed: 9600 },
-      { id: "nhal", questId: "admiral_nhal_veyr_boss", preparedLevel: 15, seed: 9700 },
-      { id: "serekh", questId: "serekh_chartmaker_boss", preparedLevel: 17, seed: 9800 },
-    ] as const) {
-      for (const profile of [
-        { suffix: "prepared", level: boss.preparedLevel, gearProfile: "optional_progression" as const },
-        { suffix: "mild", level: boss.preparedLevel - 1, gearProfile: "optional_progression" as const },
-        { suffix: "severe", level: boss.preparedLevel - 1, gearProfile: "lagged_basic" as const },
-      ]) {
-        console.log("GRADIENT", simulateCombatScenario({
-          id: `${boss.id}-${profile.suffix}`,
-          questId: boss.questId,
-          heroLevel: profile.level,
-          partyClasses: ["warrior", "ranger", "cleric", "mage"],
-          difficultyId: "standard",
-          runs: 8,
-          seed: boss.seed,
-          gearProfile: profile.gearProfile,
-          progressionProfile: "subclass_ready",
-        }));
-      }
+describe("Serekh preparation gradient diagnostics", () => {
+  it("compares stable prepared and underprepared profiles and their loadouts", () => {
+    const profiles = [
+      { suffix: "prepared", level: 17, gearProfile: "optional_progression" as const },
+      { suffix: "mild", level: 16, gearProfile: "optional_progression" as const },
+      { suffix: "severe", level: 16, gearProfile: "lagged_basic" as const },
+    ] as const;
+
+    for (const profile of profiles) {
+      const party = createSimulationParty(["warrior", "ranger", "cleric", "mage"], profile.level, 9850, profile.gearProfile, "subclass_ready");
+      console.log("LOADOUT", profile.suffix, party.map((hero) => ({
+        classId: hero.classId,
+        level: hero.level,
+        equipment: hero.equipment,
+        stats: calculateHero(hero).stats,
+      })));
+      console.log("SEREKH", simulateCombatScenario({
+        id: `serekh-${profile.suffix}`,
+        questId: "serekh_chartmaker_boss",
+        heroLevel: profile.level,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId: "standard",
+        runs: 24,
+        seed: 9850,
+        gearProfile: profile.gearProfile,
+        progressionProfile: "subclass_ready",
+      }));
     }
   }, 300_000);
 });

@@ -131,7 +131,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
 
   const dungeonUnlocked = guild.world.completedCampaignNodeIds.includes("broken_wardstone") && guild.heroes.length >= DUNGEON_UNLOCK_HERO_COUNT;
   if ((underLevel || weaponLag || armorLag) && dungeonUnlocked) {
-    const runs = underLevel ? suggestedDungeonRuns(heroes, recommendedMin) : 1;
+    const runs: 1 | 2 = (weaponLag || armorLag) ? 2 : suggestedDungeonRuns(heroes, recommendedMin);
     const runText = runs === 1
       ? "Start with one Wardstone Expedition."
       : "Plan on two Wardstone Expeditions, then reassess before the next story push.";

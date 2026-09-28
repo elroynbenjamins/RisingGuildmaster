@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useLayoutEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import type { GuildState } from "../../game/guild/types";
 import type { MainTab } from "../../ui/navigation";
@@ -8,7 +8,6 @@ import { BottomNavigation } from "./BottomNavigation";
 import { GlobalResourceHeader } from "./GlobalResourceHeader";
 import { GuildActivityStrip } from "./GuildActivityStrip";
 import { useTheme } from "../../theme/theme";
-import { GuidedTutorialContext } from "../tutorial/GuidedTutorialContext";
 import { GuidedTutorialContext } from "../tutorial/GuidedTutorialContext";
 
 export function ManagementShell({ guild, active, onSelect, onOpenGems, onOpenActivity, children }: React.PropsWithChildren<{
@@ -21,8 +20,6 @@ export function ManagementShell({ guild, active, onSelect, onOpenGems, onOpenAct
   const { colors } = useTheme();
   const enterMainTab = useContext(GuidedTutorialContext)?.enterMainTab;
   useLayoutEffect(() => enterMainTab?.(active), [active, enterMainTab]);
-  const guide = useContext(GuidedTutorialContext);
-  useEffect(() => guide?.enterMainTab(active), [guide, active]);
   return <View style={[styles.root, { backgroundColor: colors.background }]}>
     <GlobalResourceHeader onOpenGems={onOpenGems} guild={guild} />
     <GuildActivityStrip guild={guild} onOpen={onOpenActivity} />

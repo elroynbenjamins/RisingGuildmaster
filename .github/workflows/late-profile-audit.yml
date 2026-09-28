@@ -1,0 +1,22 @@
+name: Late profile audit
+on:
+  push:
+    branches:
+      - balance/late-casualty-landing
+concurrency:
+  group: late-profile-audit
+  cancel-in-progress: true
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/lateProfileAudit.test.ts

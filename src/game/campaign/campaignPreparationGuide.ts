@@ -106,6 +106,18 @@ function suggestedDungeonRuns(heroes: ReturnType<typeof coreFieldHeroes>, recomm
   return averageXpGap <= averageRunTarget ? 1 : 2;
 }
 
+function rogueliteCatchupText(guild: GuildState, runs: 1 | 2): string {
+  const cooldownDay = guild.rogueliteRotation.cooldownUntilDay;
+  if (guild.currentDay < cooldownDay) {
+    return runs === 1
+      ? `Your next Roguelite Expedition becomes available on Day ${cooldownDay}. Clear it, then reassess.`
+      : `Roguelite Expeditions become available again on Day ${cooldownDay}. Plan on up to two successful clears, reassessing after each.`;
+  }
+  return runs === 1
+    ? "Start with one Roguelite Expedition, then reassess."
+    : "Plan on up to two successful Roguelite Expeditions. A victory refreshes expedition themes after 7 days, so reassess after each clear.";
+}
+
 function getTrainingAlternative(
   guild: GuildState,
   heroes: ReturnType<typeof coreFieldHeroes>,
@@ -195,9 +207,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
 
   if (reason === "level" && dungeonUnlocked && (underlevelHeroCount === 1 || sideQuests.length === 0)) {
     const runs = suggestedDungeonRuns(heroes, recommendedMin);
-    const runText = runs === 1
-      ? "Start with one Roguelite Expedition, then reassess."
-      : "Plan on up to two successful Roguelite Expeditions. A victory refreshes expedition themes after 7 days, so reassess after each clear.";
+    const runText = rogueliteCatchupText(guild, runs);
     const trainingText = trainingAlternative
       ? ` Or use the Training Hall for ${trainingAlternative.heroName}: about ${trainingAlternative.sessions} ${trainingAlternative.programName} session${trainingAlternative.sessions === 1 ? "" : "s"}, ${trainingAlternative.estimatedDays} days and ${trainingAlternative.estimatedGoldCost.toLocaleString()} gold to reach Level ${trainingAlternative.targetLevel} safely while the rest of the guild handles other work.`
       : "";
@@ -230,9 +240,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
 
   if ((underLevel || weaponLag || armorLag || secondaryGearGap) && dungeonUnlocked) {
     const runs: 1 | 2 = (weaponLag || armorLag || secondaryGearGap) ? 2 : suggestedDungeonRuns(heroes, recommendedMin);
-    const runText = runs === 1
-      ? "Start with one Roguelite Expedition."
-      : "Plan on two Roguelite Expeditions, then reassess before the next story push.";
+    const runText = rogueliteCatchupText(guild, runs);
     const dungeonReason: "level" | "weapon" | "armor" | "secondary" = meaningfulLevelGap ? "level" : weaponLag ? "weapon" : armorLag ? "armor" : secondaryGearGap ? "secondary" : "level";
     const detail = dungeonReason === "level"
       ? `Your top four average Level ${fieldLevel.toFixed(1)}; the next story mission recommends Level ${recommendedMin}. ${runText} Each clear gives catch-up XP plus an equipment cache.`

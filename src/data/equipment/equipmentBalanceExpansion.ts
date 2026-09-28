@@ -38,6 +38,16 @@ export const EQUIPMENT_BALANCE_EXPANSION: Record<string, EquipmentDefinition> = 
   "formation-plate": item("formation-plate", "Formation Plate", "armor", "uncommon", 3, 196, [mod("formation-plate", "maxHP", "percentage", .06), mod("formation-plate", "physicalDefense", "percentage", .06)], ["bulwark"]),
   "warding-brooch": item("warding-brooch", "Warding Brooch", "accessory2", "uncommon", 3, 170, [mod("warding-brooch", "magicDefenseScore", "flat", 1)]),
 
+  // Chapter 5 catch-up bridge gear: intentionally uncommon and effect-free so story loot,
+  // Level-2 workshops, and Wardstone caches can repair badly lagging primary slots without
+  // bypassing Chapter 6 rare equipment.
+  "cinderroad-fieldcoat": item("cinderroad-fieldcoat", "Cinderroad Fieldcoat", "armor", "uncommon", 7, 520, [mod("cinderroad-fieldcoat", "armorClass", "flat", 1), mod("cinderroad-fieldcoat", "maxHP", "percentage", .06), mod("cinderroad-fieldcoat", "magicDefense", "percentage", .05)]),
+  "cinderroad-crozier": item("cinderroad-crozier", "Cinderroad Crozier", "weapon", "uncommon", 7, 545, [mod("cinderroad-crozier", "attackRoll", "flat", 1), mod("cinderroad-crozier", "magicDamage", "percentage", .09), mod("cinderroad-crozier", "healingPower", "percentage", .05)], ["mage", "cleric", "summoner"]),
+  "cinderstep-quarterstaff": item("cinderstep-quarterstaff", "Cinderstep Quarterstaff", "weapon", "uncommon", 7, 535, [mod("cinderstep-quarterstaff", "attackRoll", "flat", 1), mod("cinderstep-quarterstaff", "physicalDamage", "percentage", .09), mod("cinderstep-quarterstaff", "speed", "percentage", .04)], ["monk"]),
+  "emberverse-rapier": item("emberverse-rapier", "Emberverse Rapier", "weapon", "uncommon", 7, 540, [mod("emberverse-rapier", "attackRoll", "flat", 1), mod("emberverse-rapier", "magicDamage", "percentage", .08), mod("emberverse-rapier", "criticalChance", "flat", .02)], ["bard"]),
+  "cinderscript-recurve": item("cinderscript-recurve", "Cinderscript Recurve", "weapon", "uncommon", 7, 545, [mod("cinderscript-recurve", "attackRoll", "flat", 1), mod("cinderscript-recurve", "magicDamage", "percentage", .09), mod("cinderscript-recurve", "criticalChance", "flat", .02)], ["spellbow"]),
+  "hearthwall-shield": item("hearthwall-shield", "Hearthwall Shield", "weapon", "uncommon", 7, 560, [mod("hearthwall-shield", "armorClass", "flat", 1), mod("hearthwall-shield", "maxHP", "percentage", .08), mod("hearthwall-shield", "physicalDefense", "percentage", .07)], ["bulwark"]),
+
   "stormglass-boots": item("stormglass-boots", "Stormglass Boots", "boots", "rare", 6, 330, [mod("stormglass-boots", "movementRange", "flat", 1), mod("stormglass-boots", "speed", "percentage", .06), mod("stormglass-boots", "magicDefense", "percentage", .05)]),
   "oathkeepers-helm": item("oathkeepers-helm", "Oathkeeper's Helm", "helmet", "rare", 6, 345, [mod("oathkeepers-helm", "armorClass", "flat", 1), mod("oathkeepers-helm", "maxHP", "percentage", .06)], ["warrior", "cleric", "paladin", "berserker"]),
   "harmonic-locket": item("harmonic-locket", "Harmonic Locket", "accessory2", "rare", 6, 365, [mod("harmonic-locket", "magicDamage", "percentage", .07), mod("harmonic-locket", "healingPower", "percentage", .07)], ["mage", "cleric", "bard"]),

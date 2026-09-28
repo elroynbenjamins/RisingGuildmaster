@@ -37,6 +37,16 @@ describe("equipment balance coverage", () => {
     }
   });
 
+  it("keeps every class on primary bridge gear through Chapter 5", () => {
+    for (const classId of CLASSES) {
+      const usable = Object.values(EQUIPMENT).filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(classId));
+      const weapons = usable.filter((item) => item.slot === "weapon" && item.levelRequirement >= 7 && item.levelRequirement <= 9);
+      const armor = usable.filter((item) => item.slot === "armor" && item.levelRequirement >= 7 && item.levelRequirement <= 9);
+      expect(weapons.length, `${classId} Chapter 5 bridge weapon`).toBeGreaterThanOrEqual(1);
+      expect(armor.length, `${classId} Chapter 5 bridge armor`).toBeGreaterThanOrEqual(1);
+    }
+  });
+
   it("keeps every class on a current equipment path into Chapter 7", () => {
     for (const classId of CLASSES) {
       const usable = Object.values(EQUIPMENT).filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(classId));

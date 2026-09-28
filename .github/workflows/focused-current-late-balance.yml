@@ -6,9 +6,8 @@ on:
 concurrency:
   group: focused-current-late-balance
   cancel-in-progress: true
-
 jobs:
-  prepared-standard:
+  paired-standard:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,32 +19,4 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/balanceSimulation.test.ts -t "prepared Standard casualty pressure through Chapters 7–9"
-
-  underprepared-standard:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/balanceSimulation.test.ts -t "underprepared late-chapter bosses"
-
-  hard-iron:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/balanceSimulation.test.ts -t "keeps prepared Hard and Iron parties viable"
+      - run: pnpm vitest run tests/currentMainLatePairedDiagnostics.test.ts

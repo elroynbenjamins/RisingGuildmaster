@@ -8,6 +8,8 @@ import { createSeededRandom } from "../src/utils/random";
 import { createGuild } from "../src/game/guild/guildService";
 import { resolveGuildEventChoice } from "../src/game/world/worldEventResolver";
 import { QUEST_LOOT_TABLES } from "../src/data/loot/questLootTables";
+import { CAMPAIGN_CHAPTERS, CAMPAIGN_NODES } from "../src/data/campaign/chapter1";
+import { QUESTS } from "../src/data/quests/quests";
 
 const CLASSES: ClassId[] = ["warrior", "ranger", "mage", "cleric", "paladin", "berserker", "monk", "bard", "spellbow", "bulwark", "summoner"];
 const ATTRIBUTE_TARGETS = new Set(["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]);
@@ -39,19 +41,35 @@ describe("equipment balance coverage", () => {
   });
 
   it("keeps every class on reachable primary bridge gear through Chapter 5", () => {
-    const ashlandsLootIds = new Set([
-      ...QUEST_LOOT_TABLES.ashlands_campaign_loot!.itemIds,
-      ...QUEST_LOOT_TABLES.emberfall_defense_loot!.itemIds,
-      ...QUEST_LOOT_TABLES.keeper_cinders_loot!.itemIds,
-      ...QUEST_LOOT_TABLES.purple_hearth_loot!.itemIds,
-      ...QUEST_LOOT_TABLES.ash_herald_loot!.itemIds,
-      ...QUEST_LOOT_TABLES.glassworks_rescue_loot!.itemIds,
-      ...QUEST_LOOT_TABLES.phoenix_memory_loot!.itemIds,
-    ]);
+    const accessibleQuestIds = new Set<string>();
+    for (let chapterNumber = 1; chapterNumber <= 5; chapterNumber += 1) {
+      const chapter = CAMPAIGN_CHAPTERS[chapterNumber]!;
+      for (const nodeId of chapter.nodeIds) {
+        const questId = CAMPAIGN_NODES[nodeId]?.questId;
+        if (questId) accessibleQuestIds.add(questId);
+      }
+      for (const questId of chapter.sideQuestIds ?? []) accessibleQuestIds.add(questId);
+    }
+
+    const questLootIds = new Set<string>();
+    const questRecipeOutputs = new Set<string>();
+    for (const questId of accessibleQuestIds) {
+      const quest = QUESTS[questId];
+      if (!quest) continue;
+      for (const itemId of QUEST_LOOT_TABLES[quest.lootTableId]?.itemIds ?? []) questLootIds.add(itemId);
+      for (const recipeId of quest.recipeUnlockIdsOnVictory ?? []) {
+        const outputId = CRAFTING_RECIPES[recipeId]?.outputEquipmentId;
+        if (outputId) questRecipeOutputs.add(outputId);
+      }
+    }
+
     const defaultLevelTwoOutputs = new Set(Object.values(CRAFTING_RECIPES)
       .filter((recipe) => !recipe.unlockSource && recipe.artisanLevel <= 2)
       .map((recipe) => recipe.outputEquipmentId));
-    const reachable = (itemId: string) => ashlandsLootIds.has(itemId) || defaultLevelTwoOutputs.has(itemId);
+    const reachable = (itemId: string) =>
+      questLootIds.has(itemId)
+      || questRecipeOutputs.has(itemId)
+      || defaultLevelTwoOutputs.has(itemId);
 
     for (const classId of CLASSES) {
       const usable = Object.values(EQUIPMENT).filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(classId));

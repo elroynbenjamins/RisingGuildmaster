@@ -94,10 +94,20 @@ export function getGuidedStep(tour: GuidedTourId, snapshot: GuideSnapshot, targe
       ? { tour, target: 'guild.currentOrder', title: 'Follow Current Order', body: 'When you are unsure what to do next, this is the guild’s recommended next action. It never deploys or spends resources silently.', acknowledgement: true }
       : null;
   }
-  const copy: Record<Exclude<GuidedTourId, 'quests' | 'guild'>, { title: string; body: string }> = {
-    heroes: { title: 'Get to know your company', body: 'Tap a hero for HP, readiness, gear and skills. Fallen heroes need the Temple; unavailable heroes cannot deploy.' },
-    inventory: { title: 'Put your first loot to use', body: 'Tap loot to compare it. Check level and class requirements, then equip compatible gear from the hero screen.' },
-    world: { title: 'Travel toward your objective', body: 'Travel costs days and rations. Check the destination and travel party before confirming; the guide never travels for you.' },
-  };
-  return { tour, target: `nav.${destination}`, ...copy[tour], acknowledgement: true };
+  if (tour === 'heroes') {
+    return targets.has('heroes.firstHero')
+      ? { tour, target: 'heroes.firstHero', title: 'Inspect a hero', body: 'Open a hero to see HP, readiness, gear and skills. Those are the checks that matter before deployment.', acknowledgement: false }
+      : null;
+  }
+  if (tour === 'inventory') {
+    return targets.has('inventory.firstItem')
+      ? { tour, target: 'inventory.firstItem', title: 'Inspect your loot', body: 'Open the highlighted item. The comparison view shows who can equip it and whether it is actually an upgrade.', acknowledgement: false }
+      : null;
+  }
+  if (tour === 'world') {
+    return targets.has('world.campaignRoute')
+      ? { tour, target: 'world.campaignRoute', title: 'Follow the campaign route', body: 'Use this control to focus the next campaign leg. Travel shows day and ration costs before you commit.', acknowledgement: false }
+      : null;
+  }
+  return null;
 }

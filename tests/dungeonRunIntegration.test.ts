@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DUNGEON_NODES } from "../src/data/dungeons/dungeons";
-import { beginDungeonCombatCheckpoint, beginDungeonExpedition, checkpointDungeonCombat, getDungeonCombatSetup, resolveDungeonCombat, resolveDungeonUtilityNode } from "../src/game/dungeons/dungeonRunService";
+import { beginDungeonCombatCheckpoint, beginDungeonExpedition, checkpointDungeonCombat, closeDungeonExpedition, getDungeonCombatSetup, resolveDungeonCombat, resolveDungeonUtilityNode } from "../src/game/dungeons/dungeonRunService";
 import { chooseDungeonNode } from "../src/game/dungeons/dungeonService";
 import { createGuild } from "../src/game/guild/guildService";
 import { generateHero } from "../src/game/heroes/heroGenerator";
@@ -170,6 +170,75 @@ describe("playable dungeon run integration", () => {
     expect(awarded.slot).toBe("weapon");
     expect(awarded.levelRequirement).toBe(16);
     expect(awarded.rarity).toBe("rare");
+  });
+
+  it("gives a sparse Level-17 party distinct secondary catch-up items across two clears", () => {
+    const classes = ["warrior", "ranger", "mage", "cleric"] as const;
+    const weapons = ["deepward-longsword", "deepward-longbow", "deepward-crozier", "deepward-crozier"] as const;
+    const armors = ["veyr-mail", "last-call-mantle", "last-call-mantle", "last-call-mantle"] as const;
+    const base = createGuild();
+    const partyHeroes = classes.map((classId, index) => {
+      const hero = generateHero(createSeededRandom(2_400 + index), { classId });
+      return {
+        ...hero,
+        id: `secondary-catchup-hero-${index}`,
+        level: 17,
+        equipment: {
+          ...hero.equipment,
+          weapon: weapons[index]!,
+          armor: armors[index]!,
+          helmet: null,
+          boots: null,
+          accessory1: null,
+          accessory2: null,
+        },
+      };
+    });
+    const reserves = [
+      { ...generateHero(createSeededRandom(2_490), { classId: "paladin" }), id: "secondary-catchup-reserve-1" },
+      { ...generateHero(createSeededRandom(2_491), { classId: "berserker" }), id: "secondary-catchup-reserve-2" },
+    ];
+    let guild: ReturnType<typeof createGuild> = {
+      ...base,
+      heroes: [...partyHeroes, ...reserves],
+      discoveredEnemyIds: Object.keys(ENEMIES),
+      world: { ...base.world, completedCampaignNodeIds: ["broken_wardstone"] },
+      rogueliteRotation: {
+        ...base.rogueliteRotation,
+        offeredDungeonIds: ["wardstone_depths", "thornwood_trials", "temple_of_coils"],
+      },
+    };
+    const partyHeroIds = partyHeroes.map((hero) => hero.id);
+    const awarded: string[] = [];
+
+    for (let clear = 0; clear < 2; clear += 1) {
+      guild = beginDungeonExpedition(guild, "wardstone_depths", partyHeroIds);
+      const run = guild.activeDungeonRun!;
+      guild = {
+        ...guild,
+        activeDungeonRun: { ...run, currentNodeId: "depths_boss" },
+        activeRogueliteRun: { ...guild.activeRogueliteRun!, bossRecipeAwarded: true },
+      };
+      const result = resolveDungeonCombat(guild, "victory", guild.activeDungeonRun!.heroInstances, sequenceRandom([.99, 0]));
+      const ids = result.guild.activeDungeonRun?.gearIdsAwarded ?? [];
+      awarded.push(ids[ids.length - 1]!);
+      guild = closeDungeonExpedition(result.guild);
+      guild = {
+        ...guild,
+        rogueliteRotation: {
+          ...guild.rogueliteRotation,
+          cooldownUntilDay: guild.currentDay,
+          offeredDungeonIds: ["wardstone_depths", "thornwood_trials", "temple_of_coils"],
+        },
+      };
+    }
+
+    expect(new Set(awarded).size).toBe(2);
+    for (const id of awarded) {
+      expect(["helmet", "boots", "accessory1", "accessory2"]).toContain(EQUIPMENT[id]!.slot);
+      expect(EQUIPMENT[id]!.levelRequirement).toBe(16);
+      expect(RECRUITMENT_FIELD_GEAR_IDS.has(id)).toBe(false);
+    }
   });
 
   it("does not award recruit-issued fieldcoats from expedition caches", () => {

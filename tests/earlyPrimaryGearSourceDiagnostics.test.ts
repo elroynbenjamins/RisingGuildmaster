@@ -9,7 +9,7 @@ import { STARTER_JOURNEY } from "../src/game/onboarding/starterJourneyService";
 import type { ClassId } from "../src/game/heroes/types";
 
 const ALL_CLASSES: readonly ClassId[] = ["warrior","ranger","mage","cleric","paladin","berserker","monk","bard","spellbow","bulwark","summoner"];
-const EARLY_LOCAL_QUESTS = ["coils_of_the_sunken_grove","teeth_below_guildhaven","white_maw_of_frostmarch","highcourt_silent_charter"] as const;
+const EARLY_LOCAL_QUESTS = ["coils_of_the_sunken_grove","teeth_below_guildhaven","white_maw_of_frostmarch","highcourt_silent_charter","night_of_thirteen_ladders","last_lift_of_flintwatch","bellkeeper_below"] as const;
 
 function questIdsThroughChapter(chapterNumber:number): Set<string> {
   const ids=new Set<string>([STARTER_JOURNEY.roadQuestId,STARTER_JOURNEY.sideQuestId]);
@@ -83,6 +83,11 @@ describe("early primary gear source diagnostics",()=>{
       });
       console.log("EARLY_GEAR_CHAPTER",chapterNumber,chapter.name);
       console.table(rows);
+      for (const row of rows.filter((entry) => entry.baseClass)) {
+        if (row.weaponLag > 2 || row.armorLag > 2) {
+          throw new Error(`${row.classId} Chapter ${chapterNumber} primary gear lag exceeds two levels: weapon ${row.weaponLag}, armor ${row.armorLag}`);
+        }
+      }
     }
   });
 });

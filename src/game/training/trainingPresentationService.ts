@@ -119,6 +119,6 @@ export function getTrainingCatchupAdvice(guild: GuildState): TrainingCatchupAdvi
     targetLevel: guidance.targetLevel,
     nextQuestName: guidance.nextQuestName,
     sideQuestCount: guidance.sideQuestIds.length,
-    message: `Your top-four roster is ${gap.toFixed(1)} level${Math.abs(gap - 1) < .001 ? "" : "s"} below the next campaign recommendation. One-clear Side Quests are the main active catch-up path; use Training Hall slots to supplement heroes while the rest of the guild adventures or recovers.`,
+    message: `Your top-four roster is ${gap.toFixed(1)} level${Math.abs(gap - 1) < .001 ? "" : "s"} below the next campaign recommendation. Roguelite Expeditions are the repeatable active catch-up route for XP plus gear; Training Hall slots give safer XP over calendar days while the rest of the guild adventures. One-clear Side Quests remain useful one-time catch-up.`,
   };
 }

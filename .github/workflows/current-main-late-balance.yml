@@ -4,7 +4,7 @@ on:
     branches:
       - balance/current-main-late-validation
 concurrency:
-  group: current-main-late-balance
+  group: current-main-serekh-regression
   cancel-in-progress: true
 jobs:
   validate:
@@ -19,4 +19,4 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/currentMainLateBalanceDiagnostics.test.ts
+      - run: pnpm vitest run tests/balanceSimulation.test.ts -t "prepared Standard casualty pressure through Chapters 7–9|keeps underprepared late-chapter bosses dangerous without becoming guaranteed wipes"

@@ -349,6 +349,52 @@ describe("repeatable balance simulations", () => {
     expect(results.filter((result) => result.wipeRate > 0).length, "late underprepared bosses should still produce occasional wipes").toBeGreaterThanOrEqual(1);
   }, 180_000);
 
+  it("keeps Serekh preparation meaningful without removing casualty pressure", () => {
+    const prepared = simulateCombatScenario({
+      id: "serekh-prepared-paired",
+      questId: "serekh_chartmaker_boss",
+      heroLevel: 17,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 8,
+      seed: 9500,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+    });
+    const underprepared = simulateCombatScenario({
+      id: "serekh-underprepared-paired",
+      questId: "serekh_chartmaker_boss",
+      heroLevel: 16,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 8,
+      seed: 9500,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+    });
+    const severelyUnderprepared = simulateCombatScenario({
+      id: "serekh-severely-underprepared-paired",
+      questId: "serekh_chartmaker_boss",
+      heroLevel: 16,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 8,
+      seed: 9500,
+      gearProfile: "lagged_basic",
+      progressionProfile: "subclass_ready",
+    });
+    console.table([prepared, underprepared, severelyUnderprepared]);
+    expect(prepared.stalled + underprepared.stalled + severelyUnderprepared.stalled).toBe(0);
+    expect(prepared.winRate).toBeGreaterThanOrEqual(.75);
+    expect(prepared.averageFallenHeroesOnWins).toBeGreaterThanOrEqual(.5);
+    expect(prepared.averageFallenHeroesOnWins).toBeLessThanOrEqual(1.5);
+    expect(underprepared.winRate).toBeLessThan(prepared.winRate);
+    expect(underprepared.wipeRate).toBeGreaterThanOrEqual(.25);
+    expect(underprepared.averageFallenHeroesOnWins).toBeGreaterThanOrEqual(1);
+    expect(severelyUnderprepared.winRate).toBeLessThanOrEqual(underprepared.winRate);
+    expect(severelyUnderprepared.wipeRate).toBeGreaterThanOrEqual(.5);
+  }, 180_000);
+
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [
       { id: "early", heroCount: 4, heroLevel: 2, questsPerWeek: 2, days: 28, questId: "goblin_patrol", fieldCost: 55, reserve: 720 },

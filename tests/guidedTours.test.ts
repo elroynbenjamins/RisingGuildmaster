@@ -102,7 +102,7 @@ describe('progressive main-tab guides', () => {
     expect(before?.acknowledgement).toBe(false);
     const after = getGuidedStep('quests', { ...fresh(), mainTab: 'Quests' }, new Set(['quests.story']));
     expect(after?.target).toBe('quests.story');
-    expect(after?.acknowledgement).toBe(false);
+    expect(after?.acknowledgement).toBe(true);
   });
   it('finds Campaign when a notification opened another quest category', () => {
     const step = getGuidedStep('quests', { ...fresh(), mainTab: 'Quests' }, new Set(['quests.campaign']));

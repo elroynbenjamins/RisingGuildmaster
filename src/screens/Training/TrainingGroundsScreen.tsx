@@ -13,12 +13,12 @@ import { GameIcon } from "../../components/icons/GameIcon";
 import { triggerTactileFeedback } from "../../ui/tactileFeedback";
 import { isTutorialGuidanceEnabled } from "../../game/onboarding/tutorialService";
 
-export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests, initialHeroId }: { onBack(): void; openCalendar(): void; openSideQuests?(): void; initialHeroId?: string }) {
+export function TrainingGroundsScreen({ onBack, openCalendar, openSideQuests, initialHeroId, initialProgramId }: { onBack(): void; openCalendar(): void; openSideQuests?(): void; initialHeroId?: string; initialProgramId?: TrainingProgramId }) {
   const { showDialog } = useGameDialog();
   const { guild, updateGuild } = useGuild();
   const available = guild.heroes.filter((hero) => hero.isAvailable && hero.currentHP > 0);
   const [heroId, setHeroId] = useState<string | undefined>(() => available.some((hero) => hero.id === initialHeroId) ? initialHeroId : available[0]?.id);
-  const [programId, setProgramId] = useState<TrainingProgramId>("sparring_drills");
+  const [programId, setProgramId] = useState<TrainingProgramId>(() => initialProgramId ?? "sparring_drills");
   const [tab,setTab]=useState<"Train"|"Active">("Train");
   const [showFacilityPlan,setShowFacilityPlan]=useState(false);
   const hero = guild.heroes.find((item) => item.id === heroId);

@@ -27,6 +27,8 @@ import { isQuestAvailableForGuild, isQuestBoardCategoryUnlocked } from "../../ga
 import { triggerTactileFeedback } from "../../ui/tactileFeedback";
 import { useGameToast } from "../../components/feedback/GameToast";
 import { hasSeenContextualTutorial, markContextualTutorialSeen } from "../../game/onboarding/tutorialService";
+import { GuidedTip } from "../../components/onboarding/GuidedTip";
+import { markGuidedScreenTipSeen, shouldShowGuidedScreenTip } from "../../game/onboarding/screenTutorialService";
 
 interface WorldMapProps {
   guild: GuildState;
@@ -69,6 +71,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
   const campaignRequirement = nextCampaignNode ? getCampaignNodeLocationRequirement(nextCampaignNode.id) : null;
   const campaignAtLocation = isAtCampaignLocation(guild.world, campaignRequirement);
   const guideCampaignTravel = Boolean(nextCampaignNode && campaignRequirement && !campaignAtLocation && !hasSeenContextualTutorial(guild, "campaign_travel"));
+  const showScreenGuide = shouldShowGuidedScreenTip(guild, "world") && !guideCampaignTravel;
   const campaignTravelPulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     if (!guideCampaignTravel) { campaignTravelPulse.setValue(1); return; }
@@ -129,6 +132,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
       {onBack && <BackButton onPress={onBack} />}
       <Text style={styles.title}>{WORLD_NAME}</Text>
       <Text style={styles.subtitle}>Campaign Chapter {guild.world.campaignChapter} · Current: {REGIONS[guild.world.currentRegionId]!.name}</Text>
+      {showScreenGuide && <GuidedTip step="SCREEN GUIDE · WORLD" title="Follow the campaign stop" message="Tap a flag once to inspect it and twice to open it. Travel spends days and rations, so read the preview first." onDismiss={() => updateGuild(markGuidedScreenTipSeen(guild, "world"))} />}
 
       <View style={styles.overview}>
         <View style={styles.overviewStat}><Text style={styles.overviewValue}>{guild.world.unlockedRegionIds.length}/{Object.keys(REGIONS).length}</Text><Text style={styles.overviewLabel}>REGIONS OPEN</Text></View>

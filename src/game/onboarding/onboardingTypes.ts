@@ -1,4 +1,5 @@
 import type { CombatTutorialStep } from "./combatTutorialService";
+import type { GuidedTourProgress } from "./guidedTourService";
 import { createGuidedTourProgress, type GuidedTourProgress } from "./guidedTourService";
 export type TutorialStep = "welcome" | "inspect_candidate" | "recruit_first" | "refresh_board" | "recruit_second" | "party_complete" | "complete";
 export type TutorialCandidateTab = "Overview" | "Stats" | "Traits" | "Contract";

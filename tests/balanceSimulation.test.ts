@@ -391,6 +391,34 @@ describe("repeatable balance simulations", () => {
     expect(preparedAverageFallen, "alternate prepared parties should retain aggregate casualty pressure").toBeGreaterThanOrEqual(.5);
   }, 180_000);
 
+  it("keeps a two-level-behind frontline replacement risky but viable through late bosses", () => {
+    const scenarios = [
+      { id: "replacement-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", level: 13, partyLevels: [11, 13, 13, 13] as const, seed: 13_700 },
+      { id: "replacement-ch8-nhal", questId: "admiral_nhal_veyr_boss", level: 15, partyLevels: [13, 15, 15, 15] as const, seed: 13_800 },
+      { id: "replacement-ch9-serekh", questId: "serekh_chartmaker_boss", level: 17, partyLevels: [15, 17, 17, 17] as const, seed: 13_900 },
+    ] as const;
+    const results = scenarios.map((scenario) => simulateCombatScenario({
+      id: scenario.id,
+      questId: scenario.questId,
+      heroLevel: scenario.level,
+      partyLevels: scenario.partyLevels,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "standard",
+      runs: 8,
+      seed: scenario.seed,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+    }));
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    for (const result of results) {
+      expect(result.wins, `${result.scenarioId} replacement route should remain possible`).toBeGreaterThan(0);
+      expect(result.averageFallenHeroesOnWins, `${result.scenarioId} should retain casualty pressure`).toBeGreaterThanOrEqual(.5);
+    }
+    const varkesh = results[0]!;
+    expect(varkesh.wipeRate, "Varkesh should punish a two-level-behind frontline replacement").toBeGreaterThanOrEqual(.5);
+  }, 180_000);
+
   it("keeps underprepared late-chapter bosses dangerous without becoming guaranteed wipes", () => {
     const scenarios = [
       { id: "underprepared-ch7-varkesh", questId: "varkesh_gilded_rupture_boss", heroLevel: 12, seed: 8960 },

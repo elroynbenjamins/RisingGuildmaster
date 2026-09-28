@@ -370,10 +370,14 @@ describe("repeatable balance simulations", () => {
       expect(prepared.winRate, `${boss.id} prepared win rate`).toBeGreaterThanOrEqual(.75);
       expect(prepared.averageFallenHeroesOnWins, `${boss.id} prepared casualties`).toBeGreaterThanOrEqual(.75);
       expect(prepared.averageFallenHeroesOnWins, `${boss.id} prepared casualties`).toBeLessThanOrEqual(1.75);
-      expect(underprepared.winRate, `${boss.id} preparation payoff`).toBeLessThan(prepared.winRate);
+      expect(underprepared.winRate, `${boss.id} underprepared win rate`).toBeLessThanOrEqual(prepared.winRate);
+      expect(underprepared.wipeRate, `${boss.id} underprepared wipe pressure`).toBeGreaterThanOrEqual(prepared.wipeRate);
       expect(underprepared.wipeRate, `${boss.id} underprepared wipe pressure`).toBeGreaterThanOrEqual(.25);
       expect(underprepared.wipeRate, `${boss.id} underprepared wipe pressure`).toBeLessThanOrEqual(.625);
       expect(underprepared.averageFallenHeroesOnWins, `${boss.id} underprepared casualties`).toBeGreaterThanOrEqual(1);
+      const preparationGap = underprepared.winRate <= prepared.winRate - .125
+        || underprepared.averageFallenHeroesOnWins >= prepared.averageFallenHeroesOnWins + .5;
+      expect(preparationGap, `${boss.id} preparation should improve reliability or casualty severity`).toBe(true);
       expect(severelyUnderprepared.wipeRate, `${boss.id} severe underprepared wipe pressure`).toBeGreaterThanOrEqual(.75);
     }
   }, 300_000);

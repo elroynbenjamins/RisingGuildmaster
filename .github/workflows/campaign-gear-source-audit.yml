@@ -1,10 +1,13 @@
-name: Campaign gear source audit
+name: Campaign gear source validation
 on:
   push:
     branches:
       - balance/campaign-gear-source-audit
+concurrency:
+  group: campaign-gear-source-validation
+  cancel-in-progress: true
 jobs:
-  audit:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,4 +19,6 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/campaignGearSourceDiagnostics.test.ts
+      - run: pnpm typecheck
+      - run: pnpm vitest run tests/equipmentBalanceCoverage.test.ts tests/campaignGearIcons.test.ts tests/craftingEquipment.test.ts
+      - run: pnpm vitest run tests/balanceSimulation.test.ts -t "reports Chapter 4–6 transition combat|reports prepared Standard survivor baselines"

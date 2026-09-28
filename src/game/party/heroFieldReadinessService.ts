@@ -26,7 +26,8 @@ export function getHeroFieldReadinessPenalty(hero: Hero): number {
 
 
 export function hasPendingHeroCombatProgression(hero: Hero): boolean {
+  if (hero.level < 5) return false;
   return getAvailableClassSkillPoints(hero) > 0
-    || (hero.level >= 5 && !hero.subclassId)
+    || !hero.subclassId
     || (hero.level >= 10 && !hero.masteryId);
 }

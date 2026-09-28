@@ -18,17 +18,19 @@ describe('progressive main-tab guides', () => {
     const parsed = normalizeGuidedTourProgress({ version: 1, enabled: true, tours: { guild: { status: 'completed', opened: true }, quests: { status: 'nonsense' }, unknown: { status: 'completed' }, heroes: null } });
     expect(parsed.tours).toEqual({ guild: { status: 'completed', opened: true } });
   });
-  it('retains the two-hero start and waits for recruitment to finish', () => {
+  it('keeps the opening focused through the first completed quest', () => {
     for (const heroCount of [0, 1]) expect(nextGuidedTour(createGuidedTourProgress(), { ...fresh(), heroCount })).toBe(null);
     expect(nextGuidedTour(createGuidedTourProgress(), { ...fresh(), recruitmentActive: true })).toBe(null);
-    expect(nextGuidedTour(createGuidedTourProgress(), fresh())).toBe('guild');
+    expect(nextGuidedTour(createGuidedTourProgress(), fresh())).toBe(null);
+    expect(nextGuidedTour(createGuidedTourProgress(), { ...fresh(), hasQuestResult: true })).toBe('guild');
   });
   it('suspends outside the main shell instead of following into combat or dialogs', () => {
     expect(nextGuidedTour(createGuidedTourProgress(), { ...advanced(), mainTab: null })).toBe(null);
   });
-  it('introduces Guild before Quests', () => {
-    expect(nextGuidedTour(createGuidedTourProgress(), fresh())).toBe('guild');
-    expect(nextGuidedTour(reduceGuidedTour(createGuidedTourProgress(), { type: 'complete', tour: 'guild' }), fresh())).toBe('quests');
+  it('introduces Guild before Quests after the first quest result', () => {
+    const postQuest = { ...fresh(), hasQuestResult: true };
+    expect(nextGuidedTour(createGuidedTourProgress(), postQuest)).toBe('guild');
+    expect(nextGuidedTour(reduceGuidedTour(createGuidedTourProgress(), { type: 'complete', tour: 'guild' }), postQuest)).toBe('quests');
   });
   it('does not tour all five tabs at the start', () => {
     expect(nextGuidedTour(completeCore(), fresh())).toBe(null);
@@ -72,7 +74,7 @@ describe('progressive main-tab guides', () => {
     expect(nextGuidedTour(paused, advanced())).toBe(null);
     const resumed = reduceGuidedTour(paused, { type: 'resume' });
     expect(resumed.tours.guild?.status).toBe('completed');
-    expect(nextGuidedTour(resumed, fresh())).toBe('quests');
+    expect(nextGuidedTour(resumed, { ...fresh(), hasQuestResult: true })).toBe('quests');
   });
   it('replay resets only the independent tour progress', () => {
     const p = reduceGuidedTour(completeCore(), { type: 'pause' });
@@ -102,7 +104,7 @@ describe('progressive main-tab guides', () => {
     expect(before?.acknowledgement).toBe(false);
     const after = getGuidedStep('quests', { ...fresh(), mainTab: 'Quests' }, new Set(['quests.story']));
     expect(after?.target).toBe('quests.story');
-    expect(after?.acknowledgement).toBe(true);
+    expect(after?.acknowledgement).toBe(false);
   });
   it('finds Campaign when a notification opened another quest category', () => {
     const step = getGuidedStep('quests', { ...fresh(), mainTab: 'Quests' }, new Set(['quests.campaign']));
@@ -114,7 +116,7 @@ describe('progressive main-tab guides', () => {
   it('points the Guild lesson at Current Order instead of a generic tab', () => {
     const step = getGuidedStep('guild', fresh(), new Set(['guild.currentOrder']));
     expect(step?.target).toBe('guild.currentOrder');
-    expect(step?.acknowledgement).toBe(true);
+    expect(step?.acknowledgement).toBe(false);
     expect(getGuidedStep('guild', fresh(), new Set())).toBe(null);
   });
   it('uses real actions for Heroes, Inventory and World lessons', () => {

@@ -1,0 +1,31 @@
+name: Late role substitution audit
+
+on:
+  push:
+    branches:
+      - balance/late-role-substitution-audit
+    paths:
+      - .github/workflows/late-role-substitution-audit.yml
+      - tests/lateRoleSubstitutionDiagnostic.test.ts
+      - src/game/simulation/balanceSimulation.ts
+      - src/data/classes/**
+      - src/data/skills/**
+      - src/data/encounters/**
+      - src/data/quests/**
+      - src/data/equipment/**
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/lateRoleSubstitutionDiagnostic.test.ts

@@ -1,29 +1,27 @@
 import { describe, it } from "vitest";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 
-describe("late boss real-entry combat diagnostics", () => {
-  it("measures normal and completionist boss entry levels", () => {
-    for (const boss of [
-      { id: "varkesh", questId: "varkesh_gilded_rupture_boss", normalLevel: 13, completionistLevel: 14, seed: 9900 },
-      { id: "nhal", questId: "admiral_nhal_veyr_boss", normalLevel: 16, completionistLevel: 17, seed: 9910 },
-      { id: "serekh", questId: "serekh_chartmaker_boss", normalLevel: 18, completionistLevel: 19, seed: 9920 },
+describe("Serekh real-entry stage diagnostics", () => {
+  it("compares minimum, normal, and completionist Serekh pressure by stage", () => {
+    for (const profile of [
+      { suffix: "minimum", level: 17 },
+      { suffix: "normal", level: 18 },
+      { suffix: "completionist", level: 19 },
     ] as const) {
-      for (const profile of [
-        { suffix: "normal", level: boss.normalLevel },
-        { suffix: "completionist", level: boss.completionistLevel },
-      ] as const) {
-        console.log("ENTRY_COMBAT", simulateCombatScenario({
-          id: `${boss.id}-${profile.suffix}-entry`,
-          questId: boss.questId,
+      for (const encounterLimit of [1, 2, 3] as const) {
+        console.log("SEREKH_STAGE", simulateCombatScenario({
+          id: `serekh-${profile.suffix}-limit${encounterLimit}`,
+          questId: "serekh_chartmaker_boss",
           heroLevel: profile.level,
           partyClasses: ["warrior", "ranger", "cleric", "mage"],
           difficultyId: "standard",
-          runs: 8,
-          seed: boss.seed,
+          runs: 12,
+          seed: 9940,
           gearProfile: "optional_progression",
           progressionProfile: "subclass_ready",
+          encounterLimit,
         }));
       }
     }
-  }, 240_000);
+  }, 300_000);
 });

@@ -5,6 +5,7 @@ import type { WorldEventDefinition } from "../game/world/worldTypes";
 import type { QuestResultSummary } from "../game/quests/questResultTypes";
 import type { MainTab } from "../ui/navigation";
 import type { QuestTab } from "../ui/questList";
+import type { TrainingProgramId } from "../game/training/trainingTypes";
 
 export type AppRoute =
   | { name: "gemsSupport"; originMainTab?: MainTab }
@@ -12,7 +13,7 @@ export type AppRoute =
   | { name: "settings" }
   | { name: "tutorialGuide" }
   | { name: "contentUnlock" }
-  | { name: "training"; originMainTab?: MainTab; heroId?: string }
+  | { name: "training"; originMainTab?: MainTab; heroId?: string; programId?: TrainingProgramId }
   | { name: "operations" }
   | { name: "raids" }
   | { name: "legacy" }

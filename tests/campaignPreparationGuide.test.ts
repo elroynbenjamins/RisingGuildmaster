@@ -100,6 +100,29 @@ describe("campaign preparation guidance", () => {
     });
   });
 
+  it("recommends two Wardstone runs when multiple core weapons badly lag", () => {
+    const guild = chapterEightGuild();
+    guild.heroes = heroes(6, 15, "concordance-glaive").map((hero, index) => index < 2 ? {
+      ...hero,
+      classId: index === 0 ? "mage" as const : "cleric" as const,
+      equipment: { ...hero.equipment, weapon: "skyvault-crozier" },
+    } : hero);
+    guild.world = {
+      ...guild.world,
+      completedQuestIds: [
+        ...guild.world.completedQuestIds,
+        "the_lighthouse_that_walked",
+        "letters_from_a_sunken_ship",
+      ],
+    };
+    expect(getCampaignPreparationRecommendation(guild)).toMatchObject({
+      type: "dungeon",
+      reason: "weapon",
+      suggestedRuns: 2,
+      title: "2 Wardstone Expeditions",
+    });
+  });
+
   it("recommends one Wardstone run when the core party is within one catch-up target of the next level", () => {
     const guild = chapterEightGuild();
     const level = 14;

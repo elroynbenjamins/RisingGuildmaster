@@ -38,9 +38,9 @@ function sourcedItemsThrough(chapterNumber:number): Set<string> {
   return ids;
 }
 
-function bestLevel(classId:ClassId, slot:"weapon"|"armor", ids:Set<string>):number{
+function bestLevel(classId:ClassId, slot:"weapon"|"armor", ids:Set<string>, maxLevel:number):number{
   return Math.max(0,...[...ids].map(id=>EQUIPMENT[id]).filter((item):item is NonNullable<typeof item>=>Boolean(item))
-    .filter(item=>item.slot===slot)
+    .filter(item=>item.slot===slot && item.levelRequirement<=maxLevel)
     .filter(item=>!item.classRestrictions.length || item.classRestrictions.includes(classId))
     .map(item=>item.levelRequirement));
 }
@@ -60,8 +60,8 @@ describe("late primary gear source diagnostics",()=>{
       const target=chapter.recommendedLevelMax ?? chapter.recommendedLevelMin ?? 1;
       const ids=sourcedItemsThrough(chapterNumber);
       const rows=CLASSES.map(classId=>{
-        const weapon=bestLevel(classId,"weapon",ids);
-        const armor=bestLevel(classId,"armor",ids);
+        const weapon=bestLevel(classId,"weapon",ids,target);
+        const armor=bestLevel(classId,"armor",ids,target);
         const cacheWeapon=wardstoneBest(classId,"weapon",target);
         const cacheArmor=wardstoneBest(classId,"armor",target);
         return {

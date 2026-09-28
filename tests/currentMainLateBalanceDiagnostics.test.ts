@@ -2,31 +2,19 @@ import { describe, it } from "vitest";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 
 describe("current main late balance diagnostics", () => {
-  it("checks the attrition-focused Serekh profile", () => {
-    for (const profile of [
-      { suffix: "prepared", heroLevel: 17, gearProfile: "optional_progression" as const },
-      { suffix: "underprepared", heroLevel: 16, gearProfile: "optional_progression" as const },
-      { suffix: "severely-underprepared", heroLevel: 16, gearProfile: "lagged_basic" as const },
-    ]) {
-      console.log("PROFILE", simulateCombatScenario({
-        id: `serekh-${profile.suffix}`,
-        questId: "serekh_chartmaker_boss",
-        heroLevel: profile.heroLevel,
-        partyClasses: ["warrior","ranger","cleric","mage"],
-        difficultyId: "standard",
-        runs: 8,
-        seed: 9500,
-        gearProfile: profile.gearProfile,
-        progressionProfile: "subclass_ready",
-      }));
-    }
-    for (const difficultyId of ["veteran","iron_guild"] as const) {
-      console.log("HARD", simulateCombatScenario({
-        id: `serekh-${difficultyId}`,
+  it("checks Serekh Iron viability across sensible prepared compositions", () => {
+    const parties = [
+      { id: "classic", classes: ["warrior","ranger","cleric","mage"] as const },
+      { id: "alternate-support", classes: ["paladin","ranger","bard","mage"] as const },
+      { id: "heavy-frontline", classes: ["warrior","berserker","cleric","spellbow"] as const },
+    ];
+    for (const party of parties) {
+      console.log("IRON", simulateCombatScenario({
+        id: `serekh-iron-${party.id}`,
         questId: "serekh_chartmaker_boss",
         heroLevel: 17,
-        partyClasses: ["warrior","ranger","cleric","mage"],
-        difficultyId,
+        partyClasses: party.classes,
+        difficultyId: "iron_guild",
         runs: 4,
         seed: 8975,
         gearProfile: "optional_progression",

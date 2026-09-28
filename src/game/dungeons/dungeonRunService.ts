@@ -1,6 +1,7 @@
 import { DUNGEONS, DUNGEON_NODES, DUNGEON_RUN_MODIFIERS } from "../../data/dungeons/dungeons";
 import { ROGUELITE_ENCOUNTERS } from "../../data/dungeons/rogueliteEncounters";
 import { EQUIPMENT } from "../../data/equipment/equipment";
+import { RECRUITMENT_FIELD_GEAR_IDS } from "../../data/equipment/equipmentBalanceExpansion";
 import type { RandomSource } from "../../utils/random";
 import type { HeroCombatInstance, QuestCombatSetup } from "../combat/combatTypes";
 import type { CombatState } from "../combat/combatEngine";
@@ -54,7 +55,8 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
       .map((key) => resolveEquipmentDefinition(key)?.id ?? key),
   );
   const levelAppropriate = Object.values(EQUIPMENT).filter((item) =>
-    item.levelRequirement >= minLevel
+    !RECRUITMENT_FIELD_GEAR_IDS.has(item.id)
+    && item.levelRequirement >= minLevel
     && item.levelRequirement <= maxLevel
     && (!item.classRestrictions.length || party.some((hero) => item.classRestrictions.includes(hero.classId)))
   );

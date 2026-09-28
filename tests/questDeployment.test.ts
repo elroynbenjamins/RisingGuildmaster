@@ -34,6 +34,25 @@ describe("quest deployment presentation", () => {
     expect(summary.warnings.some((entry) => entry.id === "level")).toBe(true);
   });
 
+  it("marks a deployment high risk when heroes are missing a weapon or armor piece", () => {
+    const party = [
+      hero("missing-a", "warrior", 15),
+      hero("missing-b", "warrior", 15),
+      hero("missing-c", "warrior", 15),
+      hero("missing-d", "warrior", 15),
+    ].map((entry) => ({
+      ...entry,
+      equipment: { ...entry.equipment, weapon: null, armor: "padded-armor" },
+    }));
+    const summary = getQuestDeploymentSummary({ ...quest, recommendedLevelMin: 15 }, party, [], potions);
+    expect(summary.equipment.missingPrimaryHeroes).toBe(4);
+    expect(summary.status).toBe("high_risk");
+    expect(summary.warnings).toContainEqual(expect.objectContaining({
+      id: "missing_primary_gear",
+      tone: "danger",
+    }));
+  });
+
   it("marks a deployment high risk when multiple heroes have badly lagging primary gear", () => {
     const party = [
       hero("lag-a", "warrior", 15),

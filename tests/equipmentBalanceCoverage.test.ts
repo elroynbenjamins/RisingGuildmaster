@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EQUIPMENT } from "../src/data/equipment/equipment";
+import { EQUIPMENT_ICON_ART } from "../src/data/equipment/equipmentIconArt";
 import { CRAFTING_RECIPES } from "../src/data/crafting/recipes";
 import { WORLD_EVENTS } from "../src/data/world/worldEvents";
 import { generateHero } from "../src/game/heroes/heroGenerator";
@@ -110,6 +111,19 @@ describe("equipment balance coverage", () => {
       for (const slot of ["weapon", "armor", "helmet", "boots", "accessory1", "accessory2"] as const) {
         const currentTier = usable.filter((item) => item.slot === slot && item.levelRequirement >= 10 && item.levelRequirement <= 12);
         expect(currentTier.length, `${classId} Chapter 7 ${slot}`).toBeGreaterThanOrEqual(1);
+      }
+    }
+  });
+
+  it("keeps expedition weapon bridges below the Chapter 7 and 8 epic tiers", () => {
+    for (const [prefix, level] of [["wayfarers-", 11], ["delvers-", 14]] as const) {
+      const catchup = Object.values(EQUIPMENT).filter((item) => item.id.startsWith(prefix));
+      expect(catchup, prefix).toHaveLength(7);
+      expect(catchup.every((item) => item.slot === "weapon" && item.levelRequirement === level && item.rarity === "rare")).toBe(true);
+      expect(catchup.every((item) => item.specialEffectIds.length === 0)).toBe(true);
+      for (const item of catchup) expect(EQUIPMENT_ICON_ART[item.id], item.id).toBeDefined();
+      for (const classId of CLASSES) {
+        expect(catchup.some((item) => !item.classRestrictions.length || item.classRestrictions.includes(classId)), `${classId} ${prefix} expedition catch-up weapon`).toBe(true);
       }
     }
   });

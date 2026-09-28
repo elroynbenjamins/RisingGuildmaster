@@ -18,6 +18,7 @@ import { calculateDungeonRunScore } from "./dungeonIntelService";
 import { createRogueliteDungeonRecord } from "./rogueliteRotationTypes";
 import { chooseDungeonBoon, offerDungeonBoonChoices, sumDungeonBoonValue } from "./dungeonBoonService";
 import { GAME_CONFIG } from "../../config/gameConfig";
+import { resolveEquipmentDefinition } from "../equipment/equipmentResolver";
 
 export type DungeonMerchantChoice = "buy_supplies" | "leave";
 export interface DungeonNodeResolution { guild: GuildState; check: AbilityCheckResult | null; text: string; goldDelta: number; recipeId: string | null }
@@ -48,7 +49,10 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
   const minLevel = Math.max(1, averageLevel - 2);
   const maxLevel = Math.max(minLevel, averageLevel - 1);
   const allowRare = random.next() < .15;
-  const owned = new Set([...guild.inventory, ...party.flatMap((hero) => Object.values(hero.equipment).filter((id): id is string => Boolean(id)))]);
+  const owned = new Set(
+    [...guild.inventory, ...party.flatMap((hero) => Object.values(hero.equipment).filter((id): id is string => Boolean(id)))]
+      .map((key) => resolveEquipmentDefinition(key)?.id ?? key),
+  );
   const levelAppropriate = Object.values(EQUIPMENT).filter((item) =>
     item.levelRequirement >= minLevel
     && item.levelRequirement <= maxLevel
@@ -56,15 +60,28 @@ function awardExpeditionCache(guild: GuildState, run: NonNullable<GuildState["ac
   );
   const preferred = levelAppropriate.filter((item) => item.rarity === "common" || item.rarity === "uncommon" || (allowRare && item.rarity === "rare"));
   const eligible = preferred.length ? preferred : levelAppropriate.filter((item) => item.rarity === "rare");
+  const primaryCatchup = levelAppropriate.filter((item) =>
+    (item.slot === "weapon" || item.slot === "armor")
+    && item.rarity !== "epic"
+    && item.rarity !== "legendary"
+    && party.some((hero) => {
+      if (item.classRestrictions.length && !item.classRestrictions.includes(hero.classId)) return false;
+      const equippedId = hero.equipment[item.slot];
+      const equipped = equippedId ? resolveEquipmentDefinition(equippedId) : undefined;
+      const equippedLevel = equipped?.levelRequirement ?? 0;
+      return hero.level - equippedLevel >= 3 && item.levelRequirement > equippedLevel;
+    })
+  );
+  const newPrimaryCatchup = primaryCatchup.filter((item) => !owned.has(item.id));
   const newItems = eligible.filter((item) => !owned.has(item.id));
-  const candidates = newItems.length ? newItems : eligible;
+  const candidates = newPrimaryCatchup.length ? newPrimaryCatchup : (newItems.length ? newItems : eligible);
   if (!candidates.length) return guild;
   const score = (item: (typeof candidates)[number]) => {
     let value = item.rarity === "rare" ? 3 : item.rarity === "uncommon" ? 2 : 1;
     for (const hero of party) {
       if (item.classRestrictions.length && !item.classRestrictions.includes(hero.classId)) continue;
       const equippedId = hero.equipment[item.slot];
-      const equipped = equippedId ? EQUIPMENT[equippedId] : undefined;
+      const equipped = equippedId ? resolveEquipmentDefinition(equippedId) : undefined;
       if (!equipped) value += 5;
       else if (equipped.levelRequirement < item.levelRequirement) value += 4;
       else if (equipped.levelRequirement === item.levelRequirement && equipped.rarity === "common" && item.rarity !== "common") value += 2;

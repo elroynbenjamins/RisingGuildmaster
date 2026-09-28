@@ -8,6 +8,7 @@ import { createSeededRandom } from "../src/utils/random";
 import { sequenceRandom } from "./combatTestUtils";
 import { ENEMIES } from "../src/data/enemies";
 import { createCombatState } from "../src/game/combat/combatEngine";
+import { EQUIPMENT } from "../src/data/equipment/equipment";
 
 function expeditionGuild() { const guild = createGuild(); const heroes = Array.from({ length: 8 }, (_, index) => generateHero(createSeededRandom(11 + index))).map((hero, index) => ({ ...hero, id: `dungeon-hero-${index}`, level: 6 })); return { ...guild, heroes, discoveredEnemyIds: Object.keys(ENEMIES), world: { ...guild.world, completedCampaignNodeIds: ["broken_wardstone"] }, rogueliteRotation: { ...guild.rogueliteRotation, offeredDungeonIds: ["wardstone_depths", "thornwood_trials", "temple_of_coils"] } }; }
 const partyIds = (guild: ReturnType<typeof expeditionGuild>) => guild.heroes.slice(0, 4).map((hero) => hero.id);
@@ -59,6 +60,79 @@ describe("playable dungeon run integration", () => {
     expect(fallen.xp - (before.get(fallenId) ?? 0)).toBe(Math.round(roomXp * .85));
     expect(survivor.xp - (before.get(survivorId) ?? 0)).toBe(roomXp);
     expect(fallen.isAvailable).toBe(false);
+  });
+
+  it("prioritizes a Level-11 primary weapon for a badly behind Level-12 party", () => {
+    const classes = ["ranger", "mage", "cleric", "bard"] as const;
+    const currentArmor = ["galewing-mantle", "galewing-mantle", "galewing-mantle", "resonant-fieldcoat"] as const;
+    const base = createGuild();
+    const partyHeroes = classes.map((classId, index) => {
+      const hero = generateHero(createSeededRandom(2_000 + index), { classId });
+      return { ...hero, id: `ch7-catchup-hero-${index}`, level: 12, equipment: { ...hero.equipment, armor: currentArmor[index]! } };
+    });
+    const reserves = [
+      { ...generateHero(createSeededRandom(2_090), { classId: "warrior" }), id: "ch7-catchup-reserve-1" },
+      { ...generateHero(createSeededRandom(2_091), { classId: "berserker" }), id: "ch7-catchup-reserve-2" },
+    ];
+    let guild: ReturnType<typeof createGuild> = {
+      ...base,
+      heroes: [...partyHeroes, ...reserves],
+      discoveredEnemyIds: Object.keys(ENEMIES),
+      world: { ...base.world, completedCampaignNodeIds: ["broken_wardstone"] },
+      rogueliteRotation: { ...base.rogueliteRotation, offeredDungeonIds: ["wardstone_depths", "thornwood_trials", "temple_of_coils"] },
+    };
+    guild = beginDungeonExpedition(guild, "wardstone_depths", partyHeroes.map((hero) => hero.id));
+    const run = guild.activeDungeonRun!;
+    guild = {
+      ...guild,
+      activeDungeonRun: { ...run, currentNodeId: "depths_boss" },
+      activeRogueliteRun: { ...guild.activeRogueliteRun!, bossRecipeAwarded: true },
+    };
+
+    const result = resolveDungeonCombat(guild, "victory", guild.activeDungeonRun!.heroInstances, sequenceRandom([.99, 0]));
+    const awardedIds = result.guild.activeDungeonRun?.gearIdsAwarded ?? [];
+    const awarded = EQUIPMENT[awardedIds[awardedIds.length - 1]!]!;
+
+    expect(awarded.id.startsWith("wayfarers-")).toBe(true);
+    expect(awarded.slot).toBe("weapon");
+    expect(awarded.levelRequirement).toBe(11);
+    expect(awarded.rarity).toBe("rare");
+  });
+
+  it("prioritizes a primary weapon when a Level-15 party is badly behind", () => {
+    const classes = ["ranger", "mage", "cleric", "bard"] as const;
+    const base = createGuild();
+    const partyHeroes = classes.map((classId, index) => {
+      const hero = generateHero(createSeededRandom(2_100 + index), { classId });
+      return { ...hero, id: `catchup-hero-${index}`, level: 15, equipment: { ...hero.equipment, armor: "deadletter-coat" } };
+    });
+    const reserves = [
+      { ...generateHero(createSeededRandom(2_190), { classId: "warrior" }), id: "catchup-reserve-1" },
+      { ...generateHero(createSeededRandom(2_191), { classId: "berserker" }), id: "catchup-reserve-2" },
+    ];
+    let guild: ReturnType<typeof createGuild> = {
+      ...base,
+      heroes: [...partyHeroes, ...reserves],
+      discoveredEnemyIds: Object.keys(ENEMIES),
+      world: { ...base.world, completedCampaignNodeIds: ["broken_wardstone"] },
+      rogueliteRotation: { ...base.rogueliteRotation, offeredDungeonIds: ["wardstone_depths", "thornwood_trials", "temple_of_coils"] },
+    };
+    guild = beginDungeonExpedition(guild, "wardstone_depths", partyHeroes.map((hero) => hero.id));
+    const run = guild.activeDungeonRun!;
+    guild = {
+      ...guild,
+      activeDungeonRun: { ...run, currentNodeId: "depths_boss" },
+      activeRogueliteRun: { ...guild.activeRogueliteRun!, bossRecipeAwarded: true },
+    };
+
+    const result = resolveDungeonCombat(guild, "victory", guild.activeDungeonRun!.heroInstances, sequenceRandom([.99, 0]));
+    const awardedIds = result.guild.activeDungeonRun?.gearIdsAwarded ?? [];
+    const awarded = EQUIPMENT[awardedIds[awardedIds.length - 1]!]!;
+
+    expect(awarded.id.startsWith("delvers-")).toBe(true);
+    expect(awarded.slot).toBe("weapon");
+    expect(awarded.levelRequirement).toBe(14);
+    expect(awarded.rarity).toBe("rare");
   });
 
   it("persists defeat instead of treating entry into a boss room as victory", () => { const base = expeditionGuild(); let guild = beginDungeonExpedition(base, "wardstone_depths", partyIds(base)); const run = guild.activeDungeonRun!; guild = { ...guild, activeDungeonRun: { ...run, currentNodeId: "depths_boss" } }; const result = resolveDungeonCombat(guild, "defeat", run.heroInstances.map((instance) => ({ ...instance, currentHP: 0, isAlive: false })), sequenceRandom([0])); expect(result.guild.activeDungeonRun?.status).toBe("defeat"); expect(result.guild.activeDungeonRun?.resolvedNodeIds).not.toContain("depths_boss"); });

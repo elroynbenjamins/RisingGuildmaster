@@ -4,75 +4,67 @@ import { CRAFTING_RECIPES } from "../src/data/crafting/recipes";
 import { EQUIPMENT } from "../src/data/equipment/equipment";
 import { QUEST_LOOT_TABLES } from "../src/data/loot/questLootTables";
 import { QUESTS } from "../src/data/quests/quests";
-import type { ClassId, EquipmentSlot } from "../src/game/heroes/types";
+import type { ClassId } from "../src/game/heroes/types";
+import { STARTER_JOURNEY } from "../src/game/onboarding/starterJourneyService";
 
 const CLASSES: readonly ClassId[] = ["warrior","ranger","mage","cleric","paladin","berserker","monk","bard","spellbow","bulwark","summoner"];
 
-function chapterQuestIds(chapterNumber: number): string[] {
-  const chapter = CAMPAIGN_CHAPTERS[chapterNumber]!;
-  const mainline = chapter.nodeIds
-    .map((id) => CAMPAIGN_NODES[id]?.questId)
-    .filter((id): id is string => Boolean(id));
-  return [...new Set([...mainline, ...(chapter.sideQuestIds ?? [])])];
-}
-
-function reachableItems(chapterNumber: number) {
-  const ids = new Set<string>();
-  const source = new Map<string,string[]>();
-  const add = (itemId: string, label: string) => {
-    if (!EQUIPMENT[itemId]) return;
-    ids.add(itemId);
-    source.set(itemId,[...(source.get(itemId) ?? []),label]);
-  };
-  for (const questId of chapterQuestIds(chapterNumber)) {
-    const quest=QUESTS[questId];
-    if (!quest) continue;
-    for (const itemId of QUEST_LOOT_TABLES[quest.lootTableId]?.itemIds ?? []) add(itemId,`loot:${questId}`);
+function questSources(itemId: string): string[] {
+  const sources: string[] = [];
+  for (const quest of Object.values(QUESTS)) {
+    if (QUEST_LOOT_TABLES[quest.lootTableId]?.itemIds.includes(itemId)) sources.push(`loot:${quest.id}`);
     for (const recipeId of quest.recipeUnlockIdsOnVictory ?? []) {
-      const itemId=CRAFTING_RECIPES[recipeId]?.outputEquipmentId;
-      if (itemId) add(itemId,`recipe:${questId}`);
+      if (CRAFTING_RECIPES[recipeId]?.outputEquipmentId === itemId) sources.push(`recipe:${quest.id}`);
     }
   }
-  return {ids:[...ids],source};
+  return sources;
 }
-
-function bestFor(classId: ClassId, slot: EquipmentSlot, itemIds: readonly string[]) {
-  return itemIds
-    .map((id)=>EQUIPMENT[id]!)
-    .filter((item)=>item.slot===slot)
-    .filter((item)=>!item.classRestrictions.length || item.classRestrictions.includes(classId))
-    .sort((a,b)=>b.levelRequirement-a.levelRequirement || b.value-a.value)[0] ?? null;
+function defaultRecipeSources(itemId: string): string[] {
+  return Object.values(CRAFTING_RECIPES)
+    .filter((recipe) => !recipe.unlockSource && recipe.outputEquipmentId === itemId)
+    .map((recipe) => `default-${recipe.artisanType}-L${recipe.artisanLevel}:${recipe.id}`);
+}
+function chapterForQuest(questId: string): number | null {
+  for (const [chapterNumber, chapter] of Object.entries(CAMPAIGN_CHAPTERS)) {
+    const ids = [
+      ...chapter.nodeIds.map((id) => CAMPAIGN_NODES[id]?.questId).filter((id): id is string => Boolean(id)),
+      ...(chapter.sideQuestIds ?? []),
+    ];
+    if (ids.includes(questId)) return Number(chapterNumber);
+  }
+  if (questId === STARTER_JOURNEY.roadQuestId || questId === STARTER_JOURNEY.sideQuestId) return 1;
+  return null;
 }
 
 describe("campaign gear source diagnostics",()=>{
-  it("reports reachable primary gear by chapter and class",()=>{
-    const cumulativeIds=new Set<string>();
-    const cumulativeSources=new Map<string,string[]>();
-    for(let chapterNumber=1;chapterNumber<=9;chapterNumber+=1){
-      const chapter=CAMPAIGN_CHAPTERS[chapterNumber]!;
-      const current=reachableItems(chapterNumber);
-      current.ids.forEach((id)=>{
-        cumulativeIds.add(id);
-        cumulativeSources.set(id,[...(cumulativeSources.get(id) ?? []),...(current.source.get(id) ?? [])]);
-      });
-      const rows=CLASSES.map((classId)=>{
-        const weapon=bestFor(classId,"weapon",[...cumulativeIds]);
-        const armor=bestFor(classId,"armor",[...cumulativeIds]);
-        return {
+  it("lists authored Level 7-9 primary gear and source timing",()=>{
+    const rows=[];
+    for(const classId of CLASSES){
+      for(const slot of ["weapon","armor"] as const){
+        const items=Object.values(EQUIPMENT)
+          .filter((item)=>item.slot===slot)
+          .filter((item)=>item.levelRequirement>=7&&item.levelRequirement<=9)
+          .filter((item)=>!item.classRestrictions.length||item.classRestrictions.includes(classId))
+          .sort((a,b)=>b.levelRequirement-a.levelRequirement||a.id.localeCompare(b.id));
+        rows.push({
           classId,
-          target:chapter.recommendedLevelMax,
-          weapon:weapon?.id ?? "NONE",
-          weaponLevel:weapon?.levelRequirement ?? 0,
-          weaponLag:chapter.recommendedLevelMax-(weapon?.levelRequirement ?? 0),
-          armor:armor?.id ?? "NONE",
-          armorLevel:armor?.levelRequirement ?? 0,
-          armorLag:chapter.recommendedLevelMax-(armor?.levelRequirement ?? 0),
-          weaponSource:weapon?(cumulativeSources.get(weapon.id)?.at(-1) ?? ""):"",
-          armorSource:armor?(cumulativeSources.get(armor.id)?.at(-1) ?? ""):"",
-        };
-      });
-      console.log("GEAR_SOURCE_CHAPTER",chapterNumber,chapter.name);
-      console.table(rows);
+          slot,
+          items:items.map((item)=>{
+            const qs=questSources(item.id);
+            const defaults=defaultRecipeSources(item.id);
+            return {
+              id:item.id,
+              level:item.levelRequirement,
+              questSources:qs,
+              earliestChapter:qs.map((source)=>chapterForQuest(source.split(":")[1]!)).filter((value):value is number=>value!==null).sort((a,b)=>a-b)[0] ?? null,
+              defaultRecipes:defaults,
+              wardstoneCacheAtPartyLevel: item.levelRequirement + 1,
+            };
+          }),
+        });
+      }
     }
+    console.log("MIDGAME_PRIMARY_SOURCES");
+    console.dir(rows,{depth:null});
   });
 });

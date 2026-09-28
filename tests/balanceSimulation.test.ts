@@ -367,7 +367,10 @@ describe("repeatable balance simulations", () => {
       runs: 6,
       progressionProfile: "subclass_ready",
     }));
-    const [nhalPrepared, nhalLagged, serekhPrepared, serekhLagged] = aggressive;
+    const nhalPrepared = aggressive[0]!;
+    const nhalLagged = aggressive[1]!;
+    const serekhPrepared = aggressive[2]!;
+    const serekhLagged = aggressive[3]!;
     console.table([defensiveVarkesh, ...aggressive]);
 
     expect(defensiveVarkesh.stalled).toBe(0);

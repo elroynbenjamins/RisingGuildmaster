@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest";
 import { advanceGuildTime } from "../src/game/economy/guildCalendarService";
 import { createGuild } from "../src/game/guild/guildService";
 import { deserializeGuild, serializeGuild } from "../src/game/save/saveService";
-import { getCampaignTrainingLevelCap, getTrainingGoldCost, calculateTrainingQuote, getTrainingProgressionLimit, grantTrainingXp, startHeroTraining, startTrainingGroundUpgrade, trainingCapacity } from "../src/game/training/trainingService";
+import { estimateTrainingCatchupPlan, getCampaignTrainingLevelCap, getTrainingGoldCost, calculateTrainingQuote, getTrainingProgressionLimit, grantTrainingXp, startHeroTraining, startTrainingGroundUpgrade, trainingCapacity } from "../src/game/training/trainingService";
 import { xpRequiredForNextLevel } from "../src/game/progression/xpSystem";
 import { testHero } from "./testHero";
+import { TRAINING_PROGRAMS } from "../src/data/training/trainingPrograms";
 
 describe("Training Hall", () => {
   it.each([
@@ -84,6 +85,38 @@ describe("Training Hall", () => {
     expect(quote.levelCap).toBe(13);
     expect(quote.xpReward).toBeGreaterThan(300);
     expect(quote.xpReward).toBeGreaterThanOrEqual(Math.floor(xpRequiredForNextLevel(11) * .35));
+  });
+
+  it("makes advanced programs progressively faster per calendar day", () => {
+    const programs = [
+      TRAINING_PROGRAMS.sparring_drills,
+      TRAINING_PROGRAMS.focused_practice,
+      TRAINING_PROGRAMS.class_mastery,
+      TRAINING_PROGRAMS.heroic_regimen,
+    ];
+    const dailyRates = programs.map((program) => program.catchupXpRatio / program.durationDays);
+    expect(dailyRates[1]).toBeGreaterThan(dailyRates[0]!);
+    expect(dailyRates[2]).toBeGreaterThan(dailyRates[1]!);
+    expect(dailyRates[3]).toBeGreaterThan(dailyRates[2]!);
+  });
+
+  it("estimates a practical Level-16 to 17 Training Hall catch-up plan", () => {
+    const trainee = { ...testHero(), id: "late-catchup", level: 16, xp: 0 };
+    const guild = createGuild();
+    guild.world.campaignChapter = 9;
+    guild.trainingGround.level = 3;
+    guild.heroes = [
+      trainee,
+      ...[17, 17, 17].map((level, index) => ({ ...testHero(), id: `late-veteran-${index}`, level })),
+    ];
+    expect(estimateTrainingCatchupPlan(guild, trainee, 17)).toMatchObject({
+      programId: "heroic_regimen",
+      programName: "Heroic Curriculum",
+      sessions: 2,
+      totalDays: 8,
+      totalGoldCost: 720,
+      targetLevel: 17,
+    });
   });
 
   it("does not bank training XP beyond the permitted level", () => {

@@ -25,12 +25,13 @@ describe("screen-by-screen tutorial guidance", () => {
     const guild = createGuild();
     expect(shouldShowGuidedScreenTip(guild, "guild_management")).toBe(false);
     expect(shouldShowGuidedScreenTip(guild, "temple")).toBe(false);
-    it("does not start new compact tips on an older completed save without guided-tour state", () => {
+  });
+
+  it("does not start new compact tips on an older completed save without guided-tour state", () => {
     const guild = createGuild();
     guild.tutorial = { ...guild.tutorial, active: false, completed: true, step: "complete", freeRefreshUsed: true, guided: undefined };
     expect(shouldShowGuidedScreenTip(guild, "temple")).toBe(false);
   });
-});
 
   it("shows each uncovered sub-screen tip once for guided players", () => {
     let guild = guidedGuild();
@@ -44,7 +45,14 @@ describe("screen-by-screen tutorial guidance", () => {
 
   it("does not opt skipped tutorials into the follow-up screen tour", () => {
     const guild = createGuild();
-    guild.tutorial = { ...guild.tutorial, active: false, completed: true, step: "complete", freeRefreshUsed: false, guided: createGuidedTourProgress() };
+    guild.tutorial = {
+      ...guild.tutorial,
+      active: false,
+      completed: true,
+      step: "complete",
+      freeRefreshUsed: false,
+      guided: createGuidedTourProgress(),
+    };
     expect(shouldShowGuidedScreenTip(guild, "crafting")).toBe(false);
   });
 });

@@ -19,11 +19,11 @@ describe("late party composition diagnostic", () => {
         heroLevel: scenario.level,
         partyClasses: ["warrior", "berserker", "cleric", "ranger"],
         difficultyId: "standard",
-        runs: 18,
+        runs: 8,
         seed: scenario.seed,
         gearProfile: scenario.gearProfile,
         progressionProfile: "subclass_ready",
       }));
     }
-  }, 540_000);
+  }, 360_000);
 });

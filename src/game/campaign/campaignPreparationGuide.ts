@@ -9,10 +9,18 @@ import { xpRequiredForNextLevel } from "../progression/xpSystem";
 import type { GuildState } from "../guild/types";
 import { isQuestAvailableForGuild } from "../quests/questAvailability";
 import { getAvailableCampaignNodes } from "./campaignService";
+import { getTrainingProgressionLimit, trainingCapacity } from "../training/trainingService";
+
+export interface CampaignTrainingAlternative {
+  heroId: string;
+  heroName: string;
+  currentLevel: number;
+  targetLevel: number;
+}
 
 export type CampaignPreparationRecommendation =
-  | { type: "side_quest"; questId: string; title: string; detail: string; reason: "level" | "weapon" | "armor" | "secondary" | "boss" }
-  | { type: "dungeon"; title: string; detail: string; reason: "level" | "weapon" | "armor" | "secondary"; suggestedRuns: 1 | 2 }
+  | { type: "side_quest"; questId: string; title: string; detail: string; reason: "level" | "weapon" | "armor" | "secondary" | "boss"; trainingAlternative?: CampaignTrainingAlternative }
+  | { type: "dungeon"; title: string; detail: string; reason: "level" | "weapon" | "armor" | "secondary"; suggestedRuns: 1 | 2; trainingAlternative?: CampaignTrainingAlternative }
   | null;
 
 function hasWeaponRecipe(questId: string): boolean {
@@ -92,6 +100,27 @@ function suggestedDungeonRuns(heroes: ReturnType<typeof coreFieldHeroes>, recomm
   return averageXpGap <= averageRunTarget ? 1 : 2;
 }
 
+function getTrainingAlternative(
+  guild: GuildState,
+  heroes: ReturnType<typeof coreFieldHeroes>,
+  recommendedLevel: number,
+): CampaignTrainingAlternative | undefined {
+  if (guild.trainingGround.sessions.length >= trainingCapacity(guild)) return undefined;
+  const activeTrainingIds = new Set(guild.trainingGround.sessions.map((session) => session.heroId));
+  const candidate = [...heroes]
+    .filter((hero) => hero.level < recommendedLevel && hero.isAvailable && hero.currentHP > 0 && !activeTrainingIds.has(hero.id))
+    .sort((a, b) => a.level - b.level || a.xp - b.xp || a.name.localeCompare(b.name))[0];
+  if (!candidate) return undefined;
+  const limit = getTrainingProgressionLimit(guild, candidate);
+  if (limit.levelCap <= candidate.level && candidate.xp >= xpRequiredForNextLevel(candidate.level) - 1) return undefined;
+  return {
+    heroId: candidate.id,
+    heroName: candidate.name,
+    currentLevel: candidate.level,
+    targetLevel: Math.min(recommendedLevel, Math.max(candidate.level, limit.levelCap)),
+  };
+}
+
 export function getCampaignPreparationRecommendation(guild: GuildState): CampaignPreparationRecommendation {
   const chapter = CAMPAIGN_CHAPTERS[guild.world.campaignChapter];
   if (!chapter) return null;
@@ -146,6 +175,27 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
   const reason: "level" | "weapon" | "armor" | "secondary" | "boss" | null =
     meaningfulLevelGap ? "level" : weaponLag ? "weapon" : armorLag ? "armor" : secondaryGearGap ? "secondary" : underLevel ? "level" : nextQuest.questType === "boss" && sideQuests.length ? "boss" : null;
 
+  const dungeonUnlocked = guild.world.completedCampaignNodeIds.includes("broken_wardstone") && guild.heroes.length >= DUNGEON_UNLOCK_HERO_COUNT;
+  const trainingAlternative = reason === "level" ? getTrainingAlternative(guild, heroes, recommendedMin) : undefined;
+
+  if (reason === "level" && dungeonUnlocked) {
+    const runs = suggestedDungeonRuns(heroes, recommendedMin);
+    const runText = runs === 1
+      ? "Start with one Roguelite Expedition, then reassess."
+      : "Plan on two Roguelite Expeditions, then reassess.";
+    const trainingText = trainingAlternative
+      ? ` Or send ${trainingAlternative.heroName} to the Training Hall for safe catch-up XP toward Level ${trainingAlternative.targetLevel} while the rest of the guild handles other work.`
+      : "";
+    return {
+      type: "dungeon",
+      title: runs === 1 ? "Roguelite Expedition" : "2 Roguelite Expeditions",
+      detail: `Your field team averages Level ${fieldLevel.toFixed(1)}; the next story mission recommends Level ${recommendedMin}. ${runText} Expeditions give catch-up XP plus an equipment cache.${trainingText}`,
+      reason: "level",
+      suggestedRuns: runs,
+      ...(trainingAlternative ? { trainingAlternative } : {}),
+    };
+  }
+
   if (reason && sideQuests.length) {
     const quest = sideQuests[0]!;
     const weaponRecipe = hasUsableWeaponRecipe(quest.id, coreClassIds);
@@ -160,10 +210,9 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
           : reason === "secondary"
             ? `${secondaryGapHeroes} of your core heroes ${secondaryGapHeroes === 1 ? "is" : "are"} missing three or more helmet, boots, or accessory slots. This one-clear side quest gives XP and a guaranteed equipment reward${secondaryRecipe ? ", plus a permanent secondary-slot recipe" : ""}.`
             : `You are ready for the boss, but this one-clear local story is a good final preparation route for XP and guaranteed gear${weaponRecipe ? ", with a permanent weapon recipe" : armorRecipe ? ", with a permanent armor recipe" : secondaryRecipe ? ", with a permanent secondary-slot recipe" : ""}.`;
-    return { type: "side_quest", questId: quest.id, title: quest.name, detail, reason };
+    return { type: "side_quest", questId: quest.id, title: quest.name, detail, reason, ...(reason === "level" && trainingAlternative ? { trainingAlternative } : {}) };
   }
 
-  const dungeonUnlocked = guild.world.completedCampaignNodeIds.includes("broken_wardstone") && guild.heroes.length >= DUNGEON_UNLOCK_HERO_COUNT;
   if ((underLevel || weaponLag || armorLag || secondaryGearGap) && dungeonUnlocked) {
     const runs: 1 | 2 = (weaponLag || armorLag || secondaryGearGap) ? 2 : suggestedDungeonRuns(heroes, recommendedMin);
     const runText = runs === 1
@@ -177,7 +226,14 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
         : dungeonReason === "armor"
           ? `${laggingArmorHeroes} of your core heroes have armor at least three levels behind. ${runText} Each clear gives an equipment cache plus extra XP.`
           : `${secondaryGapHeroes} of your core heroes ${secondaryGapHeroes === 1 ? "is" : "are"} missing three or more secondary gear slots. ${runText} Each clear gives an equipment cache plus extra XP.`;
-    return { type: "dungeon", title: runs === 1 ? "Wardstone Expedition" : "2 Wardstone Expeditions", detail, reason: dungeonReason, suggestedRuns: runs };
+    return {
+      type: "dungeon",
+      title: runs === 1 ? "Roguelite Expedition" : "2 Roguelite Expeditions",
+      detail,
+      reason: dungeonReason,
+      suggestedRuns: runs,
+      ...(dungeonReason === "level" && trainingAlternative ? { trainingAlternative } : {}),
+    };
   }
 
   return null;

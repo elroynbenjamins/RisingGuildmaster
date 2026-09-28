@@ -12,7 +12,7 @@ export type AppRoute =
   | { name: "settings" }
   | { name: "tutorialGuide" }
   | { name: "contentUnlock" }
-  | { name: "training"; originMainTab?: MainTab }
+  | { name: "training"; originMainTab?: MainTab; heroId?: string }
   | { name: "operations" }
   | { name: "raids" }
   | { name: "legacy" }

@@ -8,6 +8,7 @@ import { grantHeroXp } from "../progression/levelSystem";
 import { xpRequiredForNextLevel } from "../progression/xpSystem";
 import type { TrainingProgramId, TrainingSession } from "./trainingTypes";
 import { appendHeroHistoryEvent } from "../heroes/heroHistoryService";
+import { CAMPAIGN_CHAPTERS } from "../../data/campaign/chapter1";
 
 export function trainingCapacity(guild: GuildState): number { return TRAINING_GROUND_CONFIG.capacityByLevel[guild.trainingGround.level] ?? 1; }
 
@@ -15,15 +16,20 @@ export interface TrainingProgressionLimit { campaignCap: number; rosterCap: numb
 
 export function getCampaignTrainingLevelCap(guild: GuildState): number {
   const completed = new Set(guild.world.completedCampaignNodeIds);
-  if (guild.world.worldFlags.chapter_2_complete || completed.has("hollow_warden_boss")) return 11;
-  if (completed.has("chainbreaker_boss")) return 8;
-  if (completed.has("broken_wardstone") || guild.world.campaignChapter >= 2) return 6;
-  return 4;
+  const legacyCap = guild.world.worldFlags.chapter_2_complete || completed.has("hollow_warden_boss")
+    ? 11
+    : completed.has("chainbreaker_boss")
+      ? 8
+      : completed.has("broken_wardstone") || guild.world.campaignChapter >= 2
+        ? 6
+        : 4;
+  const chapterCap = CAMPAIGN_CHAPTERS[guild.world.campaignChapter]?.recommendedLevelMax ?? 1;
+  return Math.max(legacyCap, chapterCap);
 }
 
 export function getTrainingProgressionLimit(guild: GuildState, hero: Hero): TrainingProgressionLimit {
   const peers = guild.heroes.filter((entry) => entry.id !== hero.id && entry.isAvailable && entry.currentHP > 0).sort((a, b) => b.level - a.level).slice(0, 4);
-  const rosterCap = peers.length ? Math.max(hero.level, Math.floor(peers.reduce((sum, entry) => sum + entry.level, 0) / peers.length) - 1) : hero.level;
+  const rosterCap = peers.length ? Math.max(hero.level, Math.floor(peers.reduce((sum, entry) => sum + entry.level, 0) / peers.length)) : hero.level;
   const campaignCap = getCampaignTrainingLevelCap(guild);
   return { campaignCap, rosterCap, levelCap: Math.max(hero.level, Math.min(campaignCap, rosterCap)) };
 }
@@ -48,7 +54,8 @@ export function calculateTrainingQuote(hero: Hero, programId: TrainingProgramId,
   const program = TRAINING_PROGRAMS[programId]; const modifiers = collectHeroModifiers(hero); const context = { currentHP: hero.currentHP, maxHP: hero.currentHP };
   const costMultiplier = Math.max(.25, applyModifiers(1, "trainingCost", modifiers, context));
   const xpMultiplier = Math.max(.1, applyModifiers(1, "trainingXp", modifiers, context));
-  const rawXp = Math.max(1, Math.round(program.baseXp * xpMultiplier));
+  const catchupXp = Math.round(xpRequiredForNextLevel(hero.level) * program.catchupXpRatio);
+  const rawXp = Math.max(1, Math.round(Math.max(program.baseXp, catchupXp) * xpMultiplier));
   const limit = guild ? getTrainingProgressionLimit(guild, hero) : undefined;
   return { goldCost: getTrainingGoldCost(programId, costMultiplier), xpReward: limit ? Math.min(rawXp, maxXpBeforeLevelCap(hero, limit.levelCap)) : rawXp, levelCap: limit?.levelCap, developmentSessionsUsed: hero.focusedTrainingSessions ?? 0 };
 }

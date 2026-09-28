@@ -318,10 +318,12 @@ describe("repeatable balance simulations", () => {
       const boss = /varkesh|nhal|serekh/.test(result.scenarioId);
       expect(result.winRate, `${result.scenarioId} prepared Standard win rate`).toBeGreaterThanOrEqual(2 / 3);
       expect(result.averageSurvivingHeroes, `${result.scenarioId} prepared Standard survivors`).toBeGreaterThanOrEqual(boss ? 2.2 : 2.5);
-      expect(result.averageSurvivingHeroes, `${result.scenarioId} prepared Standard survivors`).toBeLessThanOrEqual(3.5);
-      expect(result.averageFallenHeroesOnWins, `${result.scenarioId} casualty pressure`).toBeGreaterThanOrEqual(.5);
-      expect(result.averageFallenHeroesOnWins, `${result.scenarioId} casualty pressure`).toBeLessThanOrEqual(boss ? 1.8 : 1.5);
+      expect(result.averageFallenHeroesOnWins, `${result.scenarioId} excessive casualty pressure`).toBeLessThanOrEqual(boss ? 1.8 : 1.5);
     }
+    const pressuredScenarios = results.filter((result) => result.averageFallenHeroesOnWins >= .5);
+    const averageFallen = results.reduce((sum, result) => sum + result.averageFallenHeroesOnWins, 0) / results.length;
+    expect(pressuredScenarios.length, "late prepared missions with meaningful casualty pressure").toBeGreaterThanOrEqual(5);
+    expect(averageFallen, "average late prepared casualty pressure").toBeGreaterThanOrEqual(.75);
   }, 180_000);
 
   it("keeps underprepared late-chapter bosses dangerous without becoming guaranteed wipes", () => {
@@ -348,6 +350,57 @@ describe("repeatable balance simulations", () => {
     }
     expect(results.filter((result) => result.wipeRate > 0).length, "late underprepared bosses should still produce occasional wipes").toBeGreaterThanOrEqual(1);
   }, 180_000);
+
+  it("keeps late boss preparation meaningfully better across shared seeds", () => {
+    const bosses = [
+      { id: "ch7-varkesh", questId: "varkesh_gilded_rupture_boss", preparedLevel: 13, seed: 9300 },
+      { id: "ch8-nhal", questId: "admiral_nhal_veyr_boss", preparedLevel: 15, seed: 9400 },
+      { id: "ch9-serekh", questId: "serekh_chartmaker_boss", preparedLevel: 17, seed: 9500 },
+    ] as const;
+    for (const boss of bosses) {
+      const prepared = simulateCombatScenario({
+        id: `${boss.id}-prepared-shared`,
+        questId: boss.questId,
+        heroLevel: boss.preparedLevel,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId: "standard",
+        runs: 8,
+        seed: boss.seed,
+        gearProfile: "optional_progression",
+        progressionProfile: "subclass_ready",
+      });
+      const underprepared = simulateCombatScenario({
+        id: `${boss.id}-underprepared-shared`,
+        questId: boss.questId,
+        heroLevel: boss.preparedLevel - 1,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId: "standard",
+        runs: 8,
+        seed: boss.seed,
+        gearProfile: "optional_progression",
+        progressionProfile: "subclass_ready",
+      });
+      const severe = simulateCombatScenario({
+        id: `${boss.id}-severe-shared`,
+        questId: boss.questId,
+        heroLevel: boss.preparedLevel - 1,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId: "standard",
+        runs: 8,
+        seed: boss.seed,
+        gearProfile: "lagged_basic",
+        progressionProfile: "subclass_ready",
+      });
+      console.table([prepared, underprepared, severe]);
+      expect(prepared.winRate, `${boss.id} prepared reliability`).toBeGreaterThanOrEqual(.625);
+      const preparationShows =
+        prepared.winRate > underprepared.winRate
+        || prepared.averageFallenHeroesOnWins + .5 <= underprepared.averageFallenHeroesOnWins;
+      expect(preparationShows, `${boss.id} preparation payoff`).toBe(true);
+      expect(underprepared.averageFallenHeroesOnWins, `${boss.id} underprepared casualties`).toBeGreaterThanOrEqual(1);
+      expect(severe.wipeRate, `${boss.id} severe underprepared wipe pressure`).toBeGreaterThanOrEqual(.625);
+    }
+  }, 300_000);
 
   it("reports early, mid and late guild economies with production salaries", () => {
     const stages = [

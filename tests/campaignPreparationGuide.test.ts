@@ -224,6 +224,17 @@ describe("campaign preparation guidance", () => {
     expect(recommendation?.detail).toContain("secondary-slot recipe");
   });
 
+  it("keeps an available Side Quest as the first recommendation when the whole field team is under-levelled", () => {
+    const guild = chapterEightGuild();
+    guild.heroes = heroes(4, 13, "sixth-voice-blade");
+    const recommendation = getCampaignPreparationRecommendation(guild);
+    expect(recommendation).toMatchObject({
+      type: "side_quest",
+      reason: "level",
+    });
+    expect(recommendation?.detail).toMatch(/side quest/i);
+  });
+
   it("offers roguelite or Training Hall XP catch-up after a Chapter 7 replacement fixes gear", () => {
     const guild = chapterSevenBossGuild(6);
     guild.heroes = guild.heroes.map((hero, index) => index === 0 ? {
@@ -248,7 +259,7 @@ describe("campaign preparation guidance", () => {
     expect(recommendation?.detail).toMatch(/Training Hall/i);
   });
 
-  it("falls back to two Wardstone runs for a Chapter 9 sparse replacement after local side stories", () => {
+  it("falls back to two Roguelite runs for a Chapter 9 sparse replacement after local side stories", () => {
     const guild = chapterNineBossGuild(6);
     guild.heroes = guild.heroes.map((hero, index) => index === 0 ? {
       ...hero,
@@ -306,7 +317,7 @@ describe("campaign preparation guidance", () => {
     });
   });
 
-  it("falls back to a Wardstone expedition when side stories are cleared and the next mission is ahead", () => {
+  it("falls back to Roguelite expeditions when side stories are cleared and the next mission is ahead", () => {
     const guild = chapterEightGuild();
     guild.heroes = heroes(6, 14, "concordance-glaive");
     guild.world = {
@@ -328,7 +339,7 @@ describe("campaign preparation guidance", () => {
     });
   });
 
-  it("recommends two Wardstone runs when multiple core weapons badly lag", () => {
+  it("recommends two Roguelite runs when multiple core weapons badly lag", () => {
     const guild = chapterEightGuild();
     guild.heroes = heroes(6, 15, "concordance-glaive").map((hero, index) => index < 2 ? {
       ...hero,
@@ -351,7 +362,7 @@ describe("campaign preparation guidance", () => {
     });
   });
 
-  it("recommends one Wardstone run when the core party is within one catch-up target of the next level", () => {
+  it("recommends one Roguelite run when the core party is within one catch-up target of the next level", () => {
     const guild = chapterEightGuild();
     const level = 14;
     const remainingTarget = getDungeonCatchupXpTarget(level);

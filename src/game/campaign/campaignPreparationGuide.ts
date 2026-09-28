@@ -137,6 +137,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
   const recommendedMin = nextQuest.recommendedLevelMin ?? chapter.recommendedLevelMin ?? 1;
   const underLevel = fieldLevel + .01 < recommendedMin;
   const meaningfulLevelGap = fieldLevel + .50 < recommendedMin;
+  const underlevelHeroCount = heroes.filter((hero) => hero.level < recommendedMin).length;
   const laggingWeaponHeroes = heroes.filter((hero) => {
     const weaponId = hero.equipment.weapon;
     if (!weaponId) return true;
@@ -178,7 +179,7 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
   const dungeonUnlocked = guild.world.completedCampaignNodeIds.includes("broken_wardstone") && guild.heroes.length >= DUNGEON_UNLOCK_HERO_COUNT;
   const trainingAlternative = reason === "level" ? getTrainingAlternative(guild, heroes, recommendedMin) : undefined;
 
-  if (reason === "level" && dungeonUnlocked) {
+  if (reason === "level" && dungeonUnlocked && (underlevelHeroCount === 1 || sideQuests.length === 0)) {
     const runs = suggestedDungeonRuns(heroes, recommendedMin);
     const runText = runs === 1
       ? "Start with one Roguelite Expedition, then reassess."
@@ -216,8 +217,8 @@ export function getCampaignPreparationRecommendation(guild: GuildState): Campaig
   if ((underLevel || weaponLag || armorLag || secondaryGearGap) && dungeonUnlocked) {
     const runs: 1 | 2 = (weaponLag || armorLag || secondaryGearGap) ? 2 : suggestedDungeonRuns(heroes, recommendedMin);
     const runText = runs === 1
-      ? "Start with one Wardstone Expedition."
-      : "Plan on two Wardstone Expeditions, then reassess before the next story push.";
+      ? "Start with one Roguelite Expedition."
+      : "Plan on two Roguelite Expeditions, then reassess before the next story push.";
     const dungeonReason: "level" | "weapon" | "armor" | "secondary" = meaningfulLevelGap ? "level" : weaponLag ? "weapon" : armorLag ? "armor" : secondaryGearGap ? "secondary" : "level";
     const detail = dungeonReason === "level"
       ? `Your top four average Level ${fieldLevel.toFixed(1)}; the next story mission recommends Level ${recommendedMin}. ${runText} Each clear gives catch-up XP plus an equipment cache.`

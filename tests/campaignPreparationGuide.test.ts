@@ -11,7 +11,15 @@ function heroes(count: number, level: number, weapon: string | null, armor: stri
     id: `prep-hero-${index}`,
     name: `Prep ${index + 1}`,
     level,
-    equipment: { ...testHero().equipment, weapon, armor },
+    equipment: {
+      ...testHero().equipment,
+      weapon,
+      armor,
+      helmet: "sunscar-veil",
+      boots: "gravewater-waders",
+      accessory1: "truthglass-signet",
+      accessory2: "ossuary-reliquary",
+    },
   }));
 }
 
@@ -76,6 +84,56 @@ describe("campaign preparation guidance", () => {
     });
     expect(recommendation?.detail).toContain("armor at least three levels behind");
     expect(recommendation?.detail).toContain("armor recipe");
+  });
+
+  it("routes a late fresh recruit with empty secondary slots through a useful side quest", () => {
+    const guild = chapterEightGuild();
+    guild.heroes = heroes(4, 15, "concordance-glaive").map((hero, index) => index === 0 ? {
+      ...hero,
+      equipment: {
+        ...hero.equipment,
+        helmet: null,
+        boots: null,
+        accessory1: null,
+        accessory2: null,
+      },
+    } : hero);
+    const recommendation = getCampaignPreparationRecommendation(guild);
+    expect(recommendation).toMatchObject({
+      type: "side_quest",
+      questId: "the_lighthouse_that_walked",
+      reason: "secondary",
+    });
+    expect(recommendation?.detail).toContain("missing multiple helmet, boots, or accessory slots");
+    expect(recommendation?.detail).toContain("secondary-slot recipe");
+  });
+
+  it("uses two expeditions when a late replacement still lacks secondary gear after local side stories", () => {
+    const guild = chapterEightGuild();
+    guild.heroes = heroes(6, 15, "concordance-glaive").map((hero, index) => index === 0 ? {
+      ...hero,
+      equipment: {
+        ...hero.equipment,
+        helmet: null,
+        boots: null,
+        accessory1: null,
+        accessory2: null,
+      },
+    } : hero);
+    guild.world = {
+      ...guild.world,
+      completedQuestIds: [
+        ...guild.world.completedQuestIds,
+        "the_lighthouse_that_walked",
+        "letters_from_a_sunken_ship",
+      ],
+    };
+    expect(getCampaignPreparationRecommendation(guild)).toMatchObject({
+      type: "dungeon",
+      reason: "secondary",
+      suggestedRuns: 2,
+      title: "2 Wardstone Expeditions",
+    });
   });
 
   it("falls back to a Wardstone expedition when side stories are cleared and the next mission is ahead", () => {

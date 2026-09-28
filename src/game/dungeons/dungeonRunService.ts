@@ -53,13 +53,11 @@ export function getExpeditionCacheTopItemIds(party: readonly Hero[], ownedInvent
     && item.levelRequirement <= maxLevel
     && (!item.classRestrictions.length || party.some((hero) => item.classRestrictions.includes(hero.classId)))
   );
-  const preferred = levelAppropriate.filter((item) => item.rarity === "common" || item.rarity === "uncommon" || (allowRare && item.rarity === "rare"));
-  const eligible = preferred.length ? preferred : levelAppropriate.filter((item) => item.rarity === "rare");
-  const newItems = eligible.filter((item) => !owned.has(item.id));
-  const candidates = newItems.length ? newItems : eligible;
-  if (!candidates.length) return [];
+  const unownedLevelAppropriate = levelAppropriate.filter((item) => !owned.has(item.id));
+  const sourcePool = unownedLevelAppropriate.length ? unownedLevelAppropriate : levelAppropriate;
+  if (!sourcePool.length) return [];
 
-  const primaryUrgency = (item: (typeof candidates)[number]): number => {
+  const primaryUrgency = (item: (typeof sourcePool)[number]): number => {
     if (item.slot !== "weapon" && item.slot !== "armor") return 0;
     let urgency = 0;
     for (const hero of party) {
@@ -78,12 +76,20 @@ export function getExpeditionCacheTopItemIds(party: readonly Hero[], ownedInvent
     return urgency;
   };
 
-  const maxPrimaryUrgency = Math.max(0, ...candidates.map(primaryUrgency));
-  const priorityPool = maxPrimaryUrgency > 0
-    ? candidates.filter((item) => primaryUrgency(item) === maxPrimaryUrgency)
-    : candidates;
+  const maxPrimaryUrgency = Math.max(0, ...sourcePool.map(primaryUrgency));
+  let priorityPool: typeof sourcePool;
+  if (maxPrimaryUrgency > 0) {
+    const urgentPrimary = sourcePool.filter((item) => primaryUrgency(item) === maxPrimaryUrgency);
+    const rarityPreferredPrimary = urgentPrimary.filter((item) => item.rarity === "common" || item.rarity === "uncommon" || (allowRare && item.rarity === "rare"));
+    // If every item capable of repairing the most urgent primary gap is rare,
+    // allow that rare bridge instead of spending the catch-up cache on a sidegrade.
+    priorityPool = rarityPreferredPrimary.length ? rarityPreferredPrimary : urgentPrimary;
+  } else {
+    const rarityPreferred = sourcePool.filter((item) => item.rarity === "common" || item.rarity === "uncommon" || (allowRare && item.rarity === "rare"));
+    priorityPool = rarityPreferred.length ? rarityPreferred : sourcePool.filter((item) => item.rarity === "rare");
+  }
 
-  const score = (item: (typeof candidates)[number]) => {
+  const score = (item: (typeof sourcePool)[number]) => {
     let value = item.rarity === "rare" ? 3 : item.rarity === "uncommon" ? 2 : 1;
     for (const hero of party) {
       if (item.classRestrictions.length && !item.classRestrictions.includes(hero.classId)) continue;

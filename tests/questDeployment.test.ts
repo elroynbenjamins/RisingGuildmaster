@@ -92,7 +92,7 @@ describe("quest deployment presentation", () => {
     };
     const readyHero = { ...unfinished, currentHP: calculateHero(unfinished).stats.maxHP };
     const summary = getQuestDeploymentSummary(
-      { ...quest, recommendedLevelMin: 13, minimumPartyAverageLevel: undefined },
+      { ...quest, recommendedLevelMin: 13, minimumPartyAverageLevel: undefined, minPartySize: 1 },
       [readyHero],
       [],
       potions,

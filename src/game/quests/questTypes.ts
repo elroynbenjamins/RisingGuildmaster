@@ -1,3 +1,4 @@
+import type { GameDifficultyId } from "../difficulty/difficultyTypes";
 export type QuestType = "campaign" | "side" | "contract" | "boss";
 export interface HuntRewardDefinition { recipeFragmentMaterialId: MaterialId; firstVictoryCount: number; repeatDropChance: number; pityAfterFailures: number }
 export interface QuestStoryContext {
@@ -16,6 +17,8 @@ export interface EncounterEnemyGroup {
   level: number;
   /** Encounter-specific multiplier for elite guards and bosses. 1.15 means +15%. */
   difficultyMultiplier?: number;
+  /** Optional extra scaling for one game difficulty when a specific encounter needs local tuning. */
+  difficultyMultiplierByDifficulty?: Partial<Record<GameDifficultyId, number>>;
   spawnPositions: GridPosition[];
 }
 

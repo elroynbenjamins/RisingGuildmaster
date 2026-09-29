@@ -46,6 +46,27 @@ describe("campaign level guidance", () => {
     }
   });
 
+  it("prefers an equally suitable catch-up quest in the next campaign battle's region", () => {
+    const guild = createGuild();
+    guild.heroes = roster([6, 6, 6, 6]);
+    guild.world.campaignChapter = 4;
+    guild.world.unlockedRegionIds = [...new Set([...guild.world.unlockedRegionIds, "frostmarch", "shadowfen"])];
+    guild.world.completedCampaignNodeIds = [
+      "northwatch_two_skies", "road_of_frozen_names", "council_at_northwatch", "night_of_blue_horns",
+      "hroth_iceblood_boss", "beneath_glimmerlake", "the_moon_gate", "vaelith_boss",
+      "a_bell_without_tower", "return_to_blackwater", "names_in_the_reeds", "procession_at_low_water",
+    ];
+    guild.world.completedQuestIds = ["road_of_frozen_names", "night_of_blue_horns", "hroth_iceblood_boss", "beneath_glimmerlake", "vaelith_pale_echo_boss", "return_to_blackwater", "procession_at_low_water"];
+
+    const guidance = getCampaignLevelGuidance(guild);
+    expect(guidance).toMatchObject({
+      averageLevel: 6,
+      targetLevel: 7,
+      nextQuestId: "bell_widow_boss",
+      recommendedSideQuestId: "lanterns_for_the_lost",
+    });
+  });
+
   it("stops recommending catch-up work once the top four match the campaign target", () => {
     const guild = createGuild();
     guild.heroes = roster([2, 2, 2, 2]);

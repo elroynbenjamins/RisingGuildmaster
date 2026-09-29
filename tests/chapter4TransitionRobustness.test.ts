@@ -121,7 +121,7 @@ describe("Chapter 3 to 4 transition robustness", () => {
 
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
-    expect(results.filter((result) => result.wins > 0).length).toBeGreaterThanOrEqual(3);
+    expect(results.filter((result) => result.wins > 0).length, "every sensible prepared Iron composition should have a winning path").toBe(4);
     expect(
       results.some((result) => result.victoriesWithAnyFallRate >= .50 || result.wipeRate >= .20),
       "Iron Morrowveil should still impose meaningful casualty risk",

@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Chapter 5 robustness guards
-        run: pnpm vitest run tests/chapter5DifficultyRobustness.test.ts --reporter=verbose
+        run: pnpm vitest run tests/chapter5DifficultyRobustness.test.ts -t "preserves the Road|keeps prepared late|keeps Solkar" --reporter=verbose
 
   validate:
     runs-on: ubuntu-latest

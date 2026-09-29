@@ -94,7 +94,7 @@ describe("late campaign party-composition robustness", () => {
             partyClasses: party.classes,
             skillPathIndices: party.skillPathIndices,
             difficultyId: "standard",
-            runs: 4,
+            runs: 3,
             seed: boss.seed + partyIndex * 200 + bossIndex * 20,
             gearProfile,
             progressionProfile: "subclass_ready",

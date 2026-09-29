@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { QUESTS } from "../src/data/quests/quests";
+import { grantHeroXp } from "../src/game/progression/levelSystem";
+import { getQuestXpForHero } from "../src/game/quests/questResolver";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
+import { testHero } from "./testHero";
 
 describe("Chapter 3 to 4 transition robustness", () => {
   it("keeps Shadowfen opening pressure readable across difficulties", () => {
@@ -45,6 +49,19 @@ describe("Chapter 3 to 4 transition robustness", () => {
     expect(byId.get("chapter4-bell-widow-standard")!.winRate).toBeGreaterThanOrEqual(.66);
     expect(byId.get("chapter4-morrowveil-standard")!.winRate).toBeGreaterThanOrEqual(.66);
   }, 240_000);
+
+  it("reaches the Level-7 Archive Below floor through authored content without repeat grinding", () => {
+    let hero = { ...testHero(), level: 6, xp: 0 };
+    for (const questId of ["return_to_blackwater", "procession_at_low_water", "bell_widow_boss"] as const) {
+      hero = grantHeroXp(hero, getQuestXpForHero(hero, QUESTS[questId]!, 4));
+    }
+
+    expect(hero.level, "mainline should leave the roster close to Level 7 rather than requiring repeated grind").toBe(6);
+    expect(hero.xp).toBeGreaterThan(6_000);
+
+    hero = grantHeroXp(hero, getQuestXpForHero(hero, QUESTS.lanterns_for_the_lost!, 4));
+    expect(hero.level, "one normal authored Shadowfen side quest should reach the Archive Below floor").toBeGreaterThanOrEqual(7);
+  });
 
   it("punishes entering Shadowfen one level behind without making recovery hopeless", () => {
     const prepared = simulateCombatScenario({

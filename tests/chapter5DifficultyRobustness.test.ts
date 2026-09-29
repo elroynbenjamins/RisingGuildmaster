@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { QUESTS } from "../src/data/quests/quests";
+import { grantHeroXp } from "../src/game/progression/levelSystem";
+import { getQuestXpForHero } from "../src/game/quests/questResolver";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
+import { testHero } from "./testHero";
 
 describe("Chapter 5 Ashlands robustness", () => {
   it("keeps the Chapter 5 difficulty curve ordered with realistic lagged gear", () => {
@@ -71,6 +75,19 @@ describe("Chapter 5 Ashlands robustness", () => {
     expect(prepared.winRate).toBeGreaterThan(behind.winRate);
     expect(behind.wipeRate).toBeGreaterThanOrEqual(prepared.wipeRate);
   }, 180_000);
+
+  it("reaches the Level-9 Causeway floor through authored Ashlands content without repeat grinding", () => {
+    let hero = { ...testHero(), level: 8, xp: 0 };
+    for (const questId of ["road_of_glass", "siege_of_emberfall", "keeper_of_cinders_boss"] as const) {
+      hero = grantHeroXp(hero, getQuestXpForHero(hero, QUESTS[questId]!, 4));
+    }
+
+    expect(hero.level, "mainline should leave the roster close to Level 9").toBe(8);
+    expect(hero.xp).toBeGreaterThan(9_000);
+
+    hero = grantHeroXp(hero, getQuestXpForHero(hero, QUESTS.the_children_of_cinder!, 4));
+    expect(hero.level, "one authored Ashlands side quest should reach the Burning Causeway floor").toBeGreaterThanOrEqual(9);
+  });
 
   it("keeps prepared late-Chapter-5 wins costly instead of turning the finale into easy mode", () => {
     const scenarios = [

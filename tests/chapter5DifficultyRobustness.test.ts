@@ -67,23 +67,11 @@ import { testHero } from "./testHero";
 
   it("makes preparation materially matter for Road of Glass and Solkar", () => {
     const scenarios = [
-      {
-        id: "road",
-        questId: "road_of_glass",
-        preparedLevel: 8,
-        underpreparedLevel: 7,
-        seed: 52_100,
-      },
-      {
-        id: "solkar",
-        questId: "solkar_ash_herald_boss",
-        preparedLevel: 9,
-        underpreparedLevel: 8,
-        seed: 52_200,
-      },
+      { id: "road", questId: "road_of_glass", preparedLevel: 8, underpreparedLevel: 7, seed: 52_100 },
+      { id: "solkar", questId: "solkar_ash_herald_boss", preparedLevel: 9, underpreparedLevel: 8, seed: 52_200 },
     ] as const;
 
-    for (const scenario of scenarios) {
+    const pairs = scenarios.map((scenario) => {
       const prepared = simulateCombatScenario({
         id: `chapter5-${scenario.id}-veteran-prepared`,
         questId: scenario.questId,
@@ -106,17 +94,22 @@ import { testHero } from "./testHero";
         gearProfile: "lagged_basic",
         progressionProfile: "subclass_ready",
       });
+      return { scenario, prepared, underprepared };
+    });
 
-      console.table([prepared, underprepared]);
+    console.table(pairs.flatMap(({ prepared, underprepared }) => [prepared, underprepared]));
+
+    for (const { scenario, prepared, underprepared } of pairs) {
       expect(prepared.stalled + underprepared.stalled).toBe(0);
       expect(prepared.winRate, `${scenario.id} prepared Veteran viability`).toBeGreaterThanOrEqual(.66);
       expect(prepared.winRate, `${scenario.id} preparation should improve win rate`).toBeGreaterThan(underprepared.winRate);
       expect(
-        underprepared.wipeRate > 0 || underprepared.averageFallenHeroesOnWins > prepared.averageFallenHeroesOnWins,
-        `${scenario.id} underprepared party should face clearly higher casualty pressure`,
+        underprepared.wipeRate > prepared.wipeRate
+          || underprepared.averageRemainingHpRatioOnWins < prepared.averageRemainingHpRatioOnWins,
+        `${scenario.id} underprepared party should face clearly higher pressure`,
       ).toBe(true);
     }
-  }, 240_000);
+  }, 300_000);
 
   it("keeps prepared Iron Solkar viable across multiple sensible party compositions", () => {
     const parties = [

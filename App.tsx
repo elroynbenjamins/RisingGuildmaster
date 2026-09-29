@@ -63,6 +63,7 @@ import { AchievementsScreen } from "./src/screens/Achievements/AchievementsScree
 import { acknowledgeUnlockNotices, getNewUnlockNotices } from "./src/game/progression/unlockSummaryService";
 import { ThemeProvider, useTheme } from "./src/theme/theme";
 import { initializeAdMobPrivacy } from "./src/game/monetization/admobRewardedAdProvider";
+import { formatOfflineDuration } from "./src/game/heroes/offlineRecoveryService";
 
 import { pendingDayMilestone } from "./src/game/monetization/dayMilestoneAdService";
 import type { SaveSlotId } from "./src/game/save/saveService";
@@ -75,7 +76,7 @@ function Game() {
   const [showNewGameSetup, setShowNewGameSetup] = useState(false);
   const [newGameSlotId, setNewGameSlotId] = useState<SaveSlotId>(1);
   const worldRandom = useRef(createSeededRandom(randomSeed()));
-  const { guild, updateGuild, isHydrated, gameStarted, startNewGame, continueGame, deleteSaveSlot, saveSlots, saveError } = useGuild();
+  const { guild, updateGuild, isHydrated, gameStarted, startNewGame, continueGame, deleteSaveSlot, saveSlots, saveError, offlineRecoverySummary, clearOfflineRecoverySummary } = useGuild();
   const main = (tab: MainTab, questTab?: QuestTab) => setRoute({ name: "main", tab, questTab });
   const { showDialog, isDialogOpen } = useGameDialog();
   const enterQuestCombat = (questId: string, party: Party, campaignNodeId?: string, combatSetup?: QuestCombatSetup, preCombatConditions: readonly QuestPreCombatCondition[] = []) => {
@@ -93,6 +94,24 @@ function Game() {
     }
   };
   useEffect(() => { if (saveError) showDialog({title: "Guild could not be saved", message: saveError, tone: "danger"}); }, [saveError, showDialog]);
+  useEffect(() => {
+    if (!gameStarted || !offlineRecoverySummary) return;
+    const summary = offlineRecoverySummary;
+    const recoveryParts = [`Away ${formatOfflineDuration(summary.appliedMs)}`];
+    if (summary.healthRecovered > 0) {
+      recoveryParts.push(`+${summary.healthRecovered} HP across ${summary.heroesHealed} hero${summary.heroesHealed === 1 ? "" : "es"}`);
+    }
+    if (summary.injuryConditionsAdvanced > 0) {
+      const days = Math.round(summary.injuryDaysRecovered * 10) / 10;
+      recoveryParts.push(`${days} injury-day${days === 1 ? "" : "s"} recovered`);
+    }
+    if (summary.injuryConditionsRecovered > 0) {
+      recoveryParts.push(`${summary.injuryConditionsRecovered} injur${summary.injuryConditionsRecovered === 1 ? "y" : "ies"} fully healed`);
+    }
+    if (summary.capped) recoveryParts.push("24h offline cap applied");
+    showToast({ title: "Guild recovered while away", message: recoveryParts.join(" · "), tone: "success", durationMs: 6500 });
+    clearOfflineRecoverySummary();
+  }, [gameStarted, offlineRecoverySummary, showToast, clearOfflineRecoverySummary]);
   const currentGuildRef = useRef(guild); currentGuildRef.current = guild;
   const promptedDayRef = useRef<string | null>(null);
   const threatIntroPromptedRef = useRef(false);

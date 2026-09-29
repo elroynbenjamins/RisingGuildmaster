@@ -142,8 +142,8 @@ export const BOSS_PHASES: Record<string, BossPhaseDefinition> = {
   solkar_sentence_of_ash: {
     id: "solkar_sentence_of_ash", bossEnemyDefinitionId: "solkar_ash_herald", hpRatioAtMost: .30,
     name: "Sentence of Ash", announcement: "The purple hearth answers Solkar's verdict and a ring of cinders explodes through the company.",
-    playerHint: "Everyone takes a small burst as the final damage phase begins. Heal once, then commit your remaining resources.",
-    summonGroups: [], selfModifiers: [], heroPulseDamageMaxHpRatio: .06,
+    playerHint: "Everyone takes a sharp burst as the final damage phase begins. Heal once, then commit your remaining resources.",
+    summonGroups: [], selfModifiers: [], heroPulseDamageMaxHpRatio: .08,
   },
 
   cassian_crown_decree: {

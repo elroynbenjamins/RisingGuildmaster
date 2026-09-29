@@ -12,6 +12,7 @@ export interface OfflineRecoverySummary {
   injuryDaysRecovered: number;
   healthRecovered: number;
   heroesHealed: number;
+  injuryConditionsAdvanced: number;
   injuryConditionsRecovered: number;
   capped: boolean;
 }
@@ -39,6 +40,7 @@ export function applyOfflineRecovery(guild: GuildState, elapsedMs: number): Offl
 
   let healthRecovered = 0;
   let heroesHealed = 0;
+  let injuryConditionsAdvanced = 0;
   let injuryConditionsRecovered = 0;
 
   const heroes = guild.heroes.map((hero) => {
@@ -48,6 +50,7 @@ export function applyOfflineRecovery(guild: GuildState, elapsedMs: number): Offl
 
     const conditions = hero.conditions.flatMap((condition) => {
       if (!isInjuryCondition(condition.conditionId)) return [condition];
+      injuryConditionsAdvanced += 1;
       const remainingDuration = condition.remainingDuration - injuryDaysRecovered;
       if (remainingDuration <= 0) {
         injuryConditionsRecovered += 1;
@@ -78,6 +81,7 @@ export function applyOfflineRecovery(guild: GuildState, elapsedMs: number): Offl
       injuryDaysRecovered,
       healthRecovered,
       heroesHealed,
+      injuryConditionsAdvanced,
       injuryConditionsRecovered,
       capped: normalizedElapsedMs > maxMs,
     },

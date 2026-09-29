@@ -54,15 +54,15 @@ describe("campaign level guidance", () => {
     guild.world.completedCampaignNodeIds = [
       "northwatch_two_skies", "road_of_frozen_names", "council_at_northwatch", "night_of_blue_horns",
       "hroth_iceblood_boss", "beneath_glimmerlake", "the_moon_gate", "vaelith_boss",
-      "a_bell_without_tower", "return_to_blackwater", "names_in_the_reeds", "procession_at_low_water",
+      "a_bell_without_tower", "return_to_blackwater", "names_in_the_reeds", "procession_at_low_water", "bell_widow_boss",
     ];
-    guild.world.completedQuestIds = ["road_of_frozen_names", "night_of_blue_horns", "hroth_iceblood_boss", "beneath_glimmerlake", "vaelith_pale_echo_boss", "return_to_blackwater", "procession_at_low_water"];
+    guild.world.completedQuestIds = ["road_of_frozen_names", "night_of_blue_horns", "hroth_iceblood_boss", "beneath_glimmerlake", "vaelith_pale_echo_boss", "return_to_blackwater", "procession_at_low_water", "bell_widow_boss"];
 
     const guidance = getCampaignLevelGuidance(guild);
     expect(guidance).toMatchObject({
       averageLevel: 6,
       targetLevel: 7,
-      nextQuestId: "bell_widow_boss",
+      nextQuestId: "archive_below",
       recommendedSideQuestId: "lanterns_for_the_lost",
     });
   });

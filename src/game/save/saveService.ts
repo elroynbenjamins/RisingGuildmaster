@@ -6,6 +6,7 @@ import { loadAccountContentEntitlements, saveAccountContentEntitlements } from "
 import { accountGemWalletFromGuild, applyAccountGemWallet, initializeAccountGemWallet, saveAccountGemWallet } from "../monetization/accountGemWalletService";
 import { migrateGuildState } from "./guildStateMigration";
 import { UnsupportedSaveSchemaError, decodePersistedSave, serializePersistedGuild } from "./saveSchema";
+import { applyOfflineRecovery, type OfflineRecoverySummary } from "../heroes/offlineRecoveryService";
 
 export type SaveSlotId = 1 | 2;
 
@@ -47,6 +48,45 @@ const saveQueues: Record<SaveSlotId, Promise<void>> = {
   1: Promise.resolve(),
   2: Promise.resolve(),
 };
+
+const offlineRecoveryKey = (slotId: SaveSlotId): string => `${SAVE_SLOT_KEYS[slotId].primary}.offlineStartedAt`;
+
+export interface StoredOfflineRecoveryResult {
+  guild: GuildState;
+  summary: OfflineRecoverySummary | null;
+}
+
+export async function markGuildOffline(slotId: SaveSlotId, startedAt = new Date()): Promise<void> {
+  await AsyncStorage.setItem(offlineRecoveryKey(slotId), startedAt.toISOString());
+}
+
+export async function clearGuildOfflineMarker(slotId: SaveSlotId): Promise<void> {
+  await AsyncStorage.removeItem(offlineRecoveryKey(slotId));
+}
+
+export async function recoverGuildFromOffline(
+  guild: GuildState,
+  slotId: SaveSlotId,
+  now = new Date(),
+): Promise<StoredOfflineRecoveryResult> {
+  const key = offlineRecoveryKey(slotId);
+  const storedStartedAt = await AsyncStorage.getItem(key);
+  if (!storedStartedAt) return { guild, summary: null };
+
+  const startedAtMs = Date.parse(storedStartedAt);
+  if (!Number.isFinite(startedAtMs)) {
+    await AsyncStorage.removeItem(key);
+    return { guild, summary: null };
+  }
+
+  const result = applyOfflineRecovery(guild, Math.max(0, now.getTime() - startedAtMs));
+
+  // Persist the recovered state before consuming the marker. This prevents the
+  // same offline interval from being claimed twice after a normal resume.
+  await saveGuild(result.guild, slotId);
+  await AsyncStorage.removeItem(key);
+  return result;
+}
 
 /**
  * Domain-state JSON helper retained for tests and tools that intentionally
@@ -228,7 +268,7 @@ export function summarizeGuildSave(guild: GuildState, slotId: SaveSlotId): SaveS
 export async function deleteGuildSave(slotId: SaveSlotId = 1): Promise<void> {
   await saveQueues[slotId].catch(() => undefined);
   const keys = SAVE_SLOT_KEYS[slotId];
-  await AsyncStorage.multiRemove([keys.primary, keys.backup, `${keys.primary}.meta`, `guildmaster.guild.slot.${slotId}.v1`, `guildmaster.guild.slot.${slotId}.v1.backup`, ...(slotId === 1 ? [LEGACY_SAVE_KEY, LEGACY_BACKUP_SAVE_KEY] : [])]);
+  await AsyncStorage.multiRemove([keys.primary, keys.backup, `${keys.primary}.meta`, offlineRecoveryKey(slotId), `guildmaster.guild.slot.${slotId}.v1`, `guildmaster.guild.slot.${slotId}.v1.backup`, ...(slotId === 1 ? [LEGACY_SAVE_KEY, LEGACY_BACKUP_SAVE_KEY] : [])]);
 }
 
 async function importHistoricalSlot(slotId: SaveSlotId): Promise<void> {

@@ -135,9 +135,9 @@ export const BOSS_PHASES: Record<string, BossPhaseDefinition> = {
 
   solkar_calls_the_scale: {
     id: "solkar_calls_the_scale", bossEnemyDefinitionId: "solkar_ash_herald", hpRatioAtMost: .60,
-    name: "Call of the Scale", announcement: "Solkar calls an Ashbound Sentinel from the violet hearth and orders it to weigh the guild's worth.",
-    playerHint: "The Sentinel can stall melee access. Remove it if it blocks your route; otherwise keep burst damage on Solkar.",
-    summonGroups: [{ enemyDefinitionId: "ashbound_sentinel", count: 1 }], selfModifiers: [],
+    name: "Call of the Scale", announcement: "Solkar calls two Ashbound Sentinels from the violet hearth and orders them to weigh the guild's worth.",
+    playerHint: "The Sentinels can stall melee access. Remove one if they block your route; otherwise keep burst damage on Solkar.",
+    summonGroups: [{ enemyDefinitionId: "ashbound_sentinel", count: 2 }], selfModifiers: [],
   },
   solkar_sentence_of_ash: {
     id: "solkar_sentence_of_ash", bossEnemyDefinitionId: "solkar_ash_herald", hpRatioAtMost: .30,

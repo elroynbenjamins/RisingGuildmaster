@@ -143,9 +143,10 @@ describe("Chapter 5 cross-difficulty robustness", () => {
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
     expect(results.filter((result) => result.wins > 0).length, "Iron Solkar should not require one exact party").toBeGreaterThanOrEqual(3);
-    expect(
-      results.some((result) => result.victoriesWithAnyFallRate >= .50 || result.wipeRate >= .20),
-      "Iron Solkar should preserve meaningful casualty risk",
-    ).toBe(true);
+    expect(results.filter((result) => result.winRate >= .60).length, "prepared Iron parties should usually remain viable").toBeGreaterThanOrEqual(3);
+    const averageFallen = results.reduce((sum, result) => sum + result.averageFallenHeroesOnWins, 0) / results.length;
+    expect(averageFallen, "Iron Solkar should retain aggregate casualty pressure").toBeGreaterThanOrEqual(.75);
+    expect(results.some((result) => result.wipeRate > 0 || result.victoriesWithTwoPlusFallsRate >= .40),
+      "Iron Solkar should create at least one genuinely dangerous matchup").toBe(true);
   }, 240_000);
 });

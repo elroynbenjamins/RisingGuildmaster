@@ -31,6 +31,8 @@ export type EncounterObjectiveDefinition =
 export interface EncounterDefinition {
   id: string;
   battlefieldId: string;
+  /** Optional encounter-wide scaling adjustment for one game difficulty. */
+  difficultyMultiplierByDifficulty?: Partial<Record<GameDifficultyId, number>>;
   objective?: EncounterObjectiveDefinition;
   /** Roguelite-only progression gate. Ordinary quest encounters ignore this field. */
   minimumRoguelitePartyLevel?: number;

@@ -27,4 +27,29 @@ describe("Chapter 1-2 fast balance diagnostic", () => {
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
   }, 240_000);
+
+  it("samples prepared Iron Hollow Warden party robustness", () => {
+    const parties = [
+      { id: "classic", classes: ["warrior", "ranger", "cleric", "mage"] as const },
+      { id: "defensive", classes: ["warrior", "paladin", "cleric", "mage"] as const },
+      { id: "aggressive", classes: ["warrior", "berserker", "cleric", "ranger"] as const },
+      { id: "flex-support", classes: ["paladin", "ranger", "cleric", "mage"] as const },
+    ] as const;
+
+    const results = parties.map((party, partyIndex) => simulateCombatScenario({
+      id: `ch2-warden-iron-${party.id}`,
+      questId: "hollow_warden_boss",
+      heroLevel: 5,
+      partyClasses: party.classes,
+      difficultyId: "iron_guild",
+      runs: 4,
+      seed: 23_100 + partyIndex * 100,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+    }));
+
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+  }, 180_000);
+
 });

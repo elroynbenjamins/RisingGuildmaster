@@ -52,4 +52,38 @@ describe("Chapter 1-2 fast balance diagnostic", () => {
     expect(results.every((result) => result.stalled === 0)).toBe(true);
   }, 180_000);
 
+
+  it("samples Chapter 1 across sensible base-class party shapes", () => {
+    const parties = [
+      { id: "classic", classes: ["warrior", "ranger", "cleric", "mage"] as const },
+      { id: "defensive", classes: ["warrior", "paladin", "cleric", "ranger"] as const },
+      { id: "aggressive", classes: ["warrior", "berserker", "ranger", "mage"] as const },
+      { id: "alternate-frontline", classes: ["paladin", "berserker", "cleric", "mage"] as const },
+    ] as const;
+
+    const results = parties.flatMap((party, partyIndex) =>
+      (["standard", "iron_guild"] as const).map((difficultyId) =>
+        simulateCombatScenario({
+          id: `ch1-chieftain-${party.id}-${difficultyId}`,
+          questId: "goblin_chieftain_boss",
+          heroLevel: 2,
+          partyClasses: party.classes,
+          difficultyId,
+          runs: 6,
+          seed: 29_100 + partyIndex * 200,
+          gearProfile: "starter",
+          progressionProfile: "base",
+        }),
+      ),
+    );
+
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+
+    const standard = results.filter((result) => result.scenarioId.endsWith("-standard"));
+    const iron = results.filter((result) => result.scenarioId.endsWith("-iron_guild"));
+    expect(standard.every((result) => result.wins > 0), "Standard should not hard-brick a sensible Chapter 1 party").toBe(true);
+    expect(iron.filter((result) => result.wins > 0).length, "Iron should allow multiple sensible Chapter 1 parties").toBeGreaterThanOrEqual(3);
+  }, 240_000);
+
 });

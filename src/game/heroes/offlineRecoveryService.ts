@@ -42,6 +42,7 @@ export function applyOfflineRecovery(guild: GuildState, elapsedMs: number): Offl
   let heroesHealed = 0;
   let injuryConditionsAdvanced = 0;
   let injuryConditionsRecovered = 0;
+  let changed = false;
 
   const heroes = guild.heroes.map((hero) => {
     // Fallen heroes still require Temple/revive systems, and heroes in a
@@ -51,6 +52,7 @@ export function applyOfflineRecovery(guild: GuildState, elapsedMs: number): Offl
     const conditions = hero.conditions.flatMap((condition) => {
       if (!isInjuryCondition(condition.conditionId)) return [condition];
       injuryConditionsAdvanced += 1;
+      changed = true;
       const remainingDuration = condition.remainingDuration - injuryDaysRecovered;
       if (remainingDuration <= 0) {
         injuryConditionsRecovered += 1;
@@ -62,9 +64,10 @@ export function applyOfflineRecovery(guild: GuildState, elapsedMs: number): Offl
     const recoveredHero = { ...hero, conditions };
     const maxHP = calculateHero(recoveredHero).stats.maxHP;
     const healing = Math.round(maxHP * GAME_CONFIG.offlineHeroHealthRecoveryPerHourRatio * offlineHours);
-    const nextHP = Math.min(maxHP, hero.currentHP + Math.max(0, healing));
+    const nextHP = Math.max(hero.currentHP, Math.min(maxHP, hero.currentHP + Math.max(0, healing)));
 
     if (nextHP > hero.currentHP) {
+      changed = true;
       healthRecovered += nextHP - hero.currentHP;
       heroesHealed += 1;
     }
@@ -73,7 +76,7 @@ export function applyOfflineRecovery(guild: GuildState, elapsedMs: number): Offl
   });
 
   return {
-    guild: heroes === guild.heroes ? guild : { ...guild, heroes },
+    guild: changed ? { ...guild, heroes } : guild,
     summary: {
       elapsedMs: normalizedElapsedMs,
       appliedMs,

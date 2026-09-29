@@ -107,6 +107,25 @@ describe("Chapter 6 cross-difficulty robustness", () => {
     }
   }, 300_000);
 
+  it("isolates Cassian honor-guard attrition", () => {
+    const results = (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>
+      simulateCombatScenario({
+        id: `chapter6-cassian-guard-${difficultyId}`,
+        questId: "cassian_vane_boss",
+        heroLevel: 11,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId,
+        runs: 6,
+        seed: 64_100,
+        gearProfile: "optional_progression",
+        progressionProfile: "subclass_ready",
+        encounterLimit: 1,
+      }),
+    );
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+  }, 180_000);
+
   it("keeps prepared Iron Cassian viable across multiple sensible party compositions", () => {
     const parties = [
       { id: "classic", classes: ["warrior", "ranger", "cleric", "mage"] as const },

@@ -5,7 +5,8 @@ import { getQuestXpForHero } from "../src/game/quests/questResolver";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 import { testHero } from "./testHero";
 
-// Deterministic seed coverage stays intentionally small here because the full suite already carries broader Standard baselines.\ndescribe("Chapter 5 cross-difficulty robustness", () => {
+// Deterministic seed coverage stays intentionally small here because the full suite already carries broader Standard baselines.
+describe("Chapter 5 cross-difficulty robustness", () => {
   it("keeps the Ashlands curve ordered across Standard, Veteran, and Iron", () => {
     const encounters = [
       { id: "road", questId: "road_of_glass", heroLevel: 8, seed: 51_100 },

@@ -1,3 +1,4 @@
+import type { GameDifficultyId } from "../difficulty/difficultyTypes";
 export type QuestType = "campaign" | "side" | "contract" | "boss";
 export interface HuntRewardDefinition { recipeFragmentMaterialId: MaterialId; firstVictoryCount: number; repeatDropChance: number; pityAfterFailures: number }
 export interface QuestStoryContext {
@@ -28,6 +29,8 @@ export type EncounterObjectiveDefinition =
 export interface EncounterDefinition {
   id: string;
   battlefieldId: string;
+  /** Optional encounter-wide HP adjustment for one game difficulty. */
+  hpMultiplierByDifficulty?: Partial<Record<GameDifficultyId, number>>;
   objective?: EncounterObjectiveDefinition;
   /** Roguelite-only progression gate. Ordinary quest encounters ignore this field. */
   minimumRoguelitePartyLevel?: number;

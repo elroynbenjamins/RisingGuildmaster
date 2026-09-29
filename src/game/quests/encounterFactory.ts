@@ -17,7 +17,8 @@ export function createQuestEncounter(encounterId: string, random: RandomSource, 
   const difficulty = getDifficulty(difficultyId);
   return encounter.enemies.flatMap((entry) => Array.from({ length: entry.count }, (_, index) => {
     const enemyLevel = Math.max(1, entry.level + enemyLevelModifier);
-    const scaling = { ...getEnemyLevelStatMultipliers(enemyLevel), difficultyMultiplier: entry.difficultyMultiplier ?? 1, hpMultiplier: difficulty.enemyHpMultiplier, damageMultiplier: difficulty.enemyDamageMultiplier, defenseMultiplier: difficulty.enemyDefenseMultiplier, speedMultiplier: difficulty.enemySpeedMultiplier };
+    const encounterHpMultiplier = encounter.hpMultiplierByDifficulty?.[difficultyId] ?? 1;
+    const scaling = { ...getEnemyLevelStatMultipliers(enemyLevel), difficultyMultiplier: entry.difficultyMultiplier ?? 1, hpMultiplier: difficulty.enemyHpMultiplier * encounterHpMultiplier, damageMultiplier: difficulty.enemyDamageMultiplier, defenseMultiplier: difficulty.enemyDefenseMultiplier, speedMultiplier: difficulty.enemySpeedMultiplier };
     const instance = createEnemyInstance(entry.enemyDefinitionId, ENEMY_BASE_STATS, random, { level: enemyLevel, scaling });
     const definition = getEnemyDefinition(entry.enemyDefinitionId); const stats = calculateEnemyStats(ENEMY_BASE_STATS, definition, scaling);
     const movementRange = Math.min(5, Math.max(2, 3 + Math.floor(stats.speed / 30)));

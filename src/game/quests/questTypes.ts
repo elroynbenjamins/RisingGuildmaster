@@ -17,8 +17,6 @@ export interface EncounterEnemyGroup {
   level: number;
   /** Encounter-specific multiplier for elite guards and bosses. 1.15 means +15%. */
   difficultyMultiplier?: number;
-  /** Optional extra scaling for one game difficulty when a specific encounter needs local tuning. */
-  difficultyMultiplierByDifficulty?: Partial<Record<GameDifficultyId, number>>;
   spawnPositions: GridPosition[];
 }
 
@@ -31,8 +29,8 @@ export type EncounterObjectiveDefinition =
 export interface EncounterDefinition {
   id: string;
   battlefieldId: string;
-  /** Optional encounter-wide scaling adjustment for one game difficulty. */
-  difficultyMultiplierByDifficulty?: Partial<Record<GameDifficultyId, number>>;
+  /** Optional encounter-wide HP adjustment for one game difficulty. */
+  hpMultiplierByDifficulty?: Partial<Record<GameDifficultyId, number>>;
   objective?: EncounterObjectiveDefinition;
   /** Roguelite-only progression gate. Ordinary quest encounters ignore this field. */
   minimumRoguelitePartyLevel?: number;

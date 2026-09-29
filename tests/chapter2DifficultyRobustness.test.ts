@@ -60,7 +60,7 @@ describe("Chapter 2 cross-difficulty robustness", () => {
       heroLevel: 5,
       partyClasses: ["warrior", "ranger", "cleric", "mage"],
       difficultyId: "veteran",
-      runs: 4,
+      runs: 10,
       seed: 22_200,
       gearProfile: "optional_progression",
       progressionProfile: "subclass_ready",
@@ -71,7 +71,7 @@ describe("Chapter 2 cross-difficulty robustness", () => {
       heroLevel: 4,
       partyClasses: ["warrior", "ranger", "cleric", "mage"],
       difficultyId: "veteran",
-      runs: 4,
+      runs: 10,
       seed: 22_200,
       gearProfile: "lagged_basic",
       progressionProfile: "base",
@@ -82,7 +82,7 @@ describe("Chapter 2 cross-difficulty robustness", () => {
     expect(prepared.winRate, "prepared Veteran Hollow Warden viability").toBeGreaterThanOrEqual(.50);
     expect(underprepared.wipeRate, "underprepared Veteran Hollow Warden wipe pressure").toBeGreaterThanOrEqual(.50);
     expect(prepared.winRate, "preparation should improve the Hollow Warden outcome").toBeGreaterThan(underprepared.winRate);
-  }, 120_000);
+  }, 180_000);
 
   it("keeps Iron Hollow Warden possible for more than one sensible prepared composition", () => {
     const parties = [
@@ -99,7 +99,7 @@ describe("Chapter 2 cross-difficulty robustness", () => {
         heroLevel: 5,
         partyClasses: party.classes,
         difficultyId: "iron_guild",
-        runs: 4,
+        runs: 10,
         seed: 23_100 + partyIndex * 100,
         gearProfile: "optional_progression",
         progressionProfile: "subclass_ready",
@@ -112,5 +112,5 @@ describe("Chapter 2 cross-difficulty robustness", () => {
     const viable = results.filter((result) => result.wins > 0);
     expect(viable.length, "Iron Hollow Warden should not require one exact party").toBeGreaterThanOrEqual(2);
     expect(results.some((result) => result.wipeRate >= .50), "Iron should still punish weak matchups").toBe(true);
-  }, 120_000);
+  }, 300_000);
 });

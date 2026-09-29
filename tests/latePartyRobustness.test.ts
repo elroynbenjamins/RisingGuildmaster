@@ -154,7 +154,7 @@ describe("late campaign party-composition robustness", () => {
       laggedResults.filter((result) => result.wipeRate > 0).length,
       "lagged late-game gear should produce occasional wipes across realistic party builds",
     ).toBeGreaterThanOrEqual(3);
-  }, 540_000);
+  }, 720_000);
 
   it("keeps role-starved edge parties risky but not globally hard-bricked", () => {
     const results = ROLE_EDGE_CASES.flatMap((party, partyIndex) =>

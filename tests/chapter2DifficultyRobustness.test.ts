@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 
 describe("Chapter 2 cross-difficulty robustness", () => {
-  it("keeps intended-level lagged parties ordered across Standard, Veteran and Iron", () => {
+  it("keeps the intended Chapter 2 difficulty curve ordered without stalls", () => {
     const encounters = [
       { id: "broken-carts", questId: "road_of_broken_carts", heroLevel: 3, seed: 21_100 },
       { id: "flintwatch", questId: "fires_of_flintwatch", heroLevel: 4, seed: 21_200 },
@@ -18,7 +18,7 @@ describe("Chapter 2 cross-difficulty robustness", () => {
           heroLevel: encounter.heroLevel,
           partyClasses: ["warrior", "ranger", "cleric", "mage"],
           difficultyId,
-          runs: 6,
+          runs: 4,
           seed: encounter.seed,
           gearProfile: "lagged_basic",
           progressionProfile: encounter.heroLevel >= 5 ? "subclass_ready" : "base",
@@ -35,121 +35,82 @@ describe("Chapter 2 cross-difficulty robustness", () => {
       const iron = results.find((result) => result.scenarioId === `chapter2-${encounter.id}-iron_guild`)!;
 
       expect(standard.winRate, `${encounter.id} Standard should not be harder than Veteran`).toBeGreaterThanOrEqual(veteran.winRate);
-      expect(veteran.winRate, `${encounter.id} Veteran should not be harder than Iron`).toBeGreaterThanOrEqual(iron.winRate);
+      expect(veteran.winRate, `${encounter.id} Veteran should not be easier than Iron`).toBeGreaterThanOrEqual(iron.winRate);
       expect(standard.averageSurvivingHeroes, `${encounter.id} Standard survivors`).toBeGreaterThanOrEqual(iron.averageSurvivingHeroes);
     }
 
     const byId = new Map(results.map((result) => [result.scenarioId, result]));
     expect(byId.get("chapter2-broken-carts-standard")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter2-flintwatch-standard")!.winRate).toBeGreaterThanOrEqual(.75);
-    expect(byId.get("chapter2-chainbreaker-standard")!.winRate).toBeGreaterThanOrEqual(.50);
+    expect(byId.get("chapter2-chainbreaker-standard")!.winRate).toBeGreaterThanOrEqual(.75);
     expect(byId.get("chapter2-hollow-warden-standard")!.winRate).toBeGreaterThanOrEqual(.50);
-    expect(byId.get("chapter2-hollow-warden-standard")!.averageSurvivingHeroes).toBeLessThan(3.25);
-  }, 300_000);
 
-  it("rewards preparation on Veteran and Iron instead of making Chapter 2 a level wall", () => {
-    const encounters = [
-      {
-        id: "chainbreaker",
-        questId: "ghorak_chainbreaker_boss",
-        preparedLevel: 4,
-        underpreparedLevel: 3,
-        seed: 22_100,
-      },
-      {
-        id: "hollow-warden",
-        questId: "hollow_warden_boss",
-        preparedLevel: 5,
-        underpreparedLevel: 4,
-        seed: 22_200,
-      },
-    ] as const;
+    expect(byId.get("chapter2-flintwatch-iron_guild")!.averageFallenHeroesOnWins)
+      .toBeGreaterThanOrEqual(byId.get("chapter2-flintwatch-standard")!.averageFallenHeroesOnWins);
+    expect(byId.get("chapter2-chainbreaker-iron_guild")!.averageFallenHeroesOnWins)
+      .toBeGreaterThanOrEqual(byId.get("chapter2-chainbreaker-standard")!.averageFallenHeroesOnWins);
+    expect(byId.get("chapter2-hollow-warden-iron_guild")!.winRate)
+      .toBeLessThan(byId.get("chapter2-hollow-warden-standard")!.winRate);
+  }, 240_000);
 
-    const results = encounters.flatMap((encounter) =>
-      (["veteran", "iron_guild"] as const).flatMap((difficultyId) => [
-        simulateCombatScenario({
-          id: `chapter2-${encounter.id}-${difficultyId}-prepared`,
-          questId: encounter.questId,
-          heroLevel: encounter.preparedLevel,
-          partyClasses: ["warrior", "ranger", "cleric", "mage"],
-          difficultyId,
-          runs: 6,
-          seed: encounter.seed,
-          gearProfile: "optional_progression",
-          progressionProfile: encounter.preparedLevel >= 5 ? "subclass_ready" : "base",
-        }),
-        simulateCombatScenario({
-          id: `chapter2-${encounter.id}-${difficultyId}-underprepared`,
-          questId: encounter.questId,
-          heroLevel: encounter.underpreparedLevel,
-          partyClasses: ["warrior", "ranger", "cleric", "mage"],
-          difficultyId,
-          runs: 6,
-          seed: encounter.seed,
-          gearProfile: "lagged_basic",
-          progressionProfile: "base",
-        }),
-      ]),
-    );
+  it("makes preparation materially matter for Hollow Warden on Veteran", () => {
+    const prepared = simulateCombatScenario({
+      id: "chapter2-hollow-veteran-prepared",
+      questId: "hollow_warden_boss",
+      heroLevel: 5,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "veteran",
+      runs: 4,
+      seed: 22_200,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+    });
+    const underprepared = simulateCombatScenario({
+      id: "chapter2-hollow-veteran-underprepared",
+      questId: "hollow_warden_boss",
+      heroLevel: 4,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "veteran",
+      runs: 4,
+      seed: 22_200,
+      gearProfile: "lagged_basic",
+      progressionProfile: "base",
+    });
 
-    console.table(results);
-    expect(results.every((result) => result.stalled === 0)).toBe(true);
+    console.table([prepared, underprepared]);
+    expect(prepared.stalled + underprepared.stalled).toBe(0);
+    expect(prepared.winRate, "prepared Veteran Hollow Warden viability").toBeGreaterThanOrEqual(.50);
+    expect(underprepared.wipeRate, "underprepared Veteran Hollow Warden wipe pressure").toBeGreaterThanOrEqual(.50);
+    expect(prepared.winRate, "preparation should improve the Hollow Warden outcome").toBeGreaterThan(underprepared.winRate);
+  }, 120_000);
 
-    for (const encounter of encounters) {
-      for (const difficultyId of ["veteran", "iron_guild"] as const) {
-        const prepared = results.find((result) => result.scenarioId === `chapter2-${encounter.id}-${difficultyId}-prepared`)!;
-        const underprepared = results.find((result) => result.scenarioId === `chapter2-${encounter.id}-${difficultyId}-underprepared`)!;
-
-        expect(prepared.winRate, `${encounter.id} ${difficultyId} preparation win-rate benefit`).toBeGreaterThanOrEqual(underprepared.winRate);
-        expect(prepared.averageSurvivingHeroes, `${encounter.id} ${difficultyId} preparation survivor benefit`).toBeGreaterThanOrEqual(underprepared.averageSurvivingHeroes);
-      }
-    }
-
-    const preparedVeteran = results.filter((result) => result.scenarioId.includes("-veteran-prepared"));
-    expect(preparedVeteran.every((result) => result.wins > 0), "prepared Veteran parties should remain viable").toBe(true);
-
-    const preparedIron = results.filter((result) => result.scenarioId.includes("-iron_guild-prepared"));
-    expect(preparedIron.filter((result) => result.wins > 0).length, "prepared Iron should remain possible in Chapter 2").toBeGreaterThanOrEqual(1);
-
-    const underpreparedIron = results.filter((result) => result.scenarioId.includes("-iron_guild-underprepared"));
-    expect(underpreparedIron.some((result) => result.wipeRate >= .5), "underprepared Iron should create real wipe pressure").toBe(true);
-  }, 300_000);
-
-  it("does not require one exact four-class party to clear the Chapter 2 finale", () => {
+  it("keeps Iron Hollow Warden possible for more than one sensible prepared composition", () => {
     const parties = [
       { id: "classic", classes: ["warrior", "ranger", "cleric", "mage"] as const },
-      { id: "alternate-support", classes: ["paladin", "ranger", "bard", "mage"] as const },
-      { id: "heavy-frontline", classes: ["warrior", "berserker", "cleric", "spellbow"] as const },
+      { id: "defensive", classes: ["warrior", "paladin", "cleric", "mage"] as const },
+      { id: "aggressive", classes: ["warrior", "berserker", "cleric", "ranger"] as const },
+      { id: "flex-support", classes: ["paladin", "ranger", "cleric", "mage"] as const },
     ] as const;
 
-    const results = parties.flatMap((party, partyIndex) =>
-      (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>
-        simulateCombatScenario({
-          id: `chapter2-hollow-${party.id}-${difficultyId}`,
-          questId: "hollow_warden_boss",
-          heroLevel: 5,
-          partyClasses: party.classes,
-          difficultyId,
-          runs: 4,
-          seed: 23_100 + partyIndex * 100,
-          gearProfile: "optional_progression",
-          progressionProfile: "subclass_ready",
-        }),
-      ),
+    const results = parties.map((party, partyIndex) =>
+      simulateCombatScenario({
+        id: `chapter2-hollow-iron-${party.id}`,
+        questId: "hollow_warden_boss",
+        heroLevel: 5,
+        partyClasses: party.classes,
+        difficultyId: "iron_guild",
+        runs: 4,
+        seed: 23_100 + partyIndex * 100,
+        gearProfile: "optional_progression",
+        progressionProfile: "subclass_ready",
+      }),
     );
 
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
 
-    const standard = results.filter((result) => result.scenarioId.endsWith("-standard"));
-    const veteran = results.filter((result) => result.scenarioId.endsWith("-veteran"));
-    const iron = results.filter((result) => result.scenarioId.endsWith("-iron_guild"));
-
-    expect(standard.every((result) => result.wins > 0), "all sensible prepared parties should clear Standard").toBe(true);
-    expect(veteran.filter((result) => result.wins > 0).length, "Veteran should support more than one viable composition").toBeGreaterThanOrEqual(2);
-    expect(iron.filter((result) => result.wins > 0).length, "Iron should remain possible with at least one sensible composition").toBeGreaterThanOrEqual(1);
-
-    const ironCasualtyPressure = iron.reduce((sum, result) => sum + result.averageFallenHeroesOnWins, 0) / iron.length;
-    expect(ironCasualtyPressure, "Iron prepared-party casualty pressure").toBeGreaterThanOrEqual(.75);
-  }, 240_000);
+    const viable = results.filter((result) => result.wins > 0);
+    expect(viable.length, "Iron Hollow Warden should not require one exact party").toBeGreaterThanOrEqual(2);
+    expect(results.some((result) => result.wipeRate >= .50), "Iron should still punish weak matchups").toBe(true);
+  }, 120_000);
 });

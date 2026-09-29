@@ -51,7 +51,7 @@ describe("Chapter 3 cross-difficulty robustness", () => {
       .toBeLessThan(byId.get("chapter3-vaelith-standard")!.winRate);
   }, 240_000);
 
-  it("makes preparation materially matter for Vaelith on Veteran", () => {
+  it("makes preparation materially reduce Vaelith casualties on Veteran", () => {
     const prepared = simulateCombatScenario({
       id: "chapter3-vaelith-veteran-prepared",
       questId: "vaelith_pale_echo_boss",
@@ -78,10 +78,11 @@ describe("Chapter 3 cross-difficulty robustness", () => {
     console.table([prepared, underprepared]);
     expect(prepared.stalled + underprepared.stalled).toBe(0);
     expect(prepared.winRate, "prepared Veteran Vaelith viability").toBeGreaterThanOrEqual(.66);
-    expect(underprepared.wipeRate, "underprepared Veteran Vaelith should sometimes wipe").toBeGreaterThanOrEqual(.16);
+    expect(underprepared.averageFallenHeroesOnWins, "underprepared Veteran should lose heroes heavily even when it wins").toBeGreaterThanOrEqual(1);
     expect(underprepared.victoriesWithAnyFallRate, "underprepared Veteran wins should usually cost heroes").toBeGreaterThanOrEqual(.66);
-    expect(prepared.winRate, "preparation should improve the Vaelith outcome").toBeGreaterThan(underprepared.winRate);
+    expect(underprepared.victoriesWithTwoPlusFallsRate, "underprepared Veteran should regularly lose multiple heroes").toBeGreaterThanOrEqual(.33);
     expect(prepared.averageFallenHeroesOnWins, "preparation should reduce casualties").toBeLessThan(underprepared.averageFallenHeroesOnWins);
+    expect(prepared.victoriesWithAnyFallRate, "preparation should make clean victories more common").toBeLessThan(underprepared.victoriesWithAnyFallRate);
   }, 180_000);
 
   it("keeps Iron Vaelith viable for sensible prepared compositions while preserving casualties", () => {

@@ -331,7 +331,7 @@ export function HeroDetailScreen({
         <Panel style={styles.sheetPanel}>{liveHero.conditions.map((condition) => {
           const definition = CONDITIONS[condition.conditionId];
           return <View key={condition.conditionId} style={styles.conditionRow}>
-            <View style={styles.conditionCopy}><Text style={[styles.entryName, { color: definition.category === "boon" ? c.green : c.gold }]}>{definition.name}</Text><Text style={[styles.hint, { color: c.muted }]}>{condition.remainingDuration} day{condition.remainingDuration === 1 ? "" : "s"} remaining</Text></View>
+            <View style={styles.conditionCopy}><Text style={[styles.entryName, { color: definition.category === "boon" ? c.green : c.gold }]}>{definition.name}</Text><Text style={[styles.hint, { color: c.muted }]}>{Math.ceil(condition.remainingDuration)} day{Math.ceil(condition.remainingDuration) === 1 ? "" : "s"} remaining</Text></View>
             <StatusChip label={definition.category === "boon" ? "BOON" : "CONDITION"} tone={definition.category === "boon" ? "good" : "gold"} />
           </View>;
         })}</Panel>

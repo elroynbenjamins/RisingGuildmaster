@@ -67,6 +67,26 @@ describe("campaign level guidance", () => {
     });
   });
 
+  it("keeps the Level-8 Ashlands catch-up recommendation local before Burning Causeway", () => {
+    const guild = createGuild();
+    guild.heroes = roster([8, 8, 8, 8]);
+    guild.world.campaignChapter = 5;
+    guild.world.unlockedRegionIds = [...new Set([...guild.world.unlockedRegionIds, "shadowfen", "ashlands"])];
+    guild.world.completedCampaignNodeIds = [
+      "drowned_archivist_boss",
+      "east_with_the_covenant", "road_of_glass", "embers_council", "siege_of_emberfall", "keeper_of_cinders_boss",
+    ];
+    guild.world.completedQuestIds = ["road_of_glass", "siege_of_emberfall", "keeper_of_cinders_boss"];
+
+    const guidance = getCampaignLevelGuidance(guild);
+    expect(guidance).toMatchObject({
+      averageLevel: 8,
+      targetLevel: 9,
+      nextQuestId: "the_burning_causeway",
+      recommendedSideQuestId: "the_children_of_cinder",
+    });
+  });
+
   it("stops recommending catch-up work once the top four match the campaign target", () => {
     const guild = createGuild();
     guild.heroes = roster([2, 2, 2, 2]);

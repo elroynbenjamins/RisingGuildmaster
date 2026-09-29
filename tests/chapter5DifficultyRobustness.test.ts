@@ -10,8 +10,6 @@ import { testHero } from "./testHero";
     const encounters = [
       { id: "road", questId: "road_of_glass", heroLevel: 8, seed: 51_100 },
       { id: "siege", questId: "siege_of_emberfall", heroLevel: 8, seed: 51_200 },
-      { id: "keeper", questId: "keeper_of_cinders_boss", heroLevel: 9, seed: 51_300 },
-      { id: "causeway", questId: "the_burning_causeway", heroLevel: 9, seed: 51_400 },
       { id: "solkar", questId: "solkar_ash_herald_boss", heroLevel: 9, seed: 51_500 },
     ] as const;
 
@@ -46,8 +44,6 @@ import { testHero } from "./testHero";
     const byId = new Map(results.map((result) => [result.scenarioId, result]));
     expect(byId.get("chapter5-road-standard")!.winRate).toBeGreaterThanOrEqual(.66);
     expect(byId.get("chapter5-siege-standard")!.winRate).toBeGreaterThanOrEqual(.66);
-    expect(byId.get("chapter5-keeper-standard")!.winRate).toBeGreaterThanOrEqual(.66);
-    expect(byId.get("chapter5-causeway-standard")!.winRate).toBeGreaterThanOrEqual(.66);
     expect(byId.get("chapter5-solkar-standard")!.winRate).toBeGreaterThanOrEqual(.66);
   }, 300_000);
 

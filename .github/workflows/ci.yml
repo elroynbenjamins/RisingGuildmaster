@@ -7,11 +7,11 @@ on:
       - main
 
 concurrency:
-  group: tidewatch-stage-diagnostic-${{ github.sha }}
+  group: late-midmission-final-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
-  tidewatch-stage:
+  skyvault:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +23,35 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "isolates prepared Veteran Tidewatch stage attrition" --reporter=verbose
+      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "measures skyvault" --reporter=verbose
+
+  tidewatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "measures tidewatch" --reporter=verbose
+
+  veteran-preparation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "compares prepared and one-level-behind Veteran pressure" --reporter=verbose
 
   typecheck:
     runs-on: ubuntu-latest

@@ -31,7 +31,7 @@ describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
       const [standard, veteran, iron] = results;
       expect(standard!.winRate, `${mission.id} Standard ordering`).toBeGreaterThanOrEqual(veteran!.winRate);
       expect(veteran!.winRate, `${mission.id} Veteran ordering`).toBeGreaterThanOrEqual(iron!.winRate);
-      expect(standard!.winRate, `${mission.id} prepared Standard viability`).toBeGreaterThanOrEqual(2 / 3);
+      expect(standard!.winRate, `${mission.id} prepared Standard viability`).toBeGreaterThanOrEqual(2 / 3);\n      expect(veteran!.winRate, `${mission.id} prepared Veteran viability`).toBeGreaterThanOrEqual(.50);
     }, 240_000);
   }
 
@@ -69,7 +69,7 @@ describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
     for (const mission of missions) {
       const prepared = results.find((result) => result.scenarioId === `late-mid-${mission.id}-veteran-prepared`)!;
       const behind = results.find((result) => result.scenarioId === `late-mid-${mission.id}-veteran-behind`)!;
-      expect(prepared.winRate, `${mission.id} prepared Veteran viability`).toBeGreaterThanOrEqual(.33);
+      expect(prepared.winRate, `${mission.id} prepared Veteran viability`).toBeGreaterThanOrEqual(.50);
       expect(prepared.winRate, `${mission.id} preparation should improve the outcome`).toBeGreaterThan(behind.winRate);
       expect(behind.wipeRate, `${mission.id} underprepared wipe pressure`).toBeGreaterThanOrEqual(.66);
     }

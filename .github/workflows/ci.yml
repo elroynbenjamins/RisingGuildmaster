@@ -7,11 +7,11 @@ on:
       - main
 
 concurrency:
-  group: late-nonboss-tuning-${{ github.sha }}
+  group: late-nonboss-preparation-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
-  skyvault:
+  skyvault-preparation:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,9 +23,9 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps skyvault prepared difficulty curve ordered" --reporter=verbose
+      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps skyvault one-level-behind Veteran pressure above prepared pressure" --reporter=verbose
 
-  tidewatch:
+  tidewatch-preparation:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,9 +37,9 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps tidewatch prepared difficulty curve ordered" --reporter=verbose
+      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps tidewatch one-level-behind Veteran pressure above prepared pressure" --reporter=verbose
 
-  preparation:
+  chain-preparation:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +51,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps one-level-behind Veteran parties meaningfully worse" --reporter=verbose
+      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps chain one-level-behind Veteran pressure above prepared pressure" --reporter=verbose
 
   typecheck:
     runs-on: ubuntu-latest

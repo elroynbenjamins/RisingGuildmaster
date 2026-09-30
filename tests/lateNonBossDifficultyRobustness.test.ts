@@ -12,7 +12,7 @@ const missions = [
   { id: "chain", questId: "chain_beneath_fleet", preparedLevel: 17, seed: 83_100 },
 ] as const;
 
-const preparedParty = {
+// Shared prepared benchmark: skilled tactics, coherent build, and gear averaging roughly two levels behind.\nconst preparedParty = {
   partyClasses: ["warrior", "ranger", "cleric", "mage"] as const,
   // Bulwark / Marksman / Lifebringer / Elementalist: durable frontline,
   // focused ranged damage, strong recovery, and dependable area pressure.

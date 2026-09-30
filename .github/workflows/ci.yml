@@ -7,7 +7,7 @@ on:
       - main
 
 concurrency:
-  group: ch1-3-5-retune-${{ github.sha }}
+  group: ch1-3-5-regression-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/chapter1To5PreparedReliability.test.ts -t "Chapter 1 prepared" --reporter=verbose
+      - run: pnpm vitest run tests/chapter1DifficultyRobustness.test.ts --reporter=verbose
 
   chapter3:
     runs-on: ubuntu-latest
@@ -31,7 +31,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/chapter1To5PreparedReliability.test.ts -t "Chapter 3 prepared" --reporter=verbose
+      - run: pnpm vitest run tests/chapter3DifficultyRobustness.test.ts --reporter=verbose
 
   chapter5:
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/chapter1To5PreparedReliability.test.ts -t "Chapter 5 prepared" --reporter=verbose
+      - run: pnpm vitest run tests/chapter5DifficultyRobustness.test.ts --reporter=verbose
 
   typecheck:
     runs-on: ubuntu-latest

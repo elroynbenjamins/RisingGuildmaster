@@ -34,6 +34,29 @@ describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
     }, 240_000);
   }
 
+
+  for (const mission of missions) {
+    it(`isolates ${mission.id} opening-stage attrition`, () => {
+      const results = (["veteran", "iron_guild"] as const).map((difficultyId) =>
+        simulateCombatScenario({
+          id: `late-mid-opener-${mission.id}-${difficultyId}`,
+          questId: mission.questId,
+          heroLevel: mission.heroLevel,
+          partyClasses: ["warrior", "ranger", "cleric", "mage"],
+          difficultyId,
+          runs: 4,
+          seed: mission.seed + 500,
+          gearProfile: "optional_progression",
+          progressionProfile: "subclass_ready",
+          encounterLimit: 1,
+        }),
+      );
+
+      console.table(results);
+      expect(results.every((result) => result.stalled === 0)).toBe(true);
+    }, 180_000);
+  }
+
   it("compares prepared and one-level-behind Veteran pressure", () => {
     const results = missions.flatMap((mission, index) => {
       const prepared = simulateCombatScenario({

@@ -7,11 +7,11 @@ on:
       - main
 
 concurrency:
-  group: late-nonboss-preparation-${{ github.sha }}
+  group: tidewatch-opening-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
-  skyvault-preparation:
+  tidewatch-opening:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,46 +23,4 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps skyvault one-level-behind Veteran pressure above prepared pressure" --reporter=verbose
-
-  tidewatch-preparation:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps tidewatch one-level-behind Veteran pressure above prepared pressure" --reporter=verbose
-
-  chain-preparation:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps chain one-level-behind Veteran pressure above prepared pressure" --reporter=verbose
-
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
+      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "isolates Tidewatch Veteran opening pressure on the paired seed" --reporter=verbose

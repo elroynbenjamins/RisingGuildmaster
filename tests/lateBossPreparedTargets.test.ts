@@ -19,6 +19,7 @@ const preparedParty = {
   tacticsProfile: "skilled" as const,
 };
 
+// Target calibration rerun after difficulty-specific encounter tuning.
 describe("Chapter 7-9 boss prepared-party target bands", () => {
   for (const boss of bosses) {
     it(`keeps ${boss.id} near the 85/75/60 prepared targets`, () => {

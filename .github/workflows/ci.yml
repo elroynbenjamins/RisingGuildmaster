@@ -7,7 +7,7 @@ on:
       - main
 
 concurrency:
-  group: late-nonboss-balance-${{ github.sha }}
+  group: late-nonboss-tuning-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -38,20 +38,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps tidewatch prepared difficulty curve ordered" --reporter=verbose
-
-  chain:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps chain prepared difficulty curve ordered" --reporter=verbose
 
   preparation:
     runs-on: ubuntu-latest

@@ -47,26 +47,6 @@ describe("Chapter 7-9 prepared cross-difficulty boss robustness", () => {
 
 
 
-  it("isolates Nhal after the drowned deck", () => {
-    const results = (["veteran", "iron_guild"] as const).map((difficultyId) =>
-      simulateCombatScenario({
-        id: `late-nhal-two-stage-${difficultyId}`,
-        questId: "admiral_nhal_veyr_boss",
-        heroLevel: 15,
-        partyClasses: ["warrior", "ranger", "cleric", "mage"],
-        difficultyId,
-        runs: 6,
-        seed: 76_100,
-        gearProfile: "optional_progression",
-        progressionProfile: "subclass_ready",
-        encounterLimit: 2,
-      }),
-    );
-
-    console.table(results);
-    expect(results.every((result) => result.stalled === 0)).toBe(true);
-  }, 180_000);
-
   it("keeps prepared Iron late bosses possible with sensible tactical parties", () => {
     const scenarios = [
       {

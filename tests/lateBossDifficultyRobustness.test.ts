@@ -47,6 +47,26 @@ describe("Chapter 7-9 prepared cross-difficulty boss robustness", () => {
 
 
 
+
+  it("confirms prepared Veteran Nhal viability across a wider sample", () => {
+    const result = simulateCombatScenario({
+      id: "late-nhal-veteran-wide",
+      questId: "admiral_nhal_veyr_boss",
+      heroLevel: 15,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "veteran",
+      runs: 6,
+      seed: 77_100,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+    });
+
+    console.table([result]);
+    expect(result.stalled).toBe(0);
+    expect(result.winRate, "prepared Veteran Nhal wider-sample viability").toBeGreaterThanOrEqual(.50);
+    expect(result.victoriesWithAnyFallRate + result.wipeRate, "Veteran Nhal should still carry casualty pressure").toBeGreaterThan(0);
+  }, 240_000);
+
   it("keeps prepared Iron late bosses possible with sensible tactical parties", () => {
     const scenarios = [
       {

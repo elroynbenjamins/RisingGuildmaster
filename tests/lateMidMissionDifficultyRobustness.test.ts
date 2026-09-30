@@ -31,7 +31,8 @@ describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
       const [standard, veteran, iron] = results;
       expect(standard!.winRate, `${mission.id} Standard ordering`).toBeGreaterThanOrEqual(veteran!.winRate);
       expect(veteran!.winRate, `${mission.id} Veteran ordering`).toBeGreaterThanOrEqual(iron!.winRate);
-      expect(standard!.winRate, `${mission.id} prepared Standard viability`).toBeGreaterThanOrEqual(2 / 3);\n      expect(veteran!.winRate, `${mission.id} prepared Veteran viability`).toBeGreaterThanOrEqual(.50);
+      expect(standard!.winRate, `${mission.id} prepared Standard viability`).toBeGreaterThanOrEqual(2 / 3);
+      expect(veteran!.winRate, `${mission.id} prepared Veteran viability`).toBeGreaterThanOrEqual(.50);
     }, 240_000);
   }
 

@@ -71,4 +71,35 @@ describe("Chapter 7-9 non-boss cross-difficulty robustness", () => {
       ).toBe(true);
     }, 180_000);
   }
+
+  it("isolates Tidewatch Veteran opening pressure on the paired seed", () => {
+    const prepared = simulateCombatScenario({
+      id: "late-nonboss-tidewatch-veteran-opening-prepared",
+      questId: "siege_of_tidewatch",
+      heroLevel: 15,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "veteran",
+      runs: 5,
+      seed: 82_600,
+      gearProfile: "optional_progression",
+      progressionProfile: "subclass_ready",
+      encounterLimit: 1,
+    });
+    const behind = simulateCombatScenario({
+      id: "late-nonboss-tidewatch-veteran-opening-behind",
+      questId: "siege_of_tidewatch",
+      heroLevel: 14,
+      partyClasses: ["warrior", "ranger", "cleric", "mage"],
+      difficultyId: "veteran",
+      runs: 5,
+      seed: 82_600,
+      gearProfile: "lagged_basic",
+      progressionProfile: "subclass_ready",
+      encounterLimit: 1,
+    });
+
+    console.table([prepared, behind]);
+    expect(prepared.stalled + behind.stalled).toBe(0);
+  }, 180_000);
+
 });

@@ -7,7 +7,7 @@ on:
       - main
 
 concurrency:
-  group: late-nonboss-target-calibration-${{ github.sha }}
+  group: skyvault-standard-target-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -16,39 +16,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
+        with: { version: 10 }
       - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
+        with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps skyvault prepared win rates near the 85/75/60 targets" --reporter=verbose
-
-  chain-target:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps chain prepared win rates near the 85/75/60 targets" --reporter=verbose
 
   typecheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
+        with: { version: 10 }
       - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
+        with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck

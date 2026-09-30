@@ -7,11 +7,11 @@ on:
       - main
 
 concurrency:
-  group: late-midmission-openers-${{ github.sha }}
+  group: late-midmission-stage2-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
-  skyvault-opener:
+  skyvault-two-stage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,9 +23,9 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "isolates skyvault opening-stage attrition" --reporter=verbose
+      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "isolates skyvault through stage two" --reporter=verbose
 
-  tidewatch-opener:
+  tidewatch-two-stage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,18 +37,4 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "isolates tidewatch opening-stage attrition" --reporter=verbose
-
-  chain-opener:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "isolates chain opening-stage attrition" --reporter=verbose
+      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "isolates tidewatch through stage two" --reporter=verbose

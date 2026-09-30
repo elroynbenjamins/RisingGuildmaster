@@ -7,7 +7,7 @@ on:
       - main
 
 concurrency:
-  group: nhal-veteran-tuning-${{ github.sha }}
+  group: nhal-veteran-final-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm vitest run tests/lateBossDifficultyRobustness.test.ts -t "keeps nhal difficulty curve ordered" --reporter=verbose
 
-  typecheck:
+  iron-parties:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,4 +37,4 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
+      - run: pnpm vitest run tests/lateBossDifficultyRobustness.test.ts -t "keeps prepared Iron late bosses possible" --reporter=verbose

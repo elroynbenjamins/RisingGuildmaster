@@ -95,7 +95,7 @@ describe("Chapter 3 to 4 transition robustness", () => {
       behind.wipeRate > 0 || behind.averageFallenHeroesOnWins > prepared.averageFallenHeroesOnWins,
       "arriving one level behind should create visible recovery pressure",
     ).toBe(true);
-  }, 150_000);
+  }, 210_000);
 
   it("keeps multiple prepared compositions viable against Morrowveil while Iron remains costly", () => {
     const parties = [

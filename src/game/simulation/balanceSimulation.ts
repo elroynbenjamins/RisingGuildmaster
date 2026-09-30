@@ -31,7 +31,8 @@ import type { EquipmentSlot } from "../heroes/types";
 
 export type SimulationGearProfile = "starter" | "lagged_basic" | "prepared_minus_two" | "optional_progression";
 export type SimulationProgressionProfile = "base" | "subclass_ready";
-export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; partyLevels?: readonly number[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile; skillPathIndices?: readonly number[] }
+export type SimulationTacticsProfile = "basic" | "skilled";
+export interface CombatSimulationScenario { id: string; questId: string; heroLevel: number; partyClasses: readonly ClassId[]; partyLevels?: readonly number[]; difficultyId: GameDifficultyId; runs: number; seed: number; gearProfile?: SimulationGearProfile; encounterLimit?: number; progressionProfile?: SimulationProgressionProfile; skillPathIndices?: readonly number[]; tacticsProfile?: SimulationTacticsProfile }
 export interface CombatSimulationResult { scenarioId: string; wins: number; losses: number; stalled: number; winRate: number; wipeRate: number; averageRounds: number; averageSurvivingHeroes: number; averageFallenHeroesOnWins: number; victoriesWithAnyFallRate: number; victoriesWithTwoPlusFallsRate: number; averageRemainingHpRatioOnWins: number; enemyXpPool: number }
 export interface EconomySimulationScenario { id: string; questId: string; difficultyId: GameDifficultyId; heroCount: number; heroLevel?: number; weeklySalaryPerHero?: number; questsPerWeek: number; days: number; travelGoldCostPerQuest?: number; healingGoldCostPerQuest?: number; repairGoldCostPerQuest?: number; rationGoldCostPerQuest?: number; facilityReserve?: number; seed: number }
 export interface EconomySimulationResult { scenarioId: string; startingGold: number; endingGold: number; netGold: number; questIncome: number; tavernIncome: number; salaryPaid: number; fieldExpenses: number; arrears: number; breakEvenQuestsPerWeek: number; goldAfterFacilityReserve: number }
@@ -103,11 +104,54 @@ function skillTarget(state: CombatState, skill: CombatSkillDefinition): { target
   return { targetId: target?.combatantId, targetPosition: skill.areaRadius !== undefined ? target?.position : undefined };
 }
 
-function tryHeroAction(state: CombatState, random: RandomSource): CombatState | null {
+function skilledSkillScore(state: CombatState, skill: CombatSkillDefinition): number {
+  const actor = state.heroes.find((item) => item.hero.id === state.awaitingHeroId)!;
+  const livingEnemies = state.enemies.filter((item) => item.unit.isAlive);
+  const livingAllies = state.heroes.filter((item) => item.unit.isAlive);
+  const lowestAllyHpRatio = Math.min(...livingAllies.map((item) => item.unit.currentHP / item.unit.maxHP));
+
+  if (skill.healMaxHpModifier) {
+    if (skill.targetType === "self") {
+      const hpRatio = actor.unit.currentHP / actor.unit.maxHP;
+      if (hpRatio > .78) return -1000;
+      return 250 + (1 - hpRatio) * 200 + skill.healMaxHpModifier * 100;
+    }
+    if (skill.targetType === "single_ally") {
+      if (lowestAllyHpRatio > .80) return -1000;
+      return 300 + (1 - lowestAllyHpRatio) * 220 + skill.healMaxHpModifier * 100;
+    }
+    if (skill.targetType === "all_allies") {
+      const injured = livingAllies.filter((item) => item.unit.currentHP / item.unit.maxHP < .85).length;
+      if (injured < 2 && lowestAllyHpRatio > .65) return -1000;
+      return 320 + injured * 45 + skill.healMaxHpModifier * 120;
+    }
+  }
+
+  let score = skill.type === "basic_attack" ? 20 : 70;
+  if (skill.damageMultiplier) {
+    const targetCount = skill.targetType === "all_enemies" ? Math.max(1, livingEnemies.length) : 1;
+    score += skill.damageMultiplier * 100 * Math.min(targetCount, 3);
+  }
+  if (skill.conditionApplications?.length) score += 25;
+  if (skill.targetModifiers?.length || skill.selfModifiers?.length || skill.taunt) score += 18;
+  if (skill.targetType === "all_allies") score += 12;
+  return score;
+}
+
+function tryHeroAction(state: CombatState, random: RandomSource, tacticsProfile: SimulationTacticsProfile = "basic"): CombatState | null {
   const actor = state.heroes.find((item) => item.hero.id === state.awaitingHeroId)!;
   const skillIds = [...getHeroSkillIds(actor.hero)].reverse();
-  for (const skillId of skillIds) {
+  const orderedSkillIds = tacticsProfile === "skilled"
+    ? skillIds
+        .map((skillId) => ({ skillId, skill: HERO_SKILLS[skillId] }))
+        .filter((entry): entry is { skillId: string; skill: CombatSkillDefinition } => Boolean(entry.skill))
+        .sort((a, b) => skilledSkillScore(state, b.skill) - skilledSkillScore(state, a.skill))
+        .map((entry) => entry.skillId)
+    : skillIds;
+
+  for (const skillId of orderedSkillIds) {
     const skill = HERO_SKILLS[skillId]; if (!skill) continue;
+    if (tacticsProfile === "skilled" && skilledSkillScore(state, skill) < 0) continue;
     const availability = getHeroSkillAvailability(actor.hero, actor.instance, actor.unit, skillId, state.heroes.map((item) => item.unit), state.enemies.map((item) => item.unit), state.board);
     if (!availability.enabled) continue;
     try { const target = skillTarget(state, skill); return performHeroTurn(state, skillId, random, target.targetId, target.targetPosition); } catch { /* Try another legal action. */ }
@@ -115,7 +159,7 @@ function tryHeroAction(state: CombatState, random: RandomSource): CombatState | 
   return null;
 }
 
-function moveTowardGoal(state: CombatState, random: RandomSource): CombatState {
+function moveTowardGoal(state: CombatState, random: RandomSource, tacticsProfile: SimulationTacticsProfile = "basic"): CombatState {
   const actor = state.heroes.find((item) => item.hero.id === state.awaitingHeroId)!;
   const reachable = getReachablePositions(state.board, actor.unit.position, getEffectiveMovementRange(actor.unit), actor.unit.ignoredTerrainMovementCosts)
     .filter((position) => position.x !== actor.unit.position.x || position.y !== actor.unit.position.y);
@@ -129,18 +173,33 @@ function moveTowardGoal(state: CombatState, random: RandomSource): CombatState {
 
   const distanceToGoal = (position: { x: number; y: number }) =>
     Math.min(...targets.map((target) => manhattanDistance(position, target)));
+
+  if (tacticsProfile === "skilled" && state.objective.type !== "reach_zone") {
+    const rangedClasses = new Set<ClassId>(["ranger", "mage", "cleric", "bard", "spellbow", "summoner"]);
+    const preferredDistance = rangedClasses.has(actor.hero.classId) ? 4 : 1;
+    const destination = reachable.sort((a, b) => {
+      const aDistance = distanceToGoal(a);
+      const bDistance = distanceToGoal(b);
+      const aGap = Math.abs(aDistance - preferredDistance);
+      const bGap = Math.abs(bDistance - preferredDistance);
+      if (aGap !== bGap) return aGap - bGap;
+      return rangedClasses.has(actor.hero.classId) ? bDistance - aDistance : aDistance - bDistance;
+    })[0];
+    return destination ? moveCurrentHero(state, destination, random) : state;
+  }
+
   const destination = reachable.sort((a, b) => distanceToGoal(a) - distanceToGoal(b))[0];
   return destination ? moveCurrentHero(state, destination, random) : state;
 }
 
-function autoplayEncounter(initial: CombatState, random: RandomSource): CombatState {
+function autoplayEncounter(initial: CombatState, random: RandomSource, tacticsProfile: SimulationTacticsProfile = "basic"): CombatState {
   let state = beginCombat(initial, random); let decisions = 0;
   while (state.status === "active" && decisions++ < 500) {
     if (!state.awaitingHeroId) break;
-    let acted = tryHeroAction(state, random);
+    let acted = tryHeroAction(state, random, tacticsProfile);
     if (!acted && !state.actions.movementUsed) {
-      state = moveTowardGoal(state, random);
-      if (state.status === "active" && state.awaitingHeroId) acted = tryHeroAction(state, random);
+      state = moveTowardGoal(state, random, tacticsProfile);
+      if (state.status === "active" && state.awaitingHeroId) acted = tryHeroAction(state, random, tacticsProfile);
     }
     state = acted ?? state;
     if (state.status === "active" && state.awaitingHeroId) state = endCurrentHeroTurn(state, random);
@@ -165,7 +224,7 @@ export function simulateCombatScenario(scenario: CombatSimulationScenario): Comb
     let carried = undefined; let final: CombatState | undefined;
     const encounterCount = Math.min(QUESTS[scenario.questId]!.encounterIds.length, scenario.encounterLimit ?? Number.POSITIVE_INFINITY);
     for (let encounterIndex = 0; encounterIndex < encounterCount; encounterIndex++) {
-      final = autoplayEncounter(createCombatState(scenario.questId, encounterIndex, heroes, random, carried, undefined, [], scenario.difficultyId), random);
+      final = autoplayEncounter(createCombatState(scenario.questId, encounterIndex, heroes, random, carried, undefined, [], scenario.difficultyId), random, scenario.tacticsProfile ?? "basic");
       if (final.status !== "victory") break;
       const advanced = advanceToNextEncounter({ questDefinitionId: scenario.questId, partyId: "sim", currentEncounterIndex: encounterIndex, status: "active", goldEarned: 0, xpEarnedPerHero: 0, collectedLootIds: [], collectedMaterials: {} }, final.heroes.map((item) => item.instance));
       carried = advanced.heroInstances;

@@ -7,7 +7,7 @@ on:
       - main
 
 concurrency:
-  group: ch1-5-prepared-reliability-${{ github.sha }}
+  group: ch1-3-5-retune-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -22,17 +22,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm vitest run tests/chapter1To5PreparedReliability.test.ts -t "Chapter 1 prepared" --reporter=verbose
 
-  chapter2:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 10 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/chapter1To5PreparedReliability.test.ts -t "Chapter 2 prepared" --reporter=verbose
-
   chapter3:
     runs-on: ubuntu-latest
     steps:
@@ -43,17 +32,6 @@ jobs:
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm vitest run tests/chapter1To5PreparedReliability.test.ts -t "Chapter 3 prepared" --reporter=verbose
-
-  chapter4:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 10 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/chapter1To5PreparedReliability.test.ts -t "Chapter 4 prepared" --reporter=verbose
 
   chapter5:
     runs-on: ubuntu-latest

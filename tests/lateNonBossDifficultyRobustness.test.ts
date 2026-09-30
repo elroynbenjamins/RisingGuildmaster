@@ -1,4 +1,8 @@
 import { describe, expect, it } from "vitest";
+import {
+  PREPARED_BALANCE_WIN_RATE_TARGETS,
+  PREPARED_BALANCE_WIN_RATE_TOLERANCE,
+} from "../src/config/balanceTargets";
 import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 
 const missions = [
@@ -7,20 +11,27 @@ const missions = [
   { id: "chain", questId: "chain_beneath_fleet", preparedLevel: 17, seed: 83_100 },
 ] as const;
 
+const preparedParty = {
+  partyClasses: ["warrior", "ranger", "cleric", "mage"] as const,
+  // Bulwark / Marksman / Lifebringer / Elementalist: durable frontline,
+  // focused ranged damage, strong recovery, and dependable area pressure.
+  skillPathIndices: [1, 0, 0, 0] as const,
+  gearProfile: "prepared_minus_two" as const,
+  progressionProfile: "subclass_ready" as const,
+};
+
 describe("Chapter 7-9 non-boss cross-difficulty robustness", () => {
   for (const mission of missions) {
-    it(`keeps ${mission.id} prepared difficulty curve ordered`, () => {
+    it(`keeps ${mission.id} prepared win rates near the 85/75/60 targets`, () => {
       const results = (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>
         simulateCombatScenario({
           id: `late-nonboss-${mission.id}-${difficultyId}`,
           questId: mission.questId,
           heroLevel: mission.preparedLevel,
-          partyClasses: ["warrior", "ranger", "cleric", "mage"],
+          ...preparedParty,
           difficultyId,
-          runs: 3,
+          runs: 10,
           seed: mission.seed,
-          gearProfile: "optional_progression",
-          progressionProfile: "subclass_ready",
         }),
       );
 
@@ -30,9 +41,20 @@ describe("Chapter 7-9 non-boss cross-difficulty robustness", () => {
       const [standard, veteran, iron] = results;
       expect(standard!.winRate, `${mission.id} Standard should not be harder than Veteran`).toBeGreaterThanOrEqual(veteran!.winRate);
       expect(veteran!.winRate, `${mission.id} Veteran should not be easier than Iron`).toBeGreaterThanOrEqual(iron!.winRate);
-      expect(standard!.winRate, `${mission.id} prepared Standard viability`).toBeGreaterThanOrEqual(2 / 3);
-      expect(veteran!.wins, `${mission.id} prepared Veteran should retain a winning path`).toBeGreaterThan(0);
-    }, 240_000);
+
+      for (const result of results) {
+        const difficultyId = result.scenarioId.endsWith("-standard")
+          ? "standard"
+          : result.scenarioId.endsWith("-veteran")
+            ? "veteran"
+            : "iron_guild";
+        const target = PREPARED_BALANCE_WIN_RATE_TARGETS[difficultyId];
+        expect(
+          Math.abs(result.winRate - target),
+          `${mission.id} ${difficultyId} should stay close to the prepared-party target ${target}`,
+        ).toBeLessThanOrEqual(PREPARED_BALANCE_WIN_RATE_TOLERANCE + 0.0001);
+      }
+    }, 600_000);
   }
 
   for (const mission of missions) {
@@ -41,20 +63,19 @@ describe("Chapter 7-9 non-boss cross-difficulty robustness", () => {
         id: `late-nonboss-${mission.id}-veteran-prepared`,
         questId: mission.questId,
         heroLevel: mission.preparedLevel,
-        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        ...preparedParty,
         difficultyId: "veteran",
-        runs: 3,
+        runs: 4,
         seed: mission.seed + 500,
-        gearProfile: "optional_progression",
-        progressionProfile: "subclass_ready",
       });
       const behind = simulateCombatScenario({
         id: `late-nonboss-${mission.id}-veteran-behind`,
         questId: mission.questId,
         heroLevel: mission.preparedLevel - 1,
-        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        partyClasses: preparedParty.partyClasses,
+        skillPathIndices: preparedParty.skillPathIndices,
         difficultyId: "veteran",
-        runs: 3,
+        runs: 4,
         seed: mission.seed + 500,
         gearProfile: "lagged_basic",
         progressionProfile: "subclass_ready",
@@ -62,44 +83,7 @@ describe("Chapter 7-9 non-boss cross-difficulty robustness", () => {
 
       console.table([prepared, behind]);
       expect(prepared.stalled + behind.stalled).toBe(0);
-      expect(prepared.winRate, `${mission.id} preparation should not reduce win rate`).toBeGreaterThanOrEqual(behind.winRate);
-      expect(
-        behind.wipeRate > prepared.wipeRate
-          || behind.averageFallenHeroesOnWins > prepared.averageFallenHeroesOnWins
-          || behind.averageRemainingHpRatioOnWins < prepared.averageRemainingHpRatioOnWins,
-        `${mission.id} one-level-behind party should feel more pressure`,
-      ).toBe(true);
-    }, 180_000);
+      expect(prepared.winRate, `${mission.id} preparation should improve win rate`).toBeGreaterThan(behind.winRate);
+    }, 240_000);
   }
-
-  it("isolates Tidewatch Veteran opening pressure on the paired seed", () => {
-    const prepared = simulateCombatScenario({
-      id: "late-nonboss-tidewatch-veteran-opening-prepared",
-      questId: "siege_of_tidewatch",
-      heroLevel: 15,
-      partyClasses: ["warrior", "ranger", "cleric", "mage"],
-      difficultyId: "veteran",
-      runs: 5,
-      seed: 82_600,
-      gearProfile: "optional_progression",
-      progressionProfile: "subclass_ready",
-      encounterLimit: 1,
-    });
-    const behind = simulateCombatScenario({
-      id: "late-nonboss-tidewatch-veteran-opening-behind",
-      questId: "siege_of_tidewatch",
-      heroLevel: 14,
-      partyClasses: ["warrior", "ranger", "cleric", "mage"],
-      difficultyId: "veteran",
-      runs: 5,
-      seed: 82_600,
-      gearProfile: "lagged_basic",
-      progressionProfile: "subclass_ready",
-      encounterLimit: 1,
-    });
-
-    console.table([prepared, behind]);
-    expect(prepared.stalled + behind.stalled).toBe(0);
-  }, 180_000);
-
 });

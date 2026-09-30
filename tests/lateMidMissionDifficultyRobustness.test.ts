@@ -7,7 +7,8 @@ const missions = [
   { id: "chain", questId: "chain_beneath_fleet", heroLevel: 17, seed: 83_100 },
 ] as const;
 
-// Focused late non-boss regression: prepared viability plus explicit underprepared punishment.\ndescribe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
+// Focused late non-boss regression: prepared viability plus explicit underprepared punishment.
+describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
   for (const mission of missions) {
     it(`measures ${mission.id} across Standard, Veteran, and Iron`, () => {
       const results = (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>

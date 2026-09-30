@@ -81,6 +81,10 @@ describe("Chapter 7-9 non-boss cross-difficulty robustness", () => {
           `${mission.id} ${difficultyId} should stay close to the prepared-party target ${target}`,
         ).toBeLessThanOrEqual(PREPARED_BALANCE_WIN_RATE_TOLERANCE + 0.0001);
       }
+
+      expect(standard!.averageFallenHeroesOnWins, `${mission.id} Standard should still cost heroes`).toBeGreaterThanOrEqual(.4);
+      expect(veteran!.averageFallenHeroesOnWins, `${mission.id} Veteran should retain casualty pressure`).toBeGreaterThanOrEqual(.75);
+      expect(iron!.averageFallenHeroesOnWins, `${mission.id} Iron wins should remain costly`).toBeGreaterThanOrEqual(1);
     }, 600_000);
   }
 
@@ -106,6 +110,7 @@ describe("Chapter 7-9 non-boss cross-difficulty robustness", () => {
         seed: mission.seed + 500,
         gearProfile: "lagged_basic",
         progressionProfile: "subclass_ready",
+        tacticsProfile: "skilled",
       });
 
       console.table([prepared, behind]);

@@ -7,72 +7,32 @@ on:
       - main
 
 concurrency:
-  group: late-nonboss-final-${{ github.sha }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  gear-benchmark:
+  validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 10 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps the prepared benchmark gear close to two levels behind" --reporter=verbose
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  tidewatch-target:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 10 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps tidewatch prepared win rates near the 85/75/60 targets" --reporter=verbose
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
-  chain-target:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 10 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps chain prepared win rates near the 85/75/60 targets" --reporter=verbose
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
 
-  skyvault-behind:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 10 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps skyvault one-level-behind Veteran pressure above prepared pressure" --reporter=verbose
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-  tidewatch-behind:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 10 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps tidewatch one-level-behind Veteran pressure above prepared pressure" --reporter=verbose
+      - name: Typecheck
+        run: pnpm typecheck
 
-  chain-behind:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 10 }
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps chain one-level-behind Veteran pressure above prepared pressure" --reporter=verbose
+      - name: Test
+        run: pnpm test

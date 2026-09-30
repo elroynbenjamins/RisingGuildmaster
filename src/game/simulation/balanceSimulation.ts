@@ -44,19 +44,61 @@ function progressionGearTargetLevel(heroLevel: number, slot: EquipmentSlot): num
   return Math.max(1, heroLevel - lag);
 }
 
+function equipPreparedMinusTwoGear(hero: Hero): Hero {
+  const targetTotalLevel = Math.max(1, hero.level - 2) * SIMULATION_GEAR_SLOTS.length;
+  type GearState = { totalLevel: number; totalValue: number; equipment: Hero["equipment"] };
+  let states: GearState[] = [{ totalLevel: 0, totalValue: 0, equipment: { ...hero.equipment } }];
+
+  for (const slot of SIMULATION_GEAR_SLOTS) {
+    const bestByLevel = new Map<number, (typeof EQUIPMENT)[string]>();
+    for (const item of Object.values(EQUIPMENT)) {
+      if (item.slot !== slot) continue;
+      if (RECRUITMENT_FIELD_GEAR_IDS.has(item.id)) continue;
+      if (item.levelRequirement > hero.level) continue;
+      if (!(item.rarity === "common" || item.rarity === "uncommon" || item.rarity === "rare" || item.rarity === "epic")) continue;
+      if (item.classRestrictions.length && !item.classRestrictions.includes(hero.classId)) continue;
+      const existing = bestByLevel.get(item.levelRequirement);
+      if (!existing || item.value > existing.value) bestByLevel.set(item.levelRequirement, item);
+    }
+
+    const candidates = [...bestByLevel.values()];
+    if (!candidates.length) continue;
+    const next = new Map<number, GearState>();
+    for (const state of states) {
+      for (const item of candidates) {
+        const totalLevel = state.totalLevel + item.levelRequirement;
+        const candidate: GearState = {
+          totalLevel,
+          totalValue: state.totalValue + item.value,
+          equipment: { ...state.equipment, [slot]: item.id },
+        };
+        const existing = next.get(totalLevel);
+        if (!existing || candidate.totalValue > existing.totalValue) next.set(totalLevel, candidate);
+      }
+    }
+    states = [...next.values()];
+  }
+
+  const selected = states.sort((a, b) =>
+    Math.abs(a.totalLevel - targetTotalLevel) - Math.abs(b.totalLevel - targetTotalLevel)
+    || b.totalValue - a.totalValue
+  )[0];
+  const equipped = selected ? { ...hero, equipment: selected.equipment } : hero;
+  return { ...equipped, currentHP: calculateHero(equipped).stats.maxHP };
+}
+
 function equipProgressionGear(hero: Hero, profile: "lagged_basic" | "prepared_minus_two" | "optional_progression"): Hero {
+  if (profile === "prepared_minus_two") return equipPreparedMinusTwoGear(hero);
   const equipment = { ...hero.equipment };
   for (const slot of SIMULATION_GEAR_SLOTS) {
     const targetLevel = profile === "optional_progression"
       ? Math.max(1, hero.level - (slot === "weapon" ? 0 : slot === "armor" ? 1 : 2))
-      : profile === "prepared_minus_two"
-        ? Math.max(1, hero.level - 2)
-        : progressionGearTargetLevel(hero.level, slot);
+      : progressionGearTargetLevel(hero.level, slot);
     const candidates = Object.values(EQUIPMENT)
       .filter((item) => item.slot === slot)
       .filter((item) => !RECRUITMENT_FIELD_GEAR_IDS.has(item.id))
       .filter((item) => item.levelRequirement <= targetLevel)
-      .filter((item) => profile === "optional_progression" || profile === "prepared_minus_two"
+      .filter((item) => profile === "optional_progression"
         ? item.rarity === "common" || item.rarity === "uncommon" || item.rarity === "rare" || item.rarity === "epic"
         : item.rarity === "common" || item.rarity === "uncommon")
       .filter((item) => !item.classRestrictions.length || item.classRestrictions.includes(hero.classId))

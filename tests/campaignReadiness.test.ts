@@ -87,6 +87,26 @@ describe("campaign level guidance", () => {
     });
   });
 
+  it("keeps the Level-10 Greenveil catch-up recommendation local before Sixth Voice", () => {
+    const guild = createGuild();
+    guild.heroes = roster([10, 10, 10, 10]);
+    guild.world.campaignChapter = 6;
+    guild.world.unlockedRegionIds = [...new Set([...guild.world.unlockedRegionIds, "ashlands", "greenveil"])];
+    guild.world.completedCampaignNodeIds = [
+      "ash_herald_boss",
+      "home_to_a_lowered_banner", "laurel_law", "the_five_roads_run", "trial_of_the_false_oath", "guildhall_under_siege",
+    ];
+    guild.world.completedQuestIds = ["laurel_law", "the_five_roads_run", "guildhall_under_siege"];
+
+    const guidance = getCampaignLevelGuidance(guild);
+    expect(guidance).toMatchObject({
+      averageLevel: 10,
+      targetLevel: 11,
+      nextQuestId: "the_sixth_voice",
+      recommendedSideQuestId: "the_empty_banner",
+    });
+  });
+
   it("stops recommending catch-up work once the top four match the campaign target", () => {
     const guild = createGuild();
     guild.heroes = roster([2, 2, 2, 2]);

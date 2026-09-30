@@ -19,6 +19,7 @@ const preparedParty = {
   skillPathIndices: [1, 0, 0, 0] as const,
   gearProfile: "prepared_minus_two" as const,
   progressionProfile: "subclass_ready" as const,
+  tacticsProfile: "skilled" as const,
 };
 
 describe("Chapter 7-9 non-boss cross-difficulty robustness", () => {

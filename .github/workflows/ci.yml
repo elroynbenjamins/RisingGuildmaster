@@ -7,11 +7,11 @@ on:
       - main
 
 concurrency:
-  group: late-nonboss-target-calibration-${{ github.sha }}
+  group: late-boss-prepared-targets-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
-  skyvault-target:
+  varkesh-target:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,9 +23,9 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps skyvault prepared win rates near the 85/75/60 targets" --reporter=verbose
+      - run: pnpm vitest run tests/lateBossPreparedTargets.test.ts -t "keeps varkesh near the 85/75/60 prepared targets" --reporter=verbose
 
-  chain-target:
+  nhal-target:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +37,21 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateNonBossDifficultyRobustness.test.ts -t "keeps chain prepared win rates near the 85/75/60 targets" --reporter=verbose
+      - run: pnpm vitest run tests/lateBossPreparedTargets.test.ts -t "keeps nhal near the 85/75/60 prepared targets" --reporter=verbose
+
+  serekh-target:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/lateBossPreparedTargets.test.ts -t "keeps serekh near the 85/75/60 prepared targets" --reporter=verbose
 
   typecheck:
     runs-on: ubuntu-latest

@@ -7,7 +7,6 @@ const missions = [
   { id: "chain", questId: "chain_beneath_fleet", heroLevel: 17, seed: 83_100 },
 ] as const;
 
-// Focused late non-boss regression: prepared viability plus explicit underprepared punishment.
 describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
   for (const mission of missions) {
     it(`measures ${mission.id} across Standard, Veteran, and Iron`, () => {
@@ -36,18 +35,16 @@ describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
     }, 240_000);
   }
 
-
-
-
-  it("compares prepared and one-level-behind Veteran pressure", () => {
-    const veteranMissions = missions.filter((mission) => mission.id !== "chain");\n    const results = veteranMissions.flatMap((mission, index) => {
+  it("keeps prepared Veteran Skyvault and Tidewatch viable while one-level-behind parties wipe", () => {
+    const veteranMissions = missions.filter((mission) => mission.id !== "chain");
+    const results = veteranMissions.flatMap((mission, index) => {
       const prepared = simulateCombatScenario({
         id: `late-mid-${mission.id}-veteran-prepared`,
         questId: mission.questId,
         heroLevel: mission.heroLevel,
         partyClasses: ["warrior", "ranger", "cleric", "mage"],
         difficultyId: "veteran",
-        runs: 3,
+        runs: 6,
         seed: 84_100 + index * 100,
         gearProfile: "optional_progression",
         progressionProfile: "subclass_ready",
@@ -58,7 +55,7 @@ describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
         heroLevel: mission.heroLevel - 1,
         partyClasses: ["warrior", "ranger", "cleric", "mage"],
         difficultyId: "veteran",
-        runs: 3,
+        runs: 6,
         seed: 84_100 + index * 100,
         gearProfile: "lagged_basic",
         progressionProfile: "subclass_ready",
@@ -69,12 +66,12 @@ describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
 
-    for (const mission of missions) {
+    for (const mission of veteranMissions) {
       const prepared = results.find((result) => result.scenarioId === `late-mid-${mission.id}-veteran-prepared`)!;
       const behind = results.find((result) => result.scenarioId === `late-mid-${mission.id}-veteran-behind`)!;
       expect(prepared.winRate, `${mission.id} prepared Veteran viability`).toBeGreaterThanOrEqual(.50);
       expect(prepared.winRate, `${mission.id} preparation should improve the outcome`).toBeGreaterThan(behind.winRate);
       expect(behind.wipeRate, `${mission.id} underprepared wipe pressure`).toBeGreaterThanOrEqual(.66);
     }
-  }, 240_000);
+  }, 360_000);
 });

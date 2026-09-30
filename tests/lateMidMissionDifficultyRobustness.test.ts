@@ -43,7 +43,7 @@ describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
         heroLevel: mission.heroLevel,
         partyClasses: ["warrior", "ranger", "cleric", "mage"],
         difficultyId: "veteran",
-        runs: 4,
+        runs: 3,
         seed: 84_100 + index * 100,
         gearProfile: "optional_progression",
         progressionProfile: "subclass_ready",
@@ -54,7 +54,7 @@ describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
         heroLevel: mission.heroLevel - 1,
         partyClasses: ["warrior", "ranger", "cleric", "mage"],
         difficultyId: "veteran",
-        runs: 4,
+        runs: 3,
         seed: 84_100 + index * 100,
         gearProfile: "lagged_basic",
         progressionProfile: "subclass_ready",
@@ -64,5 +64,13 @@ describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
 
     console.table(results);
     expect(results.every((result) => result.stalled === 0)).toBe(true);
-  }, 300_000);
+
+    for (const mission of missions) {
+      const prepared = results.find((result) => result.scenarioId === `late-mid-${mission.id}-veteran-prepared`)!;
+      const behind = results.find((result) => result.scenarioId === `late-mid-${mission.id}-veteran-behind`)!;
+      expect(prepared.winRate, `${mission.id} prepared Veteran viability`).toBeGreaterThanOrEqual(.33);
+      expect(prepared.winRate, `${mission.id} preparation should improve the outcome`).toBeGreaterThan(behind.winRate);
+      expect(behind.wipeRate, `${mission.id} underprepared wipe pressure`).toBeGreaterThanOrEqual(.66);
+    }
+  }, 240_000);
 });

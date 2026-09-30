@@ -3,7 +3,8 @@ import {
   PREPARED_BALANCE_WIN_RATE_TARGETS,
   PREPARED_BALANCE_WIN_RATE_TOLERANCE,
 } from "../src/config/balanceTargets";
-import { simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
+import { EQUIPMENT } from "../src/data/equipment/equipment";
+import { createSimulationParty, simulateCombatScenario } from "../src/game/simulation/balanceSimulation";
 
 const missions = [
   { id: "skyvault", questId: "siege_of_skyvault", preparedLevel: 13, seed: 81_100 },
@@ -21,6 +22,31 @@ const preparedParty = {
 };
 
 describe("Chapter 7-9 non-boss cross-difficulty robustness", () => {
+  it("keeps the prepared benchmark gear close to two levels behind", () => {
+    const party = createSimulationParty(
+      preparedParty.partyClasses,
+      15,
+      80_500,
+      preparedParty.gearProfile,
+      preparedParty.progressionProfile,
+      preparedParty.skillPathIndices,
+    );
+    const slots = ["weapon", "armor", "helmet", "boots", "accessory1", "accessory2"] as const;
+    const lags = party.flatMap((hero) =>
+      slots.flatMap((slot) => {
+        const itemId = hero.equipment[slot];
+        const item = itemId ? EQUIPMENT[itemId] : undefined;
+        return item ? [hero.level - item.levelRequirement] : [];
+      }),
+    );
+
+    expect(lags.length).toBe(party.length * slots.length);
+    expect(Math.min(...lags)).toBeGreaterThanOrEqual(2);
+    const averageLag = lags.reduce((sum, lag) => sum + lag, 0) / lags.length;
+    expect(averageLag).toBeGreaterThanOrEqual(2);
+    expect(averageLag).toBeLessThanOrEqual(2.5);
+  });
+
   for (const mission of missions) {
     it(`keeps ${mission.id} prepared win rates near the 85/75/60 targets`, () => {
       const results = (["standard", "veteran", "iron_guild"] as const).map((difficultyId) =>

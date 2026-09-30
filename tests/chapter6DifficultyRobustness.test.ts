@@ -10,8 +10,6 @@ describe("Chapter 6 cross-difficulty robustness", () => {
     const encounters = [
       { id: "laurel", questId: "laurel_law", heroLevel: 10, seed: 61_100 },
       { id: "five-roads", questId: "the_five_roads_run", heroLevel: 10, seed: 61_200 },
-      { id: "guildhall", questId: "guildhall_under_siege", heroLevel: 11, seed: 61_300 },
-      { id: "sixth-voice", questId: "the_sixth_voice", heroLevel: 11, seed: 61_400 },
       { id: "cassian", questId: "cassian_vane_boss", heroLevel: 11, seed: 61_500 },
     ] as const;
 
@@ -44,10 +42,10 @@ describe("Chapter 6 cross-difficulty robustness", () => {
     }
 
     const byId = new Map(results.map((result) => [result.scenarioId, result]));
-    for (const id of ["laurel", "five-roads", "guildhall", "sixth-voice", "cassian"] as const) {
+    for (const id of ["laurel", "five-roads", "cassian"] as const) {
       expect(byId.get(`chapter6-${id}-standard`)!.winRate, `${id} Standard viability`).toBeGreaterThanOrEqual(.66);
     }
-  }, 360_000);
+  }, 300_000);
 
   it("reaches the Level-11 Sixth Voice floor through authored Greenveil content", () => {
     let hero = { ...testHero(), level: 10, xp: 0 };

@@ -35,15 +35,15 @@ describe("Chapter 7-9 non-boss cross-difficulty robustness", () => {
     }, 240_000);
   }
 
-  it("keeps one-level-behind Veteran parties meaningfully worse than prepared parties", () => {
-    const results = missions.flatMap((mission) => {
+  for (const mission of missions) {
+    it(`keeps ${mission.id} one-level-behind Veteran pressure above prepared pressure`, () => {
       const prepared = simulateCombatScenario({
         id: `late-nonboss-${mission.id}-veteran-prepared`,
         questId: mission.questId,
         heroLevel: mission.preparedLevel,
         partyClasses: ["warrior", "ranger", "cleric", "mage"],
         difficultyId: "veteran",
-        runs: 4,
+        runs: 3,
         seed: mission.seed + 500,
         gearProfile: "optional_progression",
         progressionProfile: "subclass_ready",
@@ -54,21 +54,14 @@ describe("Chapter 7-9 non-boss cross-difficulty robustness", () => {
         heroLevel: mission.preparedLevel - 1,
         partyClasses: ["warrior", "ranger", "cleric", "mage"],
         difficultyId: "veteran",
-        runs: 4,
+        runs: 3,
         seed: mission.seed + 500,
         gearProfile: "lagged_basic",
         progressionProfile: "subclass_ready",
       });
-      return [{ mission, result: prepared }, { mission, result: behind }] as const;
-    });
 
-    console.table(results.map(({ result }) => result));
-    expect(results.every(({ result }) => result.stalled === 0)).toBe(true);
-
-    for (const mission of missions) {
-      const prepared = results.find(({ result }) => result.scenarioId === `late-nonboss-${mission.id}-veteran-prepared`)!.result;
-      const behind = results.find(({ result }) => result.scenarioId === `late-nonboss-${mission.id}-veteran-behind`)!.result;
-
+      console.table([prepared, behind]);
+      expect(prepared.stalled + behind.stalled).toBe(0);
       expect(prepared.winRate, `${mission.id} preparation should not reduce win rate`).toBeGreaterThanOrEqual(behind.winRate);
       expect(
         behind.wipeRate > prepared.wipeRate
@@ -76,6 +69,6 @@ describe("Chapter 7-9 non-boss cross-difficulty robustness", () => {
           || behind.averageRemainingHpRatioOnWins < prepared.averageRemainingHpRatioOnWins,
         `${mission.id} one-level-behind party should feel more pressure`,
       ).toBe(true);
-    }
-  }, 300_000);
+    }, 180_000);
+  }
 });

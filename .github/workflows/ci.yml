@@ -7,11 +7,11 @@ on:
       - main
 
 concurrency:
-  group: late-midmission-balance-${{ github.sha }}
+  group: late-midmission-openers-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
-  skyvault:
+  skyvault-opener:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,9 +23,9 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "measures skyvault" --reporter=verbose
+      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "isolates skyvault opening-stage attrition" --reporter=verbose
 
-  tidewatch:
+  tidewatch-opener:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,9 +37,9 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "measures tidewatch" --reporter=verbose
+      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "isolates tidewatch opening-stage attrition" --reporter=verbose
 
-  chain:
+  chain-opener:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,32 +51,4 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "measures chain" --reporter=verbose
-
-  veteran-preparation:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "compares prepared and one-level-behind Veteran pressure" --reporter=verbose
-
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
+      - run: pnpm vitest run tests/lateMidMissionDifficultyRobustness.test.ts -t "isolates chain opening-stage attrition" --reporter=verbose

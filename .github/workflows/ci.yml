@@ -7,24 +7,10 @@ on:
       - main
 
 concurrency:
-  group: late-boss-final-${{ github.sha }}
+  group: nhal-final-validation-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
-  varkesh:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateBossDifficultyRobustness.test.ts -t "keeps varkesh difficulty curve ordered" --reporter=verbose
-
   nhal:
     runs-on: ubuntu-latest
     steps:

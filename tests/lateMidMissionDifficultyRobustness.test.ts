@@ -38,6 +38,26 @@ describe("Chapter 7-9 prepared non-boss cross-difficulty robustness", () => {
 
 
 
+
+  it("isolates prepared Veteran Skyvault stage attrition", () => {
+    const results = [1, 2, 3].map((encounterLimit) =>
+      simulateCombatScenario({
+        id: `late-mid-skyvault-veteran-stage-${encounterLimit}`,
+        questId: "siege_of_skyvault",
+        heroLevel: 13,
+        partyClasses: ["warrior", "ranger", "cleric", "mage"],
+        difficultyId: "veteran",
+        runs: 6,
+        seed: 85_200,
+        gearProfile: "optional_progression",
+        progressionProfile: "subclass_ready",
+        encounterLimit,
+      }),
+    );
+    console.table(results);
+    expect(results.every((result) => result.stalled === 0)).toBe(true);
+  }, 240_000);
+
   it("compares prepared and one-level-behind Veteran pressure", () => {
     const results = missions.flatMap((mission, index) => {
       const prepared = simulateCombatScenario({

@@ -7,11 +7,11 @@ on:
       - main
 
 concurrency:
-  group: late-boss-opener-${{ github.sha }}
+  group: late-boss-tuning-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
-  late-boss-openers:
+  varkesh:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,4 +23,46 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/lateBossDifficultyRobustness.test.ts -t "isolates Varkesh and Nhal opening-stage attrition" --reporter=verbose
+      - run: pnpm vitest run tests/lateBossDifficultyRobustness.test.ts -t "keeps varkesh difficulty curve ordered" --reporter=verbose
+
+  nhal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/lateBossDifficultyRobustness.test.ts -t "keeps nhal difficulty curve ordered" --reporter=verbose
+
+  iron-parties:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/lateBossDifficultyRobustness.test.ts -t "keeps prepared Iron late bosses possible" --reporter=verbose
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck

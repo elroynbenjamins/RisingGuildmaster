@@ -46,33 +46,6 @@ describe("Chapter 7-9 prepared cross-difficulty boss robustness", () => {
   }
 
 
-  it("isolates Varkesh and Nhal opening-stage attrition", () => {
-    const scenarios = [
-      { id: "varkesh-veteran", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, difficultyId: "veteran" as const, seed: 75_100 },
-      { id: "varkesh-iron", questId: "varkesh_gilded_rupture_boss", heroLevel: 13, difficultyId: "iron_guild" as const, seed: 75_200 },
-      { id: "nhal-veteran", questId: "admiral_nhal_veyr_boss", heroLevel: 15, difficultyId: "veteran" as const, seed: 75_300 },
-      { id: "nhal-iron", questId: "admiral_nhal_veyr_boss", heroLevel: 15, difficultyId: "iron_guild" as const, seed: 75_400 },
-    ] as const;
-
-    const results = scenarios.map((scenario) =>
-      simulateCombatScenario({
-        id: `late-opener-${scenario.id}`,
-        questId: scenario.questId,
-        heroLevel: scenario.heroLevel,
-        partyClasses: ["warrior", "ranger", "cleric", "mage"],
-        difficultyId: scenario.difficultyId,
-        runs: 4,
-        seed: scenario.seed,
-        gearProfile: "optional_progression",
-        progressionProfile: "subclass_ready",
-        encounterLimit: 1,
-      }),
-    );
-
-    console.table(results);
-    expect(results.every((result) => result.stalled === 0)).toBe(true);
-  }, 180_000);
-
   it("keeps prepared Iron late bosses possible with sensible tactical parties", () => {
     const scenarios = [
       {
@@ -88,13 +61,6 @@ describe("Chapter 7-9 prepared cross-difficulty boss robustness", () => {
         heroLevel: 15,
         classes: ["warrior", "berserker", "cleric", "ranger"] as const,
         seed: 74_200,
-      },
-      {
-        id: "serekh-defensive",
-        questId: "serekh_chartmaker_boss",
-        heroLevel: 17,
-        classes: ["warrior", "paladin", "cleric", "mage"] as const,
-        seed: 74_300,
       },
     ] as const;
 

@@ -64,5 +64,13 @@ describe("global casualty frequency guard", () => {
       underpreparedAverage,
       "preparation should materially reduce aggregate casualty pressure",
     ).toBeGreaterThan(preparedAverage);
+    expect(
+      pairs.filter(({ underprepared }) => underprepared.wins > 0).length,
+      "underprepared play should remain recoverable rather than becoming universal wipes",
+    ).toBeGreaterThanOrEqual(3);
+    expect(
+      preparedAverage,
+      "prepared representative fights should not become a constant casualty spiral",
+    ).toBeLessThanOrEqual(.70);
   }, 300_000);
 });

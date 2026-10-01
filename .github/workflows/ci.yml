@@ -7,7 +7,7 @@ on:
       - main
 
 concurrency:
-  group: nhal-final-validation-${{ github.sha }}
+  group: late-boss-final-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -24,6 +24,20 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm vitest run tests/lateBossDifficultyRobustness.test.ts -t "keeps nhal difficulty curve ordered" --reporter=verbose
+
+  varkesh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/lateBossDifficultyRobustness.test.ts -t "keeps varkesh difficulty curve ordered" --reporter=verbose
 
   iron-parties:
     runs-on: ubuntu-latest

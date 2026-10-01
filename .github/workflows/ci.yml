@@ -7,11 +7,11 @@ on:
       - main
 
 concurrency:
-  group: ch1-3-5-regression-${{ github.sha }}
+  group: ch1-5-reliability-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
-  chapter1:
+  chapter1-reliability:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,9 +20,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/chapter1DifficultyRobustness.test.ts --reporter=verbose
+      - run: pnpm vitest run tests/chapter1To5PreparedReliability.test.ts -t "Chapter 1 prepared Veteran and Iron reliability" --reporter=verbose
 
-  chapter3:
+  chapter2-reliability:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,9 +31,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/chapter3DifficultyRobustness.test.ts --reporter=verbose
+      - run: pnpm vitest run tests/chapter1To5PreparedReliability.test.ts -t "Chapter 2 prepared Veteran and Iron reliability" --reporter=verbose
 
-  chapter5:
+  chapter3-reliability:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +42,29 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run tests/chapter5DifficultyRobustness.test.ts --reporter=verbose
+      - run: pnpm vitest run tests/chapter1To5PreparedReliability.test.ts -t "Chapter 3 prepared Veteran and Iron reliability" --reporter=verbose
+
+  chapter4-reliability:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/chapter1To5PreparedReliability.test.ts -t "Chapter 4 prepared Veteran and Iron reliability" --reporter=verbose
+
+  chapter5-reliability:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run tests/chapter1To5PreparedReliability.test.ts -t "Chapter 5 prepared Veteran and Iron reliability" --reporter=verbose
 
   typecheck:
     runs-on: ubuntu-latest

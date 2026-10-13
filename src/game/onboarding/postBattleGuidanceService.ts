@@ -13,6 +13,7 @@ export interface PostBattleManagementAction {
   actionLabel: string;
   heroId?: string;
   itemId?: string;
+  questId?: string;
   destination?: PostBattlePreparationDestination;
   isNew: boolean;
 }
@@ -57,8 +58,9 @@ function preparationAction(summary: PostBattleSummary, guild: GuildState): PostB
     id: "preparation",
     title: "Rebuild Before the Next Push",
     description: `${resultLead} ${routeText} ${recommendation.detail}`,
-    actionLabel: recommendation.type === "dungeon" ? "Open Roguelite" : "Browse Side Quests",
+    actionLabel: recommendation.type === "dungeon" ? "Open Roguelite" : "Open Recommended Quest",
     destination,
+    ...(recommendation.type === "side_quest" ? { questId: recommendation.questId } : {}),
     isNew: guild.world.worldFlags[SEEN_FLAGS.preparation] !== true,
   };
 }

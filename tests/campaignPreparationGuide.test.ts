@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createGuild } from "../src/game/guild/guildService";
-import { getCampaignPreparationRecommendation } from "../src/game/campaign/campaignPreparationGuide";
+import { getCampaignPreparationRecommendation, getPreparationEquipmentFocus } from "../src/game/campaign/campaignPreparationGuide";
 import { getDungeonCatchupXpTarget } from "../src/game/dungeons/dungeonRunService";
 import { xpRequiredForNextLevel } from "../src/game/progression/xpSystem";
 import { advanceGuildTime } from "../src/game/economy/guildCalendarService";
@@ -107,6 +107,19 @@ function chapterNineBossGuild(count = 4) {
 }
 
 describe("campaign preparation guidance", () => {
+  it("focuses a specific under-equipped hero when a catch-up quest addresses weapon gaps", () => {
+    const guild = chapterEightGuild();
+    guild.heroes = guild.heroes.map((hero, index) => ({
+      ...hero,
+      classId: "mage" as const,
+      level: 15,
+      equipment: { ...hero.equipment, weapon: index < 2 ? "skyvault-crozier" : "concordance-glaive" },
+    }));
+    const advice = getCampaignPreparationRecommendation(guild);
+    expect(advice?.reason).toBe("weapon");
+    expect(getPreparationEquipmentFocus(guild, advice)).toMatchObject({ heroId: guild.heroes[0]!.id, slot: "weapon" });
+  });
+
   it("recommends the best available chapter side quest when weapons lag", () => {
     const guild = chapterEightGuild();
     guild.heroes = guild.heroes.map((hero) => ({

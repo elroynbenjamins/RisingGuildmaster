@@ -147,6 +147,20 @@ function getTrainingAlternative(
   };
 }
 
+/** Name the precise hero whose equipment explains an equipment catch-up recommendation. */
+export function getPreparationEquipmentFocus(guild: GuildState, recommendation: CampaignPreparationRecommendation): { heroId: string; heroName: string; slot: "weapon" | "armor" | "secondary" } | null {
+  if (!recommendation || (recommendation.reason !== "weapon" && recommendation.reason !== "armor" && recommendation.reason !== "secondary")) return null;
+  const slot = recommendation.reason;
+  const hero = coreFieldHeroes(guild).find((entry) => {
+    if (slot === "secondary") return SECONDARY_GEAR_SLOTS.filter((id) => !entry.equipment[id]).length >= 3;
+    const equipmentId = entry.equipment[slot];
+    if (!equipmentId) return true;
+    const equipment = resolveEquipmentDefinition(equipmentId);
+    return !equipment || entry.level - equipment.levelRequirement >= 3;
+  });
+  return hero ? { heroId: hero.id, heroName: hero.name, slot } : null;
+}
+
 export function getCampaignPreparationRecommendation(guild: GuildState): CampaignPreparationRecommendation {
   const chapter = CAMPAIGN_CHAPTERS[guild.world.campaignChapter];
   if (!chapter) return null;

@@ -16,7 +16,8 @@ import { getReputationToMatch, getRivalryStanding } from "../../game/rivalries/r
 import { NpcPortrait, SpeakerPortrait } from "../../components/characters/NpcPortrait";
 import { EnemyPortrait } from "../../components/enemies/EnemyPortrait";
 import { getStarterJourneyStep } from "../../game/onboarding/starterJourneyService";
-import { getCampaignPreparationRecommendation } from "../../game/campaign/campaignPreparationGuide";
+import { getCampaignPreparationRecommendation, getPreparationEquipmentFocus } from "../../game/campaign/campaignPreparationGuide";
+import type { TrainingProgramId } from "../../game/training/trainingTypes";
 
 const ENEMY_SPEAKERS: Record<string, string> = { "Goblin Chieftain": "goblin_chieftain", "Ghorak Chainbreaker": "ghorak_chainbreaker", "Hollow Warden": "hollow_warden" };
 function CampaignSpeakerPortrait({ speaker }: { speaker: string }) { const enemyId = ENEMY_SPEAKERS[speaker]; return enemyId ? <EnemyPortrait enemyId={enemyId} size={46} /> : <SpeakerPortrait speaker={speaker} size={46} />; }
@@ -28,7 +29,7 @@ function campaignLocationLabel(requirement: CampaignLocationRequirement | null):
 }
 function StoryDialogue({ scene, interlude = false }: { scene: StorySceneDefinition; interlude?: boolean }) { return <View style={[styles.scene, interlude && { backgroundColor: "#171d2a", borderColor: "#8c6138", borderRadius: 9, borderWidth: 1, padding: 11 }]}>{interlude ? <Text style={{ color: "#d99a59", fontSize: 10, fontWeight: "900", letterSpacing: 1.4 }}>{scene.perspective === "memory" ? "AN ECHO OF THE PAST" : "ELSEWHERE IN ELDORIA"}</Text> : null}<Text style={styles.sceneTitle}>{scene.title}</Text>{scene.paragraphs.map((paragraph, paragraphIndex) => <Text key={paragraphIndex} style={styles.sceneParagraph}>{paragraph}</Text>)}{scene.speakerLines.map((line) => <View key={`${line.speaker}-${line.text}`} style={[styles.quote, { alignItems: "flex-start", flexDirection: "row", gap: 10 }]}><CampaignSpeakerPortrait speaker={line.speaker} /><View style={styles.flex}><Text style={styles.speaker}>{line.speaker}</Text><Text style={styles.quoteText}>“{line.text}”</Text></View></View>)}</View>; }
 
-export function CampaignScreen({ guild, updateGuild, onBack, startQuest, openWorld, openRegion, openRecruitment, openSideQuests, openDungeons, openRaids, travelTowardObjective }: { guild: GuildState; updateGuild(guild: GuildState): void; onBack(): void; startQuest(questId: string, nodeId: string): void; openWorld(focusRegionId?: string): void; openRegion(regionId: string, focusSettlementId?: string, focusCampaignNodeId?: string, focusQuestId?: string): void; openRecruitment(): void; openSideQuests(): void; openDungeons(): void; openRaids(): void; travelTowardObjective(nodeId: string): void }) {
+export function CampaignScreen({ guild, updateGuild, onBack, startQuest, openWorld, openRegion, openRecruitment, openSideQuests, openRecommendedQuest, openTraining, openHeroEquipment, openDungeons, openRaids, travelTowardObjective }: { guild: GuildState; updateGuild(guild: GuildState): void; onBack(): void; startQuest(questId: string, nodeId: string): void; openWorld(focusRegionId?: string): void; openRegion(regionId: string, focusSettlementId?: string, focusCampaignNodeId?: string, focusQuestId?: string): void; openRecruitment(): void; openSideQuests(): void; openRecommendedQuest(questId: string): void; openTraining(heroId: string, programId?: TrainingProgramId): void; openHeroEquipment(heroId: string): void; openDungeons(): void; openRaids(): void; travelTowardObjective(nodeId: string): void }) {
   const [showCompleted, setShowCompleted] = useState(false);
   const [showRivalry, setShowRivalry] = useState(false);
   const [expandedStoryNodeId, setExpandedStoryNodeId] = useState<string>();
@@ -52,6 +53,7 @@ export function CampaignScreen({ guild, updateGuild, onBack, startQuest, openWor
   const moonGateEcho = chapter.chapterNumber === 3 && guild.world.completedCampaignNodeIds.includes("the_moon_gate") && !guild.world.completedCampaignNodeIds.includes("vaelith_boss") ? getMoonGateChoiceEcho(guild.world) : null;
   const nextIncompleteNode = chapter.nodeIds.map((id) => CAMPAIGN_NODES[id]!).find((node) => !guild.world.completedCampaignNodeIds.includes(node.id));
   const preparationRecommendation = getCampaignPreparationRecommendation(guild);
+  const preparationEquipmentFocus = getPreparationEquipmentFocus(guild, preparationRecommendation);
   const starterStep = chapter.chapterNumber === 1 ? getStarterJourneyStep(guild) : null;
   const nextLocationRequirement = nextNode ? getCampaignNodeLocationRequirement(nextNode.id) : null;
   const nextLocationReady = isAtCampaignLocation(guild.world, nextLocationRequirement);
@@ -95,8 +97,10 @@ export function CampaignScreen({ guild, updateGuild, onBack, startQuest, openWor
       <ActionButton
         iconId={preparationRecommendation.type === "side_quest" ? "quests" : "loot"}
         label={preparationRecommendation.type === "side_quest" ? "Review Recommended Side Quest" : "Open Wardstone Expeditions"}
-        onPress={preparationRecommendation.type === "side_quest" ? openSideQuests : openDungeons}
+        onPress={preparationRecommendation.type === "side_quest" ? () => openRecommendedQuest(preparationRecommendation.questId) : openDungeons}
       />
+      {preparationRecommendation.trainingAlternative ? <SecondaryButton label={`Train ${preparationRecommendation.trainingAlternative.heroName} · Lv ${preparationRecommendation.trainingAlternative.targetLevel}`} onPress={() => openTraining(preparationRecommendation.trainingAlternative!.heroId, preparationRecommendation.trainingAlternative!.programId)} /> : null}
+      {preparationEquipmentFocus ? <SecondaryButton label={`Inspect ${preparationEquipmentFocus.heroName}'s Gear`} onPress={() => openHeroEquipment(preparationEquipmentFocus.heroId)} /> : null}
     </Panel> : null}
     {chieftainEcho&&<Panel style={styles.choiceEcho}><Text style={styles.choiceEchoLabel}>CHAPTER 1 CHOICE ECHO</Text><Text style={styles.choiceEchoTitle}>{chieftainEcho.title}</Text><Text style={styles.choiceEchoText}>{chieftainEcho.detail}</Text></Panel>}{ghorakEcho&&<Panel style={styles.choiceEcho}><Text style={styles.choiceEchoLabel}>CHAINBREAKER CHOICE ECHO</Text><Text style={styles.choiceEchoTitle}>{ghorakEcho.title}</Text><Text style={styles.choiceEchoText}>{ghorakEcho.detail}</Text></Panel>}{heartstoneEcho&&<Panel style={styles.choiceEcho}><Text style={styles.choiceEchoLabel}>HOLLOW FORGE CHOICE ECHO</Text><Text style={styles.choiceEchoTitle}>{heartstoneEcho.title}</Text><Text style={styles.choiceEchoText}>{heartstoneEcho.detail}</Text></Panel>}{northwatchEcho&&<Panel style={styles.choiceEcho}><Text style={styles.choiceEchoLabel}>NORTHWATCH CHOICE ECHO</Text><Text style={styles.choiceEchoTitle}>{northwatchEcho.title}</Text><Text style={styles.choiceEchoText}>{northwatchEcho.detail}</Text></Panel>}{moonGateEcho&&<Panel style={styles.choiceEcho}><Text style={styles.choiceEchoLabel}>MOON GATE CHOICE ECHO</Text><Text style={styles.choiceEchoTitle}>{moonGateEcho.title}</Text><Text style={styles.choiceEchoText}>{moonGateEcho.detail}</Text></Panel>}
     {completedCount>0&&<View style={styles.historyToggle}><SecondaryButton label={showCompleted?"Hide Completed Story":"Review Completed Story"} onPress={()=>setShowCompleted((value)=>!value)}/></View>}

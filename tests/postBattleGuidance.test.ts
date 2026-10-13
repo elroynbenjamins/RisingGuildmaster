@@ -105,7 +105,8 @@ describe("post-battle management guidance", () => {
     expect(actions[1]).toMatchObject({
       id: "preparation",
       destination: "side_quests",
-      actionLabel: "Browse Side Quests",
+      actionLabel: "Open Recommended Quest",
+      questId: "the_lighthouse_that_walked",
     });
     expect(actions[1]?.description).toContain("The Lighthouse That Walked");
   });

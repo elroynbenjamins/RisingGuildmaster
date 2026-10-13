@@ -37,21 +37,21 @@ export function getStarterJourneyStep(guild: GuildState): StarterJourneyStep | n
     id: "travel_brambleford",
     title: "Travel to Brambleford",
     description: "Take your three-hero company to Brambleford. The first Brambleway journey begins the final preparation for the Chieftain.",
-    actionLabel: "OPEN WORLD",
+    actionLabel: "OPEN BRAMBLEFORD",
     destination: "world",
   };
   if (needsStarterRoadEncounter(guild)) return {
     id: "road_ambush",
     title: "Answer the Brambleway Alarm",
-    description: "Open Brambleford on the regional map and visit the settlement. Aldren Vale's caravan encounter is waiting there.",
-    actionLabel: "OPEN WORLD",
+    description: "Return to Brambleford on the regional map and choose Defend Caravan. No extra travel day is required.",
+    actionLabel: "RETURN TO BRAMBLEFORD",
     destination: "world",
   };
   if (needsBramblefordSideQuest(guild)) return {
     id: "brambleway_run",
     title: "Complete the Brambleway Run",
     description: "Escort the caravan from Brambleford. This Level 2 company trial is available before the normal Level 3 Side Quest unlock.",
-    actionLabel: "OPEN SIDE QUESTS",
+    actionLabel: "VIEW BRAMBLEWAY QUEST",
     destination: "sideQuests",
   };
   if (needsFourthHeroForChieftain(guild)) return {

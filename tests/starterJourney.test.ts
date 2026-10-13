@@ -46,13 +46,13 @@ describe("starter Brambleford journey continuity", () => {
     expect(getStarterJourneyStep(guild)).toMatchObject({ id: "recruit_third", destination: "recruitment" });
 
     guild.heroes.push(hero("three"));
-    expect(getStarterJourneyStep(guild)).toMatchObject({ id: "travel_brambleford", destination: "world" });
+    expect(getStarterJourneyStep(guild)).toMatchObject({ id: "travel_brambleford", destination: "world", actionLabel: "OPEN BRAMBLEFORD" });
 
     guild.world.currentSettlementId = "brambleford";
-    expect(getStarterJourneyStep(guild)).toMatchObject({ id: "road_ambush", destination: "world" });
+    expect(getStarterJourneyStep(guild)).toMatchObject({ id: "road_ambush", destination: "world", actionLabel: "RETURN TO BRAMBLEFORD" });
 
     guild.world.worldFlags.starter_brambleway_road_ambush_complete = true;
-    expect(getStarterJourneyStep(guild)).toMatchObject({ id: "brambleway_run", destination: "sideQuests" });
+    expect(getStarterJourneyStep(guild)).toMatchObject({ id: "brambleway_run", destination: "sideQuests", actionLabel: "VIEW BRAMBLEWAY QUEST" });
 
     guild.world.worldFlags.starter_brambleford_side_quest_complete = true;
     expect(getStarterJourneyStep(guild)).toMatchObject({ id: "recruit_fourth", destination: "recruitment" });

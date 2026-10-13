@@ -71,9 +71,6 @@ export function QuestSelectionScreen({ onBack, selectQuest, openQuestLocation, o
   const remoteQuests = availableCategoryQuests.filter((quest) => !isQuestAvailableAtCurrentLocation(quest, guild.world));
   const bestRemoteQuest = sortQuestsForRoster(remoteQuests, fieldLevel)[0];
   const bestRemoteDestination = bestRemoteQuest ? (bestRemoteQuest.settlementIds?.length ? SETTLEMENTS[bestRemoteQuest.settlementIds[0]!] ?.name : undefined) ?? REGIONS[bestRemoteQuest.regionId]?.name ?? bestRemoteQuest.regionId : undefined;
-  const remoteSettlements = [...new Set(remoteQuests.flatMap((quest) => quest.settlementIds?.length
-    ? quest.settlementIds.map((id) => SETTLEMENTS[id]?.name ?? formatGameId(id))
-    : [REGIONS[quest.regionId]?.name ?? formatGameId(quest.regionId)]))];
 
   const prepareStory = () => { guide?.finishNavigation("quests"); openCampaign?.(); };
 

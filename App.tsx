@@ -64,6 +64,7 @@ import { acknowledgeUnlockNotices, getNewUnlockNotices } from "./src/game/progre
 import { ThemeProvider, useTheme } from "./src/theme/theme";
 import { initializeAdMobPrivacy } from "./src/game/monetization/admobRewardedAdProvider";
 import { formatOfflineDuration } from "./src/game/heroes/offlineRecoveryService";
+import { resolveObjectiveFocus, type ObjectiveFocus } from "./src/game/navigation/objectiveNavigation";
 
 import { pendingDayMilestone } from "./src/game/monetization/dayMilestoneAdService";
 import type { SaveSlotId } from "./src/game/save/saveService";
@@ -78,6 +79,14 @@ function Game() {
   const worldRandom = useRef(createSeededRandom(randomSeed()));
   const { guild, updateGuild, isHydrated, gameStarted, startNewGame, continueGame, deleteSaveSlot, saveSlots, saveError, offlineRecoverySummary, clearOfflineRecoverySummary } = useGuild();
   const main = (tab: MainTab, questTab?: QuestTab, focusRegionId?: string, focusQuestId?: string) => setRoute({ name: "main", tab, questTab, focusRegionId, focusQuestId });
+  const openObjective = (focus: ObjectiveFocus): boolean => {
+    const target = resolveObjectiveFocus(guild.world, focus);
+    if (!target) return false;
+    if (target.screen === "quest") setRoute({ name: "questDetail", questId: target.questId });
+    else if (target.screen === "region") setRoute({ name: "regionMap", regionId: target.regionId, focusSettlementId: target.settlementId, focusQuestId: target.questId });
+    else main("World", undefined, target.regionId, target.questId);
+    return true;
+  };
   const { showDialog, isDialogOpen } = useGameDialog();
   const enterQuestCombat = (questId: string, party: Party, campaignNodeId?: string, combatSetup?: QuestCombatSetup, preCombatConditions: readonly QuestPreCombatCondition[] = []) => {
     const quest = QUESTS[questId];
@@ -363,8 +372,8 @@ function Game() {
   }
   if (route.name !== "main") return null;
   const tab = route.tab; let screen: React.ReactNode;
-  if (tab === "Guild") screen = <GuildScreen navigate={(destination) => destination === "guildmasterSkills" ? setRoute({ name: "guildmasterSkills" }) : destination === "recruitment" ? setRoute({ name: "recruitment" }) : destination === "management" ? setRoute({ name: "management" }) : destination === "heroes" ? main("Heroes") : destination === "temple" ? setRoute({ name: "temple" }) : destination === "campaign" ? setRoute({ name: "campaign" }) : destination === "crafting" ? setRoute({name:"crafting"}) : destination === "brambleford" ? setRoute({ name: "regionMap", regionId: "greenveil", focusSettlementId: STARTER_JOURNEY.targetSettlementId }) : destination === "bramblewayQuest" ? setRoute({ name: "regionMap", regionId: "greenveil", focusSettlementId: STARTER_JOURNEY.targetSettlementId, focusQuestId: STARTER_JOURNEY.sideQuestId }) : destination === "world" ? main("World") : destination === "quests" ? main("Quests") : destination === "sideQuests" ? main("Quests", "Side Quests") : destination === "gathering" ? setRoute({name: "gathering"}) : destination === "finances" ? setRoute({ name: "finances" }) : setRoute({ name: "training" })} />;
-  else if (tab === "Quests") screen = <QuestSelectionScreen key={route.questTab ?? "Campaign"} initialTab={route.questTab} selectQuest={(questId) => setRoute({ name: "questDetail", questId })} openCampaign={() => setRoute({ name: "campaign" })} openDungeons={() => setRoute({ name: "dungeon" })} openOperations={() => setRoute({ name: "operations" })} openRaids={() => setRoute({ name: "raids" })} />;
+  if (tab === "Guild") screen = <GuildScreen navigate={(destination, objective) => { if (objective && openObjective(objective)) return; destination === "guildmasterSkills" ? setRoute({ name: "guildmasterSkills" }) : destination === "recruitment" ? setRoute({ name: "recruitment" }) : destination === "management" ? setRoute({ name: "management" }) : destination === "heroes" ? main("Heroes") : destination === "temple" ? setRoute({ name: "temple" }) : destination === "campaign" ? setRoute({ name: "campaign" }) : destination === "crafting" ? setRoute({name:"crafting"}) : destination === "brambleford" ? setRoute({ name: "regionMap", regionId: "greenveil", focusSettlementId: STARTER_JOURNEY.targetSettlementId }) : destination === "bramblewayQuest" ? setRoute({ name: "regionMap", regionId: "greenveil", focusSettlementId: STARTER_JOURNEY.targetSettlementId, focusQuestId: STARTER_JOURNEY.sideQuestId }) : destination === "world" ? main("World") : destination === "quests" ? main("Quests") : destination === "sideQuests" ? main("Quests", "Side Quests") : destination === "gathering" ? setRoute({name: "gathering"}) : destination === "finances" ? setRoute({ name: "finances" }) : setRoute({ name: "training" }); }} />;
+  else if (tab === "Quests") screen = <QuestSelectionScreen key={route.questTab ?? "Campaign"} initialTab={route.questTab} selectQuest={(questId) => setRoute({ name: "questDetail", questId })} openQuestLocation={(questId) => openObjective({ questId })} openCampaign={() => setRoute({ name: "campaign" })} openDungeons={() => setRoute({ name: "dungeon" })} openOperations={() => setRoute({ name: "operations" })} openRaids={() => setRoute({ name: "raids" })} />;
   else if (tab === "World") screen = <WorldMapScreen key={`${route.focusRegionId ?? "default"}-${route.focusQuestId ?? ""}`} focusRegionId={route.focusRegionId} focusQuestId={route.focusQuestId} guild={guild} random={worldRandom.current} updateGuild={updateGuild} openQuest={(questId) => setRoute({ name: "questDetail", questId })} openRegion={(regionId, focusSettlementId, focusQuestId) => setRoute({ name: "regionMap", regionId, focusSettlementId, focusQuestId })} openCampaign={() => setRoute({ name: "campaign" })} openEvent={(event) => setRoute({ name: "event", event })} />;
   else if (tab === "Heroes") screen = <HeroesScreen openHero={(hero) => setRoute({ name: "hero", hero })} recruit={() => setRoute({ name: "recruitment" })} />;
   else screen = <InventoryScreen openItem={(item) => setRoute({ name: "item", itemId: item.inventoryKey })} openCrafting={() => setRoute({ name: "crafting" })} openGathering={() => setRoute({ name: "gathering" })} openCraftingForMaterial={(materialId)=>setRoute({name:"crafting",materialFilter:materialId})} openGatheringForMaterial={(materialId)=>setRoute({name:"gathering",targetMaterialId:materialId})} openPotions={() => setRoute({ name: "alchemy" })} />;

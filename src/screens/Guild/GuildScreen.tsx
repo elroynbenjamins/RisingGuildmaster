@@ -23,6 +23,7 @@ import { GuidedTip } from "../../components/onboarding/GuidedTip";
 import { isTutorialGuidanceEnabled } from "../../game/onboarding/tutorialService";
 import { GuidedTutorialContext } from "../../components/tutorial/GuidedTutorialContext";
 import { GuidedScrollView } from "../../components/tutorial/GuidedScrollView";
+import type { ObjectiveFocus } from "../../game/navigation/objectiveNavigation";
 
 type Destination = "guildmasterSkills" | GuildPriorityDestination | GuildCommandDestination | "heroes" | "management";
 const QUICK_ACTIONS: { label: string; target: Destination; iconId: GameIconId; sublabel: string }[] = [
@@ -59,7 +60,7 @@ function ResourceCell({ label, value, accent, fullValue }: { label: string; valu
   return <View accessible accessibilityLabel={`${label}: ${fullValue ?? value}`} style={styles.resourceCell}><Text style={styles.resourceLabel}>{label}</Text><Text numberOfLines={1} style={[styles.resourceValue, accent && styles.resourceAccent]}>{value}</Text></View>;
 }
 
-export function GuildScreen({ navigate }: { navigate(destination: Destination): void }) {
+export function GuildScreen({ navigate }: { navigate(destination: Destination, objective?: ObjectiveFocus): void }) {
   const { showDialog } = useGameDialog();
   const { colors: themeColors } = useTheme();
   const { guild, updateGuild } = useGuild();
@@ -159,12 +160,12 @@ export function GuildScreen({ navigate }: { navigate(destination: Destination): 
         <Text style={[styles.priorityKicker, priority.tone === "urgent" && styles.priorityKickerUrgent]}>{priority.tone === "urgent" ? "IMMEDIATE ACTION" : priority.tone === "progress" ? "CAMPAIGN ORDER" : "GUILD OPPORTUNITY"}</Text>
         <Text style={styles.priorityTitle}>{priority.title}</Text>
         <Text style={styles.priorityText}>{priority.description}</Text>
-        <Animated.View style={{ opacity: guideWarTable ? onboardingPulse : 1 }}><ActionButton guideId="guild.currentOrder" label={priority.actionLabel} onPress={() => { guide?.dispatch({ type: "complete", tour: "guild" }); if (!warTablePrimerSeen) acknowledgeWarTablePrimer(); navigate(priority.destination); }} /></Animated.View>
+        <Animated.View style={{ opacity: guideWarTable ? onboardingPulse : 1 }}><ActionButton guideId="guild.currentOrder" label={priority.actionLabel} onPress={() => { guide?.dispatch({ type: "complete", tour: "guild" }); if (!warTablePrimerSeen) acknowledgeWarTablePrimer(); navigate(priority.destination, priority.objective); }} /></Animated.View>
       </View>
     </Panel>
 
     <SectionTitle>GUILD ORDERS · {orders.length}</SectionTitle>
-    {orders.length ? <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.ordersStrip}>{orders.map((item) => <CommandOrderCard key={item.id} item={item} onPress={() => navigate(item.destination)} />)}</ScrollView> : <Panel style={styles.allClear}><Text style={styles.allClearLabel}>ALL CLEAR</Text><Text style={styles.allClearTitle}>No urgent orders on the board.</Text><Text style={styles.allClearText}>The guild is stable. Continue the campaign, explore the world, train heroes, or advance the calendar when ready.</Text></Panel>}
+    {orders.length ? <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.ordersStrip}>{orders.map((item) => <CommandOrderCard key={item.id} item={item} onPress={() => navigate(item.destination, item.objective)} />)}</ScrollView> : <Panel style={styles.allClear}><Text style={styles.allClearLabel}>ALL CLEAR</Text><Text style={styles.allClearTitle}>No urgent orders on the board.</Text><Text style={styles.allClearText}>The guild is stable. Continue the campaign, explore the world, train heroes, or advance the calendar when ready.</Text></Panel>}
 
     <SectionTitle>GUILD FACILITIES</SectionTitle>
     <View style={styles.quick}>{QUICK_ACTIONS.map((action) => <Pressable key={action.target} accessibilityRole="button" accessibilityLabel={`${action.label}: ${action.sublabel}`} onPress={() => navigate(action.target)} style={({ pressed }) => [styles.quickButton, pressed && styles.quickPressed]}>

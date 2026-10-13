@@ -38,7 +38,7 @@ function RewardToken({ icon, label }: { icon: "gold" | "xp" | "loot"; label: str
   return <View style={styles.rewardToken}><GameIcon id={icon} size={22} framed={false} /><Text style={styles.rewardTokenText}>{label}</Text></View>;
 }
 
-export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDungeons, openOperations, openRaids, initialTab = "Campaign" }: { onBack?: () => void; selectQuest(id: string): void; openCampaign?(): void; openDungeons?(): void; openOperations?(): void; openRaids?(): void; initialTab?: QuestTab }) {
+export function QuestSelectionScreen({ onBack, selectQuest, openQuestLocation, openCampaign, openDungeons, openOperations, openRaids, initialTab = "Campaign" }: { onBack?: () => void; selectQuest(id: string): void; openQuestLocation?(questId: string): void; openCampaign?(): void; openDungeons?(): void; openOperations?(): void; openRaids?(): void; initialTab?: QuestTab }) {
   const { guild } = useGuild();
   const guide = useContext(GuidedTutorialContext);
   const [showQuestDetails, setShowQuestDetails] = useState(!guild.uiPreferences.compactQuestCards);
@@ -69,6 +69,8 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
   const quests = sortQuestsForRoster(availableCategoryQuests.filter((quest) => isQuestAvailableAtCurrentLocation(quest, guild.world)), fieldLevel)
     .sort((a, b) => Number(hasCompletedQuestOnce(guild, a.id)) - Number(hasCompletedQuestOnce(guild, b.id)));
   const remoteQuests = availableCategoryQuests.filter((quest) => !isQuestAvailableAtCurrentLocation(quest, guild.world));
+  const bestRemoteQuest = sortQuestsForRoster(remoteQuests, fieldLevel)[0];
+  const bestRemoteDestination = bestRemoteQuest ? (bestRemoteQuest.settlementIds?.length ? SETTLEMENTS[bestRemoteQuest.settlementIds[0]!] ?.name : undefined) ?? REGIONS[bestRemoteQuest.regionId]?.name ?? bestRemoteQuest.regionId : undefined;
   const remoteSettlements = [...new Set(remoteQuests.flatMap((quest) => quest.settlementIds?.length
     ? quest.settlementIds.map((id) => SETTLEMENTS[id]?.name ?? formatGameId(id))
     : [REGIONS[quest.regionId]?.name ?? formatGameId(quest.regionId)]))];
@@ -144,7 +146,7 @@ export function QuestSelectionScreen({ onBack, selectQuest, openCampaign, openDu
       </View>;
     })}
 
-    {!quests.length && <EmptyState title={categoryUnlocked ? remoteQuests.length ? `${tab} available elsewhere` : tab === "Campaign" && nextCampaignNode && openCampaign ? "No additional local missions" : `No ${tab.toLowerCase()} available` : `${tab} locked`} message={categoryUnlocked ? remoteQuests.length ? `Travel to ${remoteSettlements.join(", ")} to access ${remoteQuests.length} available quest${remoteQuests.length === 1 ? "" : "s"}.` : tab === "Campaign" && nextCampaignNode && openCampaign ? "Your next story objective is shown above. Continue there, or browse side quests and bosses." : "Progress the campaign, unlock more regions, or check another category." : tab === "Side Quests" ? `Reach Level 3 or advance to the Goblin Chieftain to unlock side quests. Highest level: ${highestHeroLevel}.` : "Complete Chapter 1 before optional boss quests appear."} />}
+    {!quests.length && <EmptyState title={categoryUnlocked ? remoteQuests.length ? `${tab} available elsewhere` : tab === "Campaign" && nextCampaignNode && openCampaign ? "No additional local missions" : `No ${tab.toLowerCase()} available` : `${tab} locked`} message={categoryUnlocked ? remoteQuests.length ? `Best nearby objective: ${bestRemoteQuest?.name ?? "a quest"} in ${bestRemoteDestination}. ${remoteQuests.length} quest${remoteQuests.length === 1 ? "" : "s"} available elsewhere.` : tab === "Campaign" && nextCampaignNode && openCampaign ? "Your next story objective is shown above. Continue there, or browse side quests and bosses." : "Progress the campaign, unlock more regions, or check another category." : tab === "Side Quests" ? `Reach Level 3 or advance to the Goblin Chieftain to unlock side quests. Highest level: ${highestHeroLevel}.` : "Complete Chapter 1 before optional boss quests appear."} actionLabel={categoryUnlocked && bestRemoteQuest && openQuestLocation ? `Go to ${bestRemoteDestination}` : undefined} onAction={categoryUnlocked && bestRemoteQuest && openQuestLocation ? () => openQuestLocation(bestRemoteQuest.id) : undefined} />}
   </GuidedScrollView>;
 }
 

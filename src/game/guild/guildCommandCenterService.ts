@@ -13,7 +13,8 @@ import { trainingCapacity } from "../training/trainingService";
 import { getNextArtisanBuildingTier } from "../crafting/artisanBuildingService";
 import { materialRequirementsMet } from "../crafting/craftingService";
 import { hasGuildmasterSkill } from "../guildmaster/guildmasterProgression";
-import { getStarterJourneyStep } from "../onboarding/starterJourneyService";
+import { getStarterJourneyStep, STARTER_JOURNEY } from "../onboarding/starterJourneyService";
+import type { ObjectiveFocus } from "../navigation/objectiveNavigation";
 import type { GuildState } from "./types";
 
 export type GuildCommandDestination =
@@ -38,6 +39,7 @@ export interface GuildCommandOrder {
   description: string;
   actionLabel: string;
   destination: GuildCommandDestination;
+  objective?: ObjectiveFocus;
   iconId: GameIconId;
   tone: GuildCommandTone;
   badge: string;
@@ -183,6 +185,11 @@ export function getGuildCommandOrders(guild: GuildState): GuildCommandOrder[] {
       description: starterStep.description,
       actionLabel: starterStep.actionLabel,
       destination: starterStep.destination,
+      objective: starterStep.id === "brambleway_run"
+        ? { questId: STARTER_JOURNEY.sideQuestId }
+        : starterStep.id === "travel_brambleford" || starterStep.id === "road_ambush"
+          ? { regionId: "greenveil", settlementId: STARTER_JOURNEY.targetSettlementId }
+          : undefined,
       iconId: starterStep.destination === "recruitment" ? "recruitment" : starterStep.destination === "world" ? "world" : "quests",
       tone: "ready",
       badge: "COMPANY TRIAL",
@@ -258,6 +265,7 @@ export function getGuildCommandOrders(guild: GuildState): GuildCommandOrder[] {
       description: `Your four strongest heroes average Level ${levelGuidance.averageLevel.toFixed(1)}; ${levelGuidance.nextQuestName} recommends Level ${levelGuidance.targetLevel}. ${hasSideQuests ? `Best catch-up match: ${levelGuidance.recommendedSideQuestName ?? "a one-time Side Quest"}. One-time Side Quests are preferred over repetitive grinding.` : "Use available field work and contracts to raise the strongest roster; Training is best for heroes who are behind the team."}`,
       actionLabel: hasSideQuests ? "BROWSE SIDE QUESTS" : "OPEN TRAINING",
       destination: hasSideQuests ? "sideQuests" : "training",
+      objective: hasSideQuests && levelGuidance.recommendedSideQuestId ? { questId: levelGuidance.recommendedSideQuestId } : undefined,
       iconId: hasSideQuests ? "quests" : "training",
       tone: "warning",
       badge: `LV ${levelGuidance.averageLevel.toFixed(1)} / ${levelGuidance.targetLevel}`,
@@ -326,6 +334,7 @@ export function getGuildCommandOrders(guild: GuildState): GuildCommandOrder[] {
     orders.push(order({
       id: "regional_threat",
       title: `${regionName} Threat · ${highestThreat[1]}`,
+      objective: { regionId: highestThreat[0] },
       description: highestThreat[1] >= 3
         ? "The region is in danger of escalating further. Inspect the world and answer regional problems before the situation worsens."
         : "Trouble is building in the region. You still have time to prepare before it becomes a crisis.",

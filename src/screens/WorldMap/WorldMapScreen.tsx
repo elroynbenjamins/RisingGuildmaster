@@ -53,6 +53,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
   const selected = REGIONS[selectedId]!;
   const unlocked = guild.world.unlockedRegionIds.includes(selectedId);
   const current = guild.world.currentRegionId === selectedId;
+  const focusedDestinationSelected = Boolean(focusRegionId && selectedId === focusRegionId);
   const travelAllowed = canTravel(guild.world, selectedId);
   const homelandContacts = Object.values(RACE_HOMELANDS).filter((homeland) => homeland.regionId === selectedId);
   const averageLevel = guild.heroes.length ? guild.heroes.reduce((sum, hero) => sum + hero.level, 0) / guild.heroes.length : 0;
@@ -223,8 +224,8 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
           <View style={styles.roads}>{selected.connectedRegionIds.map((regionId) => { const destination = REGIONS[regionId]!; const destinationUnlocked = guild.world.unlockedRegionIds.includes(regionId); return <Pressable accessibilityRole="button" key={regionId} onPress={() => { setSelectedId(regionId); setShowRegionIntel(false); }} style={({pressed})=>[styles.road, !destinationUnlocked && styles.roadLocked,pressed&&styles.pressedControl]}><RegionEmblem regionId={regionId} status={destinationUnlocked ? "open" : "locked"} size={22}/><Text style={destinationUnlocked ? styles.roadName : styles.roadNameLocked}>{destination.name}</Text></Pressable>; })}</View>
         </View>}
         <View style={styles.buttons}>
-          <ActionButton label="Open Region Map" onPress={() => openRegion(selectedId, focusQuestId && QUESTS[focusQuestId]?.regionId === selectedId ? QUESTS[focusQuestId]?.settlementIds?.[0] : undefined, focusQuestId && QUESTS[focusQuestId]?.regionId === selectedId ? focusQuestId : undefined)} />
-          {!current && unlocked && <Animated.View style={{ alignSelf: "stretch", opacity: guideTravelAction ? campaignTravelPulse : 1 }}><ActionButton guardMs={700} label={`Travel · ${travelDays}d · ${rationCost} rations`} disabled={Boolean(travelBlocker)} onPress={travel} /></Animated.View>}
+          {!focusedDestinationSelected && <ActionButton label="Open Region Map" onPress={() => openRegion(selectedId, focusQuestId && QUESTS[focusQuestId]?.regionId === selectedId ? QUESTS[focusQuestId]?.settlementIds?.[0] : undefined, focusQuestId && QUESTS[focusQuestId]?.regionId === selectedId ? focusQuestId : undefined)} />}
+          {!current && unlocked && !focusedDestinationSelected && <Animated.View style={{ alignSelf: "stretch", opacity: guideTravelAction ? campaignTravelPulse : 1 }}><ActionButton guardMs={700} label={`Travel · ${travelDays}d · ${rationCost} rations`} disabled={Boolean(travelBlocker)} onPress={travel} /></Animated.View>}
           {current && guild.world.currentSettlementId && <ActionButton guardMs={500} label={`Buy ${getRationBundleAmount(guild)} rations · ${GAME_CONFIG.rationBundleGoldCost}g`} onPress={() => { try { const before = guild.rations; const next = buyRations(guild); updateGuild(next); triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm"); showToast({title:"Rations Restocked",message:`+${next.rations-before} rations · ${GAME_CONFIG.rationBundleGoldCost} gold spent`,tone:"success"}); } catch (error) { triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning"); showToast({title:"Purchase Failed",message:error instanceof Error ? error.message : "Purchase failed",tone:"danger"}); } }} />}
           {unlocked && availableRegionalQuestId && <ActionButton label="View Regional Quest" onPress={() => openQuest(availableRegionalQuestId)} />}
           <ActionButton label="Campaign" onPress={openCampaign} />

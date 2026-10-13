@@ -20,6 +20,19 @@
       "favicon": "./assets/app/guildmaster-app-icon-v2.png"
     },
     "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#101416",
+          "image": "./assets/app/guildmaster-adaptive-foreground-v2.png",
+          "imageWidth": 170,
+          "resizeMode": "contain",
+          "dark": {
+            "backgroundColor": "#101416",
+            "image": "./assets/app/guildmaster-adaptive-foreground-v2.png"
+          }
+        }
+      ],
       "expo-iap",
       [
         "react-native-google-mobile-ads",
@@ -34,6 +47,12 @@
         "projectId": "abcde749-f0ab-4ba2-9135-068b26ef2b4f"
       }
     },
-    "owner": "snelroy"
+    "owner": "snelroy",
+    "splash": {
+      "image": "./assets/app/guildmaster-adaptive-foreground-v2.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#101416"
+    },
+    "backgroundColor": "#101416"
   }
 }

@@ -1,4 +1,5 @@
 import { GAME_CONFIG } from "../../config/gameConfig";
+import { getAvailableClassSkillPoints } from "../progression/skills/skillProgressionService";
 import { getCampaignPreparationRecommendation } from "../campaign/campaignPreparationGuide";
 import type { GuildState } from "../guild/types";
 import type { QuestHeroOutcomeRecord } from "../quests/questChronicleTypes";
@@ -70,11 +71,11 @@ export function getPostBattleManagementActions(summary: PostBattleSummary, guild
   const partyIds = new Set(summary.heroOutcomes.map((hero) => hero.heroId));
   const needsRecovery = summary.heroOutcomes.some((outcome) => {
     const hero = guild.heroes.find((entry) => entry.id === outcome.heroId);
-    return Boolean(hero && (hero.currentHP <= 0 || hero.currentHP < outcome.maxHP || hero.conditions.length > 0));
+    return Boolean(hero && (hero.currentHP <= 0 || hero.currentHP < outcome.maxHP || hero.conditions.some((condition) => condition.conditionId !== "inspired")));
   });
   const preparation = preparationAction(summary, guild);
-  const skillHero = summary.heroOutcomes.find((outcome) => outcome.availableSkillPoints > 0 && guild.heroes.some((hero) => hero.id === outcome.heroId));
-  const itemId = summary.lootIds.find((id) => guild.inventory.includes(id)) ?? summary.lootIds[0];
+  const skillHero = summary.heroOutcomes.find((outcome) => guild.heroes.some((hero) => hero.id === outcome.heroId && getAvailableClassSkillPoints(hero) > 0));
+  const itemId = summary.lootIds.find((id) => guild.inventory.includes(id));
   const needsReadiness = guild.heroes.some((hero) => partyIds.has(hero.id) && hero.adventureStamina < GAME_CONFIG.maxAdventureStamina);
 
   if (needsRecovery) actions.push({ id: "recovery", title: "Restore the Party", description: "HP loss, injuries, and fallen heroes persist after battle. The Temple uses gold for treatment; revival costs 5 gems, or today’s free revive when Remove Ads is owned.", actionLabel: "Open Temple", isNew: guild.world.worldFlags[SEEN_FLAGS.recovery] !== true });

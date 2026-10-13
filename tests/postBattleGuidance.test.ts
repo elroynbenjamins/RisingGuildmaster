@@ -4,6 +4,7 @@ import { getPostBattleManagementActions, markPostBattleGuidanceSeen } from "../s
 import type { Hero } from "../src/game/heroes/types";
 import type { QuestHeroOutcomeRecord } from "../src/game/quests/questChronicleTypes";
 import { testHero } from "./testHero";
+import { CLASS_SKILL_TREES } from "../src/data/skills/classSkillTrees";
 
 function outcome(overrides: Partial<QuestHeroOutcomeRecord> = {}): QuestHeroOutcomeRecord {
   const hero = testHero();
@@ -64,12 +65,34 @@ function chapterEightGuild() {
 
 describe("post-battle management guidance", () => {
   it("offers only actions relevant to the persisted quest result", () => {
-    const hero = { ...testHero(), currentHP: 50, conditions: [{ conditionId: "injured" as const, remainingDuration: 2 }], adventureStamina: 75 };
+    const hero = { ...testHero(), level: 2, currentHP: 50, conditions: [{ conditionId: "injured" as const, remainingDuration: 2 }], adventureStamina: 75 };
     const guild = { ...createGuild(), heroes: [hero], inventory: ["worn-sword"] };
     const actions = getPostBattleManagementActions({ lootIds: ["worn-sword"], heroOutcomes: [outcome()] }, guild);
     expect(actions.map((action) => action.id)).toEqual(["recovery", "skills", "equipment", "readiness"]);
     expect(actions.find((action) => action.id === "skills")?.heroId).toBe(hero.id);
     expect(actions.find((action) => action.id === "equipment")?.itemId).toBe("worn-sword");
+  });
+
+  it("removes completed skill and equipment recommendations when returning from their screens", () => {
+    const hero = { ...testHero(), level: 2 };
+    const guild = { ...createGuild(), heroes: [hero], inventory: ["worn-sword"] };
+    const summary = { lootIds: ["worn-sword"], heroOutcomes: [outcome({ currentHP: hero.currentHP, maxHP: hero.currentHP, availableSkillPoints: 1 })] };
+    expect(getPostBattleManagementActions(summary, guild).map((action) => action.id)).toEqual(["skills", "equipment"]);
+    const spentSkill = CLASS_SKILL_TREES[hero.classId].nodes[0]!.skillId;
+    const updated = {
+      ...guild,
+      inventory: [],
+      heroes: [{ ...hero, learnedSkillIds: [spentSkill] }],
+    };
+    expect(getPostBattleManagementActions(summary, updated).some((action) => action.id === "skills" || action.id === "equipment")).toBe(false);
+  });
+
+  it("does not mistake the inspired buff for a condition requiring Temple treatment", () => {
+    const hero = { ...testHero(), currentHP: 100, conditions: [{ conditionId: "inspired" as const, remainingDuration: 2 }] };
+    const guild = { ...createGuild(), heroes: [hero] };
+    expect(getPostBattleManagementActions({
+      lootIds: [], heroOutcomes: [outcome({ currentHP: 100, maxHP: 100, availableSkillPoints: 0 })],
+    }, guild)).toEqual([]);
   });
 
   it("does not recommend management when the party returned fully ready without rewards", () => {

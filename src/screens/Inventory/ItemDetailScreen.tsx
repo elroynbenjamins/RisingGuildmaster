@@ -21,7 +21,7 @@ import { getEquipmentRarityColor } from "../../ui/equipmentRarity";
 import { getModifierTargetLabel } from "../../ui/modifierLabels";
 import { formatGameId } from "../../ui/textFormat";
 
-export function ItemDetailScreen({ itemId, onBack }: { itemId: string; onBack(): void }) {
+export function ItemDetailScreen({ itemId, onBack, backLabel = "Return to Inventory" }: { itemId: string; onBack(): void; backLabel?: string }) {
   const { showDialog } = useGameDialog();
   const { guild, updateGuild } = useGuild();
   const item = resolveEquipmentDefinition(itemId);
@@ -72,7 +72,7 @@ export function ItemDetailScreen({ itemId, onBack }: { itemId: string; onBack():
     });
   };
 
-  if (equipNotice) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack}/><Panel style={{ borderColor: equipNotice.error ? colors.danger : colors.green, gap: 14, marginTop: 28 }}><Text style={{ color: equipNotice.error ? colors.danger : colors.green, fontSize: 24, fontWeight: "900" }}>{equipNotice.title}</Text><Text style={{ color: colors.text, fontSize: 15, lineHeight: 21 }}>{equipNotice.message}</Text><ActionButton label="Return to Inventory" onPress={onBack}/></Panel></ScrollView>;
+  if (equipNotice) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack}/><Panel style={{ borderColor: equipNotice.error ? colors.danger : colors.green, gap: 14, marginTop: 28 }}><Text style={{ color: equipNotice.error ? colors.danger : colors.green, fontSize: 24, fontWeight: "900" }}>{equipNotice.title}</Text><Text style={{ color: colors.text, fontSize: 15, lineHeight: 21 }}>{equipNotice.message}</Text><ActionButton label={backLabel} onPress={onBack}/></Panel></ScrollView>;
 
   return <ScrollView contentContainerStyle={styles.content}>
     <BackButton onPress={onBack} />

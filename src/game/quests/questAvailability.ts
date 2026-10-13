@@ -36,7 +36,15 @@ export function isQuestAvailableForGuild(quest:QuestDefinition,world:WorldState,
 
 export function getQuestStartBlocker(quest: QuestDefinition, world: WorldState, heroes: readonly Hero[]): string | null {
   const highestHeroLevel = Math.max(1, ...heroes.map((hero) => hero.level));
-  const starterSideQuestException = quest.id === STARTER_JOURNEY.sideQuestId && world.worldFlags.starter_brambleway_road_ambush_complete === true && world.worldFlags.starter_brambleford_side_quest_complete !== true;
+  // The mandatory hidden caravan ambush must work with the starter's Level-2 heroes.
+  const starterRoadEncounter = quest.id === STARTER_JOURNEY.roadQuestId
+    && world.completedCampaignNodeIds.includes("attack_on_guildhaven")
+    && !world.completedCampaignNodeIds.includes("goblin_chieftain")
+    && world.currentRegionId === "greenveil"
+    && world.currentSettlementId === STARTER_JOURNEY.targetSettlementId
+    && world.worldFlags.starter_brambleway_road_ambush_complete !== true;
+  const starterSideQuestException = starterRoadEncounter
+    || (quest.id === STARTER_JOURNEY.sideQuestId && world.worldFlags.starter_brambleway_road_ambush_complete === true && world.worldFlags.starter_brambleford_side_quest_complete !== true);
   if (!isQuestBoardCategoryUnlocked(quest.questType, world, highestHeroLevel) && !starterSideQuestException) {
     if (quest.questType === "contract") return "Contracts unlock when a hero reaches Level 2.";
     if (quest.questType === "side") return "Side quests unlock when a hero reaches Level 3.";

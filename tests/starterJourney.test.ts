@@ -74,6 +74,27 @@ describe("starter Brambleford journey continuity", () => {
     expect(getQuestStartBlocker(QUESTS.brambleway_caravan!, guild.world, guild.heroes)).toBeNull();
   });
 
+  it("lets Level-2 heroes fight the mandatory road ambush but keeps other Side Quests locked", () => {
+    const guild = atCompanyTrial();
+    guild.heroes = [hero("one"), hero("two"), hero("three")].map((entry) => ({ ...entry, level: 2 }));
+    guild.world.currentSettlementId = "brambleford";
+    expect(needsStarterRoadEncounter(guild)).toBe(true);
+    expect(getQuestStartBlocker(QUESTS.brambleway_road_ambush!, guild.world, guild.heroes)).toBeNull();
+    expect(getQuestStartBlocker(QUESTS.echoes_of_mosswatch!, guild.world, guild.heroes)).toContain("Level 3");
+    guild.world.worldFlags.starter_brambleway_road_ambush_complete = true;
+    expect(getQuestStartBlocker(QUESTS.brambleway_road_ambush!, guild.world, guild.heroes)).toContain("Level 3");
+  });
+
+  it("allows a pending Brambleway alarm to reopen at the current location without extra travel", () => {
+    const guild = atCompanyTrial();
+    guild.heroes = [hero("one"), hero("two"), hero("three")];
+    guild.world.currentSettlementId = "brambleford";
+    const dayBefore = guild.currentDay;
+    expect(needsStarterRoadEncounter(guild)).toBe(true);
+    expect(starterBramblewayEvent().choices[0]?.questId).toBe("brambleway_road_ambush");
+    expect(guild.currentDay).toBe(dayBefore);
+  });
+
   it("keeps the Chieftain locked until the company trial and four-hero roster are ready", () => {
     const guild = atCompanyTrial();
     guild.heroes = [hero("one"), hero("two"), hero("three")];

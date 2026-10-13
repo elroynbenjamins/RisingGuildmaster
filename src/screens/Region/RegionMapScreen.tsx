@@ -18,6 +18,7 @@ import { CAMPAIGN_NODES } from "../../data/campaign/chapter1";
 import type { RandomSource } from "../../utils/random";
 import type { WorldEventDefinition } from "../../game/world/worldTypes";
 import { isSettlementAvailable } from "../../game/world/regionalThreatService";
+import { needsStarterRoadEncounter, starterBramblewayEvent } from "../../game/onboarding/starterJourneyService";
 
 export function RegionMapScreen({ regionId, focusQuestId, focusSettlementId, focusCampaignNodeId, onBack, openQuest, openCampaign, openService, random, openEvent }: { regionId: string; focusQuestId?: string; focusSettlementId?: string; focusCampaignNodeId?: string; onBack(): void; openQuest(questId: string): void; openCampaign(): void; openService(serviceId: string): void; random: RandomSource; openEvent(event: WorldEventDefinition): void }) {
   const { guild, updateGuild } = useGuild();
@@ -38,6 +39,7 @@ export function RegionMapScreen({ regionId, focusQuestId, focusSettlementId, foc
   const isCampaignTargetLocation = (entry: RegionLocationDefinition) => Boolean(campaignTargetsRegion && (campaignRequirement?.settlementIds.length ? entry.settlementId && campaignRequirement.settlementIds.includes(entry.settlementId) : nextCampaignNode?.questId && entry.questId === nextCampaignNode.questId));
   const campaignDestination = campaignTargetsRegion ? (campaignRequirement?.settlementIds.length ? campaignRequirement.settlementIds.map((id) => SETTLEMENTS[id]?.name ?? id.replace(/_/g, " ")).join(" / ") : "This region") : null;
   const regionUnlocked = guild.world.unlockedRegionIds.includes(regionId);
+  const caravanAlarmPending = regionId === "greenveil" && needsStarterRoadEncounter(guild);
   const guidedQuest = Boolean(focusedQuest && focusedQuest.regionId === regionId && !guild.world.completedQuestIds.includes(focusedQuest.id) && regionUnlocked);
   const questPulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
@@ -70,6 +72,12 @@ export function RegionMapScreen({ regionId, focusQuestId, focusSettlementId, foc
         <Text style={regionUnlocked ? styles.open : styles.locked}>{regionUnlocked ? "OPEN" : "LOCKED"}</Text>
       </View>
 
+      {caravanAlarmPending ? <Panel style={styles.focusGuide}>
+        <Text style={styles.focusGuideLabel}>URGENT OBJECTIVE · BRAMBLEFORD</Text>
+        <Text style={styles.focusGuideTitle}>Caravan Under Attack</Text>
+        <Text style={styles.focusGuideNote}>The Brambleway alarm is still active. Resume the encounter here without another travel day or ration cost.</Text>
+        <ActionButton label="Defend Caravan" onPress={() => openEvent(starterBramblewayEvent())} />
+      </Panel> : null}
       {focusedQuest && focusedQuest.regionId === regionId && focusedLocation ? <Panel style={styles.focusGuide}>
         <Text style={styles.focusGuideLabel}>NEXT STEP · {focusedLocation.name.toUpperCase()}</Text>
         <Text style={styles.focusGuideTitle}>{focusedQuest.name}</Text>

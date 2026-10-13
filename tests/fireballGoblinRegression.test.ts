@@ -7,6 +7,8 @@ import { performHeroTurn, createCombatState } from "../src/game/combat/combatEng
 import { createSeededRandom } from "../src/utils/random";
 import { testHero } from "./testHero";
 import { combatUnit } from "./combatTestUtils";
+import { getHeroSkillAvailability } from "../src/game/combat/heroActionService";
+import { createHeroCombatInstance } from "../src/game/combat/heroCombatFactory";
 
 describe("Fireball and early goblin combat safety", () => {
   it("does not highlight empty blasts that would throw No valid target", () => {
@@ -18,6 +20,18 @@ describe("Fireball and early goblin combat safety", () => {
     expect(keys.has("4,2")).toBe(true);
     expect(keys.has("1,2")).toBe(false);
     expect(keys.has("1,1")).toBe(false);
+  });
+
+  it("allows a Fireball that reaches a goblin through the blast radius", () => {
+    const mage = { ...testHero(), id: "mage", classId: "mage" as const };
+    const actor = combatUnit("mage", "heroes", { position: { x: 1, y: 2 } });
+    const enemy = combatUnit("goblin", "enemies", { position: { x: 6, y: 2 } });
+    const board = createCombatBoard();
+    const instance = createHeroCombatInstance(mage);
+    instance.currentMana = 100;
+    instance.maxMana = 100;
+    expect(getAreaTargetableKeys(HERO_SKILLS.mage_fireball!, actor, [enemy], board, CLASSES.mage).has("5,2")).toBe(true);
+    expect(getHeroSkillAvailability(mage, instance, actor, "mage_fireball", [actor], [enemy], board).enabled).toBe(true);
   });
 
   it("removes dead goblins from the Fireball area targets", () => {

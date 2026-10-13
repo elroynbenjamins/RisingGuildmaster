@@ -1,4 +1,6 @@
 import { HERO_SKILLS } from "../../data/skills/heroSkills";
+import { CLASSES } from "../../data/classes/classes";
+import { getAreaTargetableKeys } from "./areaTargetService";
 import type { RandomSource } from "../../utils/random";
 import type { Hero } from "../heroes/types";
 import { isSkillReady, setSkillCooldown } from "./cooldownService";
@@ -31,7 +33,9 @@ export function getHeroSkillAvailability(hero: Hero, instance: HeroCombatInstanc
   if (!canPaySkillCost(instance, skill)) reasons.push(`Not enough ${skill.resourceType}`);
   if (blocksMagicSkills(actor) && skill.resourceType === "mana") reasons.push("Silenced: mana-based skills are unavailable");
   const validTargets = skill.targetType ? getValidTargets(skill.targetType, actor, heroes, enemies) : [];
-  const inRange = board && skill ? getTargetsInSkillRange(skill, actor, validTargets, board, getHeroSkillRange(hero, skill)) : validTargets;
+  const inRange = board && skill.areaRadius !== undefined
+    ? (getAreaTargetableKeys(skill, actor, validTargets, board, CLASSES[hero.classId]).size > 0 ? validTargets : [])
+    : board ? getTargetsInSkillRange(skill, actor, validTargets, board, getHeroSkillRange(hero, skill)) : validTargets;
   if (!skill.targetType || inRange.length === 0) reasons.push("No valid target in range");
   return { skill, enabled: reasons.length === 0, reasons };
 }

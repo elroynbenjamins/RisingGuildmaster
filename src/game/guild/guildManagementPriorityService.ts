@@ -28,7 +28,7 @@ const managementPriority = (order: GuildCommandOrder): GuildHallPriority => ({
 export function getGuildHallPriority(
   guild: GuildState,
   notices: Pick<GuildActionNotifications, "guildmaster" | "achievements" | "daily">,
-): GuildHallPriority {
+): GuildHallPriority | null {
   const relevant = getGuildCommandOrders(guild).filter((order) =>
     DESTINATIONS[order.destination] !== undefined
     && (order.id !== "guildmaster_skill" || notices.guildmaster)
@@ -73,10 +73,6 @@ export function getGuildHallPriority(
   const ready = relevant.find((order) => order.tone === "ready");
   if (ready) return managementPriority(ready);
 
-  return {
-    destination: "roster",
-    title: "Review Your Company",
-    description: "Check the roster, availability, and wages before your next expedition.",
-    tone: "normal",
-  };
+  // Do not promote routine roster inspection as an urgent task on every visit.
+  return null;
 }

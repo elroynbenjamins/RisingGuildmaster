@@ -7,9 +7,8 @@ import { testHero } from "./testHero";
 const notices = { guildmaster: false, achievements: false, daily: false };
 
 describe("Guild Hall contextual priorities", () => {
-  it("starts with a usable roster destination and no fake urgency", () => {
-    const priority = getGuildHallPriority(createGuild(), notices);
-    expect(priority).toMatchObject({ destination: "roster", tone: "normal" });
+  it("shows all clear when there are no actionable Guild Hall tasks", () => {
+    expect(getGuildHallPriority(createGuild(), notices)).toBeNull();
   });
 
   it("routes fallen heroes to the Temple before optional rewards", () => {
@@ -32,7 +31,7 @@ describe("Guild Hall contextual priorities", () => {
     guild.heroes = [{ ...testHero(), conditions: [{ conditionId: "injured", remainingDuration: 2 }] }];
     expect(getGuildHallPriority(guild, notices)).toMatchObject({ destination: "temple", tone: "warning" });
     guild.heroes = [{ ...testHero(), conditions: [{ conditionId: "inspired", remainingDuration: 2 }] }];
-    expect(getGuildHallPriority(guild, notices).destination).not.toBe("temple");
+    expect(getGuildHallPriority(guild, notices)).toBeNull();
   });
 
   it("offers the first actual reward or leadership upgrade, not merely unspendable points", () => {
@@ -41,4 +40,19 @@ describe("Guild Hall contextual priorities", () => {
     expect(getGuildHallPriority(guild, { ...notices, achievements: true })).toMatchObject({ destination: "achievements", tone: "ready" });
     expect(getGuildHallPriority(guild, { ...notices, daily: true })).toMatchObject({ destination: "gems", tone: "ready" });
   });
+  it("routes a genuine upcoming payroll warning to the ledger before daily gems", () => {
+    const guild = createGuild();
+    const hero = { ...testHero(), id: "payday" };
+    guild.heroes = [hero];
+    guild.heroContracts = [createHeroContract(hero, 150, 12, guild.currentDay)];
+    guild.currentDay = 7;
+    expect(getGuildHallPriority(guild, { ...notices, daily: true })).toMatchObject({ destination: "finances", tone: "warning" });
+  });
+
+  it("does not flag unspendable leadership points as urgent work", () => {
+    const guild = createGuild();
+    guild.guildmaster.skillPoints = 1;
+    expect(getGuildHallPriority(guild, notices)).toBeNull();
+  });
+
 });

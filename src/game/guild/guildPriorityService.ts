@@ -7,7 +7,7 @@ import { QUESTS } from "../../data/quests/quests";
 import { needsBramblefordSideQuest, needsFourthHeroForChieftain, needsStarterJourneyTravel, needsStarterRoadEncounter, needsThirdHeroForJourney } from "../onboarding/starterJourneyService";
 import { getCampaignLevelGuidance } from "../campaign/campaignReadinessService";
 
-export type GuildPriorityDestination = "recruitment" | "training" | "temple" | "campaign" | "world" | "management" | "sideQuests";
+export type GuildPriorityDestination = "recruitment" | "training" | "temple" | "campaign" | "world" | "management" | "sideQuests" | "brambleford" | "bramblewayQuest";
 export interface GuildPriority { id: string; title: string; description: string; actionLabel: string; destination: GuildPriorityDestination; iconId: GameIconId; tone: "urgent" | "progress" | "opportunity" }
 
 export function getGuildPriority(guild: GuildState): GuildPriority {
@@ -19,9 +19,9 @@ export function getGuildPriority(guild: GuildState): GuildPriority {
   const threats = Object.entries(guild.world.regionThreat ?? {}).sort((a, b) => b[1] - a[1]);
   if ((threats[0]?.[1] ?? 0) >= 3) return { id: "regional_crisis", title: "Regional Threat Escalating", description: `${threats[0]![0].replace(/_/g, " ")} has reached Threat ${threats[0]![1]}. Ignoring it may close settlements or strengthen encounters.`, actionLabel: "Inspect World", destination: "world", iconId: "world", tone: "urgent" };
   if (needsThirdHeroForJourney(guild)) return { id: "recruit_third_for_brambleway", title: "Recruit a Third Hero", description: "Guildhaven needs a three-hero escort to protect Aldren Vale's caravan on the Brambleway.", actionLabel: "Open Recruitment", destination: "recruitment", iconId: "heroes", tone: "urgent" };
-  if (needsStarterJourneyTravel(guild)) return { id: "travel_to_brambleford", title: "Travel to Brambleford", description: "Open Greenveil's regional map and walk to Brambleford. The caravan's first day on the road will be dangerous.", actionLabel: "Open World Map", destination: "world", iconId: "world", tone: "urgent" };
-  if (needsStarterRoadEncounter(guild)) return { id: "answer_brambleway_alarm", title: "Defend Aldren's Caravan", description: "You reached Brambleford, but the road alarm is still active. Return to its regional map and answer the attack; no additional travel day is required.", actionLabel: "Return to Brambleford", destination: "world", iconId: "quests", tone: "urgent" };
-  if (needsBramblefordSideQuest(guild)) return { id: "brambleford_side_quest", title: "Complete The Brambleway Run", description: "The caravan reached Brambleford. Take Aldren's local escort charter there before challenging the Chieftain.", actionLabel: "Open World Map", destination: "world", iconId: "quests", tone: "progress" };
+  if (needsStarterJourneyTravel(guild)) return { id: "travel_to_brambleford", title: "Travel to Brambleford", description: "Open Greenveil's regional map and walk to Brambleford. The caravan's first day on the road will be dangerous.", actionLabel: "Open Brambleford", destination: "brambleford", iconId: "world", tone: "urgent" };
+  if (needsStarterRoadEncounter(guild)) return { id: "answer_brambleway_alarm", title: "Defend Aldren's Caravan", description: "You reached Brambleford, but the road alarm is still active. Return to its regional map and answer the attack; no additional travel day is required.", actionLabel: "Return to Brambleford", destination: "brambleford", iconId: "quests", tone: "urgent" };
+  if (needsBramblefordSideQuest(guild)) return { id: "brambleford_side_quest", title: "Complete The Brambleway Run", description: "The caravan reached Brambleford. Take Aldren's local escort charter there before challenging the Chieftain.", actionLabel: "View Brambleway Quest", destination: "bramblewayQuest", iconId: "quests", tone: "progress" };
   if (needsFourthHeroForChieftain(guild)) return { id: "recruit_fourth_for_chieftain", title: "Recruit a Fourth Hero", description: "The Chieftain's hideout needs a full four-hero company. Recruit one more adventurer, then lead the assault.", actionLabel: "Open Recruitment", destination: "recruitment", iconId: "heroes", tone: "urgent" };
   const nodes = getAvailableCampaignNodes(guild.world); const chapter = CAMPAIGN_CHAPTERS[guild.world.campaignChapter];
   if (nodes.length) {

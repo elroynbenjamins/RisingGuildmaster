@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Animated, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ActionButton, BackButton, Panel, colors } from "../../components/ui";
 import { getRegionLocations } from "../../data/world/regionLocations";
 import { REGIONS } from "../../data/world/regions";
@@ -14,15 +14,21 @@ import { getAvailableCampaignNodes } from "../../game/campaign/campaignService";
 import { getCampaignNodeLocationRequirement } from "../../game/campaign/campaignLocationService";
 import { visitSettlementWithEvent } from "../../game/world/travelService";
 import { QUESTS } from "../../data/quests/quests";
+import { CAMPAIGN_NODES } from "../../data/campaign/chapter1";
 import type { RandomSource } from "../../utils/random";
 import type { WorldEventDefinition } from "../../game/world/worldTypes";
 import { isSettlementAvailable } from "../../game/world/regionalThreatService";
 
-export function RegionMapScreen({ regionId, onBack, openQuest, openService, random, openEvent }: { regionId: string; onBack(): void; openQuest(questId: string): void; openService(serviceId: string): void; random: RandomSource; openEvent(event: WorldEventDefinition): void }) {
+export function RegionMapScreen({ regionId, focusQuestId, focusSettlementId, focusCampaignNodeId, onBack, openQuest, openCampaign, openService, random, openEvent }: { regionId: string; focusQuestId?: string; focusSettlementId?: string; focusCampaignNodeId?: string; onBack(): void; openQuest(questId: string): void; openCampaign(): void; openService(serviceId: string): void; random: RandomSource; openEvent(event: WorldEventDefinition): void }) {
   const { guild, updateGuild } = useGuild();
   const region = REGIONS[regionId];
   const locations = useMemo(() => getRegionLocations(regionId), [regionId]);
-  const [selectedId, setSelectedId] = useState(locations[0]?.id ?? "");
+  const focusedQuest = focusQuestId ? QUESTS[focusQuestId] : undefined;
+  const campaignFocusQuestId = focusCampaignNodeId ? CAMPAIGN_NODES[focusCampaignNodeId]?.questId : undefined;
+  const focusedLocation = locations.find((entry) => Boolean((focusQuestId && entry.questId === focusQuestId) || (campaignFocusQuestId && entry.questId === campaignFocusQuestId)))
+    ?? locations.find((entry) => Boolean(entry.settlementId && (entry.settlementId === focusSettlementId || focusedQuest?.settlementIds?.includes(entry.settlementId))));
+  const [selectedId, setSelectedId] = useState(focusedLocation?.id ?? locations[0]?.id ?? "");
+  useEffect(() => { setSelectedId(focusedLocation?.id ?? locations[0]?.id ?? ""); }, [regionId, focusQuestId, focusSettlementId, focusCampaignNodeId]);
   const [showChronicle, setShowChronicle] = useState(false);
   const [travelMessage, setTravelMessage] = useState<string>();
   const selected = locations.find((entry) => entry.id === selectedId) ?? locations[0];
@@ -31,8 +37,28 @@ export function RegionMapScreen({ regionId, onBack, openQuest, openService, rand
   const campaignTargetsRegion = campaignRequirement?.regionId === regionId;
   const isCampaignTargetLocation = (entry: RegionLocationDefinition) => Boolean(campaignTargetsRegion && (campaignRequirement?.settlementIds.length ? entry.settlementId && campaignRequirement.settlementIds.includes(entry.settlementId) : nextCampaignNode?.questId && entry.questId === nextCampaignNode.questId));
   const campaignDestination = campaignTargetsRegion ? (campaignRequirement?.settlementIds.length ? campaignRequirement.settlementIds.map((id) => SETTLEMENTS[id]?.name ?? id.replace(/_/g, " ")).join(" / ") : "This region") : null;
-  if (!region || !REGION_MAP_ART[regionId]) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={styles.title}>Unknown Region</Text></ScrollView>;
   const regionUnlocked = guild.world.unlockedRegionIds.includes(regionId);
+  const guidedQuest = Boolean(focusedQuest && focusedQuest.regionId === regionId && !guild.world.completedQuestIds.includes(focusedQuest.id) && regionUnlocked);
+  const questPulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (!guidedQuest) { questPulse.setValue(1); return; }
+    const animation = Animated.loop(Animated.sequence([
+      Animated.timing(questPulse, { toValue: .5, duration: 680, useNativeDriver: true }),
+      Animated.timing(questPulse, { toValue: 1, duration: 680, useNativeDriver: true }),
+    ]));
+    animation.start();
+    return () => animation.stop();
+  }, [guidedQuest, questPulse]);
+  const visitLocation = (settlementId: string) => {
+    try {
+      const partySize = Math.max(1, guild.recentPartyHeroIds.length || Math.min(4, guild.heroes.filter((hero) => hero.isAvailable && hero.currentHP > 0).length));
+      const result = visitSettlementWithEvent(guild, settlementId, partySize, random);
+      updateGuild(result.guild);
+      setTravelMessage(`Reached ${SETTLEMENTS[settlementId]?.name}. 1 day passed.${result.event ? " A road encounter was discovered." : ""}`);
+      if (result.event) openEvent(result.event);
+    } catch (error) { setTravelMessage(error instanceof Error ? error.message : "Local travel failed"); }
+  };
+  if (!region || !REGION_MAP_ART[regionId]) return <ScrollView contentContainerStyle={styles.content}><BackButton onPress={onBack} /><Text style={styles.title}>Unknown Region</Text></ScrollView>;
   const regionLore = REGION_LORE[regionId];
   const regionLoreDiscovered = guild.world.worldFlags[`lore_${regionId}`] === true;
 
@@ -43,6 +69,19 @@ export function RegionMapScreen({ regionId, onBack, openQuest, openService, rand
         <View style={styles.flex}><Text style={styles.eyebrow}>REGIONAL MAP</Text><Text style={styles.title}>{region.name}</Text><Text style={styles.subtitle}>Recommended level {region.recommendedLevelMin}–{region.recommendedLevelMax} · {locations.length} mapped locations</Text></View>
         <Text style={regionUnlocked ? styles.open : styles.locked}>{regionUnlocked ? "OPEN" : "LOCKED"}</Text>
       </View>
+
+      {focusedQuest && focusedQuest.regionId === regionId && focusedLocation ? <Panel style={styles.focusGuide}>
+        <Text style={styles.focusGuideLabel}>NEXT STEP · {focusedLocation.name.toUpperCase()}</Text>
+        <Text style={styles.focusGuideTitle}>{focusedQuest.name}</Text>
+        <Text style={styles.focusGuideNote}>{guild.world.currentSettlementId === focusedLocation.settlementId ? "You are at the quest location. Open the quest to prepare your heroes." : "The correct location is selected on the map. Open the quest for its requirements, or travel to the settlement first."}</Text>
+        <Animated.View style={{ opacity: guidedQuest ? questPulse : 1 }}><ActionButton label={guild.world.completedQuestIds.includes(focusedQuest.id) ? "Review Quest" : "Open Quest"} disabled={!regionUnlocked} onPress={() => openQuest(focusedQuest.id)} /></Animated.View>
+        {focusedLocation.settlementId && guild.world.currentRegionId === regionId && guild.world.currentSettlementId !== focusedLocation.settlementId && regionUnlocked ? <ActionButton label={`Walk to ${focusedLocation.name} · 1 day`} onPress={() => visitLocation(focusedLocation.settlementId!)} /> : null}
+      </Panel> : null}
+      {focusCampaignNodeId && !focusedQuest && focusedLocation ? <Panel style={styles.focusGuide}>
+        <Text style={styles.focusGuideLabel}>CAMPAIGN DESTINATION · {focusedLocation.name.toUpperCase()}</Text>
+        <Text style={styles.focusGuideNote}>{!focusedLocation.settlementId ? "The campaign landmark is selected. Return to the campaign to continue the story." : guild.world.currentSettlementId === focusedLocation.settlementId ? "Destination reached. Return to the campaign to continue the story." : "The required location is selected. Travel to this settlement before continuing the story."}</Text>
+        {focusedLocation.settlementId && guild.world.currentRegionId === regionId && guild.world.currentSettlementId !== focusedLocation.settlementId && regionUnlocked ? <ActionButton label={`Walk to ${focusedLocation.name} · 1 day`} onPress={() => visitLocation(focusedLocation.settlementId!)} /> : <ActionButton label="Return to Campaign" onPress={openCampaign} />}
+      </Panel> : null}
 
       {campaignTargetsRegion && nextCampaignNode ? <Panel style={styles.campaignGuide}><Text style={styles.campaignGuideLabel}>CAMPAIGN DESTINATION</Text><Text style={styles.campaignGuideTitle}>{nextCampaignNode.title}</Text><Text style={styles.campaignGuideDestination}>{campaignDestination}</Text></Panel> : null}
 
@@ -70,10 +109,10 @@ export function RegionMapScreen({ regionId, onBack, openQuest, openService, rand
                   pressed && styles.pressedMarker,
                 ]}
               >
-                <LocationMarkerIcon type={entry.type} size={24} completed={completed} campaign={campaignTarget} />
+                <LocationMarkerIcon type={entry.type} size={24} completed={completed} campaign={campaignTarget || entry.id === focusedLocation?.id} />
                 <Text numberOfLines={2} style={[styles.markerName, active && styles.activeMarkerName]}>
                   {entry.name}
-                </Text>{campaignTarget ? <Text style={styles.campaignMarkerText}>CAMPAIGN</Text> : null}
+                </Text>{campaignTarget ? <Text style={styles.campaignMarkerText}>CAMPAIGN</Text> : entry.id === focusedLocation?.id ? <Text style={styles.campaignMarkerText}>OBJECTIVE</Text> : null}
               </Pressable>
             );
           })}
@@ -87,7 +126,7 @@ export function RegionMapScreen({ regionId, onBack, openQuest, openService, rand
         </View>
       </View>
 
-      {selected && <LocationPanel campaignTarget={isCampaignTargetLocation(selected)} location={selected} regionUnlocked={regionUnlocked} discoveredSettlementIds={guild.world.discoveredSettlementIds} completedQuestIds={guild.world.completedQuestIds} currentSettlementId={guild.world.currentSettlementId} world={guild.world} openQuest={openQuest} openService={openService} onVisit={(settlementId) => { try { const partySize = Math.max(1, guild.recentPartyHeroIds.length || Math.min(4, guild.heroes.filter((hero) => hero.isAvailable && hero.currentHP > 0).length)); const result = visitSettlementWithEvent(guild, settlementId, partySize, random); updateGuild(result.guild); setTravelMessage(`Reached ${SETTLEMENTS[settlementId]?.name}. 1 day passed.${result.event ? " A road encounter was discovered." : ""}`); if (result.event) openEvent(result.event); } catch (error) { setTravelMessage(error instanceof Error ? error.message : "Local travel failed"); } }} />}
+      {selected && <LocationPanel campaignTarget={isCampaignTargetLocation(selected)} focusQuestId={focusQuestId} location={selected} regionUnlocked={regionUnlocked} discoveredSettlementIds={guild.world.discoveredSettlementIds} completedQuestIds={guild.world.completedQuestIds} currentSettlementId={guild.world.currentSettlementId} world={guild.world} openQuest={openQuest} openService={openService} onVisit={visitLocation} />}
       {travelMessage && <Text style={styles.travelMessage}>{travelMessage}</Text>}
       {regionLore && <RegionChronicle lore={regionLore} unlocked={regionLoreDiscovered} expanded={showChronicle} toggle={() => setShowChronicle((value) => !value)} />}
     </ScrollView>
@@ -121,13 +160,14 @@ function LoreSection({ title, text }: { title: string; text: string }) {
   return <View><Text style={styles.loreHeading}>{title}</Text><Text style={styles.chronicleText}>{text}</Text></View>;
 }
 
-function LocationPanel({ location, campaignTarget, regionUnlocked, discoveredSettlementIds, completedQuestIds, currentSettlementId, world, openQuest, openService, onVisit }: { location: RegionLocationDefinition; campaignTarget: boolean; regionUnlocked: boolean; discoveredSettlementIds: string[]; completedQuestIds: string[]; currentSettlementId: string | null; world: WorldState; openQuest(questId: string): void; openService(serviceId: string): void; onVisit(settlementId: string): void }) {
+function LocationPanel({ location, campaignTarget, focusQuestId, regionUnlocked, discoveredSettlementIds, completedQuestIds, currentSettlementId, world, openQuest, openService, onVisit }: { location: RegionLocationDefinition; campaignTarget: boolean; focusQuestId?: string; regionUnlocked: boolean; discoveredSettlementIds: string[]; completedQuestIds: string[]; currentSettlementId: string | null; world: WorldState; openQuest(questId: string): void; openService(serviceId: string): void; onVisit(settlementId: string): void }) {
   const settlement = location.settlementId ? SETTLEMENTS[location.settlementId] : undefined;
   const localQuestIds = settlement?.questIds.filter((questId) => QUESTS[questId]?.questType !== "contract") ?? [];
-  const associatedQuest = location.questId ? QUESTS[location.questId] : undefined;
+  const associatedQuestId = focusQuestId && (location.questId === focusQuestId || settlement?.questIds.includes(focusQuestId)) ? focusQuestId : location.questId;
+  const associatedQuest = associatedQuestId ? QUESTS[associatedQuestId] : undefined;
   const isTravelOnlyEncounter = associatedQuest?.questType === "contract";
   const discovered = settlement ? discoveredSettlementIds.includes(settlement.id) : true;
-  const questComplete = location.questId ? completedQuestIds.includes(location.questId) : false;
+  const questComplete = associatedQuestId ? completedQuestIds.includes(associatedQuestId) : false;
   const interactiveServiceIds = new Set(["temple", "healer", "training_grounds", "recruitment", "quest_board", "guild_hall", "guild_registry"]);
   const settlementAvailable = !settlement || isSettlementAvailable(world, settlement.id);
   const localServicesActive = Boolean(settlement && currentSettlementId === settlement.id && regionUnlocked && settlementAvailable);
@@ -138,7 +178,7 @@ function LocationPanel({ location, campaignTarget, regionUnlocked, discoveredSet
       {settlement && <><Text style={styles.label}>SERVICES</Text><View style={styles.serviceGrid}>{settlement.serviceIds.map((serviceId) => { const interactive = localServicesActive && interactiveServiceIds.has(serviceId); const chip = <View style={[styles.serviceChip, interactive && styles.serviceChipActive, !localServicesActive && styles.serviceChipRemote]}><WorldServiceIcon serviceId={serviceId} size={24}/><Text style={styles.serviceName}>{pretty(serviceId)}</Text>{interactive ? <Text style={styles.serviceOpen}>OPEN</Text> : null}</View>; return interactive ? <Pressable accessibilityRole="button" key={serviceId} onPress={() => openService(serviceId)} style={({pressed})=>pressed&&styles.pressedControl}>{chip}</Pressable> : <View key={serviceId}>{chip}</View>; })}</View>{!settlementAvailable ? <Text style={styles.lockedNote}>CRISIS CLOSED · Local services are unavailable until the regional threat is resolved.</Text> : !localServicesActive ? <Text style={styles.serviceHint}>Travel to this settlement to use its local services.</Text> : null}</>}
       {settlement && regionUnlocked && <ActionButton label={!settlementAvailable ? "Crisis Closed" : currentSettlementId === settlement.id ? "Current Location" : "Walk Here · 1 day"} disabled={!settlementAvailable || currentSettlementId === settlement.id} onPress={() => onVisit(settlement.id)} />}
       {settlement && localQuestIds.length > 0 && <><Text style={styles.label}>LOCAL QUESTS</Text><Text style={styles.services}>{localQuestIds.map(pretty).join(" · ")}</Text></>}
-      {location.questId && !isTravelOnlyEncounter && <View style={styles.questRow}><View style={styles.flex}><Text style={styles.label}>ASSOCIATED QUEST</Text><Text style={questComplete ? styles.complete : styles.questName}>{pretty(location.questId)}{questComplete ? " · Complete" : ""}</Text></View><ActionButton label={questComplete ? "Review" : "Open Quest"} disabled={!regionUnlocked} onPress={() => openQuest(location.questId!)} /></View>}
+      {associatedQuestId && !isTravelOnlyEncounter && <View style={styles.questRow}><View style={styles.flex}><Text style={styles.label}>ASSOCIATED QUEST</Text><Text style={questComplete ? styles.complete : styles.questName}>{associatedQuest?.name ?? pretty(associatedQuestId)}{questComplete ? " · Complete" : ""}</Text></View><ActionButton label={questComplete ? "Review" : "Open Quest"} disabled={!regionUnlocked} onPress={() => openQuest(associatedQuestId!)} /></View>}
       {isTravelOnlyEncounter && <Text style={styles.lockedNote}>ROAD ENCOUNTER · This opportunity can be discovered while travelling through the region.</Text>}
       {!regionUnlocked && <Text style={styles.lockedNote}>Unlock and travel to this region before beginning its quests or using local services.</Text>}
     </Panel>
@@ -169,6 +209,7 @@ const styles = StyleSheet.create({
   fog: { alignItems: "center", backgroundColor: "rgba(12, 17, 20, .34)", bottom: 0, justifyContent: "flex-end", left: 0, paddingBottom: 5, position: "absolute", right: 0, top: 0 },
   fogText: { backgroundColor: "rgba(12, 17, 20, .9)", color: colors.muted, fontSize: 8, fontWeight: "900", letterSpacing: .6, padding: 4 },
   legendItem: { alignItems: "center", flexDirection: "row", gap: 3 }, legendText: { color: colors.muted, fontSize: 7, fontWeight: "900" },
+  focusGuide: { borderColor: colors.gold, gap: 6, marginBottom: 10 }, focusGuideLabel: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: .9 }, focusGuideTitle: { color: colors.text, fontSize: 17, fontWeight: "900" }, focusGuideNote: { color: colors.muted, fontSize: 11, lineHeight: 17 },
   campaignGuide: { borderColor: colors.gold, gap: 5, marginBottom: 10 }, campaignGuideLabel: { color: colors.gold, fontSize: 9, fontWeight: "900", letterSpacing: 1.1 }, campaignGuideTitle: { color: colors.text, fontSize: 17, fontWeight: "900" }, campaignGuideDestination: { color: colors.muted, fontSize: 11 }, panel: { borderColor: "#4a5857" },
   locationHeader: { alignItems: "center", flexDirection: "row", gap: 9 },
   locationIcon: { alignItems: "center", backgroundColor: colors.panel2, borderColor: colors.gold, borderRadius: 4, borderWidth: 1, height: 34, justifyContent: "center", width: 34 },

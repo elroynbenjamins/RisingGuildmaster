@@ -35,13 +35,15 @@ interface WorldMapProps {
   onBack?: () => void;
   updateGuild(guild: GuildState): void;
   openQuest(id: string): void;
-  openRegion(id: string): void;
+  openRegion(id: string, focusSettlementId?: string, focusQuestId?: string): void;
+  focusRegionId?: string;
+  focusQuestId?: string;
   openCampaign(): void;
   openEvent(event: WorldEventDefinition): void;
 }
 
-export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, openRegion, openCampaign, openEvent }: WorldMapProps) {
-  const [selectedId, setSelectedId] = useState(guild.world.currentRegionId);
+export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, openRegion, openCampaign, openEvent, focusRegionId, focusQuestId }: WorldMapProps) {
+  const [selectedId, setSelectedId] = useState(REGIONS[focusRegionId ?? ""] ? focusRegionId! : guild.world.currentRegionId);
   const { showToast } = useGameToast();
   const guide = useContext(GuidedTutorialContext);
   const [showRegionIntel, setShowRegionIntel] = useState(false);
@@ -138,7 +140,9 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
         <View style={styles.overviewStat}><Text style={styles.overviewValue}>{guild.rations}</Text><Text style={styles.overviewLabel}>RATIONS</Text></View>
       </View>
 
-      {nextCampaignNode && campaignRequirement ? <Panel style={[styles.campaignRoute, campaignAtLocation && styles.campaignRouteReady]}><Text style={campaignAtLocation ? styles.campaignRouteReadyLabel : styles.campaignRouteLabel}>{campaignAtLocation ? "✓ CAMPAIGN LOCATION REACHED" : "NEXT CAMPAIGN STOP"}</Text><Text style={styles.campaignRouteTitle}>{nextCampaignNode.title}</Text><Text style={styles.campaignRouteDestination}>{campaignDestination}</Text>{campaignTravelStep ? <View style={styles.nextLeg}><WorldStatusIcon id="campaign" size={24}/><Text style={styles.nextLegText}>NEXT LEG · {campaignTravelStep.label.toUpperCase()} · {campaignTravelStep.days}d · {campaignTravelStep.rationCost} rations</Text></View> : null}{!campaignAtLocation ? <Animated.View style={{ alignSelf: "stretch", opacity: guideCampaignRoute ? campaignTravelPulse : 1 }}><ActionButton guideId="world.campaignRoute" label={guild.world.currentRegionId === campaignRequirement.regionId ? "Open Target Region" : "Focus Next Leg on Map"} onPress={() => { guide?.dispatch({ type: "complete", tour: "world" }); if (guild.world.currentRegionId === campaignRequirement.regionId) { if (guideCampaignTravel) updateGuild(markContextualTutorialSeen(guild, "campaign_travel")); openRegion(campaignRequirement.regionId); } else setSelectedId(campaignRouteRegionId ?? campaignRequirement.regionId); }} /></Animated.View> : null}</Panel> : null}
+      {focusRegionId && REGIONS[focusRegionId] && selectedId === focusRegionId ? <Panel style={styles.campaignRoute}><Text style={styles.campaignRouteLabel}>GUIDED DESTINATION · {selected.name.toUpperCase()}</Text><Text style={styles.campaignRouteTitle}>{focusQuestId && QUESTS[focusQuestId] ? QUESTS[focusQuestId]!.name : "Inspect the Regional Map"}</Text><Text style={styles.campaignRouteDestination}>{current ? "You are in the correct region. Open its map to find the marked location." : "Inspect this region, then use Travel below to journey there before taking local quests."}</Text><ActionButton label={`Open ${selected.name} Regional Map`} onPress={() => openRegion(selectedId, undefined, focusQuestId)} /></Panel> : null}
+
+      {nextCampaignNode && campaignRequirement ? <Panel style={[styles.campaignRoute, campaignAtLocation && styles.campaignRouteReady]}><Text style={campaignAtLocation ? styles.campaignRouteReadyLabel : styles.campaignRouteLabel}>{campaignAtLocation ? "✓ CAMPAIGN LOCATION REACHED" : "NEXT CAMPAIGN STOP"}</Text><Text style={styles.campaignRouteTitle}>{nextCampaignNode.title}</Text><Text style={styles.campaignRouteDestination}>{campaignDestination}</Text>{campaignTravelStep ? <View style={styles.nextLeg}><WorldStatusIcon id="campaign" size={24}/><Text style={styles.nextLegText}>NEXT LEG · {campaignTravelStep.label.toUpperCase()} · {campaignTravelStep.days}d · {campaignTravelStep.rationCost} rations</Text></View> : null}{!campaignAtLocation ? <Animated.View style={{ alignSelf: "stretch", opacity: guideCampaignRoute ? campaignTravelPulse : 1 }}><ActionButton guideId="world.campaignRoute" label={guild.world.currentRegionId === campaignRequirement.regionId ? "Open Target Region" : "Focus Next Leg on Map"} onPress={() => { guide?.dispatch({ type: "complete", tour: "world" }); if (guild.world.currentRegionId === campaignRequirement.regionId) { if (guideCampaignTravel) updateGuild(markContextualTutorialSeen(guild, "campaign_travel")); openRegion(campaignRequirement.regionId, campaignRequirement.settlementIds[0]); } else setSelectedId(campaignRouteRegionId ?? campaignRequirement.regionId); }} /></Animated.View> : null}</Panel> : null}
 
       <View style={mapChromeStyles.frame}>
         <ImageBackground source={WORLD_ART.eldoria} resizeMode="cover" style={mapChromeStyles.canvas} imageStyle={mapChromeStyles.image}>

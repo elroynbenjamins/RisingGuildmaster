@@ -18,6 +18,7 @@ import { CAMPAIGN_NODES } from "../../data/campaign/chapter1";
 import type { RandomSource } from "../../utils/random";
 import type { WorldEventDefinition } from "../../game/world/worldTypes";
 import { isSettlementAvailable } from "../../game/world/regionalThreatService";
+import { isQuestAtCurrentLocation } from "../../game/quests/questAvailability";
 import { needsStarterRoadEncounter, starterBramblewayEvent } from "../../game/onboarding/starterJourneyService";
 
 export function RegionMapScreen({ regionId, focusQuestId, focusSettlementId, focusCampaignNodeId, onBack, openQuest, openCampaign, openService, random, openEvent }: { regionId: string; focusQuestId?: string; focusSettlementId?: string; focusCampaignNodeId?: string; onBack(): void; openQuest(questId: string): void; openCampaign(): void; openService(serviceId: string): void; random: RandomSource; openEvent(event: WorldEventDefinition): void }) {
@@ -78,12 +79,12 @@ export function RegionMapScreen({ regionId, focusQuestId, focusSettlementId, foc
         <Text style={styles.focusGuideNote}>The Brambleway alarm is still active. Resume the encounter here without another travel day or ration cost.</Text>
         <ActionButton label="Defend Caravan" onPress={() => openEvent(starterBramblewayEvent())} />
       </Panel> : null}
-      {focusedQuest && focusedQuest.regionId === regionId && focusedLocation ? <Panel style={styles.focusGuide}>
-        <Text style={styles.focusGuideLabel}>NEXT STEP · {focusedLocation.name.toUpperCase()}</Text>
+      {focusedQuest && focusedQuest.regionId === regionId ? <Panel style={styles.focusGuide}>
+        <Text style={styles.focusGuideLabel}>NEXT STEP · {(focusedLocation?.name ?? region.name).toUpperCase()}</Text>
         <Text style={styles.focusGuideTitle}>{focusedQuest.name}</Text>
-        <Text style={styles.focusGuideNote}>{guild.world.currentSettlementId === focusedLocation.settlementId ? "You are at the quest location. Open the quest to prepare your heroes." : "The correct location is selected on the map. Open the quest for its requirements, or travel to the settlement first."}</Text>
+        <Text style={styles.focusGuideNote}>{isQuestAtCurrentLocation(focusedQuest, guild.world) ? "You are at the quest location. Open it to prepare your heroes." : focusedLocation?.settlementId && guild.world.currentRegionId === regionId ? "Walk to the highlighted settlement before starting this quest." : guild.world.currentRegionId !== regionId ? "Travel to this region before starting the quest." : "This quest is available within this region. Open it to check requirements and prepare."}</Text>
         <Animated.View style={{ opacity: guidedQuest ? questPulse : 1 }}><ActionButton label={guild.world.completedQuestIds.includes(focusedQuest.id) ? "Review Quest" : "Open Quest"} disabled={!regionUnlocked} onPress={() => openQuest(focusedQuest.id)} /></Animated.View>
-        {focusedLocation.settlementId && guild.world.currentRegionId === regionId && guild.world.currentSettlementId !== focusedLocation.settlementId && regionUnlocked ? <ActionButton label={`Walk to ${focusedLocation.name} · 1 day`} onPress={() => visitLocation(focusedLocation.settlementId!)} /> : null}
+        {focusedLocation?.settlementId && guild.world.currentRegionId === regionId && guild.world.currentSettlementId !== focusedLocation.settlementId && regionUnlocked && isSettlementAvailable(guild.world, focusedLocation.settlementId) ? <ActionButton label={`Walk to ${focusedLocation.name} · 1 day`} onPress={() => visitLocation(focusedLocation.settlementId!)} /> : null}
       </Panel> : null}
       {focusCampaignNodeId && !focusedQuest && focusedLocation ? <Panel style={styles.focusGuide}>
         <Text style={styles.focusGuideLabel}>CAMPAIGN DESTINATION · {focusedLocation.name.toUpperCase()}</Text>

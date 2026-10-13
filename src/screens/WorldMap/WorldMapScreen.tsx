@@ -28,6 +28,7 @@ import { triggerTactileFeedback } from "../../ui/tactileFeedback";
 import { useGameToast } from "../../components/feedback/GameToast";
 import { hasSeenContextualTutorial, isTutorialGuidanceEnabled, markContextualTutorialSeen } from "../../game/onboarding/tutorialService";
 import { GuidedTutorialContext } from "../../components/tutorial/GuidedTutorialContext";
+import { getNextUnlockedRegionLeg } from "../../game/navigation/objectiveNavigation";
 
 interface WorldMapProps {
   guild: GuildState;
@@ -54,6 +55,8 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
   const unlocked = guild.world.unlockedRegionIds.includes(selectedId);
   const current = guild.world.currentRegionId === selectedId;
   const focusedDestinationSelected = Boolean(focusRegionId && selectedId === focusRegionId);
+  const focusNextLeg = focusRegionId && guild.world.currentRegionId !== focusRegionId
+    ? getNextUnlockedRegionLeg(guild.world, focusRegionId) : null;
   const travelAllowed = canTravel(guild.world, selectedId);
   const homelandContacts = Object.values(RACE_HOMELANDS).filter((homeland) => homeland.regionId === selectedId);
   const averageLevel = guild.heroes.length ? guild.heroes.reduce((sum, hero) => sum + hero.level, 0) / guild.heroes.length : 0;
@@ -101,6 +104,9 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
   const travelDays = current ? 0 : getRegionalTravelDays(guild.world.currentRegionId, selectedId);
   const rationCost = current || travelPartySize === 0 ? 0 : getTravelRationCost(travelDays, travelPartySize, guild.guildmaster);
   const travelBlocker = current ? null : !unlocked ? "Region locked by campaign progress." : !travelAllowed ? "No direct unlocked road from the current region." : !availableHeroes.length ? "No living, available heroes can form a travel party." : !travelPartySize ? "Select at least one hero for the journey." : guild.rations < rationCost ? `Need ${rationCost-guild.rations} more rations.` : null;
+  const focusDays = focusNextLeg ? getRegionalTravelDays(guild.world.currentRegionId, focusNextLeg) : 0;
+  const focusRations = focusNextLeg ? getTravelRationCost(focusDays, travelPartySize, guild.guildmaster) : 0;
+  const focusBlocker = current ? null : !unlocked ? "Destination region is locked." : !focusNextLeg ? "No unlocked road currently reaches this region." : !travelPartySize ? "Select a living travel hero." : guild.rations < focusRations ? `Need ${focusRations - guild.rations} more rations.` : null;
   const campaignGuideRegionId = campaignRouteRegionId ?? campaignRequirement?.regionId;
   const guideCampaignRoute = guideCampaignTravel && (guild.world.currentRegionId === campaignRequirement?.regionId || selectedId !== campaignGuideRegionId);
   const guideTravelAction = guideCampaignTravel && selectedId === campaignGuideRegionId && !current && !travelBlocker;
@@ -114,14 +120,14 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
     if (doubleTapped) openRegion(regionId, focusQuestId && QUESTS[focusQuestId]?.regionId === regionId ? QUESTS[focusQuestId]?.settlementIds?.[0] : undefined, focusQuestId && QUESTS[focusQuestId]?.regionId === regionId ? focusQuestId : undefined);
   };
 
-  const travel = () => {
+  const travel = (destinationRegionId = selectedId) => {
     try {
-      const result = travelGuildPartyToRegion(guild, selectedId, travelPartyIds, random);
-      const world = discoverRegionSettlements(result.guild.world, selectedId);
+      const result = travelGuildPartyToRegion(guild, destinationRegionId, travelPartyIds, random);
+      const world = discoverRegionSettlements(result.guild.world, destinationRegionId);
       const travelledGuild = { ...result.guild, world, recentPartyHeroIds: travelPartyIds };
       updateGuild(guideCampaignTravel ? markContextualTutorialSeen(travelledGuild, "campaign_travel") : travelledGuild);
       triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"confirm");
-      showToast({title:`Arrived in ${selected.name}`,message:`Day ${guild.currentDay} → ${result.guild.currentDay} · Rations -${result.rationCost}${result.tier ? ` · ${result.tier.toUpperCase()} road event` : " · Safe journey"}`,tone:result.tier?"gold":"success"});
+      showToast({title:`Arrived in ${REGIONS[destinationRegionId]?.name ?? destinationRegionId}`,message:`Day ${guild.currentDay} → ${result.guild.currentDay} · Rations -${result.rationCost}${result.tier ? ` · ${result.tier.toUpperCase()} road event` : " · Safe journey"}`,tone:result.tier?"gold":"success"});
       if (result.event) openEvent(result.event);
     } catch (error) {
       triggerTactileFeedback(guild.uiPreferences.tactileFeedback,"warning");
@@ -141,7 +147,7 @@ export function WorldMapScreen({ guild, random, onBack, updateGuild, openQuest, 
         <View style={styles.overviewStat}><Text style={styles.overviewValue}>{guild.rations}</Text><Text style={styles.overviewLabel}>RATIONS</Text></View>
       </View>
 
-      {focusRegionId && REGIONS[focusRegionId] && selectedId === focusRegionId ? <Panel style={styles.campaignRoute}><Text style={styles.campaignRouteLabel}>GUIDED DESTINATION · {selected.name.toUpperCase()}</Text><Text style={styles.campaignRouteTitle}>{focusQuestId && QUESTS[focusQuestId] ? QUESTS[focusQuestId]!.name : selected.name}</Text><Text style={styles.campaignRouteDestination}>{current ? "You are in the correct region. Open its map to find the marked location." : travelBlocker ? `Travel is not ready: ${travelBlocker}` : `Travel to ${selected.name} first, then open the regional map to reach the objective.`}</Text><ActionButton label={current ? `Open ${selected.name} Regional Map` : `Travel to ${selected.name} · ${travelDays}d`} disabled={!current && Boolean(travelBlocker)} onPress={() => current ? openRegion(selectedId, focusQuestId ? QUESTS[focusQuestId]?.settlementIds?.[0] : undefined, focusQuestId) : travel()} /></Panel> : null}
+      {focusRegionId && REGIONS[focusRegionId] && selectedId === focusRegionId ? <Panel style={styles.campaignRoute}><Text style={styles.campaignRouteLabel}>GUIDED DESTINATION · {selected.name.toUpperCase()}</Text><Text style={styles.campaignRouteTitle}>{focusQuestId && QUESTS[focusQuestId] ? QUESTS[focusQuestId]!.name : selected.name}</Text><Text style={styles.campaignRouteDestination}>{current ? "You are in the correct region. Open its map to find the marked location." : focusBlocker ? `Travel is not ready: ${focusBlocker}` : focusNextLeg !== focusRegionId ? `First reach ${REGIONS[focusNextLeg!]?.name ?? focusNextLeg}; your objective remains marked in ${selected.name}.` : `Travel to ${selected.name}, then open its regional map to reach the objective.`}</Text><ActionButton label={current ? `Open ${selected.name} Regional Map` : focusNextLeg ? `Travel ${focusNextLeg === focusRegionId ? "to" : "via"} ${REGIONS[focusNextLeg]?.name ?? focusNextLeg} · ${focusDays}d · ${focusRations} rations` : "Route Unavailable"} disabled={!current && Boolean(focusBlocker)} onPress={() => current ? openRegion(selectedId, focusQuestId ? QUESTS[focusQuestId]?.settlementIds?.[0] : undefined, focusQuestId) : focusNextLeg ? travel(focusNextLeg) : undefined} /></Panel> : null}
 
       {nextCampaignNode && campaignRequirement ? <Panel style={[styles.campaignRoute, campaignAtLocation && styles.campaignRouteReady]}><Text style={campaignAtLocation ? styles.campaignRouteReadyLabel : styles.campaignRouteLabel}>{campaignAtLocation ? "✓ CAMPAIGN LOCATION REACHED" : "NEXT CAMPAIGN STOP"}</Text><Text style={styles.campaignRouteTitle}>{nextCampaignNode.title}</Text><Text style={styles.campaignRouteDestination}>{campaignDestination}</Text>{campaignTravelStep ? <View style={styles.nextLeg}><WorldStatusIcon id="campaign" size={24}/><Text style={styles.nextLegText}>NEXT LEG · {campaignTravelStep.label.toUpperCase()} · {campaignTravelStep.days}d · {campaignTravelStep.rationCost} rations</Text></View> : null}{!campaignAtLocation ? <Animated.View style={{ alignSelf: "stretch", opacity: guideCampaignRoute ? campaignTravelPulse : 1 }}><ActionButton guideId="world.campaignRoute" label={guild.world.currentRegionId === campaignRequirement.regionId ? "Open Target Region" : "Focus Next Leg on Map"} onPress={() => { guide?.dispatch({ type: "complete", tour: "world" }); if (guild.world.currentRegionId === campaignRequirement.regionId) { if (guideCampaignTravel) updateGuild(markContextualTutorialSeen(guild, "campaign_travel")); openRegion(campaignRequirement.regionId, campaignRequirement.settlementIds[0]); } else setSelectedId(campaignRouteRegionId ?? campaignRequirement.regionId); }} /></Animated.View> : null}</Panel> : null}
 
